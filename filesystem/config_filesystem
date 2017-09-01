@@ -1,0 +1,12 @@
+#
+
+
+
+PUERTO_FILESYSTEM=5000
+
+#Aca escucha conexiones de DataNodes
+PUERTO_DATANODE=5001
+
+#Aca se conecta YAMA
+PUERTO_YAMA=5002
+
