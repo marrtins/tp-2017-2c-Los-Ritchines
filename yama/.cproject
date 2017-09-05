@@ -30,8 +30,10 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1739309682" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.295899654" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
-								<option id="gnu.c.link.option.libs.1002071264" superClass="gnu.c.link.option.libs" valueType="libs">
+								<option id="gnu.c.link.option.libs.1002071264" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="commons"/>
+									<listOptionValue builtIn="false" value="funcionesCompartidas"/>
+									<listOptionValue builtIn="false" value="funcionesPaquetes"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.158505425" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

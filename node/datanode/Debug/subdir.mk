@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../main.c 
+../datanode.c 
 
 OBJS += \
-./main.o 
+./datanode.o 
 
 C_DEPS += \
-./main.d 
+./datanode.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

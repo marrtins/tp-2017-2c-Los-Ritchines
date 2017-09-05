@@ -13,13 +13,11 @@
 #include <string.h>
 
 #include <netinet/in.h>
-#include "../compartidas/definiciones.h"
-#include "../compartidas/tipos.h"
-#include "../compartidas/fCompartidas.c"
-#include "../compartidas/fPaquetes.c"
 
-
-
+#include <funcionesCompartidas/funcionesCompartidas.h>
+#include <funcionesPaquetes/funcionesPaquetes.h>
+#include <tiposRecursos/tiposErrores.h>
+#include <tiposRecursos/tiposPaquetes.h>
 
 
 
@@ -157,7 +155,7 @@ int conectarConFS(tYama *yama){
 
 	puts("Me conecte a FS!");
 
-	h_esp.tipo_de_proceso = FS; h_esp.tipo_de_mensaje = INICIOFS;
+	h_esp.tipo_de_proceso = FILESYSTEM; h_esp.tipo_de_mensaje = INICIOFS;
 	if (validarRespuesta(sock_fs, h_esp, &h_obt) != 0){
 		printf("Se recibio un mensaje no esperado de FS\n");
 	}

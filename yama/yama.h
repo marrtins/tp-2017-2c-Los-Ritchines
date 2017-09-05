@@ -11,6 +11,8 @@
 #define MAX_PORT_LEN 6
 #define MAX_IP_LEN 16
 
+#define BACKLOG 20
+
 typedef struct{
 
 	char* ip_filesystem;

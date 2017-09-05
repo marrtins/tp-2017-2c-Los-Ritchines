@@ -16,8 +16,13 @@
 #include <stdlib.h>
 
 
+
 #define HEAD_SIZE 8
 #define BACKLOG 20
+
+
+
+
 typedef enum {YAMA= 1, FS= 2, DATANODE= 3, WORKER= 4, MASTER= 5} tProceso;
 
 
@@ -25,11 +30,12 @@ typedef enum{
 	FALLO_GRAL=-21,
 	FALLO_CONEXION=-22,
 	FALLO_RECV=-23,
-	FALLO_SEND=-24
+	FALLO_SEND=-24,
+	FALLO_SELECT=-24
 }tErrores;
 typedef enum {
 	INICIO      = 1,
-	HSHAKE=2,
+	NEW_DN=2,
 	INICIOFS=3
 } tMensaje;
 
@@ -38,5 +44,5 @@ typedef struct {
 
 	tProceso tipo_de_proceso;
 	tMensaje tipo_de_mensaje;
-} tPackHeader; // este tipo de struct no necesita serialazion
+} tHeader; // este tipo de struct no necesita serialazion
 #endif /* DEFINICIONES_H_ */
