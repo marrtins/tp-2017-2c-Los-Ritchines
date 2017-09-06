@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include "filesystem.h"
-#include <commons/config.h>
 #include <commons/collections/list.h>
+#include <commons/config.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -51,6 +51,13 @@ int main(int argc, char* argv[]){
 
 	fileSystem=getConfigFilesystem(argv[1]);
 	mostrarConfiguracion(fileSystem);
+
+	pthread_t consola_thread;
+
+	if(pthread_create(&consola_thread, NULL, (void*) consolaFS, NULL) < 0){
+			perror("no pudo crear hilo. error");
+			return FALLO_GRAL;
+		}
 
 
 	int stat, ready_fds;
@@ -161,7 +168,12 @@ int main(int argc, char* argv[]){
 }
 
 
+void consolaFS(void){
+	puts("funcino hilo");
 
+
+	while(1);
+}
 
 int datanodeHandler(tMensaje msjRecibido){
 
