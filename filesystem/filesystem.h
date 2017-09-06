@@ -44,7 +44,7 @@ tFS *getConfigFilesystem(char* ruta);
 
 void mostrarConfiguracion(tFS *fileSystem);
 bool sistemaEstable();
-
+void consolaFS(void);
 
 int establecerConexion(char *ip_dest, char *port_dest);
 int validarRespuesta(int sock, tHeader h_esp, tHeader *h_o);
