@@ -1,32 +1,29 @@
 /*
- * datanode.h
+ * worker.h
  *
- *  Created on: 4/9/2017
+ *  Created on: 5/9/2017
  *      Author: utnso
  */
 
-#ifndef DATANODE_H_
-#define DATANODE_H_
+#ifndef WORKER_H_
+#define WORKER_H_
 
-#define MAX_PORT_LEN 6
 #define MAX_IP_LEN 16
+#define MAX_PORT_LEN 8
 #define MAX_RUTA_LEN 100
 #define MAX_NOMBRE_LEN 100
+
 
 typedef struct{
 
 	char* ip_filesystem;
+	char* puerto_filesystem;
 	char* puerto_entrada;
 	char* puerto_master;
-	char* puerto_filesystem;
 	char* ruta_databin;
 	char* nombre_nodo;
 	int   tipo_de_proceso;
-}tDataNode;
+}tWorker;
 
-
-
-tDataNode *getConfigdn(char* ruta);
-void mostrarConfiguracion(tDataNode *dn);
-
-#endif /* DATANODE_H_ */
+tWorker *getConfigWorker(char* ruta);
+#endif /* WORKER_H_ */

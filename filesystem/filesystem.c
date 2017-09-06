@@ -12,7 +12,7 @@
 #include <commons/config.h>
 #include <commons/collections/list.h>
 #include <string.h>
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,6 +33,11 @@
 #define BACKLOG 20
 tFS *fileSystem;
 t_list *listaNodos;
+int sock_yama;
+int fd_max;
+fd_set read_fd, master_fd;
+
+int contadorHardCode;
 
 int main(int argc, char* argv[]){
 
@@ -41,8 +46,7 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	bool estable=false;
-
+	contadorHardCode=0;
 	list_create(listaNodos);
 
 	fileSystem=getConfigFilesystem(argv[1]);
@@ -51,19 +55,19 @@ int main(int argc, char* argv[]){
 
 	int stat, ready_fds;
 	int fd, new_fd;
-	int fd_max = -1;
+	fd_max = -1;
 
-	int sock_lis_datanode,sock_yama;
+	int sock_lis_datanode;
 
 
 	// Creamos e inicializamos los conjuntos que retendran sockets para el select()
-	fd_set read_fd, master_fd;
+
 	FD_ZERO(&read_fd);
 	FD_ZERO(&master_fd);
 
 
 
-	// Creamos sockets para hacer listen() de CPUs
+	// Creamos sockets para hacer listen() de datanodes
 	if ((sock_lis_datanode = makeListenSock(fileSystem->puerto_datanode)) < 0){
 		fprintf(stderr, "No se pudo crear socket para escuchar! sock_lis_cpu: %d\n", sock_lis_datanode);
 		return FALLO_CONEXION;
@@ -72,8 +76,8 @@ int main(int argc, char* argv[]){
 	fd_max = MAX(sock_lis_datanode, fd_max);
 
 
+	// Se agrega list_datanode al master
 
-	// Se agregan memoria, fs, listen_cpu, listen_consola y stdin al set master
 	FD_SET(sock_lis_datanode, &master_fd);
 	FD_SET(0, &master_fd);
 
@@ -99,7 +103,7 @@ int main(int argc, char* argv[]){
 
 				printf("Hay un socket listo! El fd es: %d\n", fd);
 
-				// Controlamos el listen de CPU o de Consola
+				// Controlamos el listen de datanode
 				if (fd == sock_lis_datanode){
 					new_fd = handleNewListened(fd, &master_fd);
 					if (new_fd < 0){
@@ -108,11 +112,10 @@ int main(int argc, char* argv[]){
 					}
 
 					fd_max = MAX(new_fd, fd_max);
-
-
 					break;
 
 				}
+
 				// Como no es un listen, recibimos el header de lo que llego
 				if ((stat = recv(fd, header_tmp, HEAD_SIZE, 0)) == -1){
 					perror("Error en recv() de algun socket. error");
@@ -120,39 +123,36 @@ int main(int argc, char* argv[]){
 
 				} else if (stat == 0){
 					printf("Se desconecto el socket %d\nLo sacamos del set listen...\n", fd);
-					//clearAndClose(&fd, &master_fd);
+					clearAndClose(&fd, &master_fd);
 					break;
 				}
 
 				// Se recibio un header sin conflictos, procedemos con el flujo..
-				if (header_tmp->tipo_de_mensaje == NEW_DN){
-					puts("Nuevo Datanode ingresa al sistema");
+
+				if (header_tmp->tipo_de_proceso == DATANODE){
+					printf("Llego algo desde DATANODE!\n");
+
+					if((stat=datanodeHandler(header_tmp->tipo_de_mensaje))<0){
+						printf("Llego un mensaje no manejado desde datanode\n");
+					}
 
 					break;
 				}
-
 				if (fd == sock_yama){
-					printf("Llego algo desde YAMA!\n\tTipo de mensaje: %d\n", header_tmp->tipo_de_mensaje);
+					printf("Llego algo desde YAMA!\n");
 
-					/*if (header_tmp->tipo_de_mensaje != )
-						break;
-					 */
-
+					if((stat=yamaHandler(header_tmp->tipo_de_mensaje))<0){
+						printf("Llego un mensaje no manejado desde yama\n");
+					}
 
 					break;
 
 
-					if (header_tmp->tipo_de_proceso == DATANODE){
-						printf("Llego algo desde DATANODE!\n\tTipo de mensaje: %d\n", header_tmp->tipo_de_mensaje);
-						break;
-					}
+				}
+				puts("Si esta linea se imprime, es porque el header_tmp tiene algun valor rarito...");
+				printf("El valor de header_tmp es: proceso %d \t mensaje: %d", header_tmp->tipo_de_proceso, header_tmp->tipo_de_mensaje);
 
-
-
-					puts("Si esta linea se imprime, es porque el header_tmp tiene algun valor rarito...");
-					printf("El valor de header_tmp es: proceso %d \t mensaje: %d", header_tmp->tipo_de_proceso, header_tmp->tipo_de_mensaje);
-
-				}} // aca terminan el for() y el if(FD_ISSET)
+			}
 		}
 
 
@@ -163,6 +163,104 @@ int main(int argc, char* argv[]){
 
 
 
+int datanodeHandler(tMensaje msjRecibido){
+
+
+	printf("Mensaje Recibido desde Datanode: %d \n",msjRecibido);
+
+	switch(msjRecibido){
+
+	case(NEW_DN):
+		contadorHardCode++;
+
+		puts("Nuevo Datanode ingresa al sistema");
+
+		if(sistemaEstable()){
+			recibirConexionYAMA();
+			contadorHardCode=-200;
+		}
+
+		break;
+
+	default:
+		break;
+
+	}
+
+	return 0;
+}
+int yamaHandler(tMensaje msjRecibido){
+
+
+	printf("Mensaje Recibido desde YAMA: %d \n",msjRecibido);
+
+	contadorHardCode=-100;
+
+	switch(msjRecibido){
+
+	case(INICIOYAMA):
+
+		puts("Conexion con YAMA exitosa");
+
+		break;
+
+	default:
+		break;
+
+	}
+
+	return 0;
+}
+
+
+
+
+
+
+//Aca se va a hacer la verificacion entre la lista de nodos guardados q tiene el FS y los que se van conectando.
+//Cuando se conecte el ultimo y haga estable el sistema, devolvera true.
+bool sistemaEstable(){
+
+	/*if...
+	 *
+	 */
+	//hardcodeo por ahora
+	return contadorHardCode>1;
+}
+
+
+
+int recibirConexionYAMA(void){
+
+	int sock_lis_yama,new_fd;
+	tHeader head, h_esp;
+	if ((sock_lis_yama = makeListenSock(fileSystem->puerto_entrada)) < 0){
+		printf("No se pudo crear socket listen en puerto: %s\n", fileSystem->puerto_entrada);
+
+		return FALLO_GRAL;
+	}
+
+	if(listen(sock_lis_yama, BACKLOG) == -1){
+
+		perror("Fallo de listen sobre socket filesystem. error");
+		return FALLO_GRAL;
+	}
+
+	while (1){
+		if((sock_yama = makeCommSock(sock_lis_yama)) < 0){
+
+			puts("No se pudo acceptar conexion entrante de YAMA");
+			return FALLO_GRAL;
+		}
+		printf("Se establecio conexion con YAMA. Socket %d\n", sock_yama);
+		break;
+	}
+
+	fd_max = MAX(sock_yama, fd_max);
+	FD_SET(sock_yama, &master_fd);
+
+	return 0;
+}
 
 tFS *getConfigFilesystem(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
@@ -171,6 +269,8 @@ tFS *getConfigFilesystem(char* ruta){
 	fileSystem->puerto_entrada = malloc(MAX_PORT_LEN);
 	fileSystem->puerto_datanode = malloc(MAX_PORT_LEN);
 	fileSystem->puerto_yama = malloc(MAX_PORT_LEN);
+	fileSystem->ip_yama = malloc(MAX_IP_LEN);
+
 
 	t_config *fsConfig = config_create(ruta);
 
@@ -178,10 +278,10 @@ tFS *getConfigFilesystem(char* ruta){
 	strcpy(fileSystem->puerto_entrada, config_get_string_value(fsConfig, "PUERTO_FILESYSTEM"));
 	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
 	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
+	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
 
 
-
-	//fileSystem->tipo_de_proceso = FILESYSTEM;
+	fileSystem->tipo_de_proceso = FILESYSTEM;
 
 	config_destroy(fsConfig);
 	return fileSystem;
@@ -191,6 +291,7 @@ void mostrarConfiguracion(tFS *fileSystem){
 	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
 	printf("Puerto Datanode: %s\n",       fileSystem->puerto_datanode);
 	printf("Puerto Yama: %s\n", fileSystem->puerto_yama);
+	printf("IP Yama: %s\n", fileSystem->ip_yama);
 	printf("Tipo de proceso: %d\n", fileSystem->tipo_de_proceso);
 }
 
@@ -290,4 +391,55 @@ int handleNewListened(int sock_listen, fd_set *setFD){
 	}
 
 	return new_fd;
+}
+
+void clearAndClose(int *fd, fd_set *setFD){
+	FD_CLR(*fd, setFD);
+	close(*fd);
+}
+
+int validarRespuesta(int sock, tHeader h_esp, tHeader *h_obt){
+
+	if ((recv(sock, h_obt, HEAD_SIZE, 0)) == -1){
+		perror("Fallo recv de Header. error");
+		return FALLO_RECV;
+	}
+
+	if (h_esp.tipo_de_proceso != h_obt->tipo_de_proceso){
+		printf("Fallo de comunicacion. Se espera un mensaje de %d, se recibio de %d\n",
+				h_esp.tipo_de_proceso, h_obt->tipo_de_proceso);
+		return FALLO_GRAL;
+	}
+
+	if (h_esp.tipo_de_mensaje != h_obt->tipo_de_mensaje){
+		printf("Fallo ejecucion de funcion con valor %d\n", h_obt->tipo_de_mensaje);
+		return FALLO_GRAL;
+	}
+
+	return 0;
+}
+
+
+int handshakeCon(int sock_dest, int id_sender){
+
+	int stat;
+	char *package;
+	tHeader head;
+	head.tipo_de_proceso = id_sender;
+	head.tipo_de_mensaje = INICIOFS;
+
+	if ((package = malloc(HEAD_SIZE)) == NULL){
+		fprintf(stderr, "No se pudo hacer malloc\n");
+		return FALLO_GRAL;
+	}
+	memcpy(package, &head, HEAD_SIZE);
+
+	if ((stat = send(sock_dest, package, HEAD_SIZE, 0)) == -1){
+		perror("Fallo send de handshake. error");
+		printf("Fallo send() al socket: %d\n", sock_dest);
+		return FALLO_SEND;
+	}
+
+	free(package);
+	return stat;
 }

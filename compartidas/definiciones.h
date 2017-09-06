@@ -21,23 +21,30 @@
 #define BACKLOG 20
 
 
-
-
-typedef enum {YAMA= 1, FS= 2, DATANODE= 3, WORKER= 4, MASTER= 5} tProceso;
-
-
 typedef enum{
 	FALLO_GRAL=-21,
 	FALLO_CONEXION=-22,
 	FALLO_RECV=-23,
 	FALLO_SEND=-24,
-	FALLO_SELECT=-24
+	FALLO_SELECT=-24,
+	CONEX_INVAL=-25
 }tErrores;
+
 typedef enum {
 	INICIO      = 1,
 	NEW_DN=2,
-	INICIOFS=3
+	INICIOFS=3,
+	INICIOYAMA=4
 } tMensaje;
+
+
+typedef enum {
+	YAMA= 1,
+	FILESYSTEM= 2,
+	DATANODE= 3,
+	WORKER= 4,
+	MASTER= 5
+} tProceso;
 
 
 typedef struct {
@@ -45,4 +52,5 @@ typedef struct {
 	tProceso tipo_de_proceso;
 	tMensaje tipo_de_mensaje;
 } tHeader; // este tipo de struct no necesita serialazion
+
 #endif /* DEFINICIONES_H_ */

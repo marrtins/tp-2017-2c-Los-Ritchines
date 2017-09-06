@@ -2,8 +2,8 @@
 
 
 #En esta ip esta YAMA (por ahora es localhost)
-YAMA_IP=127.0.0.1
+IP_YAMA=127.0.0.1
 
-YAMA_PUERTO=5002
+PUERTO_YAMA=5002
 
-MASTER_PUERTO=5004
+

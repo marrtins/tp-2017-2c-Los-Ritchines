@@ -32,4 +32,7 @@ void mostrarConfiguracion(tYama *yama);
 int conectarConFS(tYama *yama);
 
 
+void fsHandler(void);
+void masterHandler(void *client_sock);
+
 #endif /* YAMA_H_ */

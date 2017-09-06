@@ -32,13 +32,6 @@
 tDataNode *datanode;
 
 
-
-
-
-
-
-
-
 tDataNode *getConfigdn(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	tDataNode *dn = malloc(sizeof(tDataNode));
@@ -48,6 +41,7 @@ tDataNode *getConfigdn(char* ruta){
 	dn->puerto_master = malloc(MAX_PORT_LEN);
 	dn->puerto_filesystem = malloc(MAX_PORT_LEN);
 	dn->ruta_databin=malloc(MAX_RUTA_LEN);
+	dn->nombre_nodo=malloc(MAX_RUTA_LEN);
 
 	t_config *dnConfig = config_create(ruta);
 
@@ -56,11 +50,11 @@ tDataNode *getConfigdn(char* ruta){
 	strcpy(dn->puerto_master, config_get_string_value(dnConfig, "PUERTO_MASTER"));
 	strcpy(dn->puerto_filesystem, config_get_string_value(dnConfig, "PUERTO_FILESYSTEM"));
 	strcpy(dn->ruta_databin, config_get_string_value(dnConfig, "RUTA_DATABIN"));
+	strcpy(dn->nombre_nodo, config_get_string_value(dnConfig, "NOMBRE_NODO"));
 
 
 
-
-	//dn->tipo_de_proceso = DATANODE;
+	dn->tipo_de_proceso = DATANODE;
 
 	config_destroy(dnConfig);
 	return dn;
@@ -72,6 +66,7 @@ void mostrarConfiguracion(tDataNode *dn){
 	printf("Puerto Master: %s\n",       dn->puerto_master);
 	printf("Puerto Filesystem: %s\n", dn->puerto_filesystem);
 	printf("Ruta Databin: %s\n", dn->ruta_databin);
+	printf("Nombre Nodo: %s\n", dn->nombre_nodo);
 	printf("Tipo de proceso: %d\n", dn->tipo_de_proceso);
 }
 
@@ -199,7 +194,7 @@ int establecerConexion(char *ip_dest, char *port_dest){
 	freeaddrinfo(destInfo);
 
 	if (sock_dest < 0){
-		printf("Error al tratar de conectar con Kernel!\n");
+		printf("Error al tratar de conectar con FS!\n");
 		return FALLO_CONEXION;
 	}
 
@@ -213,6 +208,9 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 	int sock_fs;
+
+
+
 
 	datanode=getConfigdn(argv[1]);
 	mostrarConfiguracion(datanode);
