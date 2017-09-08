@@ -167,16 +167,30 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 }
+char* sacarBarraN(linea){
+	int tamanio = strlen(linea);
+	char * p = strndup(linea, tamanio-1);
+	return p;
 
+}
+
+void liberarPunteroDePunteros(char ** punteros) {
+	int i;
+	for (i = 0; i < 4; ++i)
+		free(punteros[i]);
+	free(punteros);
+}
 
 void consolaFS(void){
 	puts("funcion hilo");
-			char * linea = malloc(MAX_LINEA);
+			char * linea;
 			char ** palabras;
 			while(1){
+				linea = malloc(MAX_LINEA);
 				linea = fgets(linea,MAX_LINEA,stdin);
-				printf("pase\n");
+				linea = sacarBarraN(linea);
 				palabras = string_split(linea, " ");
+
 				if(string_equals_ignore_case(*palabras,"format")){
 					printf("ya pude formatear el fs\n");
 				}
@@ -216,9 +230,7 @@ void consolaFS(void){
 				else{
 					printf("No existe el comando\n");
 				}
-				 //esto libera la primera posicion del array
-				// pero hay que liberar todas ok?
-				free(*palabras);
+
 
 			}
 			free(linea);
