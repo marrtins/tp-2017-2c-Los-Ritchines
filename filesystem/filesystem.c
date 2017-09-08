@@ -170,19 +170,22 @@ int main(int argc, char* argv[]){
 char* sacarBarraN(linea){
 	int tamanio = strlen(linea);
 	char * p = strndup(linea, tamanio-1);
+	free(linea);
 	return p;
 
 }
 
 void liberarPunteroDePunteros(char ** punteros) {
-	int i;
-	for (i = 0; i < 4; ++i)
+	int tamanio = 1;
+	int i = 0;
+	while (**punteros == NULL){
 		free(punteros[i]);
+	}
 	free(punteros);
 }
 
 void consolaFS(void){
-	puts("funcion hilo");
+	puts("Bienvienido a la consola. Ingrese un comando.");
 			char * linea;
 			char ** palabras;
 			while(1){
@@ -230,8 +233,6 @@ void consolaFS(void){
 				else{
 					printf("No existe el comando\n");
 				}
-
-
 			}
 			free(linea);
 }
