@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <commons/string.h>
-//#include <readline/readline.h>
+#include <readline/readline.h>
 
 #include <netinet/in.h>
 
@@ -167,13 +167,6 @@ int main(int argc, char* argv[]){
 	}
 	return 0;
 }
-char* sacarBarraN(linea){
-	int tamanio = strlen(linea);
-	char * p = strndup(linea, tamanio-1);
-	free(linea);
-	return p;
-
-}
 
 void liberarPunteroDePunteros(char ** punteros) {
 	int tamanio = 1;
@@ -184,57 +177,47 @@ void liberarPunteroDePunteros(char ** punteros) {
 	free(punteros);
 }
 
+void procesarInput(char** palabras) {
+	if (string_equals_ignore_case(*palabras, "format")) {
+		printf("ya pude formatear el fs\n");
+	} else if (string_equals_ignore_case(*palabras, "rm")) {
+		printf("ya pude remover el archivo\n");
+	} else if (string_equals_ignore_case(*palabras, "rename")) {
+		printf("ya pude renombrar el archivo\n");
+	} else if (string_equals_ignore_case(*palabras, "mv")) {
+		printf("ya pude mover el archivo\n");
+	} else if (string_equals_ignore_case(*palabras, "cat")) {
+		printf("ya pude leer el archivo\n");
+	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
+		printf("ya pude crear el directorio\n");
+	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
+		printf(
+				"ya pude copiar el archivo local al file system siguiendo lineamientos\n");
+	} else if (string_equals_ignore_case(*palabras, "cpto")) {
+		printf("ya pude copiar un archivo local al file system\n");
+	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
+		printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
+	} else if (string_equals_ignore_case(*palabras, "md5")) {
+		printf("ya pude solicitar el md5 de un archivo del file system\n");
+	} else if (string_equals_ignore_case(*palabras, "ls")) {
+		printf("ya pude listar los archivos del directorio\n");
+	} else if (string_equals_ignore_case(*palabras, "info")) {
+		printf("ya pude mostrar la informacion del archivo\n");
+	} else {
+		printf("No existe el comando\n");
+	}
+}
+
 void consolaFS(void){
-	puts("Bienvienido a la consola. Ingrese un comando.");
+	puts("Bienvenido a la consola. Ingrese un comando.");
 			char * linea;
 			char ** palabras;
 			while(1){
-				linea = malloc(MAX_LINEA);
-				linea = fgets(linea,MAX_LINEA,stdin);
-				linea = sacarBarraN(linea);
+				char *linea = readline(">");
 				palabras = string_split(linea, " ");
-
-				if(string_equals_ignore_case(*palabras,"format")){
-					printf("ya pude formatear el fs\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"rm")){
-					printf("ya pude remover el archivo\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"rename")){
-					printf("ya pude renombrar el archivo\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"mv")){
-					printf("ya pude mover el archivo\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"cat")){
-					printf("ya pude leer el archivo\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"mkdir")){
-					printf("ya pude crear el directorio\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"cpfrom")){
-					printf("ya pude copiar el archivo local al file system siguiendo lineamientos\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"cpto")){
-					printf("ya pude copiar un archivo local al file system\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"cpblock")){
-					printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"md5")){
-					printf("ya pude solicitar el md5 de un archivo del file system\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"ls")){
-					printf("ya pude listar los archivos del directorio\n");
-				}
-				else if(string_equals_ignore_case(*palabras,"info")){
-					printf("ya pude mostrar la informacion del archivo\n");
-				}
-				else{
-					printf("No existe el comando\n");
-				}
+				procesarInput(palabras);
+				free(linea);
 			}
-			free(linea);
 }
 int datanodeHandler(tMensaje msjRecibido){
 
