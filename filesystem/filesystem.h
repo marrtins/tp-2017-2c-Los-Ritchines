@@ -39,6 +39,11 @@ typedef struct{
 	int fd_dn,id_dn;
 }t_datanode;
 
+typedef struct {
+	int index;
+	char nombre[255];
+	int padre;
+}t_directory;
 
 tFS *getConfigFilesystem(char* ruta);
 
