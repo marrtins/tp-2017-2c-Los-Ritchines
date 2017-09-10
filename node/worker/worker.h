@@ -26,4 +26,5 @@ typedef struct{
 }tWorker;
 
 tWorker *getConfigWorker(char* ruta);
+void mostrarConfiguracion(tWorker *worker);
 #endif /* WORKER_H_ */

@@ -22,5 +22,7 @@ typedef struct{
 
 
 tMaster *getConfigMaster(char* ruta);
+void mostrarConfiguracion(tMaster *master);
+int conectarAYama();
 
 #endif /* MASTER_H_ */

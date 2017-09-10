@@ -4,12 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../compartidas.c \
 ../main.c 
 
 OBJS += \
+./compartidas.o \
 ./main.o 
 
 C_DEPS += \
+./compartidas.d \
 ./main.d 
 
 

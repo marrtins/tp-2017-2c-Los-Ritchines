@@ -13,6 +13,7 @@
 #include "worker.h"
 
 #include "../../compartidas/definiciones.h"
+#include "../../compartidas/compartidas.c"
 
 
 #include <stdio.h>

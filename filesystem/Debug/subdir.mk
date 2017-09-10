@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../filesystem.c 
+../filesystem.c \
+../filesystemConfigurator.c 
 
 OBJS += \
-./filesystem.o 
+./filesystem.o \
+./filesystemConfigurator.o 
 
 C_DEPS += \
-./filesystem.d 
+./filesystem.d \
+./filesystemConfigurator.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
