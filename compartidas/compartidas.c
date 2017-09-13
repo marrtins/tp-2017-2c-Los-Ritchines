@@ -57,17 +57,30 @@ int makeListenSock(char *port_listen){
 	int stat, sock_listen;
 	struct addrinfo hints, *serverInfo;
 
+	//dada la estructura addrinfo, le cargo los demas datos que paso por parametro. Es una función inicializadora
+	//los otros parametros son: la familia de socket que se va a utilizar (TCP/IP) u otro. Null es Default
+	// Tipo de puerto, puede ser stream o datagram (elegimos stream)
+	// Flags, frecuentemente se pone en null, pero en este caso le pusimos passive que no me acuerdo que significaba
+	// mala mia
 	setupHints(&hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
 
+	//getaddrinfo está explicada en utns.com
+	//primer parametro es la ip, si es null, toma el localhost (ip local)
+	//el segundo parametro es el puerto
+	// el tercero es la estructura que inicializamos anteriormente, lo que hace la función es parsear
+	// la direccion y el puerto, y tomar los otros datos para armarme la estructura que le paso por 4to parametro
 	if ((stat = getaddrinfo(NULL, port_listen, &hints, &serverInfo)) != 0){
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(stat));
 		return FALLO_GRAL;
 	}
-
+	//creo el socket, le mando la familia de protocolos (TCP/IP), el tipo de socket(stream) y el protocolo que
+	//para esta familia puede ser TCP o UPC, elegimos TCP
 	if ((sock_listen = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol)) == -1){
 		perror("No se pudo crear socket. error.");
 		return FALLO_GRAL;
 	}
+
+	//ponemos a escuchar al socket en la direccion correspondiente (127.0.0.1:puerto)
 	if ((bind(sock_listen, serverInfo->ai_addr, serverInfo->ai_addrlen)) == -1){
 		perror("Fallo binding con socket. error");
 		printf("Fallo bind() en PORT: %s\n", port_listen);

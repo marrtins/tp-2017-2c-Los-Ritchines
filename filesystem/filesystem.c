@@ -43,26 +43,38 @@ fd_set read_fd, master_fd;
 int contadorHardCode;
 
 int main(int argc, char* argv[]){
-
+	//arc: numero de argumentos que se han introducido (el nombre del programa también se toma como argumento)
+	//argv: valor de cada argumento
+	//error en la cantidad de parametros (el parametro es la ruta al archivo config)
 	if(argc!=2){
 		printf("Error en la cantidad de parametros\n");
 		return EXIT_FAILURE;
 	}
 
 	contadorHardCode=0;
+	//crea una lista de Nodos, más adelante se especifica mas este punto
 	list_create(listaNodos);
 
+	//traigo los datos del archivo de configuracion y lo guardo en la estructura
 	fileSystem=getConfigFilesystem(argv[1]);
+	//hay que eliminar esto, muestra por consola los datos
 	mostrarConfiguracion(fileSystem);
 
+	//crea una estructura de hilo
 	pthread_t consola_thread;
 
+	//si no se pude crear el hilo, imprimi el error.
+	//ptherad_create recibe:
+	// un puntero a una estructura de hilo, y luego la devuelve con todos sus datos completos
+	// el segundo parametro pueden ser atributos de creacion de hilos como prioridades. Si se pasa Null, queda la default
+	// la funcion que deseo ejecutar
+	//  los parametros de esa funcion
 	if(pthread_create(&consola_thread, NULL, (void*) consolaFS, NULL) < 0){
 			perror("no pudo crear hilo. error");
 			return FALLO_GRAL;
 		}
 
-
+	//variables a utilizar
 	int stat, ready_fds;
 	int fd, new_fd;
 	fd_max = -1;
@@ -71,18 +83,21 @@ int main(int argc, char* argv[]){
 
 
 	// Creamos e inicializamos los conjuntos que retendran sockets para el select()
-
+	// creo que pone el cero el file descriptor, no entiendo muy bien
 	FD_ZERO(&read_fd);
 	FD_ZERO(&master_fd);
 
 
 
 	// Creamos sockets para hacer listen() de datanodes
+	// lo que hace makeListenSok¿ck, es que dado un puerto:
+	// obtiene la address info, crea el socket servidor, y lo pone a escuchar (listen) en el puerto dado
 	if ((sock_lis_datanode = makeListenSock(fileSystem->puerto_datanode)) < 0){
 		fprintf(stderr, "No se pudo crear socket para escuchar! sock_lis_cpu: %d\n", sock_lis_datanode);
 		return FALLO_CONEXION;
 	}
 
+	//no se que hace aca
 	fd_max = MAX(sock_lis_datanode, fd_max);
 
 
@@ -90,12 +105,13 @@ int main(int argc, char* argv[]){
 
 	FD_SET(sock_lis_datanode, &master_fd);
 
+	//intenta escuchar al datanode, si no puede, vuelve a intentarlo
 	while ((stat = listen(sock_lis_datanode, BACKLOG)) == -1){
 		perror("Fallo listen a socket datanodes. error");
 		puts("Reintentamos...\n");
 	}
 
-
+	//seria el buffet donde guardo la info que me llega
 	tHeader *header_tmp = malloc(HEAD_SIZE); // para almacenar cada recv
 	while (1){
 
@@ -328,19 +344,23 @@ tFS *getConfigFilesystem(char* ruta){
 	fileSystem->puerto_yama = malloc(MAX_PORT_LEN);
 	fileSystem->ip_yama = malloc(MAX_IP_LEN);
 
-
+	//funcion de gaston, recibe la ruta del archivo de configuracion y te devuelve
+	//un puntero a una estructura con todos los datos que va leyendo del archivo de conf
 	t_config *fsConfig = config_create(ruta);
 
-
+	//config_get_string_value recibe el nombre del parametro, y te devuelve el valor
+	//con esto voy cargando en una estructura, todos los datos del archivo de conf
 	strcpy(fileSystem->puerto_entrada, config_get_string_value(fsConfig, "PUERTO_FILESYSTEM"));
 	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
 	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
 	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
 
-
+	//cargo el tipo de proceso (harcodeado)
 	fileSystem->tipo_de_proceso = FILESYSTEM;
 
+	//destruye la estructura de configuracion, supongo que para liberar memoria o por seguridad
 	config_destroy(fsConfig);
+	//retorno la configuracion
 	return fileSystem;
 }
 void mostrarConfiguracion(tFS *fileSystem){
