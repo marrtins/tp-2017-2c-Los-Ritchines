@@ -45,7 +45,6 @@ int contadorHardCode;
 int main(int argc, char* argv[]){
 
 
- 	if(argc!=2){
 
 	//arc: numero de argumentos que se han introducido (el nombre del programa también se toma como argumento)
 	//argv: valor de cada argumento
@@ -249,7 +248,7 @@ int datanodeHandler(tMensaje msjRecibido,int fd_dn){
 	tPack2Bytes *infoWorker;
 
 	switch(msjRecibido){
-	(tPack2Bytes *) 
+
 	case(NEW_DN):
 		contadorHardCode++;
 
@@ -388,7 +387,7 @@ tFS *getConfigFilesystem(char* ruta){
 	config_destroy(fsConfig);
 	//retorno la configuracion
 	return fileSystem;
-}s
+}
 void mostrarConfiguracion(tFS *fileSystem){
 
 	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
