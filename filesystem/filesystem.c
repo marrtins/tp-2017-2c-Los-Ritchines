@@ -44,11 +44,11 @@ int contadorHardCode;
 
 int main(int argc, char* argv[]){
 
-	if(argc!=2){
+ 	if(argc!=2){
 		printf("Error en la cantidad de parametros\n");
 		return EXIT_FAILURE;
 	}
-
+	puts("AAAAAAAAAAAAA");
 	contadorHardCode=0;
 	list_create(listaNodos);
 
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]){
 				if (header_tmp->tipo_de_proceso == DATANODE){
 					printf("Llego algo desde DATANODE!\n");
 
-					if((stat=datanodeHandler(header_tmp->tipo_de_mensaje))<0){
+					if((stat=datanodeHandler(header_tmp->tipo_de_mensaje,fd))<0){
 						printf("Llego un mensaje no manejado desde datanode\n");
 					}
 
@@ -220,10 +220,12 @@ void consolaFS(void){
 				free(linea);
 			}
 }
-int datanodeHandler(tMensaje msjRecibido){
+int datanodeHandler(tMensaje msjRecibido,int fd_dn){
 
 
 	printf("Mensaje Recibido desde Datanode: %d \n",msjRecibido);
+	char* buffer;
+	tPack2Bytes *infoWorker;
 
 	switch(msjRecibido){
 
@@ -238,11 +240,30 @@ int datanodeHandler(tMensaje msjRecibido){
 		}
 
 		break;
+	case(INFO_WORKER):
 
+		puts("Nos llega la info del Worker Asociado");
+		if ((buffer = recvGeneric(fd_dn)) == NULL){
+			puts("Fallo recepcion de PATH_FILE_TOREDUCE");
+
+			return FALLO_RECV;
+		}
+
+		if ((infoWorker = deserializeDosChar(buffer)) == NULL){
+
+			puts("Fallo deserializacion de Bytes de la info del worker");
+			return FALLO_RECV;
+		}
+
+		printf("Puerto Worker: %s , ip Worker: %s \n",infoWorker->bytes2,infoWorker->bytes1);
+		freeAndNULL((void **) &buffer);
+		puts("fin case INFO_WORKER");
+		break;
 	default:
 		break;
 
 	}
+
 
 	return 0;
 }

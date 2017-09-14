@@ -25,7 +25,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
-
+#include <commons/string.h>
 tMaster *master;
 int sock_yama;
 
@@ -33,25 +33,123 @@ int main(int argc, char* argv[]){
 
 	int stat;
 
-	if(argc!=2){
+	if(argc!=6){
 		printf("Error en la cantidad de parametros\n");
 		return EXIT_FAILURE;
 	}
 
+	 char *configPath = string_new();
+	 configPath=argv[1];
+	 char *transformadorPath = string_new();
+	 transformadorPath=argv[2];
+	 char *reductorPath = string_new();
+	 reductorPath=argv[3];
+	 char *archivoAReducirPath = string_new();
+	 archivoAReducirPath=argv[4];
+	 char *resultadoPath = string_new();
+	 resultadoPath=argv[5];
 
-	master=getConfigMaster(argv[1]);
+
+	master=getConfigMaster(configPath);
 	mostrarConfiguracion(master);
+
+	printf("Transformador Path: %s\n",transformadorPath);
+	printf("Reductor Path: %s\n",reductorPath);
+	printf("Archivo a reducir Path: %s\n",archivoAReducirPath);
+	printf("Resultado Path: %s\n",resultadoPath);
 
 
 	if ((stat = conectarAYama()) < 0){
-				puts("No se pudo conectar con Yama!");
-				return 0;
+		puts("No se pudo conectar con Yama!");
+		return 0;
 	}
 
 
 
 
 	puts("Conectado a yama.. Inicio ejecucion..");
+	tHeader head_tmp;
+	int pack_size;
+	char *buffer;
+
+
+
+	//envio el script TRANSFORMADOR
+	tPackSrcCode *src_transformador = readFileIntoPack(MASTER, transformadorPath);
+	puts("codigo fuente creado de TRANSFORMADOR");
+	head_tmp.tipo_de_proceso = MASTER; head_tmp.tipo_de_mensaje = SRC_CODE_TRANSF; pack_size = 0;
+	buffer = serializeBytes(head_tmp, src_transformador->bytes, src_transformador->bytelen, &pack_size);
+
+	puts("codigo fuente de TRANSFORMADOR serializado");
+
+	puts("enviando codigo fuente de TRANSFORMADOR");
+
+	if ((stat = send(sock_yama, buffer, pack_size, 0)) == -1){
+		puts("no se pudo enviar codigo fuente de transformador a YAMA. ");
+		return  FALLO_SEND;
+	}
+
+	printf("se enviaron %d bytes del codigo fuente de transformador a YAMA\n",stat);
+
+	//envio el script REDUCTOR
+	tPackSrcCode *src_reductor = readFileIntoPack(MASTER, reductorPath);
+	puts("codigo fuente creado de REDUCTOR");
+	head_tmp.tipo_de_proceso = MASTER; head_tmp.tipo_de_mensaje = SRC_CODE_RED; pack_size = 0;
+	buffer = serializeBytes(head_tmp, src_reductor->bytes, src_reductor->bytelen, &pack_size);
+
+	puts("codigo fuente de REDUCTOR serializado");
+
+	puts("enviando codigo fuente de REDUCTOR");
+
+	if ((stat = send(sock_yama, buffer, pack_size, 0)) == -1){
+		puts("no se pudo enviar codigo fuente de REDUCTOR a YAMA. ");
+		return  FALLO_SEND;
+	}
+
+	printf("se enviaron %d bytes del codigo fuente de REDUCTOR a YAMA\n",stat);
+
+	// enviamos ambos scripts a yama del codigo fuente, lo liberamos ahora antes de olvidarnos..
+	freeAndNULL((void **) &src_reductor->bytes);
+	freeAndNULL((void **) &src_reductor);
+	freeAndNULL((void **) &src_transformador->bytes);
+	freeAndNULL((void **) &src_transformador);
+
+	//enviamos el path del archivo a reducir
+
+	head_tmp.tipo_de_proceso = MASTER; head_tmp.tipo_de_mensaje = PATH_FILE_TOREDUCE ;pack_size = 0;
+
+	buffer=serializeBytes(head_tmp,archivoAReducirPath,(strlen(archivoAReducirPath)+1),&pack_size);
+
+	puts("Path del archivo a reducir serializado");
+
+	puts("enviando Path del archivo a reducir");
+
+	if ((stat = send(sock_yama, buffer, pack_size, 0)) == -1){
+		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
+		return  FALLO_SEND;
+	}
+
+	printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
+	//enviamos el path del resultado
+
+	head_tmp.tipo_de_proceso = MASTER; head_tmp.tipo_de_mensaje = PATH_RES_FILE ;pack_size = 0;
+
+	buffer=serializeBytes(head_tmp,resultadoPath,(strlen(resultadoPath)+1),&pack_size);
+
+	puts("Path del resultado serializado");
+
+	puts("enviando Path del resultado");
+
+	if ((stat = send(sock_yama, buffer, pack_size, 0)) == -1){
+		puts("no se pudo enviar Path del aresultado a YAMA. ");
+		return  FALLO_SEND;
+	}
+
+	printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
+
+	freeAndNULL((void **) &buffer);
+
+
 
 	while(1);
 
@@ -62,7 +160,6 @@ int main(int argc, char* argv[]){
 int conectarAYama(){
 
 	int stat;
-	int sock_yama;
 
 
 	// Se trata de conectar con YAMA
@@ -78,6 +175,9 @@ int conectarAYama(){
 
 			return FALLO_GRAL;
 		}
+
+
+
 
 
 

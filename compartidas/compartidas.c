@@ -179,3 +179,207 @@ int enviarHeader(int sock_dest,tHeader head){
 	free(package);
 	return stat;
 }
+
+tPackSrcCode *readFileIntoPack(tProceso sender, char* ruta){
+
+	FILE *file = fopen(ruta, "rb");
+	tPackSrcCode *src_code = malloc(sizeof *src_code);
+	src_code->head.tipo_de_proceso = sender;
+	src_code->head.tipo_de_mensaje = SRC_CODE;
+
+	unsigned long fileSize = fsize(file) + 1 ; // + 1 para el '\0'
+	printf("fsize es: %lu",fileSize);
+	src_code->bytelen = fileSize;
+	src_code->bytes = malloc(src_code->bytelen);
+	fread(src_code->bytes, src_code->bytelen, 1, file);
+	fclose(file);
+	// ponemos un '\0' al final porque es probablemente mandatorio para que se lea, send'ee y recv'ee bien despues
+	src_code->bytes[src_code->bytelen - 1] = '\0';
+
+	return src_code;
+}
+
+unsigned long fsize(FILE* f){
+
+    fseek(f, 0, SEEK_END);
+    unsigned long len = (unsigned long) ftell(f);
+    fseek(f, 0, SEEK_SET);
+    return len;
+
+}
+void freeAndNULL(void **ptr){
+	free(*ptr);
+	*ptr = NULL;
+}
+/****** Definiciones de [De]Serializaciones Regulares ******/
+
+char *serializeHeader(tHeader head, int *pack_size){
+
+	char *h_serial = malloc(HEAD_SIZE);
+	*pack_size = HEAD_SIZE;
+	return memcpy(h_serial, &head, HEAD_SIZE);
+}
+
+char *serializeBytes(tHeader head, char* buffer, int buffer_size, int *pack_size){
+
+	char *bytes_serial;
+	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int) + buffer_size)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &buffer_size, sizeof buffer_size);
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, buffer, buffer_size);
+	*pack_size += buffer_size;
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+tPackBytes *deserializeBytes(char *bytes_serial){
+
+	int off;
+	tPackBytes *pbytes;
+
+	if ((pbytes = malloc(sizeof *pbytes)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+	memcpy(&pbytes->bytelen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((pbytes->bytes = malloc(pbytes->bytelen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", pbytes->bytelen);
+		return NULL;
+	}
+
+	memcpy(pbytes->bytes, bytes_serial + off, pbytes->bytelen);
+	off += pbytes->bytelen;
+
+	return pbytes;
+}
+
+
+
+char *recvGenericWFlags(int sock_in, int flags){
+	//printf("Se recibe el paquete serializado, usando flags %x\n", flags);
+
+	int stat, pack_size;
+	char *p_serial;
+
+	if ((stat = recv(sock_in, &pack_size, sizeof(int), flags)) == -1){
+		perror("Fallo de recv. error");
+		return NULL;
+
+	} else if (stat == 0){
+		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
+		return NULL;
+	}
+
+	pack_size -= (HEAD_SIZE + sizeof(int)); // ya se recibieron estas dos cantidades
+	//printf("Paquete de size: %d\n", pack_size);
+
+	if ((p_serial = malloc(pack_size)) == NULL){
+		printf("No se pudieron mallocar %d bytes para paquete generico\n", pack_size);
+		return NULL;
+	}
+
+	if ((stat = recv(sock_in, p_serial, pack_size, flags)) == -1){
+		perror("Fallo de recv. error");
+		return NULL;
+
+	} else if (stat == 0){
+		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
+		return NULL;
+	}
+
+	return p_serial;
+}
+
+char *recvGeneric(int sock_in){
+	return recvGenericWFlags(sock_in, 0);
+}
+
+char *serializeDosChar(tHeader head, char* buffer1, int buffer_size1,char* buffer2,int buffer_size2, int *pack_size){
+
+	char *bytes_serial;
+	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int) +sizeof(int)+buffer_size2+ buffer_size1)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &buffer_size1, sizeof buffer_size1);
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, buffer1, buffer_size1);
+	*pack_size += buffer_size1;
+
+	memcpy(bytes_serial + *pack_size, &buffer_size2, sizeof buffer_size2);
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, buffer2, buffer_size2);
+	*pack_size += buffer_size2;
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+tPack2Bytes *deserializeDosChar(char *bytes_serial){
+
+	int off;
+	tPack2Bytes *p2bytes;
+
+	if ((p2bytes = malloc(sizeof *p2bytes)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+	memcpy(&p2bytes->bytelen1, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((p2bytes->bytes1 = malloc(p2bytes->bytelen1)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", p2bytes->bytelen1);
+		return NULL;
+	}
+
+	memcpy(p2bytes->bytes1, bytes_serial + off, p2bytes->bytelen1);
+	off += p2bytes->bytelen1;
+
+
+
+	memcpy(&p2bytes->bytelen2, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((p2bytes->bytes2 = malloc(p2bytes->bytelen2)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", p2bytes->bytelen2);
+		return NULL;
+	}
+
+	memcpy(p2bytes->bytes2, bytes_serial + off, p2bytes->bytelen2);
+	off += p2bytes->bytelen2;
+
+
+	return p2bytes;
+}
+
+
+
+

@@ -34,7 +34,13 @@ typedef enum {
 	INICIO      = 1,
 	NEW_DN=2,
 	INICIOFS=3,
-	INICIOYAMA=4
+	INICIOYAMA=4,
+	SRC_CODE_RED=5,
+	SRC_CODE_TRANSF=6,
+	SRC_CODE=7,
+	PATH_FILE_TOREDUCE=8,
+	PATH_RES_FILE=9,
+	INFO_WORKER=10
 } tMensaje;
 
 
@@ -47,10 +53,30 @@ typedef enum {
 } tProceso;
 
 
+
+
 typedef struct {
 
 	tProceso tipo_de_proceso;
 	tMensaje tipo_de_mensaje;
 } tHeader; // este tipo de struct no necesita serialazion
+
+typedef struct {
+
+	tHeader head;
+	int bytelen;
+	char *bytes;
+} tPackSrcCode,tPackBytes;
+
+typedef struct {
+
+	tHeader head;
+	int bytelen1;
+	char *bytes1;
+	int bytelen2;
+	char *bytes2;
+}__attribute__((packed)) tPack2Bytes;
+
+
 
 #endif /* DEFINICIONES_H_ */

@@ -8,7 +8,7 @@
 #ifndef DATANODE_H_
 #define DATANODE_H_
 
-#define MAX_PORT_LEN 6
+#define MAX_PORT_LEN 4
 #define MAX_IP_LEN 16
 #define MAX_RUTA_LEN 100
 #define MAX_NOMBRE_LEN 100
@@ -21,6 +21,8 @@ typedef struct{
 	char* puerto_filesystem;
 	char* ruta_databin;
 	char* nombre_nodo;
+	char* ip_nodo;
+	char* puerto_worker;
 	int   tipo_de_proceso;
 }tDataNode;
 
