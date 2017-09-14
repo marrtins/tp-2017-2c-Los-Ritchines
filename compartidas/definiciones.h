@@ -40,7 +40,10 @@ typedef enum {
 	SRC_CODE=7,
 	PATH_FILE_TOREDUCE=8,
 	PATH_RES_FILE=9,
-	INFO_WORKER=10
+	INFO_NODO=10,
+	INICIOMASTER=11,
+	START_LOCALTRANSF=12,
+	FIN_LOCALTRANSF=13
 } tMensaje;
 
 
@@ -76,6 +79,17 @@ typedef struct {
 	int bytelen2;
 	char *bytes2;
 }__attribute__((packed)) tPack2Bytes;
+
+typedef struct {
+
+	tHeader head;
+	int puertoLen;
+	char *puertoWorker;
+	int ipLen;
+	char *ipNodo;
+	int nombreLen;
+	char *nombreNodo;
+}__attribute__((packed)) tPackInfoNodo;
 
 
 

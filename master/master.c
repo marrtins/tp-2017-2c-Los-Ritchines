@@ -26,6 +26,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <commons/string.h>
+#include <pthread.h>
+
 tMaster *master;
 int sock_yama;
 
@@ -149,12 +151,113 @@ int main(int argc, char* argv[]){
 
 	freeAndNULL((void **) &buffer);
 
+	tHeader head;
+
+	while((stat = recv(sock_yama, &head, HEAD_SIZE, 0)) > 0){
+
+	printf("Recibimos un paquete de YAMA.\n");
+
+	switch(head.tipo_de_mensaje){
+	case(START_LOCALTRANSF):
+		//Aca llegaria la respuesta de yama con la info sobre bloques y a que workers conectarnos..
+
+		//aca creamos un hilo por cada worker al que tenemos que conectarnos.
+
+		//Suponiendo que yama nos indico 2 workers a los que conectarnos y nos paso ip, puerto, etc: iniciamos las solicitudes.
+		puts("asd");
+
+		tInfoWorker *atributosW1=malloc(sizeof *atributosW1);
+		tInfoWorker *atributosW2=malloc(sizeof *atributosW1);
+
+		atributosW1->ip_worker="127.0.0.1";
+		atributosW1->puerto_worker="5013";
+
+		atributosW2->ip_worker="127.0.0.1";
+		atributosW2->puerto_worker="5023";
 
 
-	while(1);
+		//esta info de arriba no se genera, sino que nos la va apasar yama
 
+
+		pthread_attr_t attr;
+		pthread_t hilo_worker1;
+		pthread_t hilo_worker2;
+
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+		if(pthread_create(&hilo_worker1, &attr, (void *) workerHandler, (void*) atributosW1) < 0){
+			printf("No pudo crear hilo.\n");
+			return FALLO_GRAL;
+		}
+
+		if(pthread_create(&hilo_worker2, &attr, (void *) workerHandler, (void*) atributosW2) < 0){
+					printf("No pudo crear hilo.\n");
+					return FALLO_GRAL;
+				}
+
+		break;
+	default:
+		break;
+	}
+
+	}
 	return 0;
 }
+
+
+void *workerHandler(void *atributos){
+
+
+	tInfoWorker *infoWorker = (tInfoWorker *) atributos;
+
+	printf("Creado el hilo del worker con direccion: %s:%s\nnos conectamos a el\n",infoWorker->ip_worker,infoWorker->puerto_worker);
+
+
+	int stat,sock_worker;
+
+	// Se trata de conectar con YAMA
+	if ((sock_worker = establecerConexion(infoWorker->ip_worker, infoWorker->puerto_worker)) < 0){
+		fprintf(stderr, "No se pudo conectar con el worker! sock_worker: %d\n", sock_worker);
+
+		return (void *) FALLO_CONEXION;
+	}
+
+
+
+	puts("Conectado al worker.. Inicio transfo local..");
+
+
+	tHeader head;
+	head.tipo_de_proceso=MASTER;
+	head.tipo_de_mensaje=START_LOCALTRANSF;
+	if ((stat = enviarHeader(sock_worker, head)) < 0){
+		fprintf(stderr, "No se pudo enviar aviso a master\n");
+
+		return FALLO_GRAL;
+	}
+
+	while((stat = recv(sock_worker, &head, HEAD_SIZE, 0)) > 0){
+
+		if(head.tipo_de_mensaje=FIN_LOCALTRANSF){
+			puts("Worker nos avisa q finalizo la transfo local");
+		}
+
+
+	}
+
+
+
+
+	return NULL;
+
+
+}
+
+
+
+
+
 
 
 int conectarAYama(){
@@ -168,21 +271,6 @@ int conectarAYama(){
 
 		return FALLO_CONEXION;
 	}
-
-	// No permitimos continuar la ejecucion hasta lograr un handshake con YAMA
-		if ((stat = handshakeCon(sock_yama, master->tipo_de_proceso)) < 0){
-			fprintf(stderr, "No se pudo hacer hadshake con YAMA\n");
-
-			return FALLO_GRAL;
-		}
-
-
-
-
-
-
-	printf("Se enviaron: %d bytes a YAMA\n", stat);
-
 	return 0;
 }
 

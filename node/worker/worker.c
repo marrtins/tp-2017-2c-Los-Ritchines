@@ -75,13 +75,42 @@ int main(int argc, char* argv[]){
 		switch(head.tipo_de_proceso){
 
 		case MASTER:
-			puts("Se conecto master, forkeamos para que atienda su solicitud");
-			/*
-			 * FORK ETC ETC ETC
-			 */
+
+			if(head.tipo_de_mensaje==START_LOCALTRANSF){
+				puts("CASE INICIOYAMA --> FORK");
+				pid_t  pid;
+				int    i;
+				char   buf[100];
+
+
+				pid = fork();
+
+				if(pid==0){
+
+					puts("proceso hijo forkeado satisfactoriamente. ejecutamos la transf local...");
+
+					puts("fin transf local, le avisamos a master y finalizamos ");
+
+					tHeader henvio;
+					henvio.tipo_de_mensaje=FIN_LOCALTRANSF;
+					henvio.tipo_de_proceso=WORKER;
+
+					if ((stat = enviarHeader(client_sock, head)) < 0){
+							fprintf(stderr, "No se pudo enviar aviso a master\n");
+
+							return FALLO_GRAL;
+						}
+					puts("Mande algo");
+					return 0;
+
+
+				}else{
+					puts("padre");
+				}
+			}
+
 			break;
 		default:
-			puts("Trato de conectarse algo que no era ni Kernel ni CPU!");
 			printf("El tipo de proceso y mensaje son: %d y %d\n", head.tipo_de_proceso, head.tipo_de_mensaje);
 			printf("Se recibio esto del socket: %d\n", client_sock);
 			return CONEX_INVAL;

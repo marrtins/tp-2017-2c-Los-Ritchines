@@ -7,7 +7,7 @@ PUERTO_FILESYSTEM=5000
 #Aca escucha conexiones de DataNodes
 PUERTO_DATANODE=5001
 
-#Aca se conecta YAMA
+#Aca se conecta escucha conexiones de YAMA
 PUERTO_YAMA=5002
 IP_YAMA=127.0.0.1
 

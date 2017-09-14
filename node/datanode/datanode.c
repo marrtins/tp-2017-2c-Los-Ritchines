@@ -69,15 +69,27 @@ int main(int argc, char* argv[]){
 
 	//enviamos el path del archivo a reducir
 
-	int pack_size;	char *buffer;
+	int pack_size;
+	char *buffer;
+	pack_size = 0;
+	tPackInfoNodo *infoAEnviar = malloc(sizeof *infoAEnviar);
+
+	//llenamos el paquete a enviar a filesystem con toda la info que le interesa sobre el nodo:
+	infoAEnviar->head.tipo_de_proceso=DATANODE;
+	infoAEnviar->head.tipo_de_mensaje=INFO_NODO;
+
+	infoAEnviar->puertoLen=(strlen(datanode->puerto_worker)) + 1 ;
+	infoAEnviar->puertoWorker=datanode->puerto_worker;
+
+	infoAEnviar->ipLen=(strlen(datanode->ip_nodo))+1;
+	infoAEnviar->ipNodo=datanode->ip_nodo;
+
+	infoAEnviar->nombreLen=(strlen(datanode->nombre_nodo))+1;
+	infoAEnviar->nombreNodo=datanode->nombre_nodo;
 
 
-	head.tipo_de_mensaje = INFO_WORKER ; pack_size = 0;
 
-	int puertoWorkerSize = (strlen(datanode->puerto_worker));
-	int ipWorkerSize = (strlen(datanode->ip_nodo));
-
-	buffer=serializeDosChar(head,datanode->ip_filesystem,ipWorkerSize,datanode->puerto_worker,puertoWorkerSize,&pack_size);
+	buffer=serializeInfoNodoPack(infoAEnviar->head,infoAEnviar,&pack_size);
 
 	puts("IP y Puerto serializados");
 

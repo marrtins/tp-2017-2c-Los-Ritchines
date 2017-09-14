@@ -19,10 +19,17 @@ typedef struct{
 	int   tipo_de_proceso;
 }tMaster;
 
+typedef struct{
+
+	char* ip_worker;
+	char* puerto_worker;
+}tInfoWorker;
+
 
 
 tMaster *getConfigMaster(char* ruta);
 void mostrarConfiguracion(tMaster *master);
 int conectarAYama();
+void *workerHandler(void *atributos);
 
 #endif /* MASTER_H_ */

@@ -36,8 +36,12 @@ typedef struct {
 } fs_socks;
 
 typedef struct{
-	int fd_dn,id_dn;
-}t_datanode;
+	int fd_dn;
+	int id_dn;
+	char* nombreNodo;
+	char* ipWorker;
+	char* puertoWorker;
+}t_infoNodo;
 
 typedef struct {
 	int index;
@@ -53,6 +57,11 @@ void consolaFS(void);
 
 int establecerConexion(char *ip_dest, char *port_dest);
 int validarRespuesta(int sock, tHeader h_esp, tHeader *h_o);
+
+int yamaHandler(tMensaje msjRecibido);
+int datanodeHandler(tMensaje msjRecibido,int fd_dn);
+int crearListenYama();
+
 
 //int conectarConFS(tFS *fileSystem);
 

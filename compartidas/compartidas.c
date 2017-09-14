@@ -393,6 +393,103 @@ tPack2Bytes *deserializeDosChar(char *bytes_serial){
 	return p2bytes;
 }
 
+char *serializeInfoNodoPack(tHeader head,tPackInfoNodo *infoNodo, int *pack_size){
+
+	char *bytes_serial;
+	int longitudesVariables = infoNodo->ipLen+infoNodo->nombreLen+infoNodo->puertoLen;
+
+	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int) +sizeof(int)+sizeof(int)+longitudesVariables)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &(infoNodo->ipLen), sizeof(int));
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, infoNodo->ipNodo, infoNodo->ipLen);
+	*pack_size += infoNodo->ipLen;
+
+	memcpy(bytes_serial + *pack_size, &(infoNodo->puertoLen), sizeof(int));
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, infoNodo->puertoWorker, infoNodo->puertoLen);
+	*pack_size += infoNodo->puertoLen;
+
+	memcpy(bytes_serial + *pack_size, &(infoNodo->nombreLen), sizeof(int));
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, infoNodo->nombreNodo, infoNodo->nombreLen);
+	*pack_size += infoNodo->nombreLen;
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+tPackInfoNodo *deserializeInfoNodo(char *bytes_serial){
+
+	int off;
+	tPackInfoNodo *infoNodo;
+
+	if ((infoNodo = malloc(sizeof *infoNodo)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+	memcpy(&infoNodo->ipLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((infoNodo->ipNodo = malloc(infoNodo->ipLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoNodo->ipLen);
+		return NULL;
+	}
+
+	memcpy(infoNodo->ipNodo, bytes_serial + off, infoNodo->ipLen);
+	off += infoNodo->ipLen;
+
+
+
+
+
+	memcpy(&infoNodo->puertoLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((infoNodo->puertoWorker = malloc(infoNodo->puertoLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoNodo->puertoLen);
+			return NULL;
+		}
+
+		memcpy(infoNodo->puertoWorker, bytes_serial + off, infoNodo->puertoLen);
+		off += infoNodo->puertoLen;
+
+
+
+
+
+
+		memcpy(&infoNodo->nombreLen, bytes_serial + off, sizeof (int));
+			off += sizeof (int);
+
+			if ((infoNodo->nombreNodo = malloc(infoNodo->nombreLen)) == NULL){
+				printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoNodo->nombreLen);
+				return NULL;
+			}
+
+			memcpy(infoNodo->nombreNodo, bytes_serial + off, infoNodo->nombreLen);
+			off += infoNodo->nombreLen;
+
+
+
+
+	return infoNodo;
+}
+
 
 
 

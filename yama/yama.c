@@ -52,10 +52,13 @@ int main(int argc, char* argv[]){
 	clientSize = sizeof client;
 
 
-	if(pthread_create(&fs_thread, NULL, (void*) fsHandler, NULL) < 0){
-		perror("no pudo crear hilo. error");
-		return FALLO_GRAL;
+	if ((stat = conectarAFs()) < 0){
+			puts("No se pudo conectar con FS!");
+			exit(-1);
 	}
+
+
+
 
 
 	if ((sock_entrada = makeListenSock(yama->puerto_entrada)) < 0){
@@ -131,6 +134,10 @@ void masterHandler(void *client_sock){
 			printf("proc %d \t msj %d \n", head.tipo_de_proceso, head.tipo_de_mensaje);
 
 			switch(head.tipo_de_mensaje){
+
+
+
+
 
 			case SRC_CODE_TRANSF:
 					puts("Master quiere iniciar un JOB");
@@ -217,11 +224,24 @@ void masterHandler(void *client_sock){
 							freeAndNULL((void **) &buffer);
 							puts("fin case PATH_RES_FILE");
 
-							break;
-			case(0):
-					puts("entro");
-				break;
+							//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
+							//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
 
+							/* pido info, la proceso y ahora se a que workers el master se va a conectar y se los paso...*/
+
+							//x ahora solo le aviso q inice la transf local
+
+							tHeader head;
+							int stat;
+							head.tipo_de_proceso=YAMA;
+							head.tipo_de_mensaje=START_LOCALTRANSF;
+
+							if((stat=enviarHeader(sock_master,head))<0){
+								puts("No se pudo enviar el header de inicio");
+							}
+
+
+							break;
 			default:
 				break;
 
@@ -233,66 +253,27 @@ void masterHandler(void *client_sock){
 }
 
 
-void fsHandler(void){
 
-	int stat;
-
-	tHeader *head;
-
-	if ((stat = conectarAFs()) < 0){
-			puts("No se pudo conectar con FS!");
-	}
-
-	while((stat = recv(sock_fs, &head, HEAD_SIZE, 0)) > 0){
-
-		puts("Se recibio un paquete de FS");
-		printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
-
-		switch(head->tipo_de_mensaje){
-
-		case(1):
-				break;
-
-		default:
-			break;
-
-		}
-
-	}
-
-
-}
 int conectarAFs(){
 
 	int stat;
-
+	tHeader head;
 	// Se trata de conectar con FS
 	if ((sock_fs = establecerConexion(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
 		fprintf(stderr, "No se pudo conectar con FS! sock_fs: %d\n", sock_fs);
 
 		return FALLO_CONEXION;
 	}
-
+	head.tipo_de_mensaje=INICIOYAMA;
+	head.tipo_de_proceso=YAMA;
 	// No permitimos continuar la ejecucion hasta lograr un handshake con FS
-		if ((stat = handshakeCon(sock_fs, yama->tipo_de_proceso)) < 0){
-			fprintf(stderr, "No se pudo hacer hadshake con FS\n");
+	if ((stat = enviarHeader(sock_fs, head)) < 0){
+		fprintf(stderr, "No se pudo hacer hadshake con FS\n");
 
-			return FALLO_GRAL;
-		}
+		return FALLO_GRAL;
+	}
 
-
-	// No permitimos continuar la ejecucion hasta no recibir el primer mensaje de FS
-	/*h_esperado.tipo_de_proceso=YAMA;
-	h_esperado.tipo_de_mensaje=INICIOYAMA;
-
-	if ((stat = validarRespuesta(sock_yama,h_esperado,&h_obtenido)) != 0){
-			fprintf(stderr, "No se recibio el mensaje de inicio de YAMA\n");
-			return FALLO_GRAL;
-		}
-
-	*/
-
-	printf("Se enviaron: %d bytes a FS\n", stat);
+	printf("Se enviaron: %d bytes a FS del handshake \n", stat);
 
 	return 0;
 }
@@ -331,34 +312,4 @@ void mostrarConfiguracion(tYama *yama){
 	printf("Algoritmo Balanceo: %d\n", yama->algoritmo_balanceo);
 	printf("Tipo de proceso: %d\n", yama->tipo_de_proceso);
 }
-
-int conectarConFS(tYama *yama){
-
-	int stat;
-
-	printf("Conectando con FS...\n");
-
-	sock_fs = establecerConexion(yama->ip_filesystem, yama->puerto_filesystem);
-	if (sock_fs < 0){
-		puts("Fallo conexion a FS");
-		return FALLO_CONEXION;
-	}
-
-	if ((stat = handshakeCon(sock_fs, yama->tipo_de_proceso)) < 0){
-
-		fprintf(stderr, "No se pudo hacer hadshake con FS\n");
-		return FALLO_GRAL;
-	}
-
-	printf("Se enviaron: %d bytes a FS\n", stat);
-
-	puts("Me conecte a FS!");
-
-
-
-	printf("Me conecte a FILESYSTEM en socket #%d\n",sock_fs);
-		return 0;
-}
-
-
 

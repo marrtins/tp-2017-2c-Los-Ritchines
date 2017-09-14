@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <commons/string.h>
 #include <readline/readline.h>
-
+#include <pthread.h>
 #include <netinet/in.h>
 
 #include "../compartidas/definiciones.h"
@@ -36,11 +36,12 @@
 #define BACKLOG 20
 tFS *fileSystem;
 t_list *listaNodos;
-int sock_yama;
+int sock_lis_yama;
 int fd_max;
 fd_set read_fd, master_fd;
 
-int contadorHardCode;
+int contadorHardCode,idGlobal;
+bool permitirYama;
 
 int main(int argc, char* argv[]){
 
@@ -54,8 +55,12 @@ int main(int argc, char* argv[]){
 		printf("Error en la cantidad de parametros\n");
 		return EXIT_FAILURE;
 	}
-	puts("AAAAAAAAAAAAA");
+
+	idGlobal=0;
+
+	permitirYama=false;
 	contadorHardCode=0;
+
 	//crea una lista de Nodos, más adelante se especifica mas este punto
 	list_create(listaNodos);
 
@@ -104,16 +109,14 @@ int main(int argc, char* argv[]){
 	//no se que hace aca
 	fd_max = MAX(sock_lis_datanode, fd_max);
 
-
-	// Se agrega list_datanode al master
-
-	FD_SET(sock_lis_datanode, &master_fd);
-
 	//intenta escuchar al datanode, si no puede, vuelve a intentarlo
 	while ((stat = listen(sock_lis_datanode, BACKLOG)) == -1){
 		perror("Fallo listen a socket datanodes. error");
 		puts("Reintentamos...\n");
 	}
+	// Se agrega list_datanode al master
+
+	FD_SET(sock_lis_datanode, &master_fd);
 
 	//seria el buffet donde guardo la info que me llega
 	tHeader *header_tmp = malloc(HEAD_SIZE); // para almacenar cada recv
@@ -145,6 +148,29 @@ int main(int argc, char* argv[]){
 
 				}
 
+
+				// Controlamos el listen de YAMA
+				if (fd == sock_lis_yama){
+
+					//Verificamos que se permita la conexion de yama( el sist sea estable, sino desestimamos)
+					if(permitirYama){
+
+						new_fd = handleNewListened(fd, &master_fd);
+						if (new_fd < 0){
+							perror("Fallo en manejar un listen. error");
+							return FALLO_CONEXION;
+						}
+
+						fd_max = MAX(new_fd, fd_max);
+						break;
+					}
+					else{
+						puts("se conecto yama pero el sistema aun no es estable. Vuelva mas tarde");
+						break;
+					}
+
+				}
+
 				// Como no es un listen, recibimos el header de lo que llego
 				if ((stat = recv(fd, header_tmp, HEAD_SIZE, 0)) == -1){
 					perror("Error en recv() de algun socket. error");
@@ -167,7 +193,7 @@ int main(int argc, char* argv[]){
 
 					break;
 				}
-				if (fd == sock_yama){
+				if (header_tmp->tipo_de_proceso == YAMA){
 					printf("Llego algo desde YAMA!\n");
 
 					if((stat=yamaHandler(header_tmp->tipo_de_mensaje))<0){
@@ -187,6 +213,184 @@ int main(int argc, char* argv[]){
 
 	}
 	return 0;
+}
+
+
+void consolaFS(void){
+	puts("Bienvenido a la consola. Ingrese un comando.");
+
+			char ** palabras;
+			while(1){
+				char *linea = readline(">");
+				palabras = string_split(linea, " ");
+				procesarInput(palabras);
+				free(linea);
+			}
+}
+int datanodeHandler(tMensaje msjRecibido,int fd_dn){
+
+
+	printf("Mensaje Recibido desde Datanode: %d \n",msjRecibido);
+	char* buffer;
+	tPackInfoNodo *infoNodo;
+
+	switch(msjRecibido){
+
+	case(NEW_DN):
+		contadorHardCode++;
+
+		puts("Nuevo Datanode ingresa al sistema");
+
+		if(sistemaEstable()){
+			crearListenYama();
+			permitirYama=true;
+			printf("El sistema ahora es estable, permitimos la conexion de YAMA\n");
+			contadorHardCode=-200;
+		}
+
+		break;
+	case(INFO_NODO):
+
+		puts("Nos llega la info del NODO Asociado");
+		if ((buffer = recvGeneric(fd_dn)) == NULL){
+			puts("Fallo recepcion de INFO_WORKER");
+
+			return FALLO_RECV;
+		}
+
+		if ((infoNodo = deserializeInfoNodo(buffer)) == NULL){
+
+			puts("Fallo deserializacion de Bytes de la info del worker");
+			return FALLO_RECV;
+		}
+
+		printf("Puerto Worker: %s , ip Worker: %s , nombre nodo: %s\n",infoNodo->puertoWorker,infoNodo->ipNodo,infoNodo->nombreNodo);
+
+
+		//guardamos toda la info de este nodo en una lista, para poder ir gestionandola luego..
+
+		t_infoNodo *info = malloc(sizeof(*info));
+
+		info->fd_dn=fd_dn;
+		info->id_dn=idGlobal++;
+		info->ipWorker=infoNodo->ipNodo;
+		info->nombreNodo=infoNodo->nombreNodo;
+		info->puertoWorker=infoNodo->puertoWorker;
+
+		list_add(listaNodos,info);
+
+		freeAndNULL((void **) &buffer);
+		puts("fin case INFO_WORKER");
+		break;
+	default:
+		break;
+
+	}
+
+
+	return 0;
+}
+
+int crearListenYama(){
+
+	//desde este momento escuchamos a yama
+
+	int stat;
+
+	if ((sock_lis_yama= makeListenSock(fileSystem->puerto_yama)) < 0){
+		fprintf(stderr, "No se pudo crear socket para escuchar! sock_lis_yama: %d\n", sock_lis_yama);
+		return FALLO_CONEXION;
+	}
+
+	fd_max = MAX(sock_lis_yama, fd_max);
+
+	while ((stat = listen(sock_lis_yama, BACKLOG)) == -1){
+		perror("Fallo listen a socket datanodes. error");
+		puts("Reintentamos...\n");
+	}
+
+	FD_SET(sock_lis_yama, &master_fd);
+
+	return 0;
+}
+
+int yamaHandler(tMensaje msjRecibido){
+
+
+	printf("Mensaje Recibido desde YAMA: %d \n",msjRecibido);
+
+	contadorHardCode=-100;
+
+	switch(msjRecibido){
+
+	case(INICIOYAMA):
+
+		puts("Conexion con YAMA exitosa");
+		break;
+
+	default:
+		break;
+
+	}
+
+	return 0;
+}
+
+
+
+
+
+
+//Aca se va a hacer la verificacion entre la lista de nodos guardados q tiene el FS y los que se van conectando.
+//Cuando se conecte el ultimo y haga estable el sistema, devolvera true.
+bool sistemaEstable(){
+
+	/*if...
+	 *
+	 */
+	//hardcodeo por ahora
+	return contadorHardCode>1;
+}
+
+
+
+
+
+tFS *getConfigFilesystem(char* ruta){
+	printf("Ruta del archivo de configuracion: %s\n", ruta);
+	tFS *fileSystem = malloc(sizeof(tFS));
+
+	fileSystem->puerto_entrada = malloc(MAX_PORT_LEN);
+	fileSystem->puerto_datanode = malloc(MAX_PORT_LEN);
+	fileSystem->puerto_yama = malloc(MAX_PORT_LEN);
+	fileSystem->ip_yama = malloc(MAX_IP_LEN);
+
+	//funcion de gaston, recibe la ruta del archivo de configuracion y te devuelve
+	//un puntero a una estructura con todos los datos que va leyendo del archivo de conf
+	t_config *fsConfig = config_create(ruta);
+
+	//config_get_string_value recibe el nombre del parametro, y te devuelve el valor
+	//con esto voy cargando en una estructura, todos los datos del archivo de conf
+	strcpy(fileSystem->puerto_entrada, config_get_string_value(fsConfig, "PUERTO_FILESYSTEM"));
+	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
+	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
+	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
+
+	//cargo el tipo de proceso (harcodeado)
+	fileSystem->tipo_de_proceso = FILESYSTEM;
+
+	//destruye la estructura de configuracion, supongo que para liberar memoria o por seguridad
+	config_destroy(fsConfig);
+	//retorno la configuracion
+	return fileSystem;
+}
+void mostrarConfiguracion(tFS *fileSystem){
+
+	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
+	printf("Puerto Datanode: %s\n",       fileSystem->puerto_datanode);
+	printf("Puerto Yama: %s\n", fileSystem->puerto_yama);
+	printf("IP Yama: %s\n", fileSystem->ip_yama);
+	printf("Tipo de proceso: %d\n", fileSystem->tipo_de_proceso);
 }
 
 void liberarPunteroDePunteros(char ** punteros) {
@@ -228,175 +432,6 @@ void procesarInput(char** palabras) {
 		printf("No existe el comando\n");
 	}
 }
-
-void consolaFS(void){
-	puts("Bienvenido a la consola. Ingrese un comando.");
-			char * linea;
-			char ** palabras;
-			while(1){
-				char *linea = readline(">");
-				palabras = string_split(linea, " ");
-				procesarInput(palabras);
-				free(linea);
-			}
-}
-int datanodeHandler(tMensaje msjRecibido,int fd_dn){
-
-
-	printf("Mensaje Recibido desde Datanode: %d \n",msjRecibido);
-	char* buffer;
-	tPack2Bytes *infoWorker;
-
-	switch(msjRecibido){
-
-	case(NEW_DN):
-		contadorHardCode++;
-
-		puts("Nuevo Datanode ingresa al sistema");
-
-		if(sistemaEstable()){
-			recibirConexionYAMA();
-			contadorHardCode=-200;
-		}
-
-		break;
-	case(INFO_WORKER):
-
-		puts("Nos llega la info del Worker Asociado");
-		if ((buffer = recvGeneric(fd_dn)) == NULL){
-			puts("Fallo recepcion de PATH_FILE_TOREDUCE");
-
-			return FALLO_RECV;
-		}
-
-		if ((infoWorker = deserializeDosChar(buffer)) == NULL){
-
-			puts("Fallo deserializacion de Bytes de la info del worker");
-			return FALLO_RECV;
-		}
-
-		printf("Puerto Worker: %s , ip Worker: %s \n",infoWorker->bytes2,infoWorker->bytes1);
-		freeAndNULL((void **) &buffer);
-		puts("fin case INFO_WORKER");
-		break;
-	default:
-		break;
-
-	}
-
-
-	return 0;
-}
-int yamaHandler(tMensaje msjRecibido){
-
-
-	printf("Mensaje Recibido desde YAMA: %d \n",msjRecibido);
-
-	contadorHardCode=-100;
-
-	switch(msjRecibido){
-
-	case(INICIOYAMA):
-
-		puts("Conexion con YAMA exitosa");
-
-		break;
-
-	default:
-		break;
-
-	}
-
-	return 0;
-}
-
-
-
-
-
-
-//Aca se va a hacer la verificacion entre la lista de nodos guardados q tiene el FS y los que se van conectando.
-//Cuando se conecte el ultimo y haga estable el sistema, devolvera true.
-bool sistemaEstable(){
-
-	/*if...
-	 *
-	 */
-	//hardcodeo por ahora
-	return contadorHardCode>1;
-}
-
-
-
-int recibirConexionYAMA(void){
-
-	int sock_lis_yama,new_fd;
-	tHeader head, h_esp;
-	if ((sock_lis_yama = makeListenSock(fileSystem->puerto_entrada)) < 0){
-		printf("No se pudo crear socket listen en puerto: %s\n", fileSystem->puerto_entrada);
-
-		return FALLO_GRAL;
-	}
-
-	if(listen(sock_lis_yama, BACKLOG) == -1){
-
-		perror("Fallo de listen sobre socket filesystem. error");
-		return FALLO_GRAL;
-	}
-
-	while (1){
-		if((sock_yama = makeCommSock(sock_lis_yama)) < 0){
-
-			puts("No se pudo acceptar conexion entrante de YAMA");
-			return FALLO_GRAL;
-		}
-		printf("Se establecio conexion con YAMA. Socket %d\n", sock_yama);
-		break;
-	}
-
-	fd_max = MAX(sock_yama, fd_max);
-	FD_SET(sock_yama, &master_fd);
-
-	return 0;
-}
-
-tFS *getConfigFilesystem(char* ruta){
-	printf("Ruta del archivo de configuracion: %s\n", ruta);
-	tFS *fileSystem = malloc(sizeof(tFS));
-
-	fileSystem->puerto_entrada = malloc(MAX_PORT_LEN);
-	fileSystem->puerto_datanode = malloc(MAX_PORT_LEN);
-	fileSystem->puerto_yama = malloc(MAX_PORT_LEN);
-	fileSystem->ip_yama = malloc(MAX_IP_LEN);
-
-	//funcion de gaston, recibe la ruta del archivo de configuracion y te devuelve
-	//un puntero a una estructura con todos los datos que va leyendo del archivo de conf
-	t_config *fsConfig = config_create(ruta);
-
-	//config_get_string_value recibe el nombre del parametro, y te devuelve el valor
-	//con esto voy cargando en una estructura, todos los datos del archivo de conf
-	strcpy(fileSystem->puerto_entrada, config_get_string_value(fsConfig, "PUERTO_FILESYSTEM"));
-	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
-	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
-	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
-
-	//cargo el tipo de proceso (harcodeado)
-	fileSystem->tipo_de_proceso = FILESYSTEM;
-
-	//destruye la estructura de configuracion, supongo que para liberar memoria o por seguridad
-	config_destroy(fsConfig);
-	//retorno la configuracion
-	return fileSystem;
-}
-void mostrarConfiguracion(tFS *fileSystem){
-
-	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
-	printf("Puerto Datanode: %s\n",       fileSystem->puerto_datanode);
-	printf("Puerto Yama: %s\n", fileSystem->puerto_yama);
-	printf("IP Yama: %s\n", fileSystem->ip_yama);
-	printf("Tipo de proceso: %d\n", fileSystem->tipo_de_proceso);
-}
-
 
 
 
