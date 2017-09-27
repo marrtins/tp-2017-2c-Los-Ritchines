@@ -4,5 +4,6 @@
 #include "../../../compartidas/compartidas/funcionesCompartidas.h"
 
 #include <readline/readline.h>
+#include <commons/bitarray.h>
 
 #endif

@@ -14,7 +14,6 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void levantarTablasDirectorios(Tdirectorios * tablaDirectorios);
 void levantarTablasArchivos(Tarchivos * tablaArchivos);
 void levantarTablasNodos();
-void levantarBitmap();
-void levantarTablas(Tdirectorios * tablaDirectorios, Tarchivos * tablaArchivos);
+void levantarTablas(Tdirectorios * tablaDirectorios, t_list * listaBitMaps);
 
 #endif

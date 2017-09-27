@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
 		cantModificados,
 		estable = 0;
 
+	t_list * listaBitmaps;
+
 	Tdirectorios tablaDirectorios[100];
 	Tarchivos * tablaArchivos;
 
@@ -36,7 +38,8 @@ int main(int argc, char* argv[]) {
 	fileSystem = obtenerConfiguracion("/home/utnso/buenasPracticas/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	//levantarTablaArchivos(tablaArchivos);
-	levantarTablas(tablaDirectorios, tablaArchivos);
+	list_create(listaBitmaps);
+	levantarTablas(tablaDirectorios, listaBitmaps);
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
