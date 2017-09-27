@@ -27,13 +27,13 @@ endif
 all: worker
 
 dependents:
-	-cd /home/utnso/buenasPracticas/compartidas/Debug && $(MAKE) all
+	-cd /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug && $(MAKE) clean all
 
 # Tool invocations
-worker: $(OBJS) $(USER_OBJS) /home/utnso/buenasPracticas/compartidas/Debug/libcompartidas.so
+worker: $(OBJS) $(USER_OBJS) /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug/libcompartidas.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/buenasPracticas/compartidas/Debug" -o "worker" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug" -o "worker" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -44,6 +44,6 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
-/home/utnso/buenasPracticas/compartidas/Debug/libcompartidas.so:
+/home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug/libcompartidas.so:
 
 -include ../makefile.targets

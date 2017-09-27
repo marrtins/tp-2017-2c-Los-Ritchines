@@ -105,11 +105,6 @@ int conectarAServidor(char *ipDestino, char *puertoDestino){
 
 	freeaddrinfo(infoServer);
 
-	if (socketDestino < 0){
-		printf("Error al tratar de conectar con Kernel!\n");
-		return FALLO_CONEXION;
-	}
-
 	return socketDestino;
 }
 
