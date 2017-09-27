@@ -1,0 +1,1 @@
+Se desconecto el cliente de fd: 4.
