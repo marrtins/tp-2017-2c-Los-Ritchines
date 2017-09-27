@@ -120,7 +120,7 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD){
 }
 
 void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
-	FILE * archivoDirectorios = fopen("/home/utnso/buenasPracticas/fileSystem/src/metadata/directorios.txt", "r");
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
 	int i = 0;
 
 	while(!feof(archivoDirectorios)){
@@ -139,9 +139,9 @@ void mostrarDirectorios(Tdirectorios * tablaDirectorios){
 
 
 
-void levantarTablasArchivos(Tarchivos * tablaArchivos){
+void levantarTablaArchivos(Tarchivos * tablaArchivos){
 
-	t_config *archivo = config_create("/home/utnso/buenasPracticas/fileSystem/src/metadata/2/archivo1.txt");
+	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/2/archivo1.txt");
 	Tarchivos *archivos;
 	char**temporal1;
     char**temporal2;

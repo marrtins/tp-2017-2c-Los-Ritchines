@@ -35,11 +35,16 @@ int main(int argc, char* argv[]) {
 	}*/
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
-	fileSystem = obtenerConfiguracion("/home/utnso/buenasPracticas/fileSystem/config_filesystem");
+	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
+<<<<<<< HEAD
 	//levantarTablaArchivos(tablaArchivos);
 	list_create(listaBitmaps);
 	levantarTablas(tablaDirectorios, listaBitmaps);
+=======
+	levantarTablaArchivos(tablaArchivos);
+	levantarTablas(tablaDirectorios, tablaArchivos);
+>>>>>>> c992c2dae112d371c917e2560a14b8a430a25d3e
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
