@@ -1,7 +1,10 @@
 #ifndef LIB_INCLUDES_H_
 #define LIB_INCLUDES_H_
 
-#include "../../../compartidas/compartidas/funcionesCompartidas.h"
+#include <funcionesCompartidas/funcionesCompartidas.h>
+#include <tiposDatos/definicionesCompartidas.h>
+#include <tiposDatos/estructurasCompartidas.h>
+#include <tiposDatos/includesCompartidos.h>
 
 #include <readline/readline.h>
 #include <commons/bitarray.h>

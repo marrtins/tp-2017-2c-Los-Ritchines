@@ -33,7 +33,7 @@ dependents:
 fileSystem: $(OBJS) $(USER_OBJS) /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug/libcompartidas.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug" -o "fileSystem" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc  -o "fileSystem" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

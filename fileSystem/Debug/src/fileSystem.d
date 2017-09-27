@@ -1,9 +1,5 @@
 src/fileSystem.d: ../src/fileSystem.c ../src/lib/funciones.h \
- ../src/lib/estructuras.h ../src/lib/definiciones.h ../src/lib/includes.h \
- ../src/lib/../../../compartidas/compartidas/funcionesCompartidas.h \
- ../src/lib/../../../compartidas/compartidas/estructurasCompartidas.h \
- ../src/lib/../../../compartidas/compartidas/definicionesCompartidas.h \
- ../src/lib/../../../compartidas/compartidas/includesCompartidos.h
+ ../src/lib/estructuras.h ../src/lib/definiciones.h ../src/lib/includes.h
 
 ../src/lib/funciones.h:
 
@@ -12,11 +8,3 @@ src/fileSystem.d: ../src/fileSystem.c ../src/lib/funciones.h \
 ../src/lib/definiciones.h:
 
 ../src/lib/includes.h:
-
-../src/lib/../../../compartidas/compartidas/funcionesCompartidas.h:
-
-../src/lib/../../../compartidas/compartidas/estructurasCompartidas.h:
-
-../src/lib/../../../compartidas/compartidas/definicionesCompartidas.h:
-
-../src/lib/../../../compartidas/compartidas/includesCompartidos.h:

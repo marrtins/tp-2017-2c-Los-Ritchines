@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>fileSystem</name>
+	<name>tiposRecursos</name>
 	<comment></comment>
 	<projects>
-		<project>dataNode</project>
-		<project>compartidas</project>
-		<project>biblioPropias</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

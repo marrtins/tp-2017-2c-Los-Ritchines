@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
 
 	logger = log_create("worker.log", "worker.log", false, LOG_LEVEL_INFO);
 
-	worker=obtenerConfiguracionWorker("/home/utnso/buenasPracticas/worker/config_worker");
+	worker=obtenerConfiguracionWorker(argv[1]);
 	mostrarConfiguracion(worker);
 
 	socketDeMaster = crearSocketDeEscucha(worker->puerto_entrada);
