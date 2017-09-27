@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
 	}*/
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
-	fileSystem = obtenerConfiguracion("/home/utnso/buenasPracticas/fileSystem/config_filesystem");
+	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
-	//levantarTablaArchivos(tablaArchivos);
+	levantarTablaArchivos(tablaArchivos);
 	levantarTablas(tablaDirectorios, tablaArchivos);
 
 	FD_ZERO(&masterFD);
