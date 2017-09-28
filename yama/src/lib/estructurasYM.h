@@ -1,7 +1,7 @@
-#ifndef LIB_ESTRUCTURAS_H_
-#define LIB_ESTRUCTURAS_H_
+#ifndef LIB_ESTRUCTURASYM_H_
+#define LIB_ESTRUCTURASYM_H_
 
-#include "definiciones.h"
+#include "definicionesYM.h"
 
 typedef struct{
 

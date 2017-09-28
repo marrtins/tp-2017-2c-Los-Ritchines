@@ -1,4 +1,4 @@
-#include "funciones.h"
+#include "funcionesFS.h"
 
 void logAndExit(char * mensaje){
 	log_error(logger,mensaje);

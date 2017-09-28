@@ -1,4 +1,4 @@
-#include "lib/funciones.h"
+#include "lib/funcionesYM.h"
 
 
 int main(int argc, char* argv[]){

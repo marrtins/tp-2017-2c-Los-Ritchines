@@ -1,7 +1,7 @@
-#ifndef LIB_ESTRUCTURAS_H_
-#define LIB_ESTRUCTURAS_H_
+#ifndef LIB_ESTRUCTURASFS_H_
+#define LIB_ESTRUCTURASFS_H_
 
-#include "definiciones.h"
+#include "definicionesFS.h"
 
 typedef struct{
 

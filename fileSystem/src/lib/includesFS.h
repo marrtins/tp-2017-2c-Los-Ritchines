@@ -1,5 +1,5 @@
-#ifndef LIB_INCLUDES_H_
-#define LIB_INCLUDES_H_
+#ifndef LIB_INCLUDESFS_H_
+#define LIB_INCLUDESFS_H_
 
 #include <funcionesCompartidas/funcionesCompartidas.h>
 #include <readline/readline.h>

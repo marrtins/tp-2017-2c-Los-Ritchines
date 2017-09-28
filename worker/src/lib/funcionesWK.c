@@ -1,4 +1,4 @@
-#include "funciones.h"
+#include "funcionesWK.h"
 
 void logAndExit(char * mensaje){
 	log_error(logger,mensaje);

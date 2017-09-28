@@ -5,10 +5,10 @@
  *      Author: utnso
  */
 
-#ifndef LIB_ESTRUCTURAS_H_
-#define LIB_ESTRUCTURAS_H_
+#ifndef LIB_ESTRUCTURASWK_H_
+#define LIB_ESTRUCTURASWK_H_
 
-#include "definiciones.h"
+#include "definicionesWK.h"
 
 
 typedef struct{
@@ -24,4 +24,4 @@ typedef struct{
 
 t_log* logger;
 
-#endif /* LIB_ESTRUCTURAS_H_ */
+#endif /* LIB_ESTRUCTURASWK_H_ */

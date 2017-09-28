@@ -1,7 +1,7 @@
-#ifndef LIB_FUNCIONES_H_
-#define LIB_FUNCIONES_H_
+#ifndef LIB_FUNCIONESFS_H_
+#define LIB_FUNCIONESFS_H_
 
-#include "estructuras.h"
+#include "estructurasFS.h"
 
 void logAndExit(char * mensaje);
 TfileSystem *obtenerConfiguracion(char* ruta);

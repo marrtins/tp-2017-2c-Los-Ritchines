@@ -1,7 +1,7 @@
-#ifndef LIB_ESTRUCTURAS_H_
-#define LIB_ESTRUCTURAS_H_
+#ifndef LIB_ESTRUCTURASMS_H_
+#define LIB_ESTRUCTURASMS_H_
 
-#include "definiciones.h"
+#include "definicionesMS.h"
 
 typedef struct{
 	char * ipYama;

@@ -5,13 +5,13 @@
  *      Author: utnso
  */
 
-#ifndef LIB_DEFINICIONES_H_
-#define LIB_DEFINICIONES_H_
+#ifndef LIB_DEFINICIONESDN_H_
+#define LIB_DEFINICIONESDN_H_
 
-#include "includes.h"
+#include "includesDN.h"
 
 #define MAXIMA_LONGITUD_RUTA 100
 #define MAXIMA_LONGITUD_NOMBRE 100
 
 
-#endif /* LIB_DEFINICIONES_H_ */
+#endif /* LIB_DEFINICIONESDN_H_ */

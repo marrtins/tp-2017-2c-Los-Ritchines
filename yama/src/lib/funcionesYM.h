@@ -1,7 +1,7 @@
-#ifndef LIB_FUNCIONES_H_
-#define LIB_FUNCIONES_H_
+#ifndef LIB_FUNCIONESYM_H_
+#define LIB_FUNCIONESYM_H_
 
-#include "estructuras.h"
+#include "estructurasYM.h"
 
 void logAndExit(char * mensaje);
 Tyama *obtenerConfiguracion(char* ruta);

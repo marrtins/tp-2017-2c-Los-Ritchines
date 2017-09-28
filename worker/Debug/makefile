@@ -27,7 +27,7 @@ endif
 all: worker
 
 dependents:
-	-cd /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug && $(MAKE) all
+	-cd /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug && $(MAKE) clean all
 
 # Tool invocations
 worker: $(OBJS) $(USER_OBJS) /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug/libcompartidas.so

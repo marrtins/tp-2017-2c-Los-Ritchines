@@ -1,7 +1,7 @@
-#ifndef LIB_FUNCIONES_H_
-#define LIB_FUNCIONES_H_
+#ifndef LIB_FUNCIONESWK_H_
+#define LIB_FUNCIONESWK_H_
 
-#include "estructuras.h"
+#include "estructurasWK.h"
 
 void logAndExit(char * mensaje);
 Tworker *obtenerConfiguracionWorker(char* ruta);

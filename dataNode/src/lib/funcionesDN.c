@@ -1,4 +1,4 @@
-#include "funciones.h"
+#include "funcionesDN.h"
 
 void logAndExit(char * mensaje){
 	log_error(logger,mensaje);

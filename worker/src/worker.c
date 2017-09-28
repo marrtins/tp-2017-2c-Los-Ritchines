@@ -1,4 +1,4 @@
-#include "lib/funciones.h"
+#include "lib/funcionesWK.h"
 
 int main(int argc, char* argv[]){
 

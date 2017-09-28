@@ -1,7 +1,7 @@
-#ifndef LIB_FUNCIONES_H_
-#define LIB_FUNCIONES_H_
+#ifndef LIB_FUNCIONESDN_H_
+#define LIB_FUNCIONESDN_H_
 
-#include "estructuras.h"
+#include "estructurasDN.h"
 
 TdataNode *obtenerConfiguracion(char* ruta);
 void mostrarConfiguracion(TdataNode *dn);
