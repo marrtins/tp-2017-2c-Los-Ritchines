@@ -1,10 +1,11 @@
-src/fileSystem.d: ../src/fileSystem.c ../src/lib/funciones.h \
- ../src/lib/estructuras.h ../src/lib/definiciones.h ../src/lib/includes.h
+src/fileSystem.d: ../src/fileSystem.c ../src/lib/funcionesFS.h \
+ ../src/lib/estructurasFS.h ../src/lib/definicionesFS.h \
+ ../src/lib/includesFS.h
 
-../src/lib/funciones.h:
+../src/lib/funcionesFS.h:
 
-../src/lib/estructuras.h:
+../src/lib/estructurasFS.h:
 
-../src/lib/definiciones.h:
+../src/lib/definicionesFS.h:
 
-../src/lib/includes.h:
+../src/lib/includesFS.h:

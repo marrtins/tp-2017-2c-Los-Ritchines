@@ -85,3 +85,7 @@
 [ERROR] 15:33:18:574 FileSystem.log/(5190:5190): Fallo el select.
 [ERROR] 20:45:22:425 FileSystem.log/(2754:2754): Fallo el select.
 [ERROR] 20:49:06:321 FileSystem.log/(2988:2988): Fallo el select.
+[ERROR] 16:09:59:825 FileSystem.log/(12657:12657): Fallo el select.
+[ERROR] 16:10:50:356 FileSystem.log/(12839:12839): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:10:56:449 FileSystem.log/(12843:12843): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:12:11:312 FileSystem.log/(12890:12890): Fallo el select.

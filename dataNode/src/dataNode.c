@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
 	char *mensaje = malloc(100);
 	Theader *head = malloc(HEAD_SIZE);
 	head->tipo_de_proceso = DATANODE;
-	head->tipo_de_mensaje = 0;
+	head->tipo_de_mensaje = INFO_NODO;
 
 	if(argc!=2){
 			printf("Error en la cantidad de parametros\n");

@@ -1,10 +1,11 @@
-src/worker.d: ../src/worker.c ../src/lib/funciones.h \
- ../src/lib/estructuras.h ../src/lib/definiciones.h ../src/lib/includes.h
+src/worker.d: ../src/worker.c ../src/lib/funcionesWK.h \
+ ../src/lib/estructurasWK.h ../src/lib/definicionesWK.h \
+ ../src/lib/includesWK.h
 
-../src/lib/funciones.h:
+../src/lib/funcionesWK.h:
 
-../src/lib/estructuras.h:
+../src/lib/estructurasWK.h:
 
-../src/lib/definiciones.h:
+../src/lib/definicionesWK.h:
 
-../src/lib/includes.h:
+../src/lib/includesWK.h:

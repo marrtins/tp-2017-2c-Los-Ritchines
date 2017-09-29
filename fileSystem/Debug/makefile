@@ -27,7 +27,7 @@ endif
 all: fileSystem
 
 dependents:
-	-cd /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug && $(MAKE) clean all
+	-cd /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug && $(MAKE) all
 
 # Tool invocations
 fileSystem: $(OBJS) $(USER_OBJS) /home/utnso/tp-2017-2c-Los-Ritchines/compartidas/Debug/libcompartidas.so
