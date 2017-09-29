@@ -16,5 +16,6 @@ void levantarTablasArchivos(Tarchivos * tablaArchivos);
 void levantarTablasNodos();
 void levantarTablas(Tdirectorios * tablaDirectorios);
 t_bitarray* crearBitmap(int tamanioBitmap);
+void conexionesDatanode(void * estructura);
 
 #endif

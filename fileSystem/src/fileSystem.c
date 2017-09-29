@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 	t_list * listaDeNodos;
 	TfileSystem * fileSystem;
 
-	pthread_t consolaThread;
+	pthread_t consolaThread, datanodesThread;
 
 	fd_set readFD, masterFD;
 
@@ -46,9 +46,9 @@ int main(int argc, char* argv[]) {
 	FD_ZERO(&readFD);
 	//list_create(listaDeNodos);
 
-	crearHilo(&consolaThread, (void *)consolaFS);
-	socketDeEscuchaDatanodes = crearSocketDeEscucha(fileSystem->puerto_datanode);
+	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 
+	socketDeEscuchaDatanodes = crearSocketDeEscucha(fileSystem->puerto_datanode);
 	fileDescriptorMax = MAXIMO(socketDeEscuchaDatanodes, fileDescriptorMax);
 
 	while (listen(socketDeEscuchaDatanodes, BACKLOG) == -1){
@@ -121,6 +121,24 @@ int main(int argc, char* argv[]) {
 					switch(head->tipo_de_proceso){
 						case YAMA:
 							puts("Es YAMA");
+							if (estable) {
+									puts("Filesystem estable");
+									socketYama = aceptarCliente(socketDeEscuchaYama);
+
+									puts("Recibimos de YAMA");
+									estado = recv(socketYama, head, HEAD_SIZE, 0);
+
+									if (estado == -1) {
+										log_trace(logger, "Error al recibir información de Yama.");
+									} else if (estado == 0) {
+										sprintf(mensaje, "Se desconecto el cliente de fd: %d.", socketYama);
+										log_trace(logger, mensaje);
+										close(socketYama);
+									}
+									printf("Recibi %d bytes\n", estado);
+									printf("el proceso es %d\n", head->tipo_de_proceso);
+									printf("el mensaje es %d\n", head->tipo_de_mensaje);
+								}
 							break;
 
 						case DATANODE:
@@ -159,29 +177,6 @@ int main(int argc, char* argv[]) {
 		puts("sali del for");
 
 	} // termina el while
-
-
-
-	if (estable) {
-		puts("Filesystem estable");
-		socketYama = aceptarCliente(socketDeEscuchaYama);
-
-		puts("Recibimos de YAMA");
-		estado = recv(socketYama, head, HEAD_SIZE, 0);
-
-		if (estado == -1) {
-			log_trace(logger, "Error al recibir información de Yama.");
-		} else if (estado == 0) {
-			sprintf(mensaje, "Se desconecto el cliente de fd: %d.", socketYama);
-			log_trace(logger, mensaje);
-			close(socketYama);
-		}
-		printf("Recibi %d bytes\n", estado);
-		printf("el proceso es %d\n", head->tipo_de_proceso);
-		printf("el mensaje es %d\n", head->tipo_de_mensaje);
-	}
-
-
 
 
 	free(mensaje);

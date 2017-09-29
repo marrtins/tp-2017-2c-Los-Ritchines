@@ -5,7 +5,7 @@
 PUERTO_FILESYSTEM=5000
 
 #Aca escucha conexiones de DataNodes
-PUERTO_DATANODE=5001
+PUERTO_DATANODE=5999
 
 #Aca se conecta escucha conexiones de YAMA
 PUERTO_YAMA=5002

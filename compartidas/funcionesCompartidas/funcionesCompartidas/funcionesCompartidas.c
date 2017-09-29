@@ -56,8 +56,8 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 	return socketDeEscucha;
 }
 
-void crearHilo(pthread_t * nombreHilo, void * nombreFuncion){
-	if(pthread_create(nombreHilo, NULL, nombreFuncion, NULL) < 0){
+void crearHilo(pthread_t * nombreHilo, void * nombreFuncion, void * parametros){
+	if(pthread_create(nombreHilo, NULL, nombreFuncion, parametros) < 0){
 				logAndExit("No se pudo crear el hilo.");
 		}
 }
