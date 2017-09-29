@@ -13,7 +13,7 @@ int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void freeEstructuraAnidada(Tarchivos * tabla, int cantBloques);
 void levantarTablasDirectorios(Tdirectorios * tablaDirectorios);
-void levantarTablasArchivos(Tarchivos * tablaArchivos);
+void levantarTablaArchivos(Tarchivos * tablaArchivos);
 void levantarTablasNodos();
 void levantarTablas(Tdirectorios * tablaDirectorios);
 t_bitarray* crearBitmap(int tamanioBitmap);

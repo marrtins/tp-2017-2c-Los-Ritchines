@@ -39,18 +39,11 @@ int main(int argc, char* argv[]) {
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 
-<<<<<<< HEAD
 
 	list_create(listaBitmaps);
-	levantarTablas(tablaDirectorios, listaBitmaps);
-
-	levantarTablaArchivos(tablaArchivos);
-	levantarTablas(tablaDirectorios, tablaArchivos);
-
-=======
-	//levantarTablaArchivos(tablaArchivos);
 	levantarTablas(tablaDirectorios);
->>>>>>> 6f4f1fe50bba3292601ff6c1794221429283fbaa
+	levantarTablaArchivos(tablaArchivos);
+
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
