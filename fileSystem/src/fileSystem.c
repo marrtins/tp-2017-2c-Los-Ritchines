@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 		cantModificados,
 		estable = 0;
 
-	t_list * listaBitmaps;
+	t_list * listaBitmaps = list_create();
 
 	Tdirectorios tablaDirectorios[100];
 	Tarchivos * tablaArchivos = malloc(sizeof(Tarchivos));
@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 
+<<<<<<< HEAD
 
 	list_create(listaBitmaps);
 	levantarTablas(tablaDirectorios, listaBitmaps);
@@ -46,6 +47,10 @@ int main(int argc, char* argv[]) {
 	levantarTablaArchivos(tablaArchivos);
 	levantarTablas(tablaDirectorios, tablaArchivos);
 
+=======
+	//levantarTablaArchivos(tablaArchivos);
+	levantarTablas(tablaDirectorios);
+>>>>>>> 6f4f1fe50bba3292601ff6c1794221429283fbaa
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -130,6 +135,12 @@ int main(int argc, char* argv[]) {
 
 						case DATANODE:
 							puts("Es DATANODE");
+							if(head->tipo_de_mensaje == INFO_NODO){
+								list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
+								mostrarBitmap(list_get(listaBitmaps,0));
+
+							}
+
 							break;
 
 						//NO está manejada la conexion con worker

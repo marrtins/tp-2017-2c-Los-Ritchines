@@ -43,9 +43,14 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 }
 
 void liberarPunteroDePunterosAChar(char** palabras){
+<<<<<<< HEAD
 	int i = 0;
 
 	while(palabras[i] != NULL){
+=======
+	int i=0;
+	while(palabras[i]!=NULL){
+>>>>>>> 6f4f1fe50bba3292601ff6c1794221429283fbaa
 		free(palabras[i]);
 		i++;
 	}
@@ -212,6 +217,7 @@ int contarPunteroDePunteros(char ** puntero){
 	return contador;
 }
 
+<<<<<<< HEAD
 
 void crearBitmaps(t_list * listaBitmaps){
 /*	char ** nodos;
@@ -234,6 +240,13 @@ void crearBitmaps(t_list * listaBitmaps){
 		list_add(listaBitmaps, bitmap);
 	}*/
 
+=======
+t_bitarray* crearBitmap(int tamanioDatabin){
+	int tamanioEnBits = ceil(tamanioDatabin/8.0);
+	char * bitarray = calloc(tamanioEnBits,1);
+	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBits,LSB_FIRST);
+	return bitmap;
+>>>>>>> 6f4f1fe50bba3292601ff6c1794221429283fbaa
 }
 
 void levantarTablasNodos(){
@@ -242,9 +255,16 @@ void levantarTablasNodos(){
 	config_save(tablaNodosConfig); // escribe algo en el config*/
 }
 
-void levantarTablas(Tdirectorios * tablaDirectorios, t_list * listaBitMaps){
+void levantarTablas(Tdirectorios * tablaDirectorios){
 	levantarTablasDirectorios(tablaDirectorios);
 	mostrarDirectorios(tablaDirectorios); //no hace nada, pero deberia
-	//levantarTablasNodos(); el torri dijo que no va
-	crearBitmaps(listaBitMaps);
+}
+
+void mostrarBitmap(t_bitarray* bitmap){
+	int i;
+	puts("El bitmap es:");
+	for(i=0;i < bitarray_get_max_bit(bitmap);i++){
+		printf("%d",bitarray_test_bit(bitmap,i));
+	}
+	puts("");
 }
