@@ -43,11 +43,12 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 }
 
 void liberarPunteroDePunterosAChar(char** palabras){
-	int i=0;
-	while(palabras[i]!=NULL){
+	int i = 0;
+	while(palabras[i] != NULL){
 		free(palabras[i]);
 		i++;
 	}
+
 }
 
 void procesarInput(char* linea) {
@@ -279,29 +280,67 @@ void mostrarDirectorios(Tdirectorios * tablaDirectorios){
 }
 
 
-
 void levantarTablaArchivos(Tarchivos * tablaArchivos){
 
-	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/2/archivo1.txt");
-	Tarchivos *archivos;
-	char**temporal1;
-    char**temporal2;
-    int bytes;
-	strcpy(archivos->tamanioTotal, config_get_int_value(archivo, "TAMANIO"));
-	strcpy(archivos->extensionArchivo, config_get_string_value(archivo, "TIPO"));
-	strcpy(temporal1, config_get_array_value(archivo, "BLOQUECOPIA0"));
-	strcpy(temporal2, config_get_array_value(archivo, "BLOQUE0COPIA1"));
-	strcpy(bytes, config_get_int_value(archivo, "BLOQUE0BYTES"));
+	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/2/archivo1.txt");
 
+	tablaArchivos->extensionArchivo = malloc(sizeof(Tarchivos));
+	tablaArchivos->bloques = malloc(sizeof(Tbloques));
 
-	strcpy(archivos->bloques->copiaCero.nombreDeNodo,**temporal1);
-	strcpy(archivos->bloques->copiaCero.numeroBloqueDeNodo,**(temporal1 + 1));
-	archivos->bloques->bytes =bytes;
-	//destruye la estructura de configuracion, supongo que para liberar memoria o por seguridad
-	config_destroy(archivo);
+	int cantBloques,
+			nroBloque = 0;
+	char **temporal1,
+				**temporal2;
+	char* bloqueCopia0 = malloc(sizeof(char)*20);
+	char* bloqueCopia1 = malloc(sizeof(char)*20);
+	char* bloqueBytes = malloc(sizeof(char)*20);
 
-	fclose(archivo);
+	tablaArchivos->tamanioTotal = config_get_int_value(archivo, "TAMANIO");
+	strcpy(tablaArchivos->extensionArchivo, config_get_string_value(archivo, "TIPO"));
+
+	cantBloques = ceil(tablaArchivos->tamanioTotal/1048576.0);
+	printf("cant bloques %d\n",cantBloques);
+
+	printf("Tamanio %d\n", tablaArchivos->tamanioTotal);
+	printf("Extension %s\n", tablaArchivos->extensionArchivo);
+
+	while(nroBloque != cantBloques){
+
+		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(sizeof(char*));
+		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char*));
+		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(sizeof(char*));
+		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char*));
+
+		sprintf(bloqueCopia0,"BLOQUE%dCOPIA0",nroBloque);
+		sprintf(bloqueCopia1,"BLOQUE%dCOPIA1",nroBloque);
+		sprintf(bloqueBytes,"BLOQUE%dBYTES",nroBloque);
+
+		temporal1 = config_get_array_value(archivo, bloqueCopia0);
+		temporal2 = config_get_array_value(archivo, bloqueCopia1);
+		tablaArchivos->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueBytes);
+
+		strcpy(tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo,temporal1[0]);
+		strcpy(tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo,temporal1[1]);
+
+		strcpy(tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo,temporal2[0]);
+		strcpy(tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo,temporal2[1]);
+
+		printf("Nombre de nodo copia cero %s\n",tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo);
+		printf("Numero de nodo copia cero %s\n",tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
+		printf("Nombre de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo);
+		printf("Numero de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
+		printf("Bytes %d\n",tablaArchivos->bloques[nroBloque].bytes);
+		nroBloque++;
+
+		liberarPunteroDePunterosAChar(temporal1);
+		free(temporal1);
+		liberarPunteroDePunterosAChar(temporal2);
+		free(temporal2);
+	}
+	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
+	//config_destroy(archivo);
 }
+
 
 int contarPunteroDePunteros(char ** puntero){
 	char ** aux = puntero;

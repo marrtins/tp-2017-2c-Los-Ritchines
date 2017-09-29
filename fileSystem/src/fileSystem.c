@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 	t_list * listaBitmaps = list_create();
 
 	Tdirectorios tablaDirectorios[100];
-	Tarchivos * tablaArchivos;
+	Tarchivos * tablaArchivos = malloc(sizeof(Tarchivos));
 
 	t_list * listaDeNodos;
 	TfileSystem * fileSystem;
@@ -39,8 +39,11 @@ int main(int argc, char* argv[]) {
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 
-	//levantarTablaArchivos(tablaArchivos);
+
+	list_create(listaBitmaps);
 	levantarTablas(tablaDirectorios);
+	levantarTablaArchivos(tablaArchivos);
+
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -182,6 +185,7 @@ int main(int argc, char* argv[]) {
 	free(mensaje);
 	free(listaDeNodos);
 	free(head);
+	free(tablaArchivos);
 	return EXIT_SUCCESS;
 }
 
