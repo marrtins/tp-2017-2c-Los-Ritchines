@@ -1,2 +1,12 @@
 [ERROR] 16:56:12:309 FileSystem.log/(4719:4719): Fallo el select.
 [ERROR] 18:15:10:385 FileSystem.log/(4762:4762): Fallo el select.
+[ERROR] 14:25:23:618 FileSystem.log/(3141:3141): Fallo el select.
+[ERROR] 15:37:29:681 FileSystem.log/(6798:6798): Fallo el select.
+[ERROR] 15:54:43:980 FileSystem.log/(7351:7351): Fallo el select.
+[ERROR] 16:01:20:760 FileSystem.log/(7437:7437): Fallo el select.
+[ERROR] 16:02:24:849 FileSystem.log/(7518:7518): Fallo el select.
+[ERROR] 16:27:48:72 FileSystem.log/(8145:8145): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:28:27:496 FileSystem.log/(8209:8209): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:29:38:36 FileSystem.log/(8320:8320): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:38:59:59 FileSystem.log/(8065:8065): Fallo el select.
+[ERROR] 18:08:37:787 FileSystem.log/(12633:12633): Fallo el select.

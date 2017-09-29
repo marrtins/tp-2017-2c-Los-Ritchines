@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/lib/funciones.c 
+../src/lib/funcionesYM.c 
 
 OBJS += \
-./src/lib/funciones.o 
+./src/lib/funcionesYM.o 
 
 C_DEPS += \
-./src/lib/funciones.d 
+./src/lib/funcionesYM.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

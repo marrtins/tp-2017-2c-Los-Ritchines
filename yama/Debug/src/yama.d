@@ -1,10 +1,11 @@
-src/yama.d: ../src/yama.c ../src/lib/funciones.h ../src/lib/estructuras.h \
- ../src/lib/definiciones.h ../src/lib/includes.h
+src/yama.d: ../src/yama.c ../src/lib/funcionesYM.h \
+ ../src/lib/estructurasYM.h ../src/lib/definicionesYM.h \
+ ../src/lib/includesYM.h
 
-../src/lib/funciones.h:
+../src/lib/funcionesYM.h:
 
-../src/lib/estructuras.h:
+../src/lib/estructurasYM.h:
 
-../src/lib/definiciones.h:
+../src/lib/definicionesYM.h:
 
-../src/lib/includes.h:
+../src/lib/includesYM.h:
