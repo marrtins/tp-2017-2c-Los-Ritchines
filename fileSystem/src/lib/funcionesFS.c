@@ -43,10 +43,10 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 }
 
 void liberarPunteroDePunterosAChar(char** palabras){
-	int i,
-		longitud = sizeof(palabras)/sizeof(palabras[0]);
-	for(i = 0;i<longitud;i++){
+	int i=0;
+	while(palabras[i]!=NULL){
 		free(palabras[i]);
+		i++;
 	}
 }
 
