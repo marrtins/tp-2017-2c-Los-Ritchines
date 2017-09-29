@@ -43,14 +43,8 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 }
 
 void liberarPunteroDePunterosAChar(char** palabras){
-<<<<<<< HEAD
 	int i = 0;
-
 	while(palabras[i] != NULL){
-=======
-	int i=0;
-	while(palabras[i]!=NULL){
->>>>>>> 6f4f1fe50bba3292601ff6c1794221429283fbaa
 		free(palabras[i]);
 		i++;
 	}
@@ -217,36 +211,11 @@ int contarPunteroDePunteros(char ** puntero){
 	return contador;
 }
 
-<<<<<<< HEAD
-
-void crearBitmaps(t_list * listaBitmaps){
-/*	char ** nodos;
-	char * bitArray;
-	char * nombreNodoTotal = malloc(sizeof(char) * 12);
-	char * nombreNodoLibre = malloc(sizeof(char) * 12);
-	int longitud, i, totalNodos, nodosLibres;
-	t_bitarray * bitmap;
-	t_config * tablaNodosConfig = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-	nodos = config_get_array_value(tablaNodosConfig, "NODOS");
-	longitud = contarPunteroDePunteros(nodos);
-	for(i = 1; i <= longitud; i++){
-		sprintf(nombreNodoTotal, "Nodo%dTotal", i);
-		totalNodos = config_get_int_value(tablaNodosConfig, nombreNodoTotal);
-		sprintf(nombreNodoLibre, "Nodo%dLibre", i);
-		nodosLibres = config_get_int_value(tablaNodosConfig, nombreNodoLibre);
-		bitArray = malloc(totalNodos);
-		bitmap = bitarray_create_with_mode(bitArray, sizeof(bitArray), LSB_FIRST);
-
-		list_add(listaBitmaps, bitmap);
-	}*/
-
-=======
 t_bitarray* crearBitmap(int tamanioDatabin){
 	int tamanioEnBits = ceil(tamanioDatabin/8.0);
 	char * bitarray = calloc(tamanioEnBits,1);
 	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBits,LSB_FIRST);
 	return bitmap;
->>>>>>> 6f4f1fe50bba3292601ff6c1794221429283fbaa
 }
 
 void levantarTablasNodos(){
