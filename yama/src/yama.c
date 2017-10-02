@@ -25,10 +25,7 @@ int main(int argc, char* argv[]){
 	tamanioCliente = sizeof(client);
 
 	//yama cliente
-	if ((estado = conectarAFS(&socketFS,yama)) < 0){
-			puts("No se pudo conectar con FS!");
-			exit(-1);
-	}
+	conectarAFS(&socketFS,yama);
 
 	//yama como servidor
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);

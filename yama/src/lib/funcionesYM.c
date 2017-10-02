@@ -41,30 +41,29 @@ void mostrarConfiguracion(Tyama *yama){
 	printf("Tipo de proceso: %d\n", yama->tipo_de_proceso);
 }
 
-int conectarAFS(int* socketFS, Tyama *yama){
+void conectarAFS(int* socketFS, Tyama *yama){
 	int estado;
 	Theader *head = malloc(HEAD_SIZE);
-
-	//Theader head;
-	// Se trata de conectar con FS
-	if ((*socketFS = conectarAServidor(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
-		fprintf(stderr, "No se pudo conectar con FS! sock_fs: %d\n", *socketFS);
-		return FALLO_CONEXION;
-	}
+	char * mensaje = malloc(100);
 
 	head->tipo_de_proceso=YAMA;
 	head->tipo_de_mensaje=INICIOYAMA;
 
+	//Theader head;
+	// Se trata de conectar con FS
+	if ((*socketFS = conectarAServidor(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
+		sprintf(mensaje, "No se pudo conectar con FS! sock_fs: %d\n", *socketFS);
+		logAndExit(mensaje);
+	}
+
 
 	// No permitimos continuar la ejecucion hasta lograr un handshake con FS
 	if ((estado = send(*socketFS, head, HEAD_SIZE, 0)) == -1){
-		perror("Fallo send de handshake. error");
-		printf("Fallo send() al socket: %d\n", *socketFS);
-		return FALLO_SEND;
+		sprintf(mensaje, "Fallo send() al socket: %d\n", *socketFS);
+		logAndExit(mensaje);
 	}
 
 	printf("Se enviaron: %d bytes a FS del handshake \n", estado);
-	return 0;
 }
 
 char *recvGenericWFlags(int sock_in, int flags){

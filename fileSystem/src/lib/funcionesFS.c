@@ -130,6 +130,7 @@ void conexionesDatanode(void * estructura){
 		nuevoFileDescriptor,
 		fileDescriptor,
 		estable,
+		cantNodosPorConectar = fileSystem->cant_nodos,
 		estado;
 	t_list * listaBitmaps = list_create();
 	Theader * head = malloc(HEAD_SIZE);;
@@ -171,24 +172,13 @@ void conexionesDatanode(void * estructura){
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
 
-						//Se pone estable cuando se conecta un datanode CAMBIARLO
-						estable = 1;
+						cantNodosPorConectar--;
 						puts("Filesystem estable");
 
 						fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 						printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 						break;
 					}
-
-					/*if (fileDescriptor == socketDeEscuchaYama) {
-						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor,
-								&masterFD);
-						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
-						fileDescriptorMax = MAXIMO(nuevoFileDescriptor,
-								fileDescriptorMax);
-						printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
-						break;
-					} Va en yama */
 						puts("Recibiendo...");
 
 						estado = recv(fileDescriptor, head, HEAD_SIZE, 0);
@@ -202,54 +192,24 @@ void conexionesDatanode(void * estructura){
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
 						}
-						switch(head->tipo_de_proceso){
-							/*case YAMA:
-								puts("Es YAMA");
-								if (estable) {
-										puts("Filesystem estable");
-										socketYama = aceptarCliente(socketDeEscuchaYama);
-
-										puts("Recibimos de YAMA");
-										estado = recv(socketYama, head, HEAD_SIZE, 0);
-
-										if (estado == -1) {
-											log_trace(logger, "Error al recibir información de Yama.");
-										} else if (estado == 0) {
-											sprintf(mensaje, "Se desconecto el cliente de fd: %d.", socketYama);
-											log_trace(logger, mensaje);
-											close(socketYama);
-										}
-										printf("Recibi %d bytes\n", estado);
-										printf("el proceso es %d\n", head->tipo_de_proceso);
-										printf("el mensaje es %d\n", head->tipo_de_mensaje);
-									}
-								break;*/
-
-							case DATANODE:
-								puts("Es DATANODE");
-								if(head->tipo_de_mensaje == INFO_NODO){
+					if(head->tipo_de_proceso==DATANODE){
+						switch(head->tipo_de_mensaje){
+							case INFO_NODO:
 									list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
 									mostrarBitmap(list_get(listaBitmaps,0));
-
-								}
-
 								break;
-
-							//NO está manejada la conexion con worker
-							/*case WORKER:
-								puts("Es worker");
-								break;*/
 
 							default:
 								puts("Hacker detected");
 								break;
 						}
+
 					printf("Recibi %d bytes\n",estado);
 					printf("el proceso es %d\n", head->tipo_de_proceso);
 					printf("el mensaje es %d\n", head->tipo_de_mensaje);
 					break;
 
-
+				}
 
 				} //termine el if
 
@@ -262,6 +222,7 @@ void conexionesDatanode(void * estructura){
 
 		} // termina el while
 
+	//POR ACA VA UN SIGNAL PARA INDICAR QUE FS YA TIENE TODOS LOS NODOS CONECTADOS.
 }
 
 void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
