@@ -26,8 +26,7 @@ int main(int argc, char* argv[]) {
 	logger = log_create("master.log", "master.log", false, LOG_LEVEL_INFO);
 
 	head->tipo_de_proceso = MASTER;
-	head->tipo_de_mensaje = 22;
-
+	head->tipo_de_mensaje = INICIOMASTER;
 	/*rutaTransformador=argv[1];
 	rutaReductor=argv[2];
 	rutaArchivoAReducir=argv[3];
@@ -39,26 +38,6 @@ int main(int argc, char* argv[]) {
 	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
 
 	cantidadBytesEnviados = enviarHeader(socketAYama, head);
-
-	/*if (send(socketAYama, rutaTransformador, strlen(rutaTransformador) +1, 0) == -1){
-				puts("No se pudo enviar codigo fuente de transformador a YAMA. ");
-				return  FALLO_SEND;
-			}
-
-	if (send(socketAYama, rutaReductor, strlen(rutaReductor) +1, 0) == -1){
-			puts("No se pudo enviar codigo fuente de REDUCTOR a YAMA. ");
-			return  FALLO_SEND;
-		}
-
-	if (send(socketAYama, rutaArchivoAReducir, strlen(rutaArchivoAReducir) +1, 0) == -1){
-			puts("No se pudo enviar la ruta del archivo a reducir a YAMA. ");
-			return  FALLO_SEND;
-		}
-
-		if (send(socketAYama, rutaResultado, strlen(rutaResultado) +1, 0) == -1){
-				puts("No se pudo enviar la ruta del archivo reducido a YAMA. ");
-				return  FALLO_SEND;
-			}*/
 
 	//YAMA nos envia toda la info para conectarnos a los workers
 	while ((recv(socketAYama, head, HEAD_SIZE, 0)) > 0) {
@@ -78,7 +57,7 @@ int main(int argc, char* argv[]) {
 			socketAWorker = conectarAServidor("127.0.0.1",	"5050");
 
 			head->tipo_de_proceso = MASTER;
-			head->tipo_de_mensaje = 0;
+			head->tipo_de_mensaje = INICIOMASTER;
 
 			cantidadBytesEnviados = enviarHeader(socketAWorker,head);
 			printf("Se envian %d bytes a Worker\n",cantidadBytesEnviados);
