@@ -10,6 +10,7 @@ typedef struct{
 	char* puerto_yama;
 	char* ip_yama;
 	int tipo_de_proceso;
+	int cant_nodos;
 
 }TfileSystem;
 

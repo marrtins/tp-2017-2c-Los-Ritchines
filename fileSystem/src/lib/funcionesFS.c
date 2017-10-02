@@ -12,6 +12,7 @@ TfileSystem *obtenerConfiguracion(char* ruta){
 	fileSystem->puerto_datanode = malloc(MAXIMA_LONGITUD_PUERTO);
 	fileSystem->puerto_yama = malloc(MAXIMA_LONGITUD_PUERTO);
 	fileSystem->ip_yama = malloc(MAXIMA_LONGITUD_IP);
+	fileSystem->cant_nodos = malloc(sizeof(int));
 
 	//funcion de gaston, recibe la ruta del archivo de configuracion y te devuelve
 	//un puntero a una estructura con todos los datos que va leyendo del archivo de conf
@@ -23,6 +24,9 @@ TfileSystem *obtenerConfiguracion(char* ruta){
 	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
 	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
 	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
+	fileSystem->cant_nodos = config_get_int_value(fsConfig, "CANT_NODOS");
+
+	printf("Cant de nodos %d\n", fileSystem->cant_nodos);
 
 	//cargo el tipo de proceso (harcodeado)
 	fileSystem->tipo_de_proceso = FILESYSTEM;

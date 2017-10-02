@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
 		socketYama,
 		nuevoFileDescriptor,
 		cantModificados,
-		estable = 0;
+		cantNodosPorConectar;
 
 	t_list * listaBitmaps = list_create();
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
-
+	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	list_create(listaBitmaps);
 	levantarTablas(tablaDirectorios);
@@ -91,8 +91,8 @@ int main(int argc, char* argv[]) {
 					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
 
 					//Se pone estable cuando se conecta un datanode CAMBIARLO
-					estable = 1;
-					puts("Filesystem estable");
+					cantNodosPorConectar--;
+
 
 					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 					switch(head->tipo_de_proceso){
 						case YAMA:
 							puts("Es YAMA");
-							if (estable) {
+							if (cantNodosPorConectar == 0) {
 									puts("Filesystem estable");
 									socketYama = aceptarCliente(socketDeEscuchaYama);
 
