@@ -12,7 +12,6 @@ TfileSystem *obtenerConfiguracion(char* ruta){
 	fileSystem->puerto_datanode = malloc(MAXIMA_LONGITUD_PUERTO);
 	fileSystem->puerto_yama = malloc(MAXIMA_LONGITUD_PUERTO);
 	fileSystem->ip_yama = malloc(MAXIMA_LONGITUD_IP);
-	fileSystem->cant_nodos = malloc(sizeof(int));
 
 	//funcion de gaston, recibe la ruta del archivo de configuracion y te devuelve
 	//un puntero a una estructura con todos los datos que va leyendo del archivo de conf
@@ -341,6 +340,9 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 		liberarPunteroDePunterosAChar(temporal2);
 		free(temporal2);
 	}
+		free(bloqueCopia0);
+		free(bloqueCopia1);
+		free(bloqueBytes);
 	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
 	//config_destroy(archivo);
 }
