@@ -343,6 +343,7 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 		free(bloqueCopia0);
 		free(bloqueCopia1);
 		free(bloqueBytes);
+
 	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
 	//config_destroy(archivo);
 }
@@ -383,4 +384,18 @@ void mostrarBitmap(t_bitarray* bitmap){
 		printf("%d",bitarray_test_bit(bitmap,i));
 	}
 	puts("");
+}
+
+void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos){
+	int i;
+	int cantBloques = ceil(tablaDeArchivos->tamanioTotal/1048576.0);
+	tablaDeArchivos->extensionArchivo = malloc(sizeof(Tarchivos));
+	tablaDeArchivos->bloques = malloc(sizeof(Tbloques));
+
+	for(i = 0; i != cantBloques; i++){
+		free(tablaDeArchivos->bloques[i].copiaCero.nombreDeNodo);
+		free(tablaDeArchivos->bloques[i].copiaCero.numeroBloqueDeNodo);
+		free(tablaDeArchivos->bloques[i].copiaUno.nombreDeNodo);
+		free(tablaDeArchivos->bloques[i].copiaUno.numeroBloqueDeNodo);
+	}
 }

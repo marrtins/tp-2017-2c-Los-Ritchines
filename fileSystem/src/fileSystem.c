@@ -179,8 +179,12 @@ int main(int argc, char* argv[]) {
 
 	} // termina el while
 
+	//tabla de archivos
+	liberarTablaDeArchivos(&tablaArchivos);
 
+	//otros
 	free(mensaje);
+	free(listaBitmaps);
 	free(listaDeNodos);
 	free(head);
 	free(tablaArchivos);
