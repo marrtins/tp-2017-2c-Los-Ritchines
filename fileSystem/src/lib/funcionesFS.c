@@ -309,10 +309,10 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 
 	while(nroBloque != cantBloques){
 
-		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(sizeof(char*));
-		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char*));
-		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(sizeof(char*));
-		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char*));
+		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(sizeof(char)*7);
+		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char)*4);
+		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(sizeof(char)*7);
+		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 
 		sprintf(bloqueCopia0,"BLOQUE%dCOPIA0",nroBloque);
 		sprintf(bloqueCopia1,"BLOQUE%dCOPIA1",nroBloque);
