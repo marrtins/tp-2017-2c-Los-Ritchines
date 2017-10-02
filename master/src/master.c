@@ -27,17 +27,17 @@ int main(int argc, char* argv[]) {
 
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;
-	/*rutaTransformador=argv[1];
+	rutaTransformador=argv[1];
 	rutaReductor=argv[2];
 	rutaArchivoAReducir=argv[3];
-	rutaResultado=argv[4];*/
+	rutaResultado=argv[4];
 
 	master = obtenerConfiguracion("/home/utnso/buenasPracticas/master/config_master");
 	mostrarConfiguracion(master);
 
 	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
 
-	cantidadBytesEnviados = enviarHeader(socketAYama, head);
+	empaquetarRutasYamafs(head,rutaArchivoAReducir,rutaResultado);
 
 	//YAMA nos envia toda la info para conectarnos a los workers
 	while ((recv(socketAYama, head, HEAD_SIZE, 0)) > 0) {

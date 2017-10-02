@@ -1,7 +1,7 @@
 #ifndef COMPARTIDAS_FUNCIONESCOMPARTIDAS_H_
 #define COMPARTIDAS_FUNCIONESCOMPARTIDAS_H_
 
-#include <tiposDatos/estructurasCompartidas.h>
+#include "serializacion.h"
 
 void logAndExit(char * mensaje);
 void setupHints(struct addrinfo *hints, int familiaDeProtocolos, int tipoDeProtocolo, int flags);

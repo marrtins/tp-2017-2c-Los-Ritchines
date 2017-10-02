@@ -42,4 +42,19 @@ typedef enum{
 	CONEX_INVAL=-26
 }Terrores;
 
+typedef struct {
+	Theader head;
+	uint32_t tamanioRutaOrigen;
+	char * rutaOrigen;
+	uint32_t tamanioRutaResultado;
+	char * rutaResultado;
+}TpackageRutas;
+
+typedef struct {
+	Theader head;
+	uint32_t tamanioReductor;
+	char * scriptReductor;
+	uint32_t tamanioTransformador;
+	char * scriptTransformador;
+}TpackageScripts;
 #endif
