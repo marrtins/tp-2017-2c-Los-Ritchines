@@ -4,13 +4,8 @@
 int main(int argc, char* argv[]) {
 
 	int estado,
-		fileDescriptor,
-		fileDescriptorMax = -1,
-		socketDeEscuchaDatanodes,
 		socketDeEscuchaYama,
 		socketYama,
-		nuevoFileDescriptor,
-		cantModificados,
 		cantNodosPorConectar;
 
 	t_list * listaBitmaps = list_create();
@@ -51,143 +46,70 @@ int main(int argc, char* argv[]) {
 
 	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
-	while(1);
-	socketDeEscuchaDatanodes = crearSocketDeEscucha(fileSystem->puerto_datanode);
-	fileDescriptorMax = MAXIMO(socketDeEscuchaDatanodes, fileDescriptorMax);
-
-	while (listen(socketDeEscuchaDatanodes, BACKLOG) == -1){
-			log_trace(logger, "Fallo al escuchar el socket servidor de file system.");
-			puts("Reintentamos...");
-	}
-
-	FD_SET(socketDeEscuchaDatanodes, &masterFD);
-	printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
 		log_trace(logger,"Fallo al escuchar el socket servidor de file system.");
 		puts("Reintentamos...");
 	}
-	FD_SET(socketDeEscuchaYama, &masterFD);
+		socketYama = aceptarCliente(socketDeEscuchaYama);
+
 	while(1){
+		puts("Recibiendo...");
 
-		printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
+		estado = recv(socketYama, head, HEAD_SIZE, 0);
 
-		puts("Entre al while");
-		readFD = masterFD;
-		puts("Voy a usar el select");
-		if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
-			logAndExit("Fallo el select.");
+		if(estado == -1){
+			log_trace(logger, "Error al recibir información de un cliente.");
+			break;
 		}
-		printf("Cantidad de fd modificados: %d \n", cantModificados);
-		puts("pude usar el select");
+		else if( estado == 0){
+			sprintf(mensaje, "Se desconecto YAMA fd: %d.", socketYama);
+			log_trace(logger, mensaje);
+			break;
+		}
+		switch(head->tipo_de_proceso){
+			case YAMA:
+				puts("Es YAMA");
+				if (cantNodosPorConectar == 0) {
+					puts("Filesystem estable");
 
-		for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
-			printf("Entre al for con el fd: %d\n", fileDescriptor);
-			if(FD_ISSET(fileDescriptor, &readFD)){
-				printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
-				if(fileDescriptor == socketDeEscuchaDatanodes && cantNodosPorConectar > 0){
-					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
-					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+					puts("Recibimos de YAMA");
+					estado = recv(socketYama, head, HEAD_SIZE, 0);
 
-					cantNodosPorConectar--;
-
-					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
-					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
-					break;
-				}
-
-				if (fileDescriptor == socketDeEscuchaYama) {
-					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor,
-							&masterFD);
-					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
-					fileDescriptorMax = MAXIMO(nuevoFileDescriptor,
-							fileDescriptorMax);
-					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
-					break;
-				}
-					puts("Recibiendo...");
-
-					estado = recv(fileDescriptor, head, HEAD_SIZE, 0);
-
-					if(estado == -1){
-						log_trace(logger, "Error al recibir información de un cliente.");
-						break;
-					}
-					else if( estado == 0){
-						sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
+					if (estado == -1) {
+						log_trace(logger, "Error al recibir información de Yama.");
+					} else if (estado == 0) {
+						sprintf(mensaje, "Se desconecto el cliente de fd: %d.", socketYama);
 						log_trace(logger, mensaje);
-						clearAndClose(fileDescriptor, &masterFD);
+						close(socketYama);
 					}
-					switch(head->tipo_de_proceso){
-						case YAMA:
-							puts("Es YAMA");
-							if (cantNodosPorConectar == 0) {
-									puts("Filesystem estable");
-									//socketYama = aceptarCliente(socketDeEscuchaYama);
-
-									puts("Recibimos de YAMA");
-									estado = recv(socketYama, head, HEAD_SIZE, 0);
-
-									if (estado == -1) {
-										log_trace(logger, "Error al recibir información de Yama.");
-									} else if (estado == 0) {
-										sprintf(mensaje, "Se desconecto el cliente de fd: %d.", socketYama);
-										log_trace(logger, mensaje);
-										close(socketYama);
-									}
-									printf("Recibi %d bytes\n", estado);
-									printf("el proceso es %d\n", head->tipo_de_proceso);
-									printf("el mensaje es %d\n", head->tipo_de_mensaje);
-								}
-							break;
-
-						case DATANODE:
-							puts("Es DATANODE");
-							if(head->tipo_de_mensaje == INFO_NODO){
-
-								list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
-								mostrarBitmap(list_get(listaBitmaps,0));
-
-							}
-
-							break;
+					printf("Recibi %d bytes\n", estado);
+					printf("el proceso es %d\n", head->tipo_de_proceso);
+					printf("el mensaje es %d\n", head->tipo_de_mensaje);
+					}
+					break;
 
 						//NO está manejada la conexion con worker
-						case WORKER:
-							puts("Es worker");
-							break;
+					case WORKER:
+						puts("Es worker");
+						break;
 
-						default:
-							puts("Hacker detected");
-							break;
+					default:
+						puts("Hacker detected");
+						break;
 					}
-				printf("Recibi %d bytes\n",estado);
-				printf("el proceso es %d\n", head->tipo_de_proceso);
-				printf("el mensaje es %d\n", head->tipo_de_mensaje);
-				break;
 
-
-
-			} //termine el if
-
-
-			puts("Sali del if de ISSET");
-
-		} //termine el for
-
-		puts("sali del for");
-
-	} // termina el while
+	}puts("sali del while");
 
 	//tabla de archivos
-	liberarTablaDeArchivos(&tablaArchivos);
+	liberarTablaDeArchivos(tablaArchivos);
 
 	//otros
 	free(mensaje);
 	free(listaBitmaps);
-	free(listaDeNodos);
+	//free(listaDeNodos); HAY QUE HACER EL DESTROY LIST DE GASTON
 	free(head);
 	free(tablaArchivos);
 	return EXIT_SUCCESS;
