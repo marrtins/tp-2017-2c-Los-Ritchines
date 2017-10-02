@@ -86,13 +86,9 @@ int main(int argc, char* argv[]) {
 			if(FD_ISSET(fileDescriptor, &readFD)){
 				printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
-				if(fileDescriptor == socketDeEscuchaDatanodes){
+				if(fileDescriptor == socketDeEscuchaDatanodes && cantNodosPorConectar > 0){
 					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
-
-					//Se pone estable cuando se conecta un datanode CAMBIARLO
-					cantNodosPorConectar--;
-
 
 					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
@@ -126,7 +122,7 @@ int main(int argc, char* argv[]) {
 							puts("Es YAMA");
 							if (cantNodosPorConectar == 0) {
 									puts("Filesystem estable");
-									socketYama = aceptarCliente(socketDeEscuchaYama);
+									//socketYama = aceptarCliente(socketDeEscuchaYama);
 
 									puts("Recibimos de YAMA");
 									estado = recv(socketYama, head, HEAD_SIZE, 0);
@@ -147,6 +143,8 @@ int main(int argc, char* argv[]) {
 						case DATANODE:
 							puts("Es DATANODE");
 							if(head->tipo_de_mensaje == INFO_NODO){
+								cantNodosPorConectar--;
+
 								list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
 								mostrarBitmap(list_get(listaBitmaps,0));
 
