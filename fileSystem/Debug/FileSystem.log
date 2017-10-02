@@ -127,3 +127,5 @@
 [ERROR] 15:35:39:555 FileSystem.log/(17946:17946): Fallo el select.
 [ERROR] 15:53:00:62 FileSystem.log/(18203:18203): Fallo el select.
 [ERROR] 16:02:36:356 FileSystem.log/(18382:18382): Fallo el select.
+[ERROR] 16:43:02:570 FileSystem.log/(6661:6661): Fallo el select.
+[ERROR] 16:56:55:431 FileSystem.log/(6991:6991): Fallo el select.
