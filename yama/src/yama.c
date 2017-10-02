@@ -31,7 +31,6 @@ int main(int argc, char* argv[]){
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);
 
 	if ((estado = listen(socketMasters , BACKLOG)) == -1){
-		perror("No se pudo hacer listen del socket. error");
 		logAndExit("No se pudo hacer el listen al socket.");
 	}
 	//acepta y escucha comunicaciones
@@ -61,16 +60,11 @@ int main(int argc, char* argv[]){
 
 			break;
 		default:
-			puts("Trato de conectarse algo que no era ni Kernel ni CPU!");
-			printf("El tipo de proceso y mensaje son: %d y %d\n", head->tipo_de_proceso, head->tipo_de_mensaje);
-			printf("Se recibio esto del socket: %d\n", socketMaster);
-			return CONEX_INVAL;
+			logAndExit("Se conecto a yama un infiltrado. Abortando proceso.");
 		}
 	}
 
-	// Si salio del ciclo es porque fallo el accept()
-
-	perror("Fallo el accept(). error");
+	log_trace(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();
 	return 0;
