@@ -50,7 +50,8 @@ int main(int argc, char* argv[]) {
 	//list_create(listaDeNodos);
 
 	crearHilo(&consolaThread, (void *)consolaFS, NULL);
-
+	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
+	while(1);
 	socketDeEscuchaDatanodes = crearSocketDeEscucha(fileSystem->puerto_datanode);
 	fileDescriptorMax = MAXIMO(socketDeEscuchaDatanodes, fileDescriptorMax);
 
@@ -89,6 +90,8 @@ int main(int argc, char* argv[]) {
 				if(fileDescriptor == socketDeEscuchaDatanodes && cantNodosPorConectar > 0){
 					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+
+					cantNodosPorConectar--;
 
 					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
@@ -143,7 +146,6 @@ int main(int argc, char* argv[]) {
 						case DATANODE:
 							puts("Es DATANODE");
 							if(head->tipo_de_mensaje == INFO_NODO){
-								cantNodosPorConectar--;
 
 								list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
 								mostrarBitmap(list_get(listaBitmaps,0));
