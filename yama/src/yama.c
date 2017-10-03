@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
 	puts("Esperando comunicaciones entrantes...");
 	while((socketMaster = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
 		puts("Conexion aceptada");
-		if ((estado = recv(socketMaster, head, HEAD_SIZE, 0)) < 0){
+		if ((estado = recv(socketMaster, head, sizeof(Theader), 0)) < 0){
 			logAndExit("Error en la recepcion del header de master.");
 		}
 

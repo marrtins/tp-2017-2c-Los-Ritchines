@@ -5,8 +5,8 @@ char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaR
 								sizeof(int) + sizeof(rutaResultado)-1);
 
 	char * p = chorroBytes;
-	memcpy(p, head, HEAD_SIZE);
-	p += HEAD_SIZE;
+	memcpy(p, head, sizeof(Theader));
+	p += sizeof(Theader);
 	memcpy(p, sizeof(*rutaArchivoAReducir), sizeof(int));
 	p += sizeof(int);
 	memcpy(p, *rutaArchivoAReducir, sizeof(*rutaArchivoAReducir));

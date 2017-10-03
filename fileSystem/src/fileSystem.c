@@ -20,29 +20,27 @@ int main(int argc, char* argv[]) {
 
 	fd_set readFD, masterFD;
 
-	Theader *head = malloc(HEAD_SIZE);
+	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100	);
 
-
-	/*
 	if(argc != 2){
 		puts("Error en la cantidad de parametros.");
 		return EXIT_FAILURE;
-	}*/
+	}
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
+	list_create(listaDeNodos);
 	list_create(listaBitmaps);
+
 	levantarTablas(tablaDirectorios);
 	levantarTablaArchivos(tablaArchivos);
 
-
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
-	//list_create(listaDeNodos);
 
 	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
@@ -59,7 +57,7 @@ int main(int argc, char* argv[]) {
 	while(1){
 		puts("Recibiendo...");
 
-		estado = recv(socketYama, head, HEAD_SIZE, 0);
+		estado = recv(socketYama, head, sizeof(Theader), 0);
 
 		if(estado == -1){
 			log_trace(logger, "Error al recibir información de un cliente.");
@@ -78,7 +76,7 @@ int main(int argc, char* argv[]) {
 
 
 					puts("Recibimos de YAMA");
-					estado = recv(socketYama, head, HEAD_SIZE, 0);
+					estado = recv(socketYama, head, sizeof(Theader), 0);
 
 					if (estado == -1) {
 						log_trace(logger, "Error al recibir información de Yama.");
@@ -103,17 +101,18 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 
-	}puts("sali del while");
+	}
 
 	//tabla de archivos
 	liberarTablaDeArchivos(tablaArchivos);
 
+	//listas
+	list_destroy(listaDeNodos);
+	list_destroy(listaBitmaps);
+
 	//otros
 	free(mensaje);
-	free(listaBitmaps);
-	//free(listaDeNodos); HAY QUE HACER EL DESTROY LIST DE GASTON
 	free(head);
-	free(tablaArchivos);
 	return EXIT_SUCCESS;
 }
 

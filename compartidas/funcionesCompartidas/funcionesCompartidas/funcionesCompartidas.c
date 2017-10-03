@@ -112,7 +112,7 @@ int enviarHeader(int socketDestino,Theader * head){
 
 	int estado;
 
-	if ((estado = send(socketDestino, head, HEAD_SIZE, 0)) == -1){
+	if ((estado = send(socketDestino, head, sizeof(Theader), 0)) == -1){
 		logAndExit("Fallo al enviar el header");
 	}
 

@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
 		puertoWorker,
 		ipWorker;
 	Tmaster *master;
-	Theader * head = malloc(HEAD_SIZE);
+	Theader * head = malloc(sizeof(Theader));
 	char *rutaTransformador = string_new();
 	char *rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	empaquetarRutasYamafs(head,rutaArchivoAReducir,rutaResultado);
 
 	//YAMA nos envia toda la info para conectarnos a los workers
-	while ((recv(socketAYama, head, HEAD_SIZE, 0)) > 0) {
+	while ((recv(socketAYama, head, sizeof(Theader), 0)) > 0) {
 
 		puts("Recibimos un paquete de YAMA");
 

@@ -43,7 +43,7 @@ void mostrarConfiguracion(Tyama *yama){
 
 void conectarAFS(int* socketFS, Tyama *yama){
 	int estado;
-	Theader *head = malloc(HEAD_SIZE);
+	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 
 	head->tipo_de_proceso=YAMA;
@@ -58,7 +58,7 @@ void conectarAFS(int* socketFS, Tyama *yama){
 
 
 	// No permitimos continuar la ejecucion hasta lograr un handshake con FS
-	if ((estado = send(*socketFS, head, HEAD_SIZE, 0)) == -1){
+	if ((estado = send(*socketFS, head, sizeof(Theader), 0)) == -1){
 		sprintf(mensaje, "Fallo send() al socket: %d\n", *socketFS);
 		logAndExit(mensaje);
 	}
@@ -81,7 +81,7 @@ char *recvGenericWFlags(int sock_in, int flags){
 		return NULL;
 	}
 
-	pack_size -= (HEAD_SIZE + sizeof(int)); // ya se recibieron estas dos cantidades
+	pack_size -= (sizeof(Theader) + sizeof(int)); // ya se recibieron estas dos cantidades
 	//printf("Paquete de size: %d\n", pack_size);
 
 	if ((p_serial = malloc(pack_size)) == NULL){
@@ -138,7 +138,7 @@ void freeAndNULL(void **ptr){
 void masterHandler(void *client_sock){
 	int sock_master = (int *)client_sock;
 	int estado;
-	Theader * head = malloc(HEAD_SIZE);
+	Theader * head = malloc(sizeof(Theader));
 	TpackSrcCode *entradaTransformador;
 	TpackSrcCode *entradaReductor;
 	TpackBytes *pathArchivoAReducir;
@@ -148,7 +148,7 @@ void masterHandler(void *client_sock){
 	head->tipo_de_mensaje = 0;
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
-	while((estado = recv(sock_master, &head, HEAD_SIZE, 0)) > 0){
+	while((estado = recv(sock_master, &head, sizeof(Theader), 0)) > 0){
 			puts("Se recibio un paquete de Master");
 			printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
 
