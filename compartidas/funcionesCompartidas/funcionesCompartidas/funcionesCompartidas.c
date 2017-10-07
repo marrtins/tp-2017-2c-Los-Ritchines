@@ -1,15 +1,5 @@
 #include "funcionesCompartidas.h"
 
-/*void logMensaje(char * mensaje){
-	FILE * archivoLog = fopen("/home/utnso/buenasPracticas/fileSystem/src/logs/logs.txt", "w");
-	char * mensajeAGuardar = malloc(strlen(mensaje) + 2);
-	strcpy(mensajeAGuardar, mensaje);
-	strcat(mensajeAGuardar, "\n");
-	fputs(mensajeAGuardar, archivoLog);
-	free(mensajeAGuardar);
-
-}*/
-
 void setupHints(struct addrinfo *hints, int address_family, int socket_type, int flags){
 	memset(hints, 0, sizeof *hints);
 	hints->ai_family = address_family;
@@ -23,29 +13,16 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 	struct addrinfo hints, * infoDelServer;
 	char * mensaje = malloc(50);
 
-	//dada la estructura addrinfo, le cargo los demas datos que paso por parametro. Es una función inicializadora
-	//los otros parametros son: la familia de socket que se va a utilizar (TCP/IP) u otro. Null es Default
-	// Tipo de puerto, puede ser stream o datagram (elegimos stream)
-	// Flags, frecuentemente se pone en null, pero en este caso le pusimos passive que no me acuerdo que significaba
-	// mala mia
 	setupHints(&hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
 
-	//getaddrinfo está explicada en utns.com
-	//primer parametro es la ip, si es null, toma el localhost (ip local)
-	//el segundo parametro es el puerto
-	// el tercero es la estructura que inicializamos anteriormente, lo que hace la función es parsear
-	// la direccion y el puerto, y tomar los otros datos para armarme la estructura que le paso por 4to parametro
 	if ((estado = getaddrinfo(NULL, puertoDeEscucha, &hints, &infoDelServer)) != 0){
-		//fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(estado));
 		logAndExit("No se pudo crear el adrrinfo.");
 	}
-	//creo el socket, le mando la familia de protocolos (TCP/IP), el tipo de socket(stream) y el protocolo que
-	//para esta familia puede ser creo que pone el cero el file descriptor, no entiendo muy bienTCP o UPC, elegimos TCP
+
 	if ((socketDeEscucha = socket(infoDelServer->ai_family, infoDelServer->ai_socktype, infoDelServer->ai_protocol)) == -1){
 		logAndExit("No se pudo crear el socket.");
 	}
 
-	//reservamos el puerto que nos enviaron (127.0.0.1:puerto)
 	if ((bind(socketDeEscucha, infoDelServer->ai_addr, infoDelServer->ai_addrlen)) == -1){
 		sprintf(mensaje, "Fallo al reservar el puerto %s. Es posible que el puerto este ocupado." , puertoDeEscucha);
 		logAndExit(mensaje);
@@ -82,7 +59,7 @@ int aceptarCliente(int fileDescriptor){
 int conectarAServidor(char *ipDestino, char *puertoDestino){
 
 	int estado;
-	int socketDestino; // file descriptor para el socket del destino a conectar
+	int socketDestino;
 	struct addrinfo hints, *infoServer;
 
 	setupHints(&hints, AF_INET, SOCK_STREAM, 0);
