@@ -37,7 +37,9 @@ int main(int argc, char* argv[]){
 
 	puts("Esperando comunicaciones entrantes...");
 	while((socketMasters = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
+
 		puts("Conexion aceptada");
+
 		if (recv(socketMasters, &estructuraDeRutas->head, sizeof(Theader), 0) < 0){
 			logAndExit("Error en la recepcion del header de master.");
 		}
@@ -51,6 +53,9 @@ int main(int argc, char* argv[]){
 				return FALLO_GRAL;
 			}*/
 
+			if(estructuraDeRutas->head.tipo_de_mensaje == INICIOMASTER){
+
+
 			desempaquetarRutasYamafs(estructuraDeRutas, socketMasters);
 
 			puts("Desempaquete el mensaje.");
@@ -60,6 +65,9 @@ int main(int argc, char* argv[]){
 			printf("Ruta Origen: %s\n", estructuraDeRutas->rutaOrigen);
 			printf("Ruta Resultado: %s\n", estructuraDeRutas->rutaResultado);
 
+			break;
+
+			}
 			/*head->tipo_de_proceso = YAMA;
 			head->tipo_de_mensaje = INFO_NODO;
 

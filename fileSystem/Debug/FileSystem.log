@@ -130,3 +130,9 @@
 [ERROR] 16:43:02:570 FileSystem.log/(6661:6661): Fallo el select.
 [ERROR] 16:56:55:431 FileSystem.log/(6991:6991): Fallo el select.
 [ERROR] 16:11:46:286 FileSystem.log/(7076:7076): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 19:34:05:753 FileSystem.log/(3230:3230): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 19:34:38:10 FileSystem.log/(3248:3248): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 19:35:12:401 FileSystem.log/(3360:3360): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 19:35:43:146 FileSystem.log/(3478:3478): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 19:36:02:399 FileSystem.log/(3569:3569): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 19:44:51:850 FileSystem.log/(3873:3873): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4

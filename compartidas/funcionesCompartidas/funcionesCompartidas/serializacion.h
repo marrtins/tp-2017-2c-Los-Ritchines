@@ -3,7 +3,7 @@
 
 #include <tiposDatos/estructurasCompartidas.h>
 
-char * empaquetarRutasYamafs(Theader *head, char *rutaArchivoAReducir,char* rutaResultado);
+char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado);
 void desempaquetarRutasYamafs(TpackageRutas * estructuraDeRutas, int socket);
 
 #endif

@@ -26,8 +26,6 @@ int main(int argc, char* argv[]) {
 
 	logger = log_create("master.log", "master.log", false, LOG_LEVEL_INFO);
 
-	head->tipo_de_proceso = MASTER;
-	head->tipo_de_mensaje = INICIOMASTER;
 	rutaTransformador=argv[1];
 	rutaReductor=argv[2];
 	rutaArchivoAReducir=argv[3];
@@ -38,7 +36,13 @@ int main(int argc, char* argv[]) {
 
 	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
 
-	chorroDeBytes = empaquetarRutasYamafs(head,rutaArchivoAReducir,rutaResultado);
+	head->tipo_de_proceso = MASTER;
+	head->tipo_de_mensaje = INICIOMASTER;
+
+	//chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
+	chorroDeBytes = empaquetarRutasYamafs(head, "ruta/hardcodeada/a/reducir", "ruta/harcodeada/destino");
+
+	printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
 
 	send(socketAYama, chorroDeBytes, sizeof(chorroDeBytes), 0);
 
