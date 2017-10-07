@@ -23,10 +23,10 @@ int main(int argc, char* argv[]) {
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100	);
 
-	if(argc != 2){
+	/*if(argc != 2){
 		puts("Error en la cantidad de parametros.");
 		return EXIT_FAILURE;
-	}
+	}*/
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
