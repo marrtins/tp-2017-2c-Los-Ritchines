@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
 		ipWorker;
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
+	char * chorroDeBytes;
 	char *rutaTransformador = string_new();
 	char *rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -32,12 +33,14 @@ int main(int argc, char* argv[]) {
 	rutaArchivoAReducir=argv[3];
 	rutaResultado=argv[4];
 
-	master = obtenerConfiguracion("/home/utnso/buenasPracticas/master/config_master");
+	master = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
 	mostrarConfiguracion(master);
 
 	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
 
-	empaquetarRutasYamafs(head,rutaArchivoAReducir,rutaResultado);
+	chorroDeBytes = empaquetarRutasYamafs(head,rutaArchivoAReducir,rutaResultado);
+
+	send(socketAYama, chorroDeBytes, sizeof(chorroDeBytes), 0);
 
 	//YAMA nos envia toda la info para conectarnos a los workers
 	while ((recv(socketAYama, head, sizeof(Theader), 0)) > 0) {

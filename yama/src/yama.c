@@ -5,13 +5,13 @@ int main(int argc, char* argv[]){
 	int estado,
 	    socketFS,
 		socketMasters,
-		socketMaster,
 		tamanioCliente;
 	Tyama *yama;
 	pthread_t fs_thread;
 	pthread_t master_thread;
 	struct sockaddr client;
 	Theader *head;
+	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	if(argc!=1){
 		printf("Error en la cantidad de parametros\n");
@@ -36,13 +36,13 @@ int main(int argc, char* argv[]){
 	//acepta y escucha comunicaciones
 
 	puts("Esperando comunicaciones entrantes...");
-	while((socketMaster = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
+	while((socketMasters = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
 		puts("Conexion aceptada");
-		if ((estado = recv(socketMaster, head, sizeof(Theader), 0)) < 0){
+		if (recv(socketMasters, &estructuraDeRutas->head, sizeof(Theader), 0) < 0){
 			logAndExit("Error en la recepcion del header de master.");
 		}
 
-		switch(head->tipo_de_proceso){
+		switch(estructuraDeRutas->head.tipo_de_proceso){
 
 		case MASTER:
 			//puts("Se conecto master, creamos hilo manejador");
@@ -50,13 +50,20 @@ int main(int argc, char* argv[]){
 				perror("No pudo crear hilo. error");
 				return FALLO_GRAL;
 			}*/
-			puts("Proceso: Master");
-			printf("Mensaje: %d \n", head->tipo_de_mensaje);
 
-			head->tipo_de_proceso = YAMA;
+			desempaquetarRutasYamafs(estructuraDeRutas, socketMasters);
+
+			puts("Desempaquete el mensaje.");
+
+			puts("Proceso: Master");
+			printf("Mensaje: %d \n", estructuraDeRutas->head.tipo_de_mensaje);
+			printf("Ruta Origen: %s\n", estructuraDeRutas->rutaOrigen);
+			printf("Ruta Resultado: %s\n", estructuraDeRutas->rutaResultado);
+
+			/*head->tipo_de_proceso = YAMA;
 			head->tipo_de_mensaje = INFO_NODO;
 
-			enviarHeader(socketMaster, head);
+			enviarHeader(socketMasters, head);*/
 
 			break;
 		default:
