@@ -133,7 +133,7 @@ void conexionesDatanode(void * estructura){
 		cantNodosPorConectar = fileSystem->cant_nodos,
 		estado;
 	t_list * listaBitmaps = list_create();
-	Theader * head = malloc(HEAD_SIZE);;
+	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 
 	FD_ZERO(&masterFD);
@@ -181,7 +181,7 @@ void conexionesDatanode(void * estructura){
 					}
 						puts("Recibiendo...");
 
-						estado = recv(fileDescriptor, head, HEAD_SIZE, 0);
+						estado = recv(fileDescriptor, head, sizeof(Theader), 0);
 
 						if(estado == -1){
 							log_trace(logger, "Error al recibir información de un cliente.");
@@ -248,13 +248,13 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 
 	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/2/archivo1.txt");
 
-	tablaArchivos->extensionArchivo = malloc(sizeof(Tarchivos));
-	tablaArchivos->bloques = malloc(sizeof(Tbloques));
+	tablaArchivos->extensionArchivo = malloc(sizeof(char)*10);
+
 
 	int cantBloques,
 			nroBloque = 0;
-	char **temporal1,
-				**temporal2;
+	char **temporal1;
+	char **temporal2;
 	char* bloqueCopia0 = malloc(sizeof(char)*20);
 	char* bloqueCopia1 = malloc(sizeof(char)*20);
 	char* bloqueBytes = malloc(sizeof(char)*20);
@@ -263,6 +263,7 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 	strcpy(tablaArchivos->extensionArchivo, config_get_string_value(archivo, "TIPO"));
 
 	cantBloques = ceil(tablaArchivos->tamanioTotal/1048576.0);
+	tablaArchivos->bloques = malloc(sizeof(Tbloques)*cantBloques);
 	printf("cant bloques %d\n",cantBloques);
 
 	printf("Tamanio %d\n", tablaArchivos->tamanioTotal);
@@ -306,7 +307,7 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 		free(bloqueBytes);
 
 	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
-	//config_destroy(archivo);
+	config_destroy(archivo);
 }
 
 
@@ -327,14 +328,55 @@ t_bitarray* crearBitmap(int tamanioDatabin){
 	return bitmap;
 }
 
-void levantarTablasNodos(){
-	/*t_config * tablaNodosConfig = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+void levantarTablaNodos(Tnodos * tablaNodos){
+
+	int i = 0;
+	int j = 0;
+	char* nodoTotal = malloc(sizeof(char)*12);
+	char* nodoLibre = malloc(sizeof(char)*12);
+
+
+	t_config * archivoNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+
+	tablaNodos->cantBloquesTotal = config_get_int_value(archivoNodos,"TAMANIO");
+	tablaNodos->cantLibresTotal = config_get_int_value(archivoNodos,"LIBRE");
+
+	printf("Cantidad bloques totales %d\n", tablaNodos->cantBloquesTotal);
+	printf("Cantidad bloques libres %d\n", tablaNodos->cantLibresTotal);
+
+	tablaNodos->nodos = config_get_array_value(archivoNodos,"NODOS");
+	printf("nombre nodo 1: %s\n", tablaNodos->nodos[0]);
+	printf("nombre nodo 2: %s\n", tablaNodos->nodos[1]);
+	while(tablaNodos->nodos[j] != NULL){
+		j++;
+	}
+
+	tablaNodos->nodoBloques = malloc(sizeof(TnodoBloque)*j);
+
+	while(tablaNodos->nodos[i] != NULL){
+
+		sprintf(nodoTotal,"Nodo%dTotal",i+1);
+		sprintf(nodoLibre,"Nodo%dLibre",i+1);
+
+		tablaNodos->nodoBloques[i].cantBloques = config_get_int_value(archivoNodos,nodoTotal);
+		tablaNodos->nodoBloques[i].cantLibres = config_get_int_value(archivoNodos,nodoLibre);
+
+		i++;
+		}
+
+
+
+	/*
 	config_set_value(tablaNodosConfig, "Nodo1Libre", "5");
-	config_save(tablaNodosConfig); // escribe algo en el config*/
+	config_save(tablaNodosConfig); // escribe algo en el configs
+*/	free(nodoTotal);
+	free(nodoLibre);
+	config_destroy(archivoNodos);
 }
 
-void levantarTablas(Tdirectorios * tablaDirectorios){
+void levantarTablas(Tdirectorios * tablaDirectorios, Tnodos * tablaNodos){
 	levantarTablasDirectorios(tablaDirectorios);
+	levantarTablaNodos(tablaNodos);
 	mostrarDirectorios(tablaDirectorios); //no hace nada, pero deberia
 }
 

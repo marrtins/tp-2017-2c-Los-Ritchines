@@ -12,6 +12,7 @@ int main(int argc, char* argv[]) {
 
 	Tdirectorios tablaDirectorios[100];
 	Tarchivos * tablaArchivos = malloc(sizeof(Tarchivos));
+	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
 
 	t_list * listaDeNodos;
 	TfileSystem * fileSystem;
@@ -23,10 +24,10 @@ int main(int argc, char* argv[]) {
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100	);
 
-	if(argc != 2){
+	/*if(argc != 2){
 		puts("Error en la cantidad de parametros.");
 		return EXIT_FAILURE;
-	}
+	}*/
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
@@ -36,7 +37,7 @@ int main(int argc, char* argv[]) {
 	list_create(listaDeNodos);
 	list_create(listaBitmaps);
 
-	levantarTablas(tablaDirectorios);
+	levantarTablas(tablaDirectorios, tablaNodos);
 	levantarTablaArchivos(tablaArchivos);
 
 	FD_ZERO(&masterFD);
@@ -105,6 +106,7 @@ int main(int argc, char* argv[]) {
 
 	//tabla de archivos
 	liberarTablaDeArchivos(tablaArchivos);
+	//	FALTA free tablanodos
 
 	//listas
 	list_destroy(listaDeNodos);
@@ -114,6 +116,7 @@ int main(int argc, char* argv[]) {
 	free(mensaje);
 	free(head);
 	return EXIT_SUCCESS;
+
 }
 
 

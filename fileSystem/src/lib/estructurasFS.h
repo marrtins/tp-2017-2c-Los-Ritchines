@@ -37,6 +37,18 @@ typedef struct{
 	Tbloques * bloques;
 }Tarchivos;
 
+typedef struct{
+	int cantBloques;
+	int cantLibres;
+}TnodoBloque;
+
+typedef struct{
+	int cantBloquesTotal;
+	int cantLibresTotal;
+	char ** nodos;
+	TnodoBloque * nodoBloques;
+}Tnodos;
+
 t_log* logger;
 
 #endif

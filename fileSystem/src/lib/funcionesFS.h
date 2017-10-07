@@ -14,9 +14,10 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void freeEstructuraAnidada(Tarchivos * tabla, int cantBloques);
 void levantarTablasDirectorios(Tdirectorios * tablaDirectorios);
 void levantarTablaArchivos(Tarchivos * tablaArchivos);
-void levantarTablasNodos();
-void levantarTablas(Tdirectorios * tablaDirectorios);
+void levantarTablaNodos(Tnodos * tablaNodos);
+void levantarTablas(Tdirectorios * tablaDirectorios, Tnodos * tablaNodos);
 t_bitarray* crearBitmap(int tamanioBitmap);
+void mostrarBitmap(t_bitarray* bitmap);
 void conexionesDatanode(void * estructura);
 void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos);
 
