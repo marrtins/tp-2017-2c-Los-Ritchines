@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 	fd_set readFD, masterFD;
 
 	Theader *head = malloc(sizeof(Theader));
-	char * mensaje = malloc(100	);
+	char * mensaje = malloc(100);
 
 	if(argc != 1){
 		puts("Error en la cantidad de parametros.");

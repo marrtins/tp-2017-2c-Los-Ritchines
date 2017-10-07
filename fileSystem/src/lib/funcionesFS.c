@@ -13,12 +13,8 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	fileSystem->puerto_yama = malloc(MAXIMA_LONGITUD_PUERTO);
 	fileSystem->ip_yama = malloc(MAXIMA_LONGITUD_IP);
 
-	//funcion de gaston, recibe la ruta del archivo de configuracion y te devuelve
-	//un puntero a una estructura con todos los datos que va leyendo del archivo de conf
 	t_config *fsConfig = config_create(ruta);
 
-	//config_get_string_value recibe el nombre del parametro, y te devuelve el valor
-	//con esto voy cargando en una estructura, todos los datos del archivo de conf
 	strcpy(fileSystem->puerto_entrada, config_get_string_value(fsConfig, "PUERTO_FILESYSTEM"));
 	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
 	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
@@ -27,12 +23,10 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 
 	printf("Cant de nodos %d\n", fileSystem->cant_nodos);
 
-	//cargo el tipo de proceso (harcodeado)
 	fileSystem->tipo_de_proceso = FILESYSTEM;
 
-	//destruye la estructura de configuracion, supongo que para liberar memoria o por seguridad
 	config_destroy(fsConfig);
-	//retorno la configuracion
+
 	return fileSystem;
 }
 
@@ -107,11 +101,6 @@ int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){
 
 		int nuevoFileDescriptor = aceptarCliente(fileDescriptor);
 		FD_SET(nuevoFileDescriptor, bolsaDeFileDescriptors);
-		/*if ((listen(fileDescriptor, BACKLOG)) == -1){
-			perror("Fallo listen al socket. error");
-			printf("Fallo listen() en el sock_listen: %d", fileDescriptor);
-			return FALLO_GRAL;
-		}*/
 		return nuevoFileDescriptor;
 }
 
