@@ -1,12 +1,13 @@
 #include "serializacion.h"
 
 char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado){
+	puts("Creando estructura de empaquetacion.");
 	char *chorroBytes = malloc(sizeof(*head) + sizeof(uint32_t) + sizeof(*rutaArchivoAReducir)-1 +
 								sizeof(sizeof(uint32_t)) + sizeof(rutaResultado)-1);
 
 	char * p = chorroBytes;
-	memcpy(p, head, sizeof(Theader));
-	p += sizeof(Theader);
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
 	memcpy(p, sizeof(rutaArchivoAReducir), sizeof(uint32_t));
 	p += sizeof(uint32_t);
 	memcpy(p, rutaArchivoAReducir, sizeof(rutaArchivoAReducir));

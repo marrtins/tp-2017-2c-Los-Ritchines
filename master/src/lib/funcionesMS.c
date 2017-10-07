@@ -5,7 +5,7 @@ void logAndExit(char * mensaje){
 	exit(-1);
 }
 
-Tmaster * obtenerConfiguracion(char* ruta){
+Tmaster * obtenerConfiguracionMaster(char* ruta){
 	Tmaster *master = malloc(sizeof(Tmaster));
 	t_config * masterConfig = config_create(ruta);
 

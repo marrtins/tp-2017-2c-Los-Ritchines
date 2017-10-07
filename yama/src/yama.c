@@ -20,7 +20,7 @@ int main(int argc, char* argv[]){
 
 
 	logger = log_create("yama.log", "yama.log", false, LOG_LEVEL_INFO);
-	yama=obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
+	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 	tamanioCliente = sizeof(client);
 

@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 		}
 
 	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
-	dataNode = obtenerConfiguracion(argv[1]);
+	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 	puts("Intentando conectar con file system");
 

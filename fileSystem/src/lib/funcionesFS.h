@@ -4,7 +4,7 @@
 #include "estructurasFS.h"
 
 void logAndExit(char * mensaje);
-TfileSystem *obtenerConfiguracion(char* ruta);
+TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 void liberarPunteroDePunterosAChar(char** palabras);
 void procesarInput(char * palabras);

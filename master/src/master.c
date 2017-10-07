@@ -28,19 +28,23 @@ int main(int argc, char* argv[]) {
 
 	rutaTransformador=argv[1];
 	rutaReductor=argv[2];
-	rutaArchivoAReducir=argv[3];
-	rutaResultado=argv[4];
+	//hardcodeado
+	rutaArchivoAReducir = "ruta/hardcodeada/a/reducir";
+	rutaResultado = "ruta/harcodeada/destino";
+	//rutaArchivoAReducir=argv[3];
+	//rutaResultado=argv[4];
 
-	master = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
+	master = obtenerConfiguracionMaster("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
 	mostrarConfiguracion(master);
 
 	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
-
+	puts("Conectado a Yama");
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;
 
 	//chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
-	chorroDeBytes = empaquetarRutasYamafs(head, "ruta/hardcodeada/a/reducir", "ruta/harcodeada/destino");
+	puts("Por empaquetar...");
+	chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
 
 	printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
 

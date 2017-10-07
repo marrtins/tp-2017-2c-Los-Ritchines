@@ -5,7 +5,7 @@ void logAndExit(char * mensaje){
 	exit(-1);
 }
 
-TfileSystem *obtenerConfiguracion(char* ruta){
+TfileSystem * obtenerConfiguracionFS(char* ruta){
 	TfileSystem *fileSystem = malloc(sizeof(TfileSystem));
 
 	fileSystem->puerto_entrada = malloc(MAXIMA_LONGITUD_PUERTO);

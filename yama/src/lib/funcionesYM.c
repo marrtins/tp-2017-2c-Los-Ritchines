@@ -5,7 +5,7 @@ void logAndExit(char * mensaje){
 	exit(-1);
 }
 
-Tyama *obtenerConfiguracion(char* ruta){
+Tyama *obtenerConfiguracionYama(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	Tyama *yama = malloc(sizeof(Tyama));
 
