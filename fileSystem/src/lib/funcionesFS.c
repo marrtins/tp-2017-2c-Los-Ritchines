@@ -1,10 +1,5 @@
 #include "funcionesFS.h"
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
-	exit(-1);
-}
-
 TfileSystem * obtenerConfiguracionFS(char* ruta){
 	TfileSystem *fileSystem = malloc(sizeof(TfileSystem));
 

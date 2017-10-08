@@ -57,4 +57,7 @@ typedef struct {
 	uint32_t tamanioTransformador;
 	char * scriptTransformador;
 }TpackageScripts;
+
+t_log* logger;
+
 #endif

@@ -1,5 +1,10 @@
 #include "funcionesCompartidas.h"
 
+void logAndExit(char * mensaje){
+	log_error(logger,mensaje);
+	exit(-1);
+}
+
 void setupHints(struct addrinfo *hints, int address_family, int socket_type, int flags){
 	memset(hints, 0, sizeof *hints);
 	hints->ai_family = address_family;

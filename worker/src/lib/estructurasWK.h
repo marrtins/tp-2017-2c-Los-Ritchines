@@ -1,10 +1,3 @@
-/*
- * estructuras.h
- *
- *  Created on: 24/9/2017
- *      Author: utnso
- */
-
 #ifndef LIB_ESTRUCTURASWK_H_
 #define LIB_ESTRUCTURASWK_H_
 
@@ -22,6 +15,4 @@ typedef struct{
 	int   tipo_de_proceso;
 }Tworker;
 
-t_log* logger;
-
-#endif /* LIB_ESTRUCTURASWK_H_ */
+#endif

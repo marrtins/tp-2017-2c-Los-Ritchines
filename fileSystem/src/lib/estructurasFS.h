@@ -49,6 +49,4 @@ typedef struct{
 	TnodoBloque * nodoBloques;
 }Tnodos;
 
-t_log* logger;
-
 #endif

@@ -14,6 +14,4 @@ typedef struct{
 	char* puertoWorker;
 }TinfoWorker;
 
-t_log* logger;
-
 #endif

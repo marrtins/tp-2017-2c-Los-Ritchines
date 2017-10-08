@@ -1,10 +1,3 @@
-/*
- * estructuras.h
- *
- *  Created on: 20/9/2017
- *      Author: utnso
- */
-
 #ifndef LIB_ESTRUCTURASDN_H_
 #define LIB_ESTRUCTURASDN_H_
 
@@ -23,6 +16,4 @@ typedef struct{
 	int   tipo_de_proceso;
 }TdataNode;
 
-t_log* logger;
-
-#endif /* LIB_ESTRUCTURASDN_H_ */
+#endif

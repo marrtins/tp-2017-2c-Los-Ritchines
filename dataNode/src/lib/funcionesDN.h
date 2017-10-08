@@ -5,6 +5,5 @@
 
 TdataNode *obtenerConfiguracionDN(char* ruta);
 void mostrarConfiguracion(TdataNode *dn);
-void logAndExit(char * mensaje);
 
 #endif

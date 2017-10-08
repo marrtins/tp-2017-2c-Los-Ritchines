@@ -3,7 +3,6 @@
 
 #include "estructurasYM.h"
 
-void logAndExit(char * mensaje);
 Tyama *obtenerConfiguracionYama(char* ruta);
 void mostrarConfiguracion(Tyama *yama);
 void conectarAFS(int* socketFS, Tyama *yama);

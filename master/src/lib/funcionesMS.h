@@ -3,7 +3,6 @@
 
 #include "estructurasMS.h"
 
-void logAndExit(char * mensaje);
 Tmaster * obtenerConfiguracionMaster(char * ruta);
 void mostrarConfiguracion(Tmaster *master);
 

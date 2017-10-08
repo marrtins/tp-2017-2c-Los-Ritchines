@@ -1,10 +1,5 @@
 #include "funcionesMS.h"
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
-	exit(-1);
-}
-
 Tmaster * obtenerConfiguracionMaster(char* ruta){
 	Tmaster *master = malloc(sizeof(Tmaster));
 	t_config * masterConfig = config_create(ruta);

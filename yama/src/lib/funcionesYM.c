@@ -1,10 +1,5 @@
 #include "funcionesYM.h"
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
-	exit(-1);
-}
-
 Tyama *obtenerConfiguracionYama(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	Tyama *yama = malloc(sizeof(Tyama));

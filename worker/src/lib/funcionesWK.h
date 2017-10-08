@@ -3,7 +3,6 @@
 
 #include "estructurasWK.h"
 
-void logAndExit(char * mensaje);
 Tworker *obtenerConfiguracionWorker(char* ruta);
 void mostrarConfiguracion(Tworker *worker);
 

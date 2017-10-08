@@ -3,7 +3,6 @@
 
 #include "estructurasFS.h"
 
-void logAndExit(char * mensaje);
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 void liberarPunteroDePunterosAChar(char** palabras);
