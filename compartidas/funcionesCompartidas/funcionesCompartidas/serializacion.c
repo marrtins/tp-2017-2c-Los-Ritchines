@@ -2,8 +2,8 @@
 
 char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado){
 	puts("Creando estructura de empaquetacion.");
-	char *chorroBytes = malloc(sizeof(*head) + sizeof(uint32_t) + sizeof(*rutaArchivoAReducir)-1 +
-								sizeof(sizeof(uint32_t)) + sizeof(rutaResultado)-1);
+	char *chorroBytes = malloc(sizeof(*head) + sizeof(uint32_t) + sizeof(rutaArchivoAReducir) +
+								sizeof(sizeof(uint32_t)) + sizeof(rutaResultado));
 
 	char * p = chorroBytes;
 	memcpy(p, head, sizeof(*head));
