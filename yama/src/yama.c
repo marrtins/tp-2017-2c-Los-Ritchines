@@ -62,8 +62,8 @@ int main(int argc, char* argv[]){
 
 			puts("Proceso: Master");
 			printf("Mensaje: %d \n", estructuraDeRutas->head.tipo_de_mensaje);
-			printf("Ruta Origen: %s\n", estructuraDeRutas->rutaOrigen);
-			printf("Ruta Resultado: %s\n", estructuraDeRutas->rutaResultado);
+			//printf("Ruta Origen: %s\n", estructuraDeRutas->rutaOrigen);
+			//printf("Ruta Resultado: %s\n", estructuraDeRutas->rutaResultado);
 
 			break;
 
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]){
 			logAndExit("Se conecto a yama un infiltrado. Abortando proceso.");
 		}
 	}
-
+	while(1){} //porque hace el break y termina
 	log_trace(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();

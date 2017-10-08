@@ -6,7 +6,8 @@ int main(int argc, char* argv[]) {
 		socketAWorker,
 		cantidadBytesEnviados,
 		puertoWorker,
-		ipWorker;
+		ipWorker,
+		cantBytes;
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
 	char * chorroDeBytes;
@@ -38,6 +39,7 @@ int main(int argc, char* argv[]) {
 	mostrarConfiguracion(master);
 
 	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
+	printf("SocketAYama es %d\n",socketAYama);
 	puts("Conectado a Yama");
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;
@@ -48,7 +50,13 @@ int main(int argc, char* argv[]) {
 	puts("Se empaqueto");
 	//printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
 
-	send(socketAYama, chorroDeBytes, strlen(chorroDeBytes), 0);
+	cantBytes = (sizeof(Theader) + sizeof(uint32_t) + strlen(rutaArchivoAReducir) +	sizeof(sizeof(uint32_t)) + strlen(rutaResultado));
+	printf("Se va a enviar con un tamaño de %d\n",cantBytes);
+
+	if ((cantidadBytesEnviados = send(socketAYama, chorroDeBytes, cantBytes, 0)) == -1){
+			logAndExit("Fallo al enviar el header");
+		}
+	printf("Se enviaron %d\n",cantidadBytesEnviados);
 
 	//YAMA nos envia toda la info para conectarnos a los workers
 	while ((recv(socketAYama, head, sizeof(Theader), 0)) > 0) {
