@@ -45,10 +45,10 @@ int main(int argc, char* argv[]) {
 	//chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
 	puts("Por empaquetar...");
 	chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
+	puts("Se empaqueto");
+	//printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
 
-	printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
-
-	send(socketAYama, chorroDeBytes, sizeof(chorroDeBytes), 0);
+	send(socketAYama, chorroDeBytes, strlen(chorroDeBytes), 0);
 
 	//YAMA nos envia toda la info para conectarnos a los workers
 	while ((recv(socketAYama, head, sizeof(Theader), 0)) > 0) {

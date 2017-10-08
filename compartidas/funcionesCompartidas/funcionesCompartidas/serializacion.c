@@ -2,21 +2,24 @@
 
 char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado){
 	puts("Creando estructura de empaquetacion.");
-	char *chorroBytes = malloc(sizeof(*head) + sizeof(uint32_t) + sizeof(rutaArchivoAReducir) +
-								sizeof(sizeof(uint32_t)) + sizeof(rutaResultado));
+	char *chorroBytes = malloc(sizeof(*head) + sizeof(uint32_t) + strlen(rutaArchivoAReducir) +
+								sizeof(sizeof(uint32_t)) + strlen(rutaResultado));
+
+	uint32_t t1 = strlen(rutaArchivoAReducir);
+	uint32_t t2 = strlen(rutaResultado);
 
 	char * p = chorroBytes;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
-	memcpy(p, sizeof(rutaArchivoAReducir), sizeof(uint32_t));
+	memcpy(p, &t1, sizeof(uint32_t));
 	p += sizeof(uint32_t);
-	memcpy(p, rutaArchivoAReducir, sizeof(rutaArchivoAReducir));
-	p += sizeof(rutaArchivoAReducir);
-	memcpy(p, sizeof(rutaResultado), sizeof(uint32_t));
+	memcpy(p, rutaArchivoAReducir, strlen(rutaArchivoAReducir));
+	p += strlen(rutaArchivoAReducir);
+	memcpy(p, &t2, sizeof(uint32_t));
 	p += sizeof(uint32_t);
-	memcpy(p, rutaResultado, sizeof(rutaResultado));
-	p += sizeof(rutaResultado);
-
+	memcpy(p, rutaResultado, strlen(rutaResultado));
+	p += strlen(rutaResultado);
+	puts("estructura creada y lista para mandar");
 	return chorroBytes;
 }
 
