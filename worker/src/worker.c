@@ -3,7 +3,7 @@
 int main(int argc, char* argv[]){
 
 	Tworker *worker;
-	Theader * head = malloc(HEAD_SIZE);
+	Theader * head = malloc(sizeof(Theader));
 	int estado,
 		socketDeMaster,
 		client_sock,
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
 	puts("esperando comunicaciones entrantes...");
 	while((client_sock = accept(socketDeMaster, (struct sockaddr*) &client, (socklen_t*) &clientSize)) != -1){
 		puts("Conexion aceptada");
-		while ((estado = recv(client_sock, head, HEAD_SIZE, 0)) < 0){
+		while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
 			log_trace(logger,"Error en la recepcion del header.");
 		}
 

@@ -3,8 +3,7 @@
 
 #include "estructurasDN.h"
 
-TdataNode *obtenerConfiguracion(char* ruta);
+TdataNode *obtenerConfiguracionDN(char* ruta);
 void mostrarConfiguracion(TdataNode *dn);
-void logAndExit(char * mensaje);
 
 #endif

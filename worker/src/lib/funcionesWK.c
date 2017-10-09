@@ -1,10 +1,5 @@
 #include "funcionesWK.h"
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
-	exit(-1);
-}
-
 Tworker *obtenerConfiguracionWorker(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	Tworker *worker = malloc(sizeof(Tworker));

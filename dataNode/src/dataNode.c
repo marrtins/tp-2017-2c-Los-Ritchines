@@ -5,11 +5,11 @@ int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
 	int socketFS, estado;
-	char *bufferRecv = malloc(HEAD_SIZE);
+	char *bufferRecv = malloc(sizeof(Theader));
 	char *mensaje = malloc(100);
-	Theader *head = malloc(HEAD_SIZE);
+	Theader *head = malloc(sizeof(Theader));
 	head->tipo_de_proceso = DATANODE;
-	head->tipo_de_mensaje = 0;
+	head->tipo_de_mensaje = INFO_NODO;
 
 	if(argc!=2){
 			printf("Error en la cantidad de parametros\n");
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 		}
 
 	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
-	dataNode = obtenerConfiguracion(argv[1]);
+	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 	puts("Intentando conectar con file system");
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 	estado = enviarHeader(socketFS, head);
 	printf("Envie %d bytes\n",estado);
 
-	if ((estado = recv(socketFS, &bufferRecv, HEAD_SIZE, 0)) == -1) {
+	if ((estado = recv(socketFS, &bufferRecv, sizeof(Theader), 0)) == -1) {
 		logAndExit("Error al recibir informacion");
 
 	} else if (estado == 0) {

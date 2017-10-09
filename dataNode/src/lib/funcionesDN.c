@@ -1,11 +1,6 @@
 #include "funcionesDN.h"
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
-	exit(-1);
-}
-
-TdataNode *obtenerConfiguracion(char* ruta){
+TdataNode *obtenerConfiguracionDN(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	TdataNode *pDataNode = malloc(sizeof(TdataNode));
 

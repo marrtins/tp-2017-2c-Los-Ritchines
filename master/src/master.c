@@ -6,11 +6,18 @@ int main(int argc, char* argv[]) {
 		cantidadBytesEnviados,
 		puertoWorker,
 		ipWorker,
+<<<<<<< HEAD
 		packSize,
 		stat;
 	Tmaster *master;
 	Theader * head = malloc(HEAD_SIZE);
 
+=======
+		cantBytes;
+	Tmaster *master;
+	Theader * head = malloc(sizeof(Theader));
+	char * chorroDeBytes;
+>>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 	char *rutaTransformador = string_new();
 	char *rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -36,6 +43,7 @@ int main(int argc, char* argv[]) {
 	// arg[4]: ruta de destino del archivo final
 
 
+<<<<<<< HEAD
 
 
 	rutaTransformador=argv[1];
@@ -81,6 +89,41 @@ int main(int argc, char* argv[]) {
 
 
 	while ((recv(sockYama, head, HEAD_SIZE, 0)) > 0) {
+=======
+	rutaTransformador=argv[1];
+	rutaReductor=argv[2];
+	//hardcodeado
+	rutaArchivoAReducir = "ruta/hardcodeada/a/reducir";
+	rutaResultado = "ruta/harcodeada/destino";
+	//rutaArchivoAReducir=argv[3];
+	//rutaResultado=argv[4];
+
+	master = obtenerConfiguracionMaster("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
+	mostrarConfiguracion(master);
+
+	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
+	printf("SocketAYama es %d\n",socketAYama);
+	puts("Conectado a Yama");
+	head->tipo_de_proceso = MASTER;
+	head->tipo_de_mensaje = INICIOMASTER;
+
+	//chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
+	puts("Por empaquetar...");
+	chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
+	puts("Se empaqueto");
+	//printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
+
+	cantBytes = (sizeof(Theader) + sizeof(uint32_t) + strlen(rutaArchivoAReducir) +	sizeof(sizeof(uint32_t)) + strlen(rutaResultado));
+	printf("Se va a enviar con un tamaño de %d\n",cantBytes);
+
+	if ((cantidadBytesEnviados = send(socketAYama, chorroDeBytes, cantBytes, 0)) == -1){
+			logAndExit("Fallo al enviar el header");
+		}
+	printf("Se enviaron %d\n",cantidadBytesEnviados);
+
+	//YAMA nos envia toda la info para conectarnos a los workers
+	while ((recv(socketAYama, head, sizeof(Theader), 0)) > 0) {
+>>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 
 		puts("Recibimos un paquete de YAMA");
 
@@ -90,6 +133,20 @@ int main(int argc, char* argv[]) {
 			//y nos dice los bloques donde hay que aplicar la transformacion
 			//aca creamos un hilo por cada worker al que tenemos que conectarnos.
 
+<<<<<<< HEAD
+=======
+			break;
+		case (INFO_NODO):
+			puts("El mensaje contiene la información del nodo");
+			puts("Nos conectamos a worker");
+			socketAWorker = conectarAServidor("127.0.0.1",	"5050");
+
+			head->tipo_de_proceso = MASTER;
+			head->tipo_de_mensaje = INICIOMASTER;
+
+			cantidadBytesEnviados = enviarHeader(socketAWorker,head);
+			printf("Se envian %d bytes a Worker\n",cantidadBytesEnviados);
+>>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 
 			break;
 //		case (INFO_NODO):

@@ -10,6 +10,7 @@ typedef struct{
 	char* puerto_yama;
 	char* ip_yama;
 	int tipo_de_proceso;
+	int cant_nodos;
 
 }TfileSystem;
 
@@ -21,7 +22,7 @@ typedef struct{
 
 typedef struct{
 	char * nombreDeNodo;
-	int numeroBloqueDeNodo;
+	char * numeroBloqueDeNodo;
 }TcopiaNodo;
 
 typedef struct{
@@ -36,6 +37,16 @@ typedef struct{
 	Tbloques * bloques;
 }Tarchivos;
 
-t_log* logger;
+typedef struct{
+	int cantBloques;
+	int cantLibres;
+}TnodoBloque;
+
+typedef struct{
+	int cantBloquesTotal;
+	int cantLibresTotal;
+	char ** nodos;
+	TnodoBloque * nodoBloques;
+}Tnodos;
 
 #endif

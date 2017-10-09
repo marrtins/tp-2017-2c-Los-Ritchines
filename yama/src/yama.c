@@ -5,13 +5,13 @@ int main(int argc, char* argv[]){
 	int estado,
 
 		socketMasters,
-		socketMaster,
 		tamanioCliente;
 	Tyama *yama;
 	pthread_t fs_thread;
 	pthread_t master_thread;
 	struct sockaddr client;
 	Theader *head;
+	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	if(argc!=1){
 		printf("Error en la cantidad de parametros\n");
@@ -20,39 +20,38 @@ int main(int argc, char* argv[]){
 
 
 	logger = log_create("yama.log", "yama.log", false, LOG_LEVEL_INFO);
-	yama=obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
+	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 	tamanioCliente = sizeof(client);
 
 	//yama cliente
-	if ((estado = conectarAFS(&socketFS,yama)) < 0){
-			puts("No se pudo conectar con FS!");
-			exit(-1);
-	}
+	conectarAFS(&socketFS,yama);
 
 	//yama como servidor
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);
 
 	if ((estado = listen(socketMasters , BACKLOG)) == -1){
-		perror("No se pudo hacer listen del socket. error");
 		logAndExit("No se pudo hacer el listen al socket.");
 	}
 	//acepta y escucha comunicaciones
 
 	puts("Esperando comunicaciones entrantes...");
-	while((socketMaster = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
+	while((socketMasters = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
+
 		puts("Conexion aceptada");
-		if ((estado = recv(socketMaster, head, HEAD_SIZE, 0)) < 0){
+
+		if (recv(socketMasters, &estructuraDeRutas->head, sizeof(Theader), 0) < 0){
 			logAndExit("Error en la recepcion del header de master.");
 		}
 
-		switch(head->tipo_de_proceso){
+		switch(estructuraDeRutas->head.tipo_de_proceso){
 
 		case MASTER:
 			puts("Se conecto master, creamos hilo manejador");
 			if(pthread_create(&master_thread, NULL, (void*) masterHandler,(void*) socketMaster) < 0){
 				perror("No pudo crear hilo. error");
 				return FALLO_GRAL;
+<<<<<<< HEAD
 			}
 
 			break;
@@ -61,12 +60,37 @@ int main(int argc, char* argv[]){
 			printf("El tipo de proceso y mensaje son: %d y %d\n", head->tipo_de_proceso, head->tipo_de_mensaje);
 			printf("Se recibio esto del socket: %d\n", socketMaster);
 			return CONEX_INVAL;
+=======
+			}*/
+
+			if(estructuraDeRutas->head.tipo_de_mensaje == INICIOMASTER){
+
+
+			desempaquetarRutasYamafs(estructuraDeRutas, socketMasters);
+
+			puts("Desempaquete el mensaje.");
+
+			puts("Proceso: Master");
+			printf("Mensaje: %d \n", estructuraDeRutas->head.tipo_de_mensaje);
+			//printf("Ruta Origen: %s\n", estructuraDeRutas->rutaOrigen);
+			//printf("Ruta Resultado: %s\n", estructuraDeRutas->rutaResultado);
+
+			break;
+
+			}
+			/*head->tipo_de_proceso = YAMA;
+			head->tipo_de_mensaje = INFO_NODO;
+
+			enviarHeader(socketMasters, head);*/
+
+			break;
+		default:
+			logAndExit("Se conecto a yama un infiltrado. Abortando proceso.");
+>>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 		}
 	}
-
-	// Si salio del ciclo es porque fallo el accept()
-
-	perror("Fallo el accept(). error");
+	while(1){} //porque hace el break y termina
+	log_trace(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();
 	return 0;

@@ -1,12 +1,7 @@
 #include "funcionesYM.h"
 extern int socketFS;
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
-	exit(-1);
-}
-
-Tyama *obtenerConfiguracion(char* ruta){
+Tyama *obtenerConfiguracionYama(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	Tyama *yama = malloc(sizeof(Tyama));
 
@@ -42,30 +37,29 @@ void mostrarConfiguracion(Tyama *yama){
 	printf("Tipo de proceso: %d\n", yama->tipo_de_proceso);
 }
 
-int conectarAFS(int* socketFS, Tyama *yama){
+void conectarAFS(int* socketFS, Tyama *yama){
 	int estado;
-	Theader *head = malloc(HEAD_SIZE);
-
-	//Theader head;
-	// Se trata de conectar con FS
-	if ((*socketFS = conectarAServidor(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
-		fprintf(stderr, "No se pudo conectar con FS! sock_fs: %d\n", *socketFS);
-		return FALLO_CONEXION;
-	}
+	Theader *head = malloc(sizeof(Theader));
+	char * mensaje = malloc(100);
 
 	head->tipo_de_proceso=YAMA;
 	head->tipo_de_mensaje=INICIOYAMA;
 
+	//Theader head;
+	// Se trata de conectar con FS
+	if ((*socketFS = conectarAServidor(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
+		sprintf(mensaje, "No se pudo conectar con FS! sock_fs: %d\n", *socketFS);
+		logAndExit(mensaje);
+	}
+
 
 	// No permitimos continuar la ejecucion hasta lograr un handshake con FS
-	if ((estado = send(*socketFS, head, HEAD_SIZE, 0)) == -1){
-		perror("Fallo send de handshake. error");
-		printf("Fallo send() al socket: %d\n", *socketFS);
-		return FALLO_SEND;
+	if ((estado = send(*socketFS, head, sizeof(Theader), 0)) == -1){
+		sprintf(mensaje, "Fallo send() al socket: %d\n", *socketFS);
+		logAndExit(mensaje);
 	}
 
 	printf("Se enviaron: %d bytes a FS del handshake \n", estado);
-	return 0;
 }
 
 char *recvGenericWFlags(int sock_in, int flags){
@@ -83,7 +77,7 @@ char *recvGenericWFlags(int sock_in, int flags){
 		return NULL;
 	}
 
-	pack_size -= (HEAD_SIZE + sizeof(int)); // ya se recibieron estas dos cantidades
+	pack_size -= (sizeof(Theader) + sizeof(int)); // ya se recibieron estas dos cantidades
 	//printf("Paquete de size: %d\n", pack_size);
 
 	if ((p_serial = malloc(pack_size)) == NULL){
@@ -139,8 +133,15 @@ void freeAndNULL(void **ptr){
 
 void masterHandler(void *client_sock){
 	int sock_master = (int *)client_sock;
+<<<<<<< HEAD
 	int stat,packSize;
 	Theader * head = malloc(HEAD_SIZE);
+=======
+	int estado;
+	Theader * head = malloc(sizeof(Theader));
+	TpackSrcCode *entradaTransformador;
+	TpackSrcCode *entradaReductor;
+>>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 	TpackBytes *pathArchivoAReducir;
 	TpackBytes *pathResultado;
 	char* buffer;
@@ -148,6 +149,7 @@ void masterHandler(void *client_sock){
 	head->tipo_de_mensaje = 0;
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
+<<<<<<< HEAD
 	while((stat = recv(sock_master, &head, HEAD_SIZE, 0)) > 0){
 		puts("Se recibio un paquete de Master");
 		printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
@@ -155,6 +157,11 @@ void masterHandler(void *client_sock){
 		case INICIOMASTER:
 			puts("Master quiere iniciar un nuevo JOB. esperamos a recibir la info");
 			break;
+=======
+	while((estado = recv(sock_master, &head, sizeof(Theader), 0)) > 0){
+			puts("Se recibio un paquete de Master");
+			printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
+>>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 
 		case PATH_FILE_TOREDUCE:
 

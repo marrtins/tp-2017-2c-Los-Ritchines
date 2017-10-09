@@ -3,17 +3,21 @@
 
 #include "estructurasFS.h"
 
-void logAndExit(char * mensaje);
-TfileSystem *obtenerConfiguracion(char* ruta);
+TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 void liberarPunteroDePunterosAChar(char** palabras);
 void procesarInput(char * palabras);
 void consolaFS(void);
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
+void freeEstructuraAnidada(Tarchivos * tabla, int cantBloques);
 void levantarTablasDirectorios(Tdirectorios * tablaDirectorios);
-void levantarTablasArchivos(Tarchivos * tablaArchivos);
-void levantarTablasNodos();
-void levantarTablas(Tdirectorios * tablaDirectorios, t_list * listaBitMaps);
+void levantarTablaArchivos(Tarchivos * tablaArchivos);
+void levantarTablaNodos(Tnodos * tablaNodos);
+void levantarTablas(Tdirectorios * tablaDirectorios, Tnodos * tablaNodos);
+t_bitarray* crearBitmap(int tamanioBitmap);
+void mostrarBitmap(t_bitarray* bitmap);
+void conexionesDatanode(void * estructura);
+void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos);
 
 #endif
