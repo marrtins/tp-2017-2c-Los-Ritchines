@@ -133,15 +133,12 @@ void freeAndNULL(void **ptr){
 
 void masterHandler(void *client_sock){
 	int sock_master = (int *)client_sock;
-<<<<<<< HEAD
 	int stat,packSize;
-	Theader * head = malloc(HEAD_SIZE);
-=======
 	int estado;
 	Theader * head = malloc(sizeof(Theader));
 	TpackSrcCode *entradaTransformador;
 	TpackSrcCode *entradaReductor;
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
+
 	TpackBytes *pathArchivoAReducir;
 	TpackBytes *pathResultado;
 	char* buffer;
@@ -149,19 +146,15 @@ void masterHandler(void *client_sock){
 	head->tipo_de_mensaje = 0;
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
-<<<<<<< HEAD
-	while((stat = recv(sock_master, &head, HEAD_SIZE, 0)) > 0){
-		puts("Se recibio un paquete de Master");
-		printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
+
+	while((estado = recv(sock_master, &head, sizeof(Theader), 0)) > 0){
 		switch(head->tipo_de_mensaje){
+
 		case INICIOMASTER:
 			puts("Master quiere iniciar un nuevo JOB. esperamos a recibir la info");
-			break;
-=======
-	while((estado = recv(sock_master, &head, sizeof(Theader), 0)) > 0){
 			puts("Se recibio un paquete de Master");
 			printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
+			break;
 
 		case PATH_FILE_TOREDUCE:
 
@@ -216,14 +209,12 @@ void masterHandler(void *client_sock){
 
 			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
 
-			while((stat = recv(socketFS, &head, HEAD_SIZE, 0))>0){
+			while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
 				if(head->tipo_de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
 					//recibimos la lista de bloques y demases que componen al archivo a reducir
 				}
 
 			}
-
-
 
 			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
 			//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.

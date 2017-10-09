@@ -101,6 +101,12 @@ int enviarHeader(int socketDestino,Theader * head){
 	return estado;
 }
 
+
+void freeAndNULL(void **ptr){
+	free(*ptr);
+	*ptr = NULL;
+}
+
 //FUNCIONES DE (DE)SERIALIZACION
 
 char *serializeBytes(Theader head, char* buffer, int buffer_size, int *pack_size){

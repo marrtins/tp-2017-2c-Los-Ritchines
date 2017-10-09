@@ -7,5 +7,6 @@
 #define MAXIMA_LONGITUD_PUERTO 6
 #define MAXIMA_LONGITUD_IP 16
 #define BACKLOG 20
+#define HEAD_SIZE 8
 
 #endif

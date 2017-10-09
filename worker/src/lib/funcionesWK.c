@@ -1,5 +1,5 @@
 #include "funcionesWK.h"
-
+#include <commons/config.h>
 Tworker *obtenerConfiguracionWorker(char* ruta){
 	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	Tworker *worker = malloc(sizeof(Tworker));

@@ -45,13 +45,12 @@ typedef enum{
 }Terrores;
 
 typedef struct {
-<<<<<<< HEAD
-
 	Theader head;
 	int bytelen;
 	char *bytes;
 } TpackSrcCode,TpackBytes;
-=======
+
+typedef struct {
 	Theader head;
 	uint32_t tamanioRutaOrigen;
 	char * rutaOrigen;
@@ -68,6 +67,5 @@ typedef struct {
 }TpackageScripts;
 
 t_log* logger;
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
 
 #endif

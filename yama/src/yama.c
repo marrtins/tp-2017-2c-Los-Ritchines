@@ -3,8 +3,8 @@
 int socketFS;
 int main(int argc, char* argv[]){
 	int estado,
-
 		socketMasters,
+		sockMaster,
 		tamanioCliente;
 	Tyama *yama;
 	pthread_t fs_thread;
@@ -36,11 +36,11 @@ int main(int argc, char* argv[]){
 	//acepta y escucha comunicaciones
 
 	puts("Esperando comunicaciones entrantes...");
-	while((socketMasters = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
+	while((sockMaster = accept(sockMaster, &client, (socklen_t*) &tamanioCliente)) != -1){
 
 		puts("Conexion aceptada");
 
-		if (recv(socketMasters, &estructuraDeRutas->head, sizeof(Theader), 0) < 0){
+		if (recv(sockMaster, &estructuraDeRutas->head, sizeof(Theader), 0) < 0){
 			logAndExit("Error en la recepcion del header de master.");
 		}
 
@@ -48,20 +48,19 @@ int main(int argc, char* argv[]){
 
 		case MASTER:
 			puts("Se conecto master, creamos hilo manejador");
-			if(pthread_create(&master_thread, NULL, (void*) masterHandler,(void*) socketMaster) < 0){
+			if(pthread_create(&master_thread, NULL, (void*) masterHandler,(void*) sockMaster) < 0){
 				perror("No pudo crear hilo. error");
 				return FALLO_GRAL;
-<<<<<<< HEAD
-			}
 
+			}
 			break;
 		default:
 			puts("Trato de conectarse algo no manejado!");
 			printf("El tipo de proceso y mensaje son: %d y %d\n", head->tipo_de_proceso, head->tipo_de_mensaje);
-			printf("Se recibio esto del socket: %d\n", socketMaster);
+			printf("Se recibio esto del socket: %d\n", sockMaster);
 			return CONEX_INVAL;
-=======
-			}*/
+
+			}
 
 			if(estructuraDeRutas->head.tipo_de_mensaje == INICIOMASTER){
 
@@ -78,16 +77,8 @@ int main(int argc, char* argv[]){
 			break;
 
 			}
-			/*head->tipo_de_proceso = YAMA;
-			head->tipo_de_mensaje = INFO_NODO;
-
-			enviarHeader(socketMasters, head);*/
-
 			break;
-		default:
-			logAndExit("Se conecto a yama un infiltrado. Abortando proceso.");
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
-		}
+
 	}
 	while(1){} //porque hace el break y termina
 	log_trace(logger, "Fallo el accept de master.");

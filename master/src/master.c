@@ -2,22 +2,17 @@
 
 int main(int argc, char* argv[]) {
 
-	int sockYama,
+	int sockYama,sockWorker,
 		cantidadBytesEnviados,
 		puertoWorker,
 		ipWorker,
-<<<<<<< HEAD
 		packSize,
-		stat;
-	Tmaster *master;
-	Theader * head = malloc(HEAD_SIZE);
-
-=======
+		stat,
 		cantBytes;
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
 	char * chorroDeBytes;
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
+
 	char *rutaTransformador = string_new();
 	char *rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -43,15 +38,12 @@ int main(int argc, char* argv[]) {
 	// arg[4]: ruta de destino del archivo final
 
 
-<<<<<<< HEAD
-
-
 	rutaTransformador=argv[1];
 	rutaReductor=argv[2];
 	rutaArchivoAReducir=argv[3];
 	rutaResultado=argv[4];
 
-	master = obtenerConfiguracion("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
+	master = obtenerConfiguracionMaster("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
 	mostrarConfiguracion(master);
 
 	printf("Transformador Path: %s\n",rutaTransformador);
@@ -64,7 +56,10 @@ int main(int argc, char* argv[]) {
 	cantidadBytesEnviados = enviarHeader(sockYama, head);
 
 	puts("Enviamos a YAMA las rutas a reducir y almacenar");
-	head.tipo_de_proceso = MASTER; head.tipo_de_mensaje = PATH_FILE_TOREDUCE ;packSize = 0;
+
+	head->tipo_de_proceso = MASTER;
+	head->tipo_de_mensaje = PATH_FILE_TOREDUCE ;
+	packSize = 0;
 	buffer=serializeBytes(head,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
 	puts("Path del archivo a reducir serializado; lo enviamos");
 
@@ -76,7 +71,7 @@ int main(int argc, char* argv[]) {
 	printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
 
 	//enviamos el path del resultado
-	head.tipo_de_proceso = MASTER; head.tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
+	head->tipo_de_proceso = MASTER; head->tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
 	buffer=serializeBytes(head,rutaResultado,(strlen(rutaResultado)+1),&packSize);
 	puts("Path del resultado serializado; lo enviamos");
 
@@ -89,7 +84,6 @@ int main(int argc, char* argv[]) {
 
 
 	while ((recv(sockYama, head, HEAD_SIZE, 0)) > 0) {
-=======
 	rutaTransformador=argv[1];
 	rutaReductor=argv[2];
 	//hardcodeado
@@ -101,8 +95,8 @@ int main(int argc, char* argv[]) {
 	master = obtenerConfiguracionMaster("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
 	mostrarConfiguracion(master);
 
-	socketAYama = conectarAServidor(master->ipYama, master->puertoYama);
-	printf("SocketAYama es %d\n",socketAYama);
+	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
+	printf("SocketAYama es %d\n",sockYama);
 	puts("Conectado a Yama");
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;
@@ -116,14 +110,14 @@ int main(int argc, char* argv[]) {
 	cantBytes = (sizeof(Theader) + sizeof(uint32_t) + strlen(rutaArchivoAReducir) +	sizeof(sizeof(uint32_t)) + strlen(rutaResultado));
 	printf("Se va a enviar con un tamaño de %d\n",cantBytes);
 
-	if ((cantidadBytesEnviados = send(socketAYama, chorroDeBytes, cantBytes, 0)) == -1){
+	if ((cantidadBytesEnviados = send(sockYama, chorroDeBytes, cantBytes, 0)) == -1){
 			logAndExit("Fallo al enviar el header");
 		}
 	printf("Se enviaron %d\n",cantidadBytesEnviados);
 
 	//YAMA nos envia toda la info para conectarnos a los workers
-	while ((recv(socketAYama, head, sizeof(Theader), 0)) > 0) {
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
+	while ((recv(sockYama, head, sizeof(Theader), 0)) > 0) {
+
 
 		puts("Recibimos un paquete de YAMA");
 
@@ -133,20 +127,18 @@ int main(int argc, char* argv[]) {
 			//y nos dice los bloques donde hay que aplicar la transformacion
 			//aca creamos un hilo por cada worker al que tenemos que conectarnos.
 
-<<<<<<< HEAD
-=======
 			break;
 		case (INFO_NODO):
 			puts("El mensaje contiene la información del nodo");
 			puts("Nos conectamos a worker");
-			socketAWorker = conectarAServidor("127.0.0.1",	"5050");
+			sockWorker = conectarAServidor("127.0.0.1",	"5050");
 
 			head->tipo_de_proceso = MASTER;
 			head->tipo_de_mensaje = INICIOMASTER;
 
-			cantidadBytesEnviados = enviarHeader(socketAWorker,head);
+			cantidadBytesEnviados = enviarHeader(sockWorker,head);
 			printf("Se envian %d bytes a Worker\n",cantidadBytesEnviados);
->>>>>>> 528618ce9496404800d5f936dedc0096fda03451
+
 
 			break;
 //		case (INFO_NODO):
@@ -172,4 +164,5 @@ int main(int argc, char* argv[]) {
 	free(head);
 	freeAndNULL((void **) &buffer);
 	return EXIT_SUCCESS;
+}
 }

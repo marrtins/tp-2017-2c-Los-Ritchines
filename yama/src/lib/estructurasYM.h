@@ -14,13 +14,13 @@ typedef struct{
 		  tipo_de_proceso;
 }Tyama;
 
-typedef struct {
+/*typedef struct {
 
 	Theader head;
 	int bytelen;
 	char *bytes;
 } TpackSrcCode,TpackBytes;
-
+*/
 typedef struct {
 
 	Theader head;
