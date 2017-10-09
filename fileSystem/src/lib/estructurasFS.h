@@ -16,6 +16,7 @@ typedef struct{
 
 //el index es el indice del vector
 typedef struct{
+	int index;
 	char nombre[255];
 	int padre;
 }Tdirectorios;
