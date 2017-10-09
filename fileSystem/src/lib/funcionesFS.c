@@ -386,3 +386,5 @@ void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos){
 		free(tablaDeArchivos->bloques[i].copiaUno.numeroBloqueDeNodo);
 	}
 }
+
+

@@ -3,5 +3,7 @@
 
 #include <funcionesCompartidas/serializacion.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #endif

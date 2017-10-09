@@ -77,10 +77,9 @@ int main(int argc, char* argv[]){
 			break;
 
 			}
-			break;
 
 	}
-	while(1){} //porque hace el break y termina
+
 	log_trace(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();

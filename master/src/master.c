@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 	printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
 
 
-	while ((recv(sockYama, head, HEAD_SIZE, 0)) > 0) {
+	while ((recv(sockYama, head, sizeof(Theader), 0)) > 0) {
 	rutaTransformador=argv[1];
 	rutaReductor=argv[2];
 	//hardcodeado

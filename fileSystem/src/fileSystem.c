@@ -104,6 +104,7 @@ int main(int argc, char* argv[]) {
 
 	}
 
+
 	//tabla de archivos
 	liberarTablaDeArchivos(tablaArchivos);
 	//	FALTA free tablanodos
