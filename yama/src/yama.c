@@ -1,9 +1,9 @@
 #include "lib/funcionesYM.h"
 
-
+int socketFS;
 int main(int argc, char* argv[]){
 	int estado,
-	    socketFS,
+
 		socketMasters,
 		socketMaster,
 		tamanioCliente;
@@ -49,22 +49,15 @@ int main(int argc, char* argv[]){
 		switch(head->tipo_de_proceso){
 
 		case MASTER:
-			//puts("Se conecto master, creamos hilo manejador");
-			/*if(pthread_create(&master_thread, NULL, (void*) masterHandler,(void*) socketCliente) < 0){
+			puts("Se conecto master, creamos hilo manejador");
+			if(pthread_create(&master_thread, NULL, (void*) masterHandler,(void*) socketMaster) < 0){
 				perror("No pudo crear hilo. error");
 				return FALLO_GRAL;
-			}*/
-			puts("Proceso: Master");
-			printf("Mensaje: %d \n", head->tipo_de_mensaje);
-
-			head->tipo_de_proceso = YAMA;
-			head->tipo_de_mensaje = INFO_NODO;
-
-			enviarHeader(socketMaster, head);
+			}
 
 			break;
 		default:
-			puts("Trato de conectarse algo que no era ni Kernel ni CPU!");
+			puts("Trato de conectarse algo no manejado!");
 			printf("El tipo de proceso y mensaje son: %d y %d\n", head->tipo_de_proceso, head->tipo_de_mensaje);
 			printf("Se recibio esto del socket: %d\n", socketMaster);
 			return CONEX_INVAL;

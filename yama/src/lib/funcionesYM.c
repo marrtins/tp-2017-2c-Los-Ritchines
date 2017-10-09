@@ -1,4 +1,5 @@
 #include "funcionesYM.h"
+extern int socketFS;
 
 void logAndExit(char * mensaje){
 	log_error(logger,mensaje);
@@ -138,10 +139,8 @@ void freeAndNULL(void **ptr){
 
 void masterHandler(void *client_sock){
 	int sock_master = (int *)client_sock;
-	int estado;
+	int stat,packSize;
 	Theader * head = malloc(HEAD_SIZE);
-	TpackSrcCode *entradaTransformador;
-	TpackSrcCode *entradaReductor;
 	TpackBytes *pathArchivoAReducir;
 	TpackBytes *pathResultado;
 	char* buffer;
@@ -149,99 +148,87 @@ void masterHandler(void *client_sock){
 	head->tipo_de_mensaje = 0;
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
-	while((estado = recv(sock_master, &head, HEAD_SIZE, 0)) > 0){
-			puts("Se recibio un paquete de Master");
-			printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
+	while((stat = recv(sock_master, &head, HEAD_SIZE, 0)) > 0){
+		puts("Se recibio un paquete de Master");
+		printf("proc %d \t msj %d \n", head->tipo_de_proceso, head->tipo_de_mensaje);
+		switch(head->tipo_de_mensaje){
+		case INICIOMASTER:
+			puts("Master quiere iniciar un nuevo JOB. esperamos a recibir la info");
+			break;
 
-			switch(head->tipo_de_mensaje){
-			case SRC_CODE_TRANSF:
-					puts("Master quiere iniciar un JOB");
-					puts("Nos llega el codigo fuente del script TRANSFORMDOR");
+		case PATH_FILE_TOREDUCE:
 
-					if ((buffer = recvGeneric(sock_master)) == NULL){
-						puts("Fallo recepcion de SRC_CODE TRANSFORMADOR");
-						return;
-					}
-
-					if ((entradaTransformador = (TpackSrcCode *) deserializeBytes(buffer)) == NULL){
-
-						puts("Fallo deserializacion de Bytes del src_transformador");
-						return;
-					}
-					printf("Codigo fuente Transformador: %s \n",entradaTransformador->bytes);
-					freeAndNULL((void **) &buffer);
-					puts("fin case src_code_trans");
-					break;
-			case SRC_CODE_RED:
-
-				puts("Nos llega el codigo fuente del script REDUCTOR");
+			puts("Nos llega el path del archivo a reducir");
 
 
-				if ((buffer = recvGeneric(sock_master)) == NULL){
-					puts("Fallo recepcion de SRC_CODE REDUCTOR");
-
-					return;
-				}
-
-				if ((entradaReductor = (TpackSrcCode *) deserializeBytes(buffer)) == NULL){
-
-					puts("Fallo deserializacion de Bytes del src_reductor");
-					return;
-				}
-
-				printf("Codigo fuente reductor: %s \n",entradaReductor->bytes);
-				freeAndNULL((void **) &buffer);
-				puts("fin case src_code_red");
-
-				break;
-			case PATH_FILE_TOREDUCE:
-
-				puts("Nos llega el path del archivo a reducir");
-
-
-				if ((buffer = recvGeneric(sock_master)) == NULL){
-					puts("Fallo recepcion de PATH_FILE_TOREDUCE");
-
-					return;
-				}
-
-				if ((pathArchivoAReducir = (TpackBytes *) deserializeBytes(buffer)) == NULL){
-
-					puts("Fallo deserializacion de Bytes del path arch a reducir");
-					return;
-				}
-
-				printf("Path archivo a reducir: : %s\n",pathArchivoAReducir->bytes);
-				freeAndNULL((void **) &buffer);
-				puts("fin case PATH_FILE_TOREDUCE");
-
-				break;
-			case PATH_RES_FILE:
-							puts("Nos llega el path del resultado");
-							if ((buffer = recvGeneric(sock_master)) == NULL){
-								puts("Fallo recepcion de PATH_RES_FILE");
-								return;
-							}
-							if ((pathResultado = (TpackBytes *) deserializeBytes(buffer)) == NULL){
-								puts("Fallo deserializacion de Bytes del path_res_file");
-								return;
-							}
-							printf("Path del resultado: : %s\n",pathResultado->bytes);
-							freeAndNULL((void **) &buffer);
-							puts("fin case PATH_RES_FILE");
-							//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
-							//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
-							/* pido info, la proceso y ahora se a que workers el master se va a conectar y se los paso...*/
-							//x ahora solo le aviso q inice la transf local
-							//Theader * head; esto no sabemos por que va
-							int stat;
-							head->tipo_de_proceso=YAMA;
-							head->tipo_de_mensaje=START_LOCALTRANSF;
-							if((stat=enviarHeader(sock_master, head))<0){
-								puts("No se pudo enviar el header de inicio");
-							}
-							break;
-			default: break;
+			if ((buffer = recvGeneric(sock_master)) == NULL){
+				puts("Fallo recepcion de PATH_FILE_TOREDUCE");
+				return;
 			}
+
+			if ((pathArchivoAReducir = (TpackBytes *) deserializeBytes(buffer)) == NULL){
+				puts("Fallo deserializacion de Bytes del path arch a reducir");
+				return;
+			}
+
+			printf("Path archivo a reducir: : %s\n",pathArchivoAReducir->bytes);
+
+
+
+
+
+		break;
+
+		case PATH_RES_FILE:
+			puts("Nos llega el path del resultado");
+			if ((buffer = recvGeneric(sock_master)) == NULL){
+				puts("Fallo recepcion de PATH_RES_FILE");
+				return;
+			}
+			if ((pathResultado = (TpackBytes *) deserializeBytes(buffer)) == NULL){
+				puts("Fallo deserializacion de Bytes del path_res_file");
+				return;
+			}
+			printf("Path del resultado: : %s\n",pathResultado->bytes);
+
+
+			puts("Pido info a filesystem sobre el archivo a transformar");
+
+			head->tipo_de_proceso=YAMA;
+			head->tipo_de_mensaje=PREG_FILEINFO;
+			packSize = 0;
+
+			buffer=serializeBytes(head,pathArchivoAReducir,(strlen(pathArchivoAReducir)+1),&packSize);
+			puts("Path del archivo a reducir serializado; lo enviamos");
+			if ((stat = send(socketFS, buffer, packSize, 0)) == -1){
+				puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
+				return;
+			}
+			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
+
+
+			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
+
+			while((stat = recv(socketFS, &head, HEAD_SIZE, 0))>0){
+				if(head->tipo_de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
+					//recibimos la lista de bloques y demases que componen al archivo a reducir
+				}
+
+			}
+
+
+
+			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
+			//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
+			/* pido info, la proceso y ahora se a que workers el master se va a conectar y se los paso...*/
+			//x ahora solo le aviso q inice la transf local
+			//Theader * head; esto no sabemos por que va
+			head->tipo_de_proceso=YAMA;
+			head->tipo_de_mensaje=START_LOCALTRANSF;
+			enviarHeader(sock_master,head);
+			break;
+		default: break;
 		}
+	}
+	freeAndNULL((void **) &buffer);
 }

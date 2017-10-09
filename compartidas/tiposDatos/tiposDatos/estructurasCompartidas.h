@@ -16,7 +16,9 @@ typedef enum {
 	INFO_NODO=10,
 	INICIOMASTER=11,
 	START_LOCALTRANSF=12,
-	FIN_LOCALTRANSF=13
+	FIN_LOCALTRANSF=13,
+	PREG_FILEINFO=14,
+	RTA_FILEINFO=15
 } Tmensaje;
 
 typedef enum {
@@ -41,5 +43,12 @@ typedef enum{
 	FALLO_BIND=-25,
 	CONEX_INVAL=-26
 }Terrores;
+
+typedef struct {
+
+	Theader head;
+	int bytelen;
+	char *bytes;
+} TpackSrcCode,TpackBytes;
 
 #endif

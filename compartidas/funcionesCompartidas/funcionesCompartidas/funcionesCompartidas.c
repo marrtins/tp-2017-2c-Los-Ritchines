@@ -118,3 +118,56 @@ int enviarHeader(int socketDestino,Theader * head){
 
 	return estado;
 }
+
+//FUNCIONES DE (DE)SERIALIZACION
+
+char *serializeBytes(Theader head, char* buffer, int buffer_size, int *pack_size){
+
+	char *bytes_serial;
+	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int) + buffer_size)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &buffer_size, sizeof buffer_size);
+	*pack_size += sizeof (int);
+	memcpy(bytes_serial + *pack_size, buffer, buffer_size);
+	*pack_size += buffer_size;
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+TpackBytes *deserializeBytes(char *bytes_serial){
+
+	int off;
+	TpackBytes *pbytes;
+
+	if ((pbytes = malloc(sizeof *pbytes)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+	memcpy(&pbytes->bytelen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((pbytes->bytes = malloc(pbytes->bytelen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", pbytes->bytelen);
+		return NULL;
+	}
+
+	memcpy(pbytes->bytes, bytes_serial + off, pbytes->bytelen);
+	off += pbytes->bytelen;
+
+	return pbytes;
+}
+
