@@ -4,5 +4,6 @@
 #include <funcionesCompartidas/serializacion.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <commons/collections/list.h>
 
 #endif

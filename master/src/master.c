@@ -1,17 +1,22 @@
 #include "lib/funcionesMS.h"
 
+
+
 int main(int argc, char* argv[]) {
 
-	int sockYama,sockWorker,
+	int sockYama,
+	//sockWorker,
 		cantidadBytesEnviados,
-		puertoWorker,
-		ipWorker,
+	//	puertoWorker,
+	//	ipWorker,
 		packSize,
-		stat,
-		cantBytes;
+		stat;
+	//	cantBytes;
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
-	char * chorroDeBytes;
+	Theader headTmp;
+	//char * chorroDeBytes;
+	t_list *bloquesTransformacion = list_create();
 
 	char *rutaTransformador = string_new();
 	char *rutaReductor = string_new();
@@ -57,12 +62,13 @@ int main(int argc, char* argv[]) {
 
 	puts("Enviamos a YAMA las rutas a reducir y almacenar");
 
-	head->tipo_de_proceso = MASTER;
-	head->tipo_de_mensaje = PATH_FILE_TOREDUCE ;
+	headTmp.tipo_de_proceso = MASTER;
+	headTmp.tipo_de_mensaje = PATH_FILE_TOREDUCE ;
 	packSize = 0;
-	buffer=serializeBytes(head,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
+	buffer=serializeBytes(headTmp,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
 	puts("Path del archivo a reducir serializado; lo enviamos");
 
+	//cantidadBytesEnviados = enviarHeader(sockYama, head);
 
 	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
@@ -70,9 +76,9 @@ int main(int argc, char* argv[]) {
 	}
 	printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
 
-	//enviamos el path del resultado
-	head->tipo_de_proceso = MASTER; head->tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
-	buffer=serializeBytes(head,rutaResultado,(strlen(rutaResultado)+1),&packSize);
+
+	headTmp.tipo_de_proceso = MASTER; headTmp.tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
+	buffer=serializeBytes(headTmp,rutaResultado,(strlen(rutaResultado)+1),&packSize);
 	puts("Path del resultado serializado; lo enviamos");
 
 
@@ -82,80 +88,57 @@ int main(int argc, char* argv[]) {
 	}
 	printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
 
+	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
-	while ((recv(sockYama, head, HEAD_SIZE, 0)) > 0) {
-	rutaTransformador=argv[1];
-	rutaReductor=argv[2];
-	//hardcodeado
-	rutaArchivoAReducir = "ruta/hardcodeada/a/reducir";
-	rutaResultado = "ruta/harcodeada/destino";
-	//rutaArchivoAReducir=argv[3];
-	//rutaResultado=argv[4];
-
-	master = obtenerConfiguracionMaster("/home/utnso/tp-2017-2c-Los-Ritchines/master/config_master");
-	mostrarConfiguracion(master);
-
-	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
-	printf("SocketAYama es %d\n",sockYama);
-	puts("Conectado a Yama");
-	head->tipo_de_proceso = MASTER;
-	head->tipo_de_mensaje = INICIOMASTER;
-
-	//chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
-	puts("Por empaquetar...");
-	chorroDeBytes = empaquetarRutasYamafs(head, rutaArchivoAReducir, rutaResultado);
-	puts("Se empaqueto");
-	//printf("Empaquetacion terminada. Se empaqueto: %s\n", chorroDeBytes);
-
-	cantBytes = (sizeof(Theader) + sizeof(uint32_t) + strlen(rutaArchivoAReducir) +	sizeof(sizeof(uint32_t)) + strlen(rutaResultado));
-	printf("Se va a enviar con un tamaño de %d\n",cantBytes);
-
-	if ((cantidadBytesEnviados = send(sockYama, chorroDeBytes, cantBytes, 0)) == -1){
-			logAndExit("Fallo al enviar el header");
-		}
-	printf("Se enviaron %d\n",cantidadBytesEnviados);
-
-	//YAMA nos envia toda la info para conectarnos a los workers
-	while ((recv(sockYama, head, sizeof(Theader), 0)) > 0) {
-
+	while ((stat=recv(sockYama, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 		puts("Recibimos un paquete de YAMA");
 
-		switch (head->tipo_de_mensaje) {
-		case (START_LOCALTRANSF):
-			//Aca llegaria la respuesta de yama con la info sobre a que workers conectarnos
-			//y nos dice los bloques donde hay que aplicar la transformacion
-			//aca creamos un hilo por cada worker al que tenemos que conectarnos.
+		TpackInfoBloque *infoBloque;
+
+		switch (headRcv.tipo_de_mensaje) {
+		case (INFOBLOQUE):
+			puts("Nos llega info de un bloque");
+			if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
+				puts("Fallo recepcion de INFOBLOQUE");
+				return -1;
+			}
+			if ((infoBloque = deserializeInfoBloque(buffer)) == NULL){
+				puts("Fallo deserializacion de Bytes del path_res_file");
+				return -1;
+			}
+			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
+			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
+			printf("%s,%s,%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque,
+					infoBloque->bytesOcupados,infoBloque->nombreTemporal);
+
+			list_add(bloquesTransformacion,infoBloque);
+			break;
+
+
+
+		case (INFOULTIMOBLOQUE):
+			puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
+			if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
+				puts("Fallo recepcion de INFOBLOQUE");
+				return -1;
+			}
+			if ((infoBloque = deserializeInfoBloque(buffer)) == NULL){
+				puts("Fallo deserializacion de Bytes del path_res_file");
+				return -1;
+			}
+			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
+			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
+			printf("%s,%s,%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque,
+					infoBloque->bytesOcupados,infoBloque->nombreTemporal);
+			list_add(bloquesTransformacion,infoBloque);
+			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 
 			break;
-		case (INFO_NODO):
-			puts("El mensaje contiene la información del nodo");
-			puts("Nos conectamos a worker");
-			sockWorker = conectarAServidor("127.0.0.1",	"5050");
 
-			head->tipo_de_proceso = MASTER;
-			head->tipo_de_mensaje = INICIOMASTER;
-
-			cantidadBytesEnviados = enviarHeader(sockWorker,head);
-			printf("Se envian %d bytes a Worker\n",cantidadBytesEnviados);
-
-
-			break;
-//		case (INFO_NODO):
-//			puts("El mensaje contiene la información del nodo");
-//			puts("Nos conectamos a worker");
-//			//sockWorker = conectarAServidor("127.0.0.1",	"5050");
-//
-//			head->tipo_de_proceso = MASTER;
-//			head->tipo_de_mensaje = 0;
-//
-//			cantidadBytesEnviados = enviarHeader(socketAWorker,head);
-//			printf("Se envian %d bytes a Worker\n",cantidadBytesEnviados);
-//
-//			break;
 		default:
-			printf("Proceso: %d \n", head->tipo_de_proceso);
-			printf("Mensaje: %d \n", head->tipo_de_mensaje);
+			printf("Proceso: %d \n", headTmp.tipo_de_proceso);
+			printf("Mensaje: %d \n", headTmp.tipo_de_mensaje);
 			break;
 		}
 
@@ -165,4 +148,4 @@ int main(int argc, char* argv[]) {
 	freeAndNULL((void **) &buffer);
 	return EXIT_SUCCESS;
 }
-}
+

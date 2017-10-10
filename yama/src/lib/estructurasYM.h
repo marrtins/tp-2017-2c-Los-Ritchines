@@ -30,16 +30,7 @@ typedef struct {
 	char *bytes2;
 }__attribute__((packed)) Tpack2Bytes;
 
-typedef struct {
 
-	Theader head;
-	int puertoLen;
-	char *puertoWorker;
-	int ipLen;
-	char *ipNodo;
-	int nombreLen;
-	char *nombreNodo;
-}__attribute__((packed)) TpackInfoNodo;
 
 t_log* logger;
 

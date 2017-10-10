@@ -11,5 +11,9 @@ char *recvGeneric(int sock_in);
 TpackBytes *deserializeBytes(char *bytes_serial);
 void freeAndNULL(void **ptr);
 void masterHandler(void *client_sock);
+int responderSolicTransf(int sockMaster,t_list * listaBloques);
+char *  generarNombreTemporal(int idMaster);
+void  generarListaBloquesHardcode(t_list *listaBloques);
+void setearGlobales();
 
 #endif

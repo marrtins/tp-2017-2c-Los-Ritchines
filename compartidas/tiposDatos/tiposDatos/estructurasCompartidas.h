@@ -18,7 +18,9 @@ typedef enum {
 	START_LOCALTRANSF=12,
 	FIN_LOCALTRANSF=13,
 	PREG_FILEINFO=14,
-	RTA_FILEINFO=15
+	RTA_FILEINFO=15,
+	INFOBLOQUE=16,
+	INFOULTIMOBLOQUE=17
 } Tmensaje;
 
 typedef enum {
@@ -65,6 +67,23 @@ typedef struct {
 	uint32_t tamanioTransformador;
 	char * scriptTransformador;
 }TpackageScripts;
+
+
+typedef struct {
+
+	Theader head;
+	int nombreLen;
+	char *nombreNodo;
+	int ipLen;
+	char *ipNodo;
+	int puertoLen;
+	char *puertoWorker;
+	int bloque;
+	int bytesOcupados;
+	int nombreTemporalLen;
+	char *nombreTemporal;
+
+}__attribute__((packed)) TpackInfoBloque;
 
 t_log* logger;
 

@@ -107,55 +107,44 @@ void freeAndNULL(void **ptr){
 	*ptr = NULL;
 }
 
-//FUNCIONES DE (DE)SERIALIZACION
 
-char *serializeBytes(Theader head, char* buffer, int buffer_size, int *pack_size){
 
-	char *bytes_serial;
-	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int) + buffer_size)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+char *recvGenericWFlags(int sock_in, int flags){
+	//printf("Se recibe el paquete serializado, usando flags %x\n", flags);
+
+	int stat, pack_size;
+	char *p_serial;
+
+	if ((stat = recv(sock_in, &pack_size, sizeof(int), flags)) == -1){
+		perror("Fallo de recv. error");
+		return NULL;
+
+	} else if (stat == 0){
+		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
 		return NULL;
 	}
 
-	*pack_size = 0;
-	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
-	*pack_size += HEAD_SIZE;
+	pack_size -= (sizeof(Theader) + sizeof(int)); // ya se recibieron estas dos cantidades
+	printf("Paquete de size: %d\n", pack_size);
 
-	// hacemos lugar para el payload_size
-	*pack_size += sizeof(int);
+	if ((p_serial = malloc(pack_size)) == NULL){
+		printf("No se pudieron mallocar %d bytes para paquete generico\n", pack_size);
+		return NULL;
+	}
 
-	memcpy(bytes_serial + *pack_size, &buffer_size, sizeof buffer_size);
-	*pack_size += sizeof (int);
-	memcpy(bytes_serial + *pack_size, buffer, buffer_size);
-	*pack_size += buffer_size;
+	if ((stat = recv(sock_in, p_serial, pack_size, flags)) == -1){
+		perror("Fallo de recv. error");
+		return NULL;
 
-	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+	} else if (stat == 0){
+		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
+		return NULL;
+	}
 
-	return bytes_serial;
+	return p_serial;
 }
 
-TpackBytes *deserializeBytes(char *bytes_serial){
-
-	int off;
-	TpackBytes *pbytes;
-
-	if ((pbytes = malloc(sizeof *pbytes)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
-		return NULL;
-	}
-
-	off = 0;
-	memcpy(&pbytes->bytelen, bytes_serial + off, sizeof (int));
-	off += sizeof (int);
-
-	if ((pbytes->bytes = malloc(pbytes->bytelen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", pbytes->bytelen);
-		return NULL;
-	}
-
-	memcpy(pbytes->bytes, bytes_serial + off, pbytes->bytelen);
-	off += pbytes->bytelen;
-
-	return pbytes;
+char *recvGeneric(int sock_in){
+	return recvGenericWFlags(sock_in, 0);
 }
 

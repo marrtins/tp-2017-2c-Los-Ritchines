@@ -1,6 +1,6 @@
 #include "lib/funcionesYM.h"
 
-int socketFS;
+int socketFS, idMasterGlobal;
 int main(int argc, char* argv[]){
 	int estado,
 		socketMasters,
@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
 	pthread_t fs_thread;
 	pthread_t master_thread;
 	struct sockaddr client;
-	Theader *head;
+	Theader head;
 	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	if(argc!=1){
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
 	tamanioCliente = sizeof(client);
 
 	//yama cliente
-	conectarAFS(&socketFS,yama);
+	//conectarAFS(&socketFS,yama);
 
 	//yama como servidor
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);
@@ -36,15 +36,16 @@ int main(int argc, char* argv[]){
 	//acepta y escucha comunicaciones
 
 	puts("Esperando comunicaciones entrantes...");
-	while((sockMaster = accept(sockMaster, &client, (socklen_t*) &tamanioCliente)) != -1){
+
+	while((sockMaster = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
 
 		puts("Conexion aceptada");
 
-		if (recv(sockMaster, &estructuraDeRutas->head, sizeof(Theader), 0) < 0){
+		if (recv(sockMaster, &head, sizeof(Theader), 0) < 0){
 			logAndExit("Error en la recepcion del header de master.");
 		}
 
-		switch(estructuraDeRutas->head.tipo_de_proceso){
+		switch(head.tipo_de_proceso){
 
 		case MASTER:
 			puts("Se conecto master, creamos hilo manejador");
@@ -56,31 +57,16 @@ int main(int argc, char* argv[]){
 			break;
 		default:
 			puts("Trato de conectarse algo no manejado!");
-			printf("El tipo de proceso y mensaje son: %d y %d\n", head->tipo_de_proceso, head->tipo_de_mensaje);
+			printf("El tipo de proceso y mensaje son: %d y %d\n", head.tipo_de_proceso, head.tipo_de_mensaje);
 			printf("Se recibio esto del socket: %d\n", sockMaster);
 			return CONEX_INVAL;
 
-			}
-
-			if(estructuraDeRutas->head.tipo_de_mensaje == INICIOMASTER){
+		}
 
 
-			desempaquetarRutasYamafs(estructuraDeRutas, socketMasters);
-
-			puts("Desempaquete el mensaje.");
-
-			puts("Proceso: Master");
-			printf("Mensaje: %d \n", estructuraDeRutas->head.tipo_de_mensaje);
-			//printf("Ruta Origen: %s\n", estructuraDeRutas->rutaOrigen);
-			//printf("Ruta Resultado: %s\n", estructuraDeRutas->rutaResultado);
-
-			break;
-
-			}
-			break;
 
 	}
-	while(1){} //porque hace el break y termina
+
 	log_trace(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();
