@@ -214,8 +214,8 @@ void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
 	int i = 0;
 
 	while(!feof(archivoDirectorios)){
-		fscanf(archivoDirectorios, "%s %d", tablaDirectorios[i].nombre, &tablaDirectorios[i].padre);
-		printf("%d \t %s \t %d \n", i, tablaDirectorios[i].nombre, tablaDirectorios[i].padre);
+		fscanf(archivoDirectorios, "%d %s %d", &tablaDirectorios[i].index, tablaDirectorios[i].nombre, &tablaDirectorios[i].padre);
+		printf("%d \t %s \t %d \n", tablaDirectorios[i].index, tablaDirectorios[i].nombre, tablaDirectorios[i].padre);
 		i++;
 	}
 
@@ -386,3 +386,5 @@ void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos){
 		free(tablaDeArchivos->bloques[i].copiaUno.numeroBloqueDeNodo);
 	}
 }
+
+

@@ -2,6 +2,7 @@
 #define LIB_ESTRUCTURASDN_H_
 
 #include "definicionesDN.h"
+char * archivoMapeado;
 
 typedef struct{
 

@@ -84,36 +84,6 @@ void conectarAFS(int* socketFS, Tyama *yama){
 
 
 
-TpackBytes *deserializeBytes(char *bytes_serial){
-
-	int off;
-	TpackBytes *pbytes;
-
-	if ((pbytes = malloc(sizeof *pbytes)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
-		return NULL;
-	}
-
-	off = 0;
-	memcpy(&pbytes->bytelen, bytes_serial + off, sizeof (int));
-	off += sizeof (int);
-
-	if ((pbytes->bytes = malloc(pbytes->bytelen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", pbytes->bytelen);
-		return NULL;
-	}
-
-	memcpy(pbytes->bytes, bytes_serial + off, pbytes->bytelen);
-	off += pbytes->bytelen;
-
-	return pbytes;
-}
-
-void freeAndNULL(void **ptr){
-	free(*ptr);
-	*ptr = NULL;
-}
-
 void masterHandler(void *client_sock){
 	int sockMaster = (int *)client_sock;
 	int stat;
@@ -216,6 +186,8 @@ void masterHandler(void *client_sock){
 			break;
 		default:
 			break;
+
+
 		}
 	}
 	freeAndNULL((void **) &buffer);

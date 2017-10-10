@@ -90,7 +90,9 @@ int main(int argc, char* argv[]) {
 
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
+
 	while ((stat=recv(sockYama, &headRcv, HEAD_SIZE, 0)) > 0) {
+
 
 		puts("Recibimos un paquete de YAMA");
 
@@ -103,6 +105,7 @@ int main(int argc, char* argv[]) {
 				puts("Fallo recepcion de INFOBLOQUE");
 				return -1;
 			}
+
 			if ((infoBloque = deserializeInfoBloque(buffer)) == NULL){
 				puts("Fallo deserializacion de Bytes del path_res_file");
 				return -1;

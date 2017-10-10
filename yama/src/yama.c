@@ -67,6 +67,9 @@ int main(int argc, char* argv[]){
 
 	}
 
+
+
+
 	log_trace(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();

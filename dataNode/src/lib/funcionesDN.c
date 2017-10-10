@@ -45,4 +45,18 @@ void mostrarConfiguracion(TdataNode *dn){
 	printf("Tipo de proceso: %d\n", dn->tipo_de_proceso);
 }
 
+void setBloque(int posicion, char * bloque){
 
+	memcpy(archivoMapeado + posicion* BLOQUE_SIZE, bloque,strlen(bloque));
+
+	if (msync((void *)archivoMapeado, strlen(bloque), MS_SYNC) < 0) {
+				logAndExit("Error al hacer msync");
+		}
+}
+
+char * getBloque(int posicion){
+	char * bloque= malloc(BLOQUE_SIZE);
+	memcpy(bloque, archivoMapeado + posicion*BLOQUE_SIZE,BLOQUE_SIZE);
+	return bloque;
+
+}

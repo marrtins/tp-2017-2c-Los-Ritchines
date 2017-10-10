@@ -19,5 +19,4 @@ t_bitarray* crearBitmap(int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
 void conexionesDatanode(void * estructura);
 void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos);
-
 #endif
