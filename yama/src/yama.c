@@ -1,17 +1,23 @@
 #include "lib/funcionesYM.h"
 
 int socketFS, idMasterGlobal;
+t_list * listaHistoricaTareas;
+pthread_mutex_t mux_listaHistorica;
 int main(int argc, char* argv[]){
 	int estado,
 		socketMasters,
 		sockMaster,
 		tamanioCliente;
 	Tyama *yama;
-	pthread_t fs_thread;
+
 	pthread_t master_thread;
 	struct sockaddr client;
 	Theader head;
 	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
+
+	listaHistoricaTareas=list_create();
+	pthread_mutex_init(&mux_listaHistorica,   NULL);
+
 
 	if(argc!=1){
 		printf("Error en la cantidad de parametros\n");
@@ -52,7 +58,6 @@ int main(int argc, char* argv[]){
 
 			crearHilo(&master_thread, (void*)masterHandler, (void*)sockMaster);
 
-
 			break;
 		default:
 			puts("Trato de conectarse algo no manejado!");
@@ -74,3 +79,4 @@ int main(int argc, char* argv[]){
 	//liberarConfiguracionYama();
 	return 0;
 }
+

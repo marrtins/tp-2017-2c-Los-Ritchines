@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
 			}
 			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
 			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%s,%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque,
+			printf("%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->bloque,
 					infoBloque->bytesOcupados,infoBloque->nombreTemporal);
 
 			list_add(bloquesTransformacion,infoBloque);
@@ -132,8 +132,8 @@ int main(int argc, char* argv[]) {
 			}
 			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
 			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%s,%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque,
-					infoBloque->bytesOcupados,infoBloque->nombreTemporal);
+			printf("%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->bloque,
+								infoBloque->bytesOcupados,infoBloque->nombreTemporal);
 			list_add(bloquesTransformacion,infoBloque);
 			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 
@@ -175,7 +175,7 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
 void workerHandler(void *info){
 	TpackInfoBloque *infoBloque = (TpackInfoBloque *)info;
 
-	printf("Hilo que se conectara al worker %s:%s.\npara transformar el bloque:%d\n",infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque);
+	//printf("Hilo que se conectara al worker %s:%s.\npara transformar el bloque:%d\n",infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque);
 
 	int stat,sockWorker;
 	Theader *headEnvio=malloc(sizeof(headEnvio));
@@ -183,12 +183,12 @@ void workerHandler(void *info){
 	headEnvio->tipo_de_proceso=MASTER;
 	headEnvio->tipo_de_mensaje=START_LOCALTRANSF;
 
-	sockWorker = conectarAServidor(infoBloque->ipNodo, infoBloque->puertoWorker);
-	stat = enviarHeader(sockWorker, headEnvio);
+	//sockWorker = conectarAServidor(infoBloque->ipNodo, infoBloque->puertoWorker);
+	//stat = enviarHeader(sockWorker, headEnvio);
 
 
 
-	puts("Conectado al worker.. Inicio transfo localASD..");
+	/*puts("Conectado al worker.. Inicio transfo localASD..");
 
 	headEnvio->tipo_de_mensaje=gl++;
 
@@ -206,6 +206,8 @@ void workerHandler(void *info){
 		}
 
 
-	}
+	}*/
+
+	while(1);
 	printf("fin thread de transfo del bloque %d\n",infoBloque->bloque);
 }

@@ -70,19 +70,35 @@ typedef struct {
 
 
 typedef struct {
+	int bloque;
+	int nombreNodoC1Len;
+	char *nombreNodoC1;
+	int bloqueC1;
+	int nombreNodoC2Len;
+	char *nombreNodoC2;
+	int bloqueC2;
+	int finBloque;
+}TpackageUbicacionBloques;
 
-	Theader head;
+typedef struct {
 	int nombreLen;
 	char *nombreNodo;
 	int ipLen;
 	char *ipNodo;
 	int puertoLen;
 	char *puertoWorker;
+}TpackageInfoNodo;
+
+
+typedef struct {
+
+	Theader head;
+	int nombreLen;
+	char *nombreNodo;
 	int bloque;
 	int bytesOcupados;
 	int nombreTemporalLen;
 	char *nombreTemporal;
-
 }__attribute__((packed)) TpackInfoBloque;
 
 t_log* logger;

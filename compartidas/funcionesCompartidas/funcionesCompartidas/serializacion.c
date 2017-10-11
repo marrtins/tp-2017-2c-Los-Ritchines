@@ -51,8 +51,8 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 	char *bytes_serial;
 
 	int espacioPackSize = sizeof(int);
-	int espacioEnteros = sizeof(int) * 6;
-	int espaciosVariables = infoBloque->ipLen+infoBloque->nombreLen+infoBloque->nombreTemporalLen+infoBloque->puertoLen;
+	int espacioEnteros = sizeof(int) * 4;
+	int espaciosVariables = infoBloque->nombreLen+infoBloque->nombreTemporalLen;
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
@@ -77,19 +77,6 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 
 
 
-	memcpy(bytes_serial + *pack_size, &infoBloque->ipLen, sizeof(int));
-		*pack_size += sizeof(int);
-
-	memcpy(bytes_serial + *pack_size, infoBloque->ipNodo, infoBloque->ipLen);
-	*pack_size += infoBloque->ipLen;
-
-
-
-	memcpy(bytes_serial + *pack_size, &infoBloque->puertoLen, sizeof(int));
-		*pack_size += sizeof(int);
-
-	memcpy(bytes_serial + *pack_size, infoBloque->puertoWorker, infoBloque->puertoLen);
-	*pack_size += infoBloque->puertoLen;
 
 
 	memcpy(bytes_serial + *pack_size, &infoBloque->bloque, sizeof(int));
@@ -136,32 +123,6 @@ TpackBytes *deserializeInfoBloque(char *bytes_serial){
 	off += infoBloque->nombreLen;
 
 
-
-	memcpy(&infoBloque->ipLen, bytes_serial + off, sizeof (int));
-	off += sizeof (int);
-
-	if ((infoBloque->ipNodo = malloc(infoBloque->ipLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->ipLen);
-		return NULL;
-	}
-
-	memcpy(infoBloque->ipNodo, bytes_serial + off, infoBloque->ipLen);
-	off += infoBloque->ipLen;
-
-
-
-
-
-	memcpy(&infoBloque->puertoLen, bytes_serial + off, sizeof (int));
-	off += sizeof (int);
-
-	if ((infoBloque->puertoWorker = malloc(infoBloque->puertoLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->puertoLen);
-		return NULL;
-	}
-
-	memcpy(infoBloque->puertoWorker, bytes_serial + off, infoBloque->puertoLen);
-	off += infoBloque->puertoLen;
 
 
 

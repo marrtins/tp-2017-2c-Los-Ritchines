@@ -10,4 +10,6 @@
 #define HEAD_SIZE 8
 #define BLOQUE_SIZE 1024*1024
 
+
+
 #endif

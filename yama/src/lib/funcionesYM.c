@@ -1,22 +1,18 @@
-#include "funcionesYM.h"
-extern int socketFS;
-#include <commons/collections/list.h>
 
-int idTempName,idMasterPropio;
+#include "funcionesYM.h"
+
+extern int socketFS;
+
+int idTempName,idPropio;
 
 
 extern int idMasterGlobal;
+extern t_list * listaHistoricaTareas;
+extern pthread_mutex_t mux_listaHistorica;
 
 
 
 pthread_mutex_t mux_idGlobal;
-
-
-#define MAXSIZETEMPNAME 35
-
-
-
-
 
 
 
@@ -98,6 +94,7 @@ void masterHandler(void *client_sock){
 
 	TpackBytes *pathArchivoAReducir;
 	TpackBytes *pathResultado;
+
 	char* buffer;
 
 	puts("Nuevo hilo MASTERHANDLER creado");
@@ -161,7 +158,7 @@ void masterHandler(void *client_sock){
 			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
 
 			while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
-				if(head->tipo_de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
+				if(head->tipo_char  *nombre =malloc(MAXSIZETEMPNAME)de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
 					//recibimos la lista de bloques y demases que componen al archivo a reducir
 				}
 
@@ -173,10 +170,22 @@ void masterHandler(void *client_sock){
 			//x ahora solo le aviso q inice la transf local
 			//Theader * head; esto no sabemos por que va
 
-			t_list *listaBloques=list_create();
-			generarListaBloquesHardcode(listaBloques);
 
-			if((stat=responderSolicTransf(sockMaster,listaBloques))<0){
+			t_list *listaComposicionArchivo=list_create();
+			generarListaComposicionArchivoHardcode(listaComposicionArchivo);
+
+
+			t_list *listaInfoNodos=list_create();
+			generarListaInfoNodos(listaInfoNodos);
+
+
+
+			t_list *listaBloquesPlanificados=planificar(listaComposicionArchivo,listaInfoNodos);
+
+
+			//generarListaBloquesHardcode(listaBloquesPlanificados);
+
+			if((stat=responderSolicTransf(sockMaster,listaBloquesPlanificados))<0){
 				puts("No se pudo responder la solicitud de transferencia");
 				return;
 			}
@@ -211,9 +220,11 @@ char *  generarNombreTemporal(int idMaster){
 void setearGlobales(){
 
 	idTempName=0;
+	pthread_mutex_init(&mux_idGlobal,   NULL);
+
 
 	pthread_mutex_lock(&mux_idGlobal);
-	idMasterPropio=idMasterGlobal++;
+	idPropio=idMasterGlobal++;
 	pthread_mutex_unlock(&mux_idGlobal);
 
 }
@@ -262,9 +273,189 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 
 }
 
+t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
+
+	t_list * listaPlanificada=list_create();
+	t_list * listaWorkersPlanificacion = list_create();
+
+	int base = 2;
+	int pwlClock=0;
+	int stat;
+	TpackageInfoNodo *aux;// = malloc(sizeof aux);
+	//lleno la lista con los workers asociados a esta transfo.
+	int i;
+	for(i=0;i<list_size(listaInfoNodos);i++){
+		aux = list_get(listaInfoNodos,i);
+		Tplanificacion * nodo = malloc(sizeof nodo);
+		nodo->infoNodo.nombreNodo=malloc(MAXSIZETEMPNAME);
+		nodo->infoNodo.nombreNodo=aux->nombreNodo;
+		nodo->infoNodo.nombreLen=aux->nombreLen;
+		nodo->infoNodo.ipNodo=malloc(MAXIMA_LONGITUD_IP);
+		nodo->infoNodo.ipNodo=aux->ipNodo;
+		nodo->infoNodo.ipLen=aux->ipLen;
+		nodo->infoNodo.puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
+		nodo->infoNodo.puertoWorker=aux->puertoWorker;
+		nodo->infoNodo.puertoLen=aux->puertoLen;
+		nodo->disponibilidadBase=base;
+		nodo->pwl=pwlClock;
+		nodo->availability=nodo->disponibilidadBase+nodo->pwl;
+		nodo->clock=false;
+		list_add(listaWorkersPlanificacion,nodo);
+	}
+
+	stat = posicionarClock(listaWorkersPlanificacion);
+	int k;
+	for(k=0;k<list_size(listaComposicionArchivo);k++){
+		TpackageUbicacionBloques *bloqueAux=list_get(listaComposicionArchivo,k);
+
+		TpackInfoBloque *bloque1 = asignarBloque(bloqueAux,listaWorkersPlanificacion);
+
+		list_add(listaPlanificada,bloque1);
+	}
 
 
-void generarListaBloquesHardcode(t_list * listaBloques){
+	return listaPlanificada;
+}
+
+TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *listaWorkersPlanificacion){
+
+
+	Tplanificacion *nodoApuntado = getNodoApuntado(listaWorkersPlanificacion);
+	TpackInfoBloque *bloqueRet=malloc(sizeof(bloqueRet));
+	if(nodoApuntado->availability>0){
+		if(bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo || bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo){
+			if(bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo ){
+				bloqueRet->bloque=bloqueAux->bloqueC1;
+			}
+			if(bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo ){
+				bloqueRet->bloque=bloqueAux->bloqueC2;
+			}
+			mergeBloque(bloqueRet,nodoApuntado,bloqueAux);
+			nodoApuntado->availability-=1;
+			avanzarClock(listaWorkersPlanificacion);
+
+		}else{
+			avanzarClock(listaWorkersPlanificacion);
+			asignarBloque(bloqueAux,listaWorkersPlanificacion);
+		}
+	}else{
+		avanzarClock(listaWorkersPlanificacion);
+		asignarBloque(bloqueAux,listaWorkersPlanificacion);
+	}
+
+
+	return bloqueRet;
+}
+void avanzarClock(t_list *listaWorkersPlanificacion){
+	int i;
+	Tplanificacion *siguiente;
+	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
+		Tplanificacion *aux=list_get(listaWorkersPlanificacion,i);
+		if(aux->clock){
+			if(i+1!=list_size(listaWorkersPlanificacion)){
+				siguiente=list_get(listaWorkersPlanificacion,i+1);
+			}else{
+				siguiente=list_get(listaWorkersPlanificacion,0);
+			}
+			aux->clock=false;
+			siguiente->clock=true;
+			if(siguiente->availability==0){
+				siguiente->availability=siguiente->disponibilidadBase;
+				avanzarClock(listaWorkersPlanificacion);
+			}
+			break;
+		}
+	}
+}
+void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,TpackageUbicacionBloques *bloqueAux){
+	int nombreLen=6;
+
+
+	bloqueRet->nombreNodo=malloc(nombreLen);
+	bloqueRet->nombreNodo=nodoApuntado->infoNodo.nombreNodo;
+	bloqueRet->nombreLen=nodoApuntado->infoNodo.nombreLen;
+	bloqueRet->nombreTemporal=malloc(MAXSIZETEMPNAME);
+	bloqueRet->nombreTemporal="tmp-asd";
+	bloqueRet->nombreTemporalLen=strlen(bloqueRet->nombreTemporal)+1;
+	bloqueRet->bytesOcupados=bloqueAux->finBloque;
+}
+
+Tplanificacion * getNodoApuntado(t_list * listaWorkersPlanificacion){
+	//todo chequeo errores
+	int i;
+	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
+		Tplanificacion *aux= list_get(listaWorkersPlanificacion,i);
+		if(aux->clock){
+			return aux;
+		}
+	}
+	return NULL;
+}
+
+
+int posicionarClock(t_list *listaWorkers){
+
+	int i;
+	int disponibilidadMasAlta = -1;
+	bool empate=false;
+	for(i=0;i<list_size(listaWorkers);i++){
+		Tplanificacion *aux = list_get(listaWorkers,i);
+		if(aux->availability > disponibilidadMasAlta){
+			disponibilidadMasAlta=aux->availability;
+			empate=false;
+		}else if(aux->availability==disponibilidadMasAlta){
+			empate=true;
+		}
+	}
+	if(empate){
+		desempatarClock(disponibilidadMasAlta,listaWorkers);
+	}
+
+
+
+	return 0;
+}
+
+int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
+
+	int i;
+	int historico1=-1;
+	int historico2=-1;
+	int indiceAModificar;
+	Tplanificacion *aux;
+	for(i=0;i<list_size(listaWorkers);i++){
+		aux = list_get(listaWorkers,i);
+		if(aux->availability == disponibilidadMasAlta){
+			historico1=getHistorico(aux);
+		}
+		if(historico1>=historico2){
+			historico2=historico1;
+			indiceAModificar=i;
+		}
+
+	}
+	aux=list_get(listaWorkers,indiceAModificar);
+	aux->clock=true;
+
+	return 0;
+}
+
+int getHistorico(Tplanificacion *infoWorker){
+	int i;
+	pthread_mutex_lock(&mux_listaHistorica);
+	for(i=0;i<list_size(listaHistoricaTareas);i++){
+		ThistorialTareas *aux = list_get(listaHistoricaTareas,i);
+		if(infoWorker->infoNodo.nombreNodo==aux->nombreNodo){
+			pthread_mutex_unlock(&mux_listaHistorica);
+			return aux->tareasRealizadas;
+		}
+	}
+	pthread_mutex_unlock(&mux_listaHistorica);
+	return 0;
+}
+
+
+/*void generarListaBloquesHardcode(t_list * listaBloques){
 
 
 	//toda esta funcion va a volar, esta hecho asi nomas para ir probandolo. esta tod hardco
@@ -378,7 +569,95 @@ void generarListaBloquesHardcode(t_list * listaBloques){
 
 
 
+}*/
+
+void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
+
+	//toda esta funcion va a volar, esta hecho asi nomas para ir probandolo. esta tod hardco
+	int maxNombreNodo=10;
+	TpackageUbicacionBloques *bloque0 = malloc(sizeof(bloque0));
+	bloque0->bloque=0;
+	bloque0->nombreNodoC1=malloc(sizeof(maxNombreNodo));
+	bloque0->nombreNodoC1="Nodo1";
+	bloque0->nombreNodoC1Len=strlen(bloque0->nombreNodoC1)+1;
+	bloque0->bloqueC1=5;
+	bloque0->nombreNodoC2=malloc(sizeof(maxNombreNodo));
+	bloque0->nombreNodoC2="Nodo2";
+	bloque0->nombreNodoC2Len=strlen(bloque0->nombreNodoC2)+1;
+	bloque0->bloqueC2=2;
+	bloque0->finBloque=1048576;
+
+	list_add(listaComposicion,bloque0);
+
+	TpackageUbicacionBloques *bloque1 = malloc(sizeof(bloque1));
+	bloque1->bloque=1;
+	bloque1->nombreNodoC1=malloc(sizeof(maxNombreNodo));
+	bloque1->nombreNodoC1="Nodo2";
+	bloque1->nombreNodoC1Len=strlen(bloque1->nombreNodoC1)+1;
+	bloque1->bloqueC1=10;
+	bloque1->nombreNodoC2=malloc(sizeof(maxNombreNodo));
+	bloque1->nombreNodoC2="Nodo1";
+	bloque1->nombreNodoC2Len=strlen(bloque1->nombreNodoC2)+1;
+	bloque1->bloqueC2=7;
+	bloque1->finBloque=1048500;
+	list_add(listaComposicion,bloque1);
+
+	TpackageUbicacionBloques *bloque2 = malloc(sizeof(bloque2));
+	bloque2->bloque=2;
+	bloque2->nombreNodoC1=malloc(sizeof(maxNombreNodo));
+	bloque2->nombreNodoC1="Nodo2";
+	bloque2->nombreNodoC1Len=strlen(bloque2->nombreNodoC1)+1;
+	bloque2->bloqueC1=12;
+	bloque2->nombreNodoC2=malloc(sizeof(maxNombreNodo));
+	bloque2->nombreNodoC2="Nodo1";
+	bloque2->nombreNodoC2Len=strlen(bloque2->nombreNodoC2)+1;
+	bloque2->bloqueC2=3;
+	bloque2->finBloque=1048516;
+	list_add(listaComposicion,bloque2);
+
 }
+
+void generarListaInfoNodos(t_list * listaNodos){
+
+
+
+	int nombreLen=6;
+	int ipLen=10;
+	int puertoLen=5;
+
+
+	TpackageInfoNodo *nodo1 = malloc(sizeof(nodo1));
+	nodo1->nombreNodo=malloc(nombreLen);
+	nodo1->nombreNodo="Nodo1";
+	nodo1->nombreLen=strlen(nodo1->nombreNodo)+1;
+	nodo1->ipNodo=malloc(ipLen);
+	nodo1->ipNodo="127.0.0.1";
+	nodo1->ipLen=strlen(nodo1->ipNodo)+1;
+	nodo1->puertoWorker=malloc(puertoLen);
+	nodo1->puertoWorker = "5013";
+	nodo1->puertoLen=strlen(nodo1->puertoWorker)+1;
+	list_add(listaNodos,nodo1);
+
+	TpackageInfoNodo *nodo2 = malloc(sizeof(nodo2));
+	nodo2->nombreNodo=malloc(nombreLen);
+	nodo2->nombreNodo="Nodo2";
+	nodo2->nombreLen=strlen(nodo2->nombreNodo)+1;
+	nodo2->ipNodo=malloc(ipLen);
+	nodo2->ipNodo="127.0.0.1";
+	nodo2->ipLen=strlen(nodo2->ipNodo)+1;
+	nodo2->puertoWorker=malloc(puertoLen);
+	nodo2->puertoWorker = "5014";
+	nodo2->puertoLen=strlen(nodo2->puertoWorker)+1;
+
+	list_add(listaNodos,nodo2);
+
+
+}
+
+
+
+
+
 
 
 
