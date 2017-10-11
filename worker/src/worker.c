@@ -47,35 +47,56 @@ int main(int argc, char* argv[]){
 
 			if(head->tipo_de_mensaje==START_LOCALTRANSF){
 				puts("CASE INICIOYAMA --> FORK");
-				pid_t  pid;
-				int    i;
-				char   buf[100];
+
+				while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
+							log_trace(logger,"Error en la recepcion del header.");
+				}
+
+				printf("Recibi %d\n",head->tipo_de_mensaje);
+
+				puts("ejecuto system");
+				char command[50];
+				char * comando = string_new();
+				int randn = rand();
+				string_append(&comando,"echo ");
+				string_append(&comando,string_itoa(head->tipo_de_mensaje));
+				printf("%s\n",comando);
+				system(comando);
 
 
-				pid = fork();
+				//system("echo hola pepe | ./script_transformacion.py > /tmp/resultado");
+				  //int retorno = system("ls");
+
+				//  printf("ls je %d\n",retorno);
+
+
+				/*pid = fork();
 
 				if(pid==0){
 
 					puts("proceso hijo forkeado satisfactoriamente. ejecutamos la transf local...");
+					puts("procesando...");
 
+
+					sleep(4);
 					puts("fin transf local, le avisamos a master y finalizamos ");
 
 					Theader henvio;
 					henvio.tipo_de_mensaje=FIN_LOCALTRANSF;
 					henvio.tipo_de_proceso=WORKER;
 
-					if ((estado = enviarHeader(client_sock, head)) < 0){
-							fprintf(stderr, "No se pudo enviar aviso a master\n");
-
-							return FALLO_GRAL;
-						}
-					puts("Mande algo");
-					return 0;
-
-
-				}else{
-					puts("padre");
 				}
+				else{
+					puts("padre");
+					waitpid(pid);
+					break;
+				}*/
+				if ((estado = enviarHeader(client_sock, head)) < 0){
+											fprintf(stderr, "No se pudo enviar aviso a master\n");
+
+											return FALLO_GRAL;
+										}
+									puts("Mande algo");
 			}
 
 

@@ -289,7 +289,7 @@ void generarListaBloquesHardcode(t_list * listaBloques){
 	bloque1->ipNodo="127.0.0.1";
 	bloque1->ipLen=strlen(bloque1->ipNodo)+1;
 	bloque1->puertoWorker=malloc(puertoLen);
-	bloque1->puertoWorker = "5010";
+	bloque1->puertoWorker = "5013";
 	bloque1->puertoLen=strlen(bloque1->puertoWorker)+1;
 	bloque1->bloque=38;
 	bloque1->bytesOcupados=10180;
@@ -307,7 +307,7 @@ void generarListaBloquesHardcode(t_list * listaBloques){
 	bloque2->ipNodo="127.0.0.1";
 	bloque2->ipLen=strlen(bloque2->ipNodo)+1;
 	bloque2->puertoWorker=malloc(puertoLen);
-	bloque2->puertoWorker = "5010";
+	bloque2->puertoWorker = "5013";
 	bloque2->puertoLen=strlen(bloque2->puertoWorker)+1;
 	bloque2->bloque=39;
 	bloque2->bytesOcupados=1048576;
@@ -321,13 +321,13 @@ void generarListaBloquesHardcode(t_list * listaBloques){
 
 	TpackInfoBloque *bloque3 = malloc(sizeof bloque3);
 	bloque3->nombreNodo=malloc(nombreLen);
-	bloque3->nombreNodo="Nodo2";
+	bloque3->nombreNodo="Nodo1";
 	bloque3->nombreLen=strlen(bloque3->nombreNodo)+1;
 	bloque3->ipNodo=malloc(ipLen);
 	bloque3->ipNodo="127.0.0.1";
 	bloque3->ipLen=strlen(bloque3->ipNodo)+1;
 	bloque3->puertoWorker=malloc(puertoLen);
-	bloque3->puertoWorker = "5011";
+	bloque3->puertoWorker = "5013";
 	bloque3->puertoLen=strlen(bloque3->puertoWorker)+1;
 	bloque3->bloque=44;
 	bloque3->bytesOcupados=1048576;
@@ -341,13 +341,13 @@ void generarListaBloquesHardcode(t_list * listaBloques){
 
 	TpackInfoBloque *bloque4 = malloc(sizeof bloque4);
 	bloque4->nombreNodo=malloc(nombreLen);
-	bloque4->nombreNodo="Nodo2";
+	bloque4->nombreNodo="Nodo1";
 	bloque4->nombreLen=strlen(bloque4->nombreNodo)+1;
 	bloque4->ipNodo=malloc(ipLen);
 	bloque4->ipNodo="127.0.0.1";
 	bloque4->ipLen=strlen(bloque4->ipNodo)+1;
 	bloque4->puertoWorker=malloc(puertoLen);
-	bloque4->puertoWorker = "5011";
+	bloque4->puertoWorker = "5013";
 	bloque4->puertoLen=strlen(bloque4->puertoWorker)+1;
 	bloque4->bloque=39;
 	bloque4->bytesOcupados=1048576;
@@ -361,13 +361,13 @@ void generarListaBloquesHardcode(t_list * listaBloques){
 
 	TpackInfoBloque *bloque5 = malloc(sizeof bloque5);
 	bloque5->nombreNodo=malloc(nombreLen);
-	bloque5->nombreNodo="Nodo2";
+	bloque5->nombreNodo="Nodo1";
 	bloque5->nombreLen=strlen(bloque5->nombreNodo)+1;
 	bloque5->ipNodo=malloc(ipLen);
 	bloque5->ipNodo="127.0.0.1";
 	bloque5->ipLen=strlen(bloque1->ipNodo)+1;
 	bloque5->puertoWorker=malloc(puertoLen);
-	bloque5->puertoWorker = "5011";
+	bloque5->puertoWorker = "5013";
 	bloque5->puertoLen=strlen(bloque5->puertoWorker)+1;
 	bloque5->bloque=46;
 	bloque5->bytesOcupados=1048576;

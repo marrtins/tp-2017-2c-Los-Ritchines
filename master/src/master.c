@@ -1,9 +1,9 @@
 #include "lib/funcionesMS.h"
 
 
-
+int gl;
 int main(int argc, char* argv[]) {
-
+	gl=0;
 	int sockYama,
 	//sockWorker,
 		cantidadBytesEnviados,
@@ -137,6 +137,9 @@ int main(int argc, char* argv[]) {
 			list_add(bloquesTransformacion,infoBloque);
 			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 
+			stat = conectarseAWorkersTransformacion(bloquesTransformacion);
+
+
 			break;
 
 		default:
@@ -152,3 +155,57 @@ int main(int argc, char* argv[]) {
 	return EXIT_SUCCESS;
 }
 
+int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
+
+
+	int cantConexiones = list_size(bloquesTransformacion);
+
+	int i;
+
+	for(i=0;i< cantConexiones;i++){
+		pthread_t workerThread[i];
+		TpackInfoBloque *infoBloque=list_get(bloquesTransformacion,i);
+		printf("creao hilo %d\n",i);
+		crearHilo(&workerThread[i], (void*)workerHandler, (void*)infoBloque);
+	}
+
+	return 0;
+}
+
+void workerHandler(void *info){
+	TpackInfoBloque *infoBloque = (TpackInfoBloque *)info;
+
+	printf("Hilo que se conectara al worker %s:%s.\npara transformar el bloque:%d\n",infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque);
+
+	int stat,sockWorker;
+	Theader *headEnvio=malloc(sizeof(headEnvio));
+	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
+	headEnvio->tipo_de_proceso=MASTER;
+	headEnvio->tipo_de_mensaje=START_LOCALTRANSF;
+
+	sockWorker = conectarAServidor(infoBloque->ipNodo, infoBloque->puertoWorker);
+	stat = enviarHeader(sockWorker, headEnvio);
+
+
+
+	puts("Conectado al worker.. Inicio transfo localASD..");
+
+	headEnvio->tipo_de_mensaje=gl++;
+
+	stat = enviarHeader(sockWorker, headEnvio);
+
+
+	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
+
+		switch (headRcv.tipo_de_mensaje) {
+			case(FIN_LOCALTRANSF):
+					printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
+
+		default:
+			break;
+		}
+
+
+	}
+	printf("fin thread de transfo del bloque %d\n",infoBloque->bloque);
+}

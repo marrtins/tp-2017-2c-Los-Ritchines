@@ -49,11 +49,10 @@ int main(int argc, char* argv[]){
 
 		case MASTER:
 			puts("Se conecto master, creamos hilo manejador");
-			if(pthread_create(&master_thread, NULL, (void*) masterHandler,(void*) sockMaster) < 0){
-				perror("No pudo crear hilo. error");
-				return FALLO_GRAL;
 
-			}
+			crearHilo(&master_thread, (void*)masterHandler, (void*)sockMaster);
+
+
 			break;
 		default:
 			puts("Trato de conectarse algo no manejado!");
