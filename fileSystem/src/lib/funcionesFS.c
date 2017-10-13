@@ -80,7 +80,7 @@ void enviarBloque(TbloqueAEnviar* bloque){
 	//hacer el send a cada nodo;
 }
 
-void verificarQueExistaDirectorio(char * directorio,Tdirectorios tablaDirectorios[100]){
+int existeDirectorio(char * directorio){
 	char ** carpeta = string_split(directorio, "/");
 
 	int i=0, j,booleano=0, encontrado;
@@ -103,11 +103,7 @@ void verificarQueExistaDirectorio(char * directorio,Tdirectorios tablaDirectorio
 		}
 		i++;
 	}
-	if(encontrado){
-		puts("El directorio existe");
-	}else {
-		puts("No existe el directorio");
-	}
+	return encontrado;
 
 }
 
@@ -181,10 +177,21 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "cat")) {
 		printf("ya pude leer el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
+		if(cantidad == 1){
+			if(existeDirectorio(palabras[1])){
+				puts("Existe el directorio");
+			}else {
+				puts("No existe el directorio"); //HAY QUE CREARLO
+			}
 		printf("ya pude crear el directorio\n");
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
 		if(cantidad == 2){
+			if(existeDirectorio(palabras[2])){
+			puts("Existe el directorio");
 			almacenarArchivo(palabras);
+			}else {
+				puts("No existe el directorio");
+			}
 		}
 		else {
 			puts("Error en la cantidad de parametros");
@@ -375,7 +382,7 @@ void conexionesDatanode(void * estructura){
 	//POR ACA VA UN SIGNAL PARA INDICAR QUE FS YA TIENE TODOS LOS NODOS CONECTADOS.
 }
 
-void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
+void levantarTablasDirectorios(){
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
 	int i = 0;
 
@@ -389,7 +396,7 @@ void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
 
 }
 
-void mostrarDirectorios(Tdirectorios * tablaDirectorios){
+void mostrarDirectorios(){
 
 }
 
@@ -513,10 +520,10 @@ void levantarTablaNodos(Tnodos * tablaNodos){
 	config_destroy(archivoNodos);
 }
 
-void levantarTablas(Tdirectorios * tablaDirectorios, Tnodos * tablaNodos){
-	levantarTablasDirectorios(tablaDirectorios);
+void levantarTablas(Tnodos * tablaNodos){
+	levantarTablasDirectorios();
 	levantarTablaNodos(tablaNodos);
-	mostrarDirectorios(tablaDirectorios); //no hace nada, pero deberia
+	mostrarDirectorios(); //no hace nada, pero deberia
 }
 
 void mostrarBitmap(t_bitarray* bitmap){

@@ -23,3 +23,5 @@
 [ERROR] 17:25:21:937 FileSystem.log/(8010:8010): Fallo al reservar el puerto 5002. Es posible que el puerto este ocupado.
 [ERROR] 17:25:25:623 FileSystem.log/(7817:7817): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 17:25:42:934 FileSystem.log/(8058:8058): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:55:01:484 FileSystem.log/(8636:8636): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:57:29:285 FileSystem.log/(8717:8717): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
