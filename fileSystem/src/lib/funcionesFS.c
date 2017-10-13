@@ -51,22 +51,76 @@ int cantidadParametros(char ** palabras){
 	return i-1;
 }
 
+int ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
+	Tnodo* nodoA = (Tnodo*)nodo1;
+	Tnodo* nodoB = (Tnodo*)nodo2;
+
+	double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
+		return (double)nodo->cantidadBloquesLibres/ nodo->cantidadBloquesTotal;
+	}
+	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
+}
+
+void enviarBloque(TbloqueAEnviar* bloque){
+	list_sort(listaDeNodos,ordenarSegunBloquesDisponibles);
+	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
+	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
+	//hacer el send a cada nodo;
+}
+
 void almacenarArchivo(char **palabras){
 	char * archivoMapeado;
+	char ** lineas;
+	unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
+	TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
+	infoBloque->numeroDeBloque = 0;
+	infoBloque->contenido = malloc(BLOQUE_SIZE);
+
 	FILE * archivoOrigen = fopen(palabras[1], "r");
 	int fd = fileno(archivoOrigen);
-	int tamanio = tamanioArchivo(archivoOrigen);
+
+	unsigned long long tamanio = tamanioArchivo(archivoOrigen);
+
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-					logAndExit("Error al hacer mmap");
-			}
+		logAndExit("Error al hacer mmap");
+	}
+
 	fclose(archivoOrigen);
 	close(fd);
+
 	int cantidadBloques = ceil((float)tamanio / BLOQUE_SIZE);
-	char * buffer = malloc(BLOQUE_SIZE);
+
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
+		return;
 	}
-	//else
+	else {
+		lineas = string_split(archivoMapeado,"\n");
+		int i = 0;
+		while(lineas[i]!=NULL){
+			//+1 por el \n faltante
+			if(bytesDisponiblesEnBloque - strlen(lineas[i]) +1 < 0){
+				infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
+				enviarBloque(infoBloque);
+				bytesDisponiblesEnBloque = BLOQUE_SIZE;
+				infoBloque->numeroDeBloque++;
+			}
+			else{
+				bytesDisponiblesEnBloque -= strlen(lineas[i])+1;
+				string_append(&infoBloque->contenido,lineas[i]);
+				if(lineas[i+1] != NULL){
+					string_append(&infoBloque->contenido,"\n");
+				}
+
+			}
+
+		}
+
+		liberarPunteroDePunterosAChar(lineas);
+		free(lineas);
+		free(infoBloque->contenido);
+		free(infoBloque);
+	}
 }
 
 void procesarInput(char* linea) {
@@ -137,6 +191,22 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD){
 
 }
 
+Tnodo* buscarPorFD(int fd){
+	int buscarPorFDParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo) elementoDeLista;
+		return nodo->fd == fd;
+	}
+
+	return (Tnodo*)list_find(listaDeNodos, buscarPorFDParaLista);
+}
+
+void inicializarNodo(int fileDescriptor, char* buffer){
+	//hay que inicializar el bitarray;
+	Tnodo* nodo = buscarPorFD(fileDescriptor);
+	//aca se deserializa el buffer que contiene la info del nodo;
+	//y se almacena en el puntero nodo que apunta al nodo de la lista global de nodos;
+}
+
 void conexionesDatanode(void * estructura){
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	fd_set readFD, masterFD;
@@ -148,7 +218,6 @@ void conexionesDatanode(void * estructura){
 		estable,
 		cantNodosPorConectar = fileSystem->cant_nodos,
 		estado;
-	t_list * listaBitmaps = list_create();
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 
@@ -185,9 +254,11 @@ void conexionesDatanode(void * estructura){
 					printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
 					if(fileDescriptor == socketDeEscuchaDatanodes){
+						Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
-
+						nuevoNodo->fd = nuevoFileDescriptor;
+						list_add(listaDeNodos,nuevoNodo);
 						cantNodosPorConectar--;
 						puts("Filesystem estable");
 
@@ -211,8 +282,11 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
-									list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
-									mostrarBitmap(list_get(listaBitmaps,0));
+								char * buffer;
+								//hay que volver a recv lo que sigue después del head;
+								//recv el nombre nodo, bloques totales, bloques libres;
+								//y los va a meter en la estructura Tnodo;
+								inicializarNodo(fileDescriptor,buffer);
 								break;
 
 							default:

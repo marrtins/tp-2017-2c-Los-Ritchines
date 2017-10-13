@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
 	Tarchivos * tablaArchivos = malloc(sizeof(Tarchivos));
 	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
 
-	t_list * listaDeNodos;
 	TfileSystem * fileSystem;
 
 	pthread_t consolaThread, datanodesThread;
