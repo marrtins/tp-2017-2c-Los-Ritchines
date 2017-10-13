@@ -65,5 +65,6 @@ typedef struct{
 }Tnodo;
 
 t_list * listaDeNodos;
+Tdirectorios tablaDirectorios[100];
 
 #endif
