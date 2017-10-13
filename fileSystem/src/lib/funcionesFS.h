@@ -22,4 +22,5 @@ void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos);
 int cantidadParametros(char **palabras);
 void almacenarArchivo(char **palabras);
 void enviarBloque(TbloqueAEnviar* bloque);
+void verificarQueExistaDirectorio(char * directorio,Tdirectorios tablaDirectorios[100]);
 #endif
