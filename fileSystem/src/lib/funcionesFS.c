@@ -67,6 +67,7 @@ int ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	Tnodo* nodoB = (Tnodo*)nodo2;
 
 	double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
+		if(nodo->cantidadBloquesLibres == 0) return 1;
 		return (double)nodo->cantidadBloquesLibres/ nodo->cantidadBloquesTotal;
 	}
 	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
@@ -233,18 +234,34 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD){
 
 }
 
-Tnodo* buscarPorFD(int fd){
-	int buscarPorFDParaLista(void* elementoDeLista){
+void liberarNodoDeLaListaGlobal(Tnodo* nodo){
+	free(nodo->nombre);
+	bitarray_destroy(nodo->bitmap);
+	free(nodo);
+}
+
+void* buscarPorFD(int fd){
+	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd == fd;
 	}
 
-	return (Tnodo*)list_find(listaDeNodos, buscarPorFDParaLista);
+	return list_find(listaDeNodos, buscarPorFDParaLista);
+}
+
+void borrarPorFD(int fd){
+	Tnodo* nodoABorrar = (Tnodo*)buscarPorFD(fd);
+	bool buscarPorFDParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return nodo->fd==fd;
+	}
+	list_remove_by_condition(listaDeNodos,buscarPorFDParaLista);
+	liberarNodoDeLaListaGlobal(nodoABorrar);
 }
 
 void inicializarNodo(int fileDescriptor, char* buffer){
 	//hay que inicializar el bitarray;
-	Tnodo* nodo = buscarPorFD(fileDescriptor);
+	Tnodo* nodo = (Tnodo*)buscarPorFD(fileDescriptor);
 	//aca se deserializa el buffer que contiene la info del nodo;
 	//y se almacena en el puntero nodo que apunta al nodo de la lista global de nodos;
 }
@@ -318,6 +335,7 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
+							borrarSegunFD(fileDescriptor);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
