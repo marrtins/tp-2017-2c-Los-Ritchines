@@ -235,7 +235,7 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD){
 
 Tnodo* buscarPorFD(int fd){
 	int buscarPorFDParaLista(void* elementoDeLista){
-		Tnodo* nodo = (Tnodo) elementoDeLista;
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd == fd;
 	}
 
@@ -262,6 +262,7 @@ void conexionesDatanode(void * estructura){
 		estado;
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
+	char * streamInfoNodo;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -324,11 +325,10 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
-								char * buffer;
 								//hay que volver a recv lo que sigue después del head;
 								//recv el nombre nodo, bloques totales, bloques libres;
 								//y los va a meter en la estructura Tnodo;
-								inicializarNodo(fileDescriptor,buffer);
+								inicializarNodo(fileDescriptor,streamInfoNodo);
 								break;
 
 							default:
