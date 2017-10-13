@@ -5,5 +5,6 @@
 #include <readline/readline.h>
 #include <commons/bitarray.h>
 #include <math.h>
+#include <sys/mman.h>
 
 #endif

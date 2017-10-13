@@ -43,8 +43,36 @@ void liberarPunteroDePunterosAChar(char** palabras){
 
 }
 
+int cantidadParametros(char ** palabras){
+	int i = 1;
+	while(palabras[i] != NULL){
+		i++;
+	}
+	return i-1;
+}
+
+void almacenarArchivo(char **palabras){
+	char * archivoMapeado;
+	FILE * archivoOrigen = fopen(palabras[1], "r");
+	int fd = fileno(archivoOrigen);
+	int tamanio = tamanioArchivo(archivoOrigen);
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+					logAndExit("Error al hacer mmap");
+			}
+	fclose(archivoOrigen);
+	close(fd);
+	int cantidadBloques = ceil((float)tamanio / BLOQUE_SIZE);
+	char * buffer = malloc(BLOQUE_SIZE);
+	if(tamanio == 0){
+		puts("Error al almacenar archivo, está vacío");
+	}
+	//else
+}
+
 void procesarInput(char* linea) {
+	int cantidad = 0;
 	char **palabras = string_split(linea, " ");
+	cantidad = cantidadParametros(palabras);
 	if (string_equals_ignore_case(*palabras, "format")) {
 		printf("ya pude formatear el fs\n");
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
@@ -58,8 +86,12 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
 		printf("ya pude crear el directorio\n");
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
-		printf(
-				"ya pude copiar el archivo local al file system siguiendo lineamientos\n");
+		if(cantidad == 2){
+			almacenarArchivo(palabras);
+		}
+		else {
+			puts("Error en la cantidad de parametros");
+		}
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
 		printf("ya pude copiar un archivo local al file system\n");
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
@@ -386,5 +418,3 @@ void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos){
 		free(tablaDeArchivos->bloques[i].copiaUno.numeroBloqueDeNodo);
 	}
 }
-
-
