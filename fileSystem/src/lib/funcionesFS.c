@@ -25,6 +25,16 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	return fileSystem;
 }
 
+int contarPunteroDePunteros(char ** puntero){
+	char ** aux = puntero;
+	int contador = 0;
+	while(*aux != NULL){
+		contador++;
+		aux++;
+	}
+	return contador;
+}
+
 void mostrarConfiguracion(TfileSystem *fileSystem){
 
 	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
@@ -49,6 +59,36 @@ int cantidadParametros(char ** palabras){
 		i++;
 	}
 	return i-1;
+}
+
+void verificarQueExistaDirectorio(char * directorio,Tdirectorios tablaDirectorios[100]){
+	char ** carpeta = string_split(directorio, "/");
+
+	int i=0, j,booleano=0, encontrado;
+	int indicePadre = 0;
+
+	while(carpeta[i] != NULL && booleano !=-1){
+
+		for(j=0;j<=99;j++){
+		encontrado = string_equals_ignore_case(tablaDirectorios[j].nombre,carpeta[i]);
+		if(encontrado){
+			if(tablaDirectorios[j].padre == indicePadre){
+				indicePadre = tablaDirectorios[j].index;
+				break;
+			}else{
+				encontrado = 0;
+				booleano = -1;
+				break;
+			}
+		}
+		}
+		i++;
+	}
+	if(encontrado){
+		puts("El directorio existe");
+	}else {
+		puts("No existe el directorio");
+	}
 }
 
 void almacenarArchivo(char **palabras){
@@ -324,17 +364,6 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 
 	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
 	config_destroy(archivo);
-}
-
-
-int contarPunteroDePunteros(char ** puntero){
-	char ** aux = puntero;
-	int contador = 0;
-	while(*aux != NULL){
-		contador++;
-		aux++;
-	}
-	return contador;
 }
 
 t_bitarray* crearBitmap(int tamanioDatabin){

@@ -39,7 +39,6 @@ int main(int argc, char* argv[]) {
 
 	levantarTablas(tablaDirectorios, tablaNodos);
 	levantarTablaArchivos(tablaArchivos);
-
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
 

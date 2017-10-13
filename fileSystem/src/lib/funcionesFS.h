@@ -21,4 +21,5 @@ void conexionesDatanode(void * estructura);
 void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos);
 int cantidadParametros(char **palabras);
 void almacenarArchivo(char **palabras);
+void verificarQueExistaDirectorio(char * directorio,Tdirectorios tablaDirectorios[100]);
 #endif
