@@ -10,8 +10,15 @@ typedef struct{
 }Tmaster;
 
 typedef struct{
+	int ipLen;
+	int puertoLen;
 	char* ipWorker;
 	char* puertoWorker;
 }TinfoWorker;
+
+typedef struct{
+	TpackInfoBloque infoBloque;
+	TinfoWorker infoWorker;
+}TatributosHilo;
 
 #endif

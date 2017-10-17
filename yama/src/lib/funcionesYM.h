@@ -22,5 +22,8 @@ int posicionarClock(t_list * listaWorkers);
 TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *listaWorkersPlanificacion);
 Tplanificacion *  getNodoApuntado(t_list * listaWorkersPlanificacion);
 void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,TpackageUbicacionBloques *bloqueAux);
+void avanzarClock(t_list *listaWorkersPlanificacion);
+int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers);
+int getHistorico(Tplanificacion *infoWorker);
 
 #endif

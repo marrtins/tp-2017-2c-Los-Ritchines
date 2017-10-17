@@ -303,7 +303,9 @@ t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
 		list_add(listaWorkersPlanificacion,nodo);
 	}
 
-	stat = posicionarClock(listaWorkersPlanificacion);
+	if((stat = posicionarClock(listaWorkersPlanificacion))<0){
+		puts("error");
+	}
 	int k;
 	for(k=0;k<list_size(listaComposicionArchivo);k++){
 		TpackageUbicacionBloques *bloqueAux=list_get(listaComposicionArchivo,k);
@@ -312,6 +314,7 @@ t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
 
 		list_add(listaPlanificada,bloque1);
 	}
+
 
 
 	return listaPlanificada;
@@ -378,6 +381,13 @@ void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,Tpackag
 	bloqueRet->nombreTemporal="tmp-asd";
 	bloqueRet->nombreTemporalLen=strlen(bloqueRet->nombreTemporal)+1;
 	bloqueRet->bytesOcupados=bloqueAux->finBloque;
+	bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
+	bloqueRet->ipWorker=nodoApuntado->infoNodo.ipNodo;
+	bloqueRet->ipLen=nodoApuntado->infoNodo.ipLen;
+	bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
+	bloqueRet->puertoWorker=nodoApuntado->infoNodo.puertoWorker;
+	bloqueRet->puertoLen=nodoApuntado->infoNodo.puertoLen;
+
 }
 
 Tplanificacion * getNodoApuntado(t_list * listaWorkersPlanificacion){

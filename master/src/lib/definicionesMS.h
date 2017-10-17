@@ -5,5 +5,5 @@
 int conectarseAWorkersTransformacion(t_list * bloquesTransformacion);
 void workerHandler(void *info);
 
-
+unsigned long fsize2(char* ruta);
 #endif

@@ -20,7 +20,9 @@ typedef enum {
 	PREG_FILEINFO=14,
 	RTA_FILEINFO=15,
 	INFOBLOQUE=16,
-	INFOULTIMOBLOQUE=17
+	INFOULTIMOBLOQUE=17,
+	INFOCONEXIONWORKER=18,
+	TRANSFORMADORLEN=19
 } Tmensaje;
 
 typedef enum {
@@ -99,7 +101,19 @@ typedef struct {
 	int bytesOcupados;
 	int nombreTemporalLen;
 	char *nombreTemporal;
+	int ipLen;
+	char * ipWorker;
+	int puertoLen;
+	char * puertoWorker;
 }__attribute__((packed)) TpackInfoBloque;
+
+typedef struct {
+	Theader head;
+	int nroBloque;
+	int cantidadBytes;
+	int temporalLen;
+	char * nombreTemporal;
+}TpackDatosTransformacion;
 
 t_log* logger;
 

@@ -1,10 +1,34 @@
 #include "lib/funcionesMS.h"
+#include <sys/sendfile.h>
+#include <fcntl.h>
 
 
-int gl;
+char * rutaTransformador, * rutaReductor;
+int transformadorLen,reductorLen,fdTransformador;
+
+
+
+
+unsigned long fsize2(char* ruta){
+	FILE *file = fopen(ruta, "rb");
+    fseek(file, 0, SEEK_END);
+    unsigned long len = (unsigned long) ftell(file);
+    fseek(file, 0, SEEK_SET);
+    fclose(file);
+    printf("fsize es: %lu",len);
+    return len+ 1;//+1 para '\0' (revisar)
+
+}
+
+
+
+
+
+
 int main(int argc, char* argv[]) {
-	gl=0;
+
 	int sockYama,
+
 	//sockWorker,
 		cantidadBytesEnviados,
 	//	puertoWorker,
@@ -18,8 +42,8 @@ int main(int argc, char* argv[]) {
 	//char * chorroDeBytes;
 	t_list *bloquesTransformacion = list_create();
 
-	char *rutaTransformador = string_new();
-	char *rutaReductor = string_new();
+	rutaTransformador = string_new();
+	rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
 	char *rutaResultado = string_new();
 	char *buffer;
@@ -44,7 +68,9 @@ int main(int argc, char* argv[]) {
 
 
 	rutaTransformador=argv[1];
+	transformadorLen=fsize2(rutaTransformador);
 	rutaReductor=argv[2];
+	reductorLen=fsize2(rutaReductor);
 	rutaArchivoAReducir=argv[3];
 	rutaResultado=argv[4];
 
@@ -56,6 +82,8 @@ int main(int argc, char* argv[]) {
 	printf("Archivo a reducir Path: %s\n",rutaArchivoAReducir);
 	printf("Resultado Path: %s\n",rutaResultado);
 
+
+	fdTransformador = open(rutaTransformador, O_RDONLY);
 
 	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
 	cantidadBytesEnviados = enviarHeader(sockYama, head);
@@ -91,6 +119,7 @@ int main(int argc, char* argv[]) {
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
 
+
 	while ((stat=recv(sockYama, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 
@@ -99,6 +128,7 @@ int main(int argc, char* argv[]) {
 		TpackInfoBloque *infoBloque;
 
 		switch (headRcv.tipo_de_mensaje) {
+
 		case (INFOBLOQUE):
 			puts("Nos llega info de un bloque");
 			if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
@@ -112,8 +142,8 @@ int main(int argc, char* argv[]) {
 			}
 			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
 			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->bloque,
-					infoBloque->bytesOcupados,infoBloque->nombreTemporal);
+			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloque,
+											infoBloque->bytesOcupados,infoBloque->nombreTemporal);
 
 			list_add(bloquesTransformacion,infoBloque);
 			break;
@@ -132,7 +162,7 @@ int main(int argc, char* argv[]) {
 			}
 			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
 			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->bloque,
+			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloque,
 								infoBloque->bytesOcupados,infoBloque->nombreTemporal);
 			list_add(bloquesTransformacion,infoBloque);
 			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
@@ -165,7 +195,7 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
 	for(i=0;i< cantConexiones;i++){
 		pthread_t workerThread[i];
 		TpackInfoBloque *infoBloque=list_get(bloquesTransformacion,i);
-		printf("creao hilo %d\n",i);
+		printf("creo hilo %d\n",i);
 		crearHilo(&workerThread[i], (void*)workerHandler, (void*)infoBloque);
 	}
 
@@ -174,40 +204,39 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
 
 void workerHandler(void *info){
 	TpackInfoBloque *infoBloque = (TpackInfoBloque *)info;
+	char * buffer;
+	int stat,sockWorker,packSize;
 
-	//printf("Hilo que se conectara al worker %s:%s.\npara transformar el bloque:%d\n",infoBloque->ipNodo,infoBloque->puertoWorker,infoBloque->bloque);
+	if((sockWorker = conectarAServidor(infoBloque->ipWorker, infoBloque->puertoWorker))<0){
+		puts("No pudo conectarse a worker");
+		return;
+	}
 
-	int stat,sockWorker;
-	Theader *headEnvio=malloc(sizeof(headEnvio));
+	puts("Nos conectamos a worker");
+
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
+
+	Theader *headEnvio=malloc(sizeof headEnvio);
 	headEnvio->tipo_de_proceso=MASTER;
-	headEnvio->tipo_de_mensaje=START_LOCALTRANSF;
+	headEnvio->tipo_de_mensaje=TRANSFORMADORLEN;
 
-	//sockWorker = conectarAServidor(infoBloque->ipNodo, infoBloque->puertoWorker);
-	//stat = enviarHeader(sockWorker, headEnvio);
+	enviarHeader(sockWorker,headEnvio);
 
-
-
-	/*puts("Conectado al worker.. Inicio transfo localASD..");
-
-	headEnvio->tipo_de_mensaje=gl++;
-
-	stat = enviarHeader(sockWorker, headEnvio);
-
+	headEnvio->tipo_de_mensaje=transformadorLen;
+	enviarHeader(sockWorker,headEnvio);
 
 	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 		switch (headRcv.tipo_de_mensaje) {
 			case(FIN_LOCALTRANSF):
-					printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
-
+				printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
+			break;
 		default:
 			break;
 		}
 
 
-	}*/
+	}
 
-	while(1);
 	printf("fin thread de transfo del bloque %d\n",infoBloque->bloque);
 }
