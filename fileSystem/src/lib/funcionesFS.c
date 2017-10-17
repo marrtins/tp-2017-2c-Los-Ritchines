@@ -25,6 +25,16 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	return fileSystem;
 }
 
+int contarPunteroDePunteros(char ** puntero){
+	char ** aux = puntero;
+	int contador = 0;
+	while(*aux != NULL){
+		contador++;
+		aux++;
+	}
+	return contador;
+}
+
 void mostrarConfiguracion(TfileSystem *fileSystem){
 
 	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
@@ -43,8 +53,119 @@ void liberarPunteroDePunterosAChar(char** palabras){
 
 }
 
+int cantidadParametros(char ** palabras){
+	int i = 1;
+	while(palabras[i] != NULL){
+		i++;
+	}
+	return i-1;
+}
+
+
+int ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
+	Tnodo* nodoA = (Tnodo*)nodo1;
+	Tnodo* nodoB = (Tnodo*)nodo2;
+
+	double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
+		if(nodo->cantidadBloquesLibres == 0) return 1;
+		return (double)nodo->cantidadBloquesLibres/ nodo->cantidadBloquesTotal;
+	}
+	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
+}
+
+void enviarBloque(TbloqueAEnviar* bloque){
+	list_sort(listaDeNodos,ordenarSegunBloquesDisponibles);
+	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
+	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
+	//hacer el send a cada nodo;
+}
+
+int existeDirectorio(char * directorio){
+	char ** carpeta = string_split(directorio, "/");
+
+	int i=0, j,booleano=0, encontrado;
+	int indicePadre = 0;
+
+	while(carpeta[i] != NULL && booleano !=-1){
+
+		for(j=0;j<=99;j++){
+		encontrado = string_equals_ignore_case(tablaDirectorios[j].nombre,carpeta[i]);
+		if(encontrado){
+			if(tablaDirectorios[j].padre == indicePadre){
+				indicePadre = tablaDirectorios[j].index;
+				break;
+			}else{
+				encontrado = 0;
+				booleano = -1;
+				break;
+			}
+		}
+		}
+		i++;
+	}
+	return encontrado;
+
+}
+
+void almacenarArchivo(char **palabras){
+	char * archivoMapeado;
+	char ** lineas;
+	unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
+	TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
+	infoBloque->numeroDeBloque = 0;
+	infoBloque->contenido = malloc(BLOQUE_SIZE);
+
+	FILE * archivoOrigen = fopen(palabras[1], "r");
+	int fd = fileno(archivoOrigen);
+
+	unsigned long long tamanio = tamanioArchivo(archivoOrigen);
+
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		logAndExit("Error al hacer mmap");
+	}
+
+	fclose(archivoOrigen);
+	close(fd);
+
+	int cantidadBloques = ceil((float)tamanio / BLOQUE_SIZE);
+
+	if(tamanio == 0){
+		puts("Error al almacenar archivo, está vacío");
+		return;
+	}
+	else {
+		lineas = string_split(archivoMapeado,"\n");
+		int i = 0;
+		while(lineas[i]!=NULL){
+			//+1 por el \n faltante
+			if(bytesDisponiblesEnBloque - strlen(lineas[i]) +1 < 0){
+				infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
+				enviarBloque(infoBloque);
+				bytesDisponiblesEnBloque = BLOQUE_SIZE;
+				infoBloque->numeroDeBloque++;
+			}
+			else{
+				bytesDisponiblesEnBloque -= strlen(lineas[i])+1;
+				string_append(&infoBloque->contenido,lineas[i]);
+				if(lineas[i+1] != NULL){
+					string_append(&infoBloque->contenido,"\n");
+				}
+
+			}
+
+		}
+
+		liberarPunteroDePunterosAChar(lineas);
+		free(lineas);
+		free(infoBloque->contenido);
+		free(infoBloque);
+	}
+}
+
 void procesarInput(char* linea) {
+	int cantidad = 0;
 	char **palabras = string_split(linea, " ");
+	cantidad = cantidadParametros(palabras);
 	if (string_equals_ignore_case(*palabras, "format")) {
 		printf("ya pude formatear el fs\n");
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
@@ -56,10 +177,25 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "cat")) {
 		printf("ya pude leer el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
+		if(cantidad == 1){
+			if(existeDirectorio(palabras[1])){
+				puts("Existe el directorio");
+			}else {
+				puts("No existe el directorio"); //HAY QUE CREARLO
+			}
 		printf("ya pude crear el directorio\n");
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
-		printf(
-				"ya pude copiar el archivo local al file system siguiendo lineamientos\n");
+		if(cantidad == 2){
+			if(existeDirectorio(palabras[2])){
+			puts("Existe el directorio");
+			almacenarArchivo(palabras);
+			}else {
+				puts("No existe el directorio");
+			}
+		}
+		else {
+			puts("Error en la cantidad de parametros");
+		}
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
 		printf("ya pude copiar un archivo local al file system\n");
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
@@ -105,6 +241,38 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD){
 
 }
 
+void liberarNodoDeLaListaGlobal(Tnodo* nodo){
+	free(nodo->nombre);
+	bitarray_destroy(nodo->bitmap);
+	free(nodo);
+}
+
+void* buscarPorFD(int fd){
+	bool buscarPorFDParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return nodo->fd == fd;
+	}
+
+	return list_find(listaDeNodos, buscarPorFDParaLista);
+}
+
+void borrarPorFD(int fd){
+	Tnodo* nodoABorrar = (Tnodo*)buscarPorFD(fd);
+	bool buscarPorFDParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return nodo->fd==fd;
+	}
+	list_remove_by_condition(listaDeNodos,buscarPorFDParaLista);
+	liberarNodoDeLaListaGlobal(nodoABorrar);
+}
+
+void inicializarNodo(int fileDescriptor, char* buffer){
+	//hay que inicializar el bitarray;
+	Tnodo* nodo = (Tnodo*)buscarPorFD(fileDescriptor);
+	//aca se deserializa el buffer que contiene la info del nodo;
+	//y se almacena en el puntero nodo que apunta al nodo de la lista global de nodos;
+}
+
 void conexionesDatanode(void * estructura){
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	fd_set readFD, masterFD;
@@ -116,9 +284,9 @@ void conexionesDatanode(void * estructura){
 		estable,
 		cantNodosPorConectar = fileSystem->cant_nodos,
 		estado;
-	t_list * listaBitmaps = list_create();
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
+	char * streamInfoNodo;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -153,9 +321,11 @@ void conexionesDatanode(void * estructura){
 					printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
 					if(fileDescriptor == socketDeEscuchaDatanodes){
+						Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
-
+						nuevoNodo->fd = nuevoFileDescriptor;
+						list_add(listaDeNodos,nuevoNodo);
 						cantNodosPorConectar--;
 						puts("Filesystem estable");
 
@@ -172,6 +342,7 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
+							borrarSegunFD(fileDescriptor);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
@@ -179,8 +350,10 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
-									list_add(listaBitmaps, crearBitmap(20)); //hardcodeado
-									mostrarBitmap(list_get(listaBitmaps,0));
+								//hay que volver a recv lo que sigue después del head;
+								//recv el nombre nodo, bloques totales, bloques libres;
+								//y los va a meter en la estructura Tnodo;
+								inicializarNodo(fileDescriptor,streamInfoNodo);
 								break;
 
 							default:
@@ -209,7 +382,7 @@ void conexionesDatanode(void * estructura){
 	//POR ACA VA UN SIGNAL PARA INDICAR QUE FS YA TIENE TODOS LOS NODOS CONECTADOS.
 }
 
-void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
+void levantarTablasDirectorios(){
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
 	int i = 0;
 
@@ -223,7 +396,7 @@ void levantarTablasDirectorios(Tdirectorios * tablaDirectorios){
 
 }
 
-void mostrarDirectorios(Tdirectorios * tablaDirectorios){
+void mostrarDirectorios(){
 
 }
 
@@ -294,17 +467,6 @@ void levantarTablaArchivos(Tarchivos * tablaArchivos){
 	config_destroy(archivo);
 }
 
-
-int contarPunteroDePunteros(char ** puntero){
-	char ** aux = puntero;
-	int contador = 0;
-	while(*aux != NULL){
-		contador++;
-		aux++;
-	}
-	return contador;
-}
-
 t_bitarray* crearBitmap(int tamanioDatabin){
 	int tamanioEnBits = ceil(tamanioDatabin/8.0);
 	char * bitarray = calloc(tamanioEnBits,1);
@@ -358,10 +520,10 @@ void levantarTablaNodos(Tnodos * tablaNodos){
 	config_destroy(archivoNodos);
 }
 
-void levantarTablas(Tdirectorios * tablaDirectorios, Tnodos * tablaNodos){
-	levantarTablasDirectorios(tablaDirectorios);
+void levantarTablas(Tnodos * tablaNodos){
+	levantarTablasDirectorios();
 	levantarTablaNodos(tablaNodos);
-	mostrarDirectorios(tablaDirectorios); //no hace nada, pero deberia
+	mostrarDirectorios(); //no hace nada, pero deberia
 }
 
 void mostrarBitmap(t_bitarray* bitmap){
@@ -386,5 +548,3 @@ void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos){
 		free(tablaDeArchivos->bloques[i].copiaUno.numeroBloqueDeNodo);
 	}
 }
-
-

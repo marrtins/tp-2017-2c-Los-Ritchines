@@ -12,6 +12,7 @@ int conectarAServidor(char *ipDestino, char *puertoDestino);
 int enviarHeader(int socketDestino,Theader * head);
 char *recvGenericWFlags(int sock_in, int flags);
 char *recvGeneric(int sock_in);
+int tamanioArchivo(FILE *archivo);
 
 
 

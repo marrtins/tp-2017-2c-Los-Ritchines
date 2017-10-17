@@ -5,6 +5,14 @@ void logAndExit(char * mensaje){
 	exit(-1);
 }
 
+int tamanioArchivo(FILE * archivo){
+	int tamanio;
+	fseek(archivo, 0L, SEEK_END);
+	tamanio = ftell(archivo);
+	fseek(archivo, 0L, SEEK_SET);
+	return tamanio;
+}
+
 void setupHints(struct addrinfo *hints, int address_family, int socket_type, int flags){
 	memset(hints, 0, sizeof *hints);
 	hints->ai_family = address_family;

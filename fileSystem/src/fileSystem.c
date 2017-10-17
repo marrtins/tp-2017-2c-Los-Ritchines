@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
 	Tarchivos * tablaArchivos = malloc(sizeof(Tarchivos));
 	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
 
-	t_list * listaDeNodos;
 	TfileSystem * fileSystem;
 
 	pthread_t consolaThread, datanodesThread;
@@ -37,11 +36,12 @@ int main(int argc, char* argv[]) {
 	list_create(listaDeNodos);
 	list_create(listaBitmaps);
 
-	levantarTablas(tablaDirectorios, tablaNodos);
+	levantarTablas(tablaNodos);
 	levantarTablaArchivos(tablaArchivos);
-
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
+
+
 
 	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
