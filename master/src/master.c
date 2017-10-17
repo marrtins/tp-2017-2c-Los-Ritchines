@@ -216,6 +216,10 @@ void workerHandler(void *info){
 
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
+
+
+
+
 	Theader *headEnvio=malloc(sizeof headEnvio);
 	headEnvio->tipo_de_proceso=MASTER;
 	headEnvio->tipo_de_mensaje=TRANSFORMADORLEN;

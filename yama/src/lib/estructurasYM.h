@@ -30,6 +30,25 @@ typedef struct {
 	char *bytes2;
 }__attribute__((packed)) Tpack2Bytes;
 
+typedef struct {
+	char * nombreNodo;
+	int tareasRealizadas;
+}ThistorialTareas;
+typedef struct {
+	char * nombreNodo;
+	int cargaGlobal;
+}TcargaGlobal;
+
+
+typedef struct {
+	TpackageInfoNodo infoNodo;
+	int availability;
+	int disponibilidadBase;
+	int pwl;
+	bool clock;
+
+}Tplanificacion;
+
 
 
 t_log* logger;

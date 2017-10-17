@@ -1,8 +1,8 @@
 #include "lib/funcionesYM.h"
 
 int socketFS, idMasterGlobal;
-t_list * listaHistoricaTareas;
-pthread_mutex_t mux_listaHistorica;
+t_list * listaHistoricaTareas,*listaCargaGlobal;
+pthread_mutex_t mux_listaHistorica,mux_listaCargaGlobal;
 int main(int argc, char* argv[]){
 	int estado,
 		socketMasters,
@@ -16,7 +16,10 @@ int main(int argc, char* argv[]){
 	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	listaHistoricaTareas=list_create();
-	pthread_mutex_init(&mux_listaHistorica,   NULL);
+	listaCargaGlobal = list_create();
+
+	pthread_mutex_init(&mux_listaHistorica, NULL);
+	pthread_mutex_init(&mux_listaCargaGlobal,NULL);
 
 
 	if(argc!=1){
