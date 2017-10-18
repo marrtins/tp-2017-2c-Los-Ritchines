@@ -62,7 +62,7 @@ typedef struct{
 	int fd;
 	unsigned int cantidadBloquesTotal;
 	unsigned int cantidadBloquesLibres;
-	int primerBloqueLibreBitmap = 0;
+	int primerBloqueLibreBitmap;
 	t_bitarray * bitmap;
 }Tnodo;
 
