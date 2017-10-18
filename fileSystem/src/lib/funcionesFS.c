@@ -82,14 +82,15 @@ void enviarBloque(TbloqueAEnviar* bloque){
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
-
+	printf("Numero de bloque %d , Tamanio de bloque %d, Cntenido de bloque %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 	if ((send(nodo1->fd, buffer , sizeof(Theader), 0)) == -1){
 			logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 		}
+	puts("Se envio bloque a Nodo1");
 	if ((send(nodo2->fd, buffer , sizeof(Theader), 0)) == -1){
 				logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 			}
-
+	puts("Se envio bloque a Nodo2");
 }
 
 int existeDirectorio(char * directorio){
@@ -197,7 +198,7 @@ void procesarInput(char* linea) {
 			}else {
 				puts("No existe el directorio"); //HAY QUE CREARLO
 				printf("ya pude crear el directorio\n");
-			}
+			}}
 
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
 		if(cantidad == 2){
@@ -233,7 +234,7 @@ void procesarInput(char* linea) {
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
 	free(linea);
-}}
+}
 
 void consolaFS(){
 	puts("Bienvenido a la consola. Ingrese un comando:");

@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) {
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
-	list_create(listaDeNodos);
-	list_create(listaBitmaps);
+	listaDeNodos = list_create();
+	listaBitmaps = list_create();
 
 	levantarTablas(tablaNodos);
 	levantarTablaArchivos(tablaArchivos);

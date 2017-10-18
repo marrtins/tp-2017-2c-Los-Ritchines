@@ -4,7 +4,8 @@
 int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
-	int socketFS, fd, estado;
+	int socketFS, fd, estado, nroBloque,tamanioBloque;
+	char* contenidoBloque;
 	char *bufferRecv = malloc(sizeof(Theader));
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
 	estado = enviarHeader(socketFS, head);
 	printf("Envie %d bytes\n",estado);
 
-	if ((estado = recv(socketFS, &bufferRecv, sizeof(Theader), 0)) == -1) {
+	if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {
 		logAndExit("Error al recibir informacion");
 
 	} else if (estado == 0) {
@@ -46,6 +47,27 @@ int main(int argc, char* argv[]) {
 
 	}
 	printf("Recibi %d bytes\n",estado);
+
+
+	if(head->tipo_de_proceso == FILESYSTEM){
+		switch(head->tipo_de_mensaje){
+			case ALMACENAR_BLOQUE:
+				puts("Es FileSystem y quiere almacenar un bloque");
+				if ((estado = recv(socketFS, nroBloque, sizeof(int), 0)) == -1) {
+						logAndExit("Error al recibir el numero de bloque");
+				}
+				printf("Recibí el numero de bloque %d\n", nroBloque);
+				if ((estado = recv(socketFS, tamanioBloque, sizeof(int), 0)) == -1) {
+						logAndExit("Error al recibir el tamaño de bloque");
+				}
+				printf("Tamanio de bloque = %d\n", tamanioBloque);
+				if ((estado = recv(socketFS, contenidoBloque, tamanioBloque, 0)) == -1) {
+						logAndExit("Error al recibir el contenido del bloque");
+				}
+	}
+
+
+}
 
 
 	free(head);
