@@ -25,3 +25,4 @@
 [ERROR] 17:25:42:934 FileSystem.log/(8058:8058): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 17:55:01:484 FileSystem.log/(8636:8636): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 17:57:29:285 FileSystem.log/(8717:8717): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 14:02:30:13 FileSystem.log/(4527:4527): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4

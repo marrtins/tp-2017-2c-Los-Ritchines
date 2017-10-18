@@ -218,7 +218,7 @@ void procesarInput(char* linea) {
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
 	free(linea);
-}
+}}
 
 void consolaFS(){
 	puts("Bienvenido a la consola. Ingrese un comando:");
@@ -342,7 +342,7 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
-							borrarSegunFD(fileDescriptor);
+							borrarPorFD(fileDescriptor);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
