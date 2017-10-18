@@ -172,11 +172,11 @@ void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, ch
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	int index = obtenerIndexDeUnaRuta(rutaDestino);
 	char * rutaArchivo = "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/";
-	string_append(rutaArchivo, string_itoa(index));
-	string_append(rutaArchivo, "/");
-	string_append(rutaArchivo, archivoAAlmacenar->nombreArchivoSinExtension);
-	string_append(rutaArchivo, ".");
-	string_append(rutaArchivo, archivoAAlmacenar->extensionArchivo);
+	string_append(&rutaArchivo, string_itoa(index));
+	string_append(&rutaArchivo, "/");
+	string_append(&rutaArchivo, archivoAAlmacenar->nombreArchivoSinExtension);
+	string_append(&rutaArchivo, ".");
+	string_append(&rutaArchivo, archivoAAlmacenar->extensionArchivo);
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnArchivoAbierto(archivoAAlmacenar, rutaArchivo);
@@ -191,7 +191,7 @@ char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension){
 	}
 	q++;
 	while(*q != '\0'){
-		string_append(extension, *q);
+		&string_append(extension, *q);
 		q++;
 	}
 	return extension;
@@ -202,7 +202,7 @@ char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension){
 	char * q = nombreDeArchivoConExtension;
 	char * nombreDeArchivoSinExtension;
 	while(*q != '\0'){
-		string_append(nombreDeArchivoSinExtension, *q);
+		&string_append(nombreDeArchivoSinExtension, *q);
 	}
 	return nombreDeArchivoSinExtension;
 }
