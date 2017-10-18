@@ -1,7 +1,7 @@
 
 #include "funcionesYM.h"
 
-extern int socketFS;
+
 
 int idTempName,idPropio;
 

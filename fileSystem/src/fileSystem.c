@@ -11,7 +11,9 @@ int main(int argc, char* argv[]) {
 	t_list * listaBitmaps = list_create();
 
 	Tdirectorios tablaDirectorios[100];
-	Tarchivos * tablaArchivos = malloc(sizeof(Tarchivos));
+
+	Tarchivo * tablaArchivos = malloc(sizeof(Tarchivo));
+
 	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
 
 	TfileSystem * fileSystem;
@@ -37,7 +39,7 @@ int main(int argc, char* argv[]) {
 	listaBitmaps = list_create();
 
 	levantarTablas(tablaNodos);
-	levantarTablaArchivos(tablaArchivos);
+	levantarTablaArchivo(tablaArchivos);
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
 
@@ -106,7 +108,7 @@ int main(int argc, char* argv[]) {
 
 
 	//tabla de archivos
-	liberarTablaDeArchivos(tablaArchivos);
+	liberarTablaDeArchivo(tablaArchivos);
 	//	FALTA free tablanodos
 
 	//listas

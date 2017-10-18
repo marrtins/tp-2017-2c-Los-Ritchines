@@ -9,6 +9,7 @@
 #define BACKLOG 20
 #define HEAD_SIZE 8
 #define BLOQUE_SIZE 1024*1024
+#define TAMANIO_EXTENSION_ARCHIVO 10
 
 
 

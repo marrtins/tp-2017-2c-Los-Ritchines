@@ -44,6 +44,10 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 	printf("Tipo de proceso: %d\n", fileSystem->tipo_de_proceso);
 }
 
+void agregarArchivosATablaDeArchivos(){
+
+}
+
 void liberarPunteroDePunterosAChar(char** palabras){
 	int i = 0;
 	while(palabras[i] != NULL){
@@ -73,6 +77,11 @@ int ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
 }
 
+void ocuparProximoBloqueBitmap(Tnodo * nodo){
+	bitarray_set_bit(nodo->bitmap, nodo->primerBloqueLibreBitmap);
+	nodo->primerBloqueLibreBitmap++;
+}
+
 void enviarBloque(TbloqueAEnviar* bloque){
 	Theader *head = malloc(sizeof(Theader));
 	char * buffer;
@@ -91,6 +100,11 @@ void enviarBloque(TbloqueAEnviar* bloque){
 				logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 			}
 	puts("Se envio bloque a Nodo2");
+
+	//hacer el send a cada nodo
+
+
+
 }
 
 int existeDirectorio(char * directorio){
@@ -120,9 +134,90 @@ int existeDirectorio(char * directorio){
 
 }
 
+int buscarIndexPorNombreDeDirectorio(char * directorio){
+	int i, comparacion;
+	for(i = 0; i < 100; i++){
+		comparacion = strcmp(tablaDirectorios[i].nombre, directorio);
+		if(comparacion == 0){
+			return tablaDirectorios[i].index;
+		}
+	}
+	return -1;
+}
+
+char * obtenerUltimoElementoDeUnSplit(char ** palabras){
+	char * ultimaPalabra;
+	int i = 0;
+	while(palabras[i] != NULL){
+		ultimaPalabra = palabras[i];
+		i++;
+	}
+	return ultimaPalabra;
+}
+
+int obtenerIndexDeUnaRuta(char * rutaDestino){
+	char ** palabras = string_split(rutaDestino, "/");
+	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
+	return buscarIndexPorNombreDeDirectorio(directorio);
+
+}
+
+void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
+	t_config * archivoConfig = config_create(rutaArchivo);
+	config_set_value(archivoConfig, "TAMANIO", string_itoa(archivoAAlmacenar->tamanioTotal));
+	config_set_value(archivoConfig, "TIPO", archivoAAlmacenar->extensionArchivo);
+
+
+}
+
+void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
+	int index = obtenerIndexDeUnaRuta(rutaDestino);
+	char * rutaArchivo = "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/";
+	string_append(rutaArchivo, string_itoa(index));
+	string_append(rutaArchivo, "/");
+	string_append(rutaArchivo, archivoAAlmacenar->nombreArchivoSinExtension);
+	string_append(rutaArchivo, ".");
+	string_append(rutaArchivo, archivoAAlmacenar->extensionArchivo);
+	FILE * archivo = fopen(rutaArchivo, "w+");
+	fclose(archivo);
+	almacenarEstructuraArchivoEnArchivoAbierto(archivoAAlmacenar, rutaArchivo);
+
+}
+
+char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension){
+	char * q = nombreArchivoConExtension;
+	char * extension;
+	while(*q != '.'){
+		q++;
+	}
+	q++;
+	while(*q != '\0'){
+		string_append(extension, *q);
+		q++;
+	}
+	return extension;
+
+}
+
+char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension){
+	char * q = nombreDeArchivoConExtension;
+	char * nombreDeArchivoSinExtension;
+	while(*q != '\0'){
+		string_append(nombreDeArchivoSinExtension, *q);
+	}
+	return nombreDeArchivoSinExtension;
+}
+
 void almacenarArchivo(char **palabras){
 	char * archivoMapeado;
 	char ** lineas;
+	char * nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(obtenerUltimoElementoDeUnSplit(palabras));
+
+	Tarchivo * archivoAAlmacenar = malloc(sizeof(Tarchivo));
+	archivoAAlmacenar->nombreArchivoSinExtension = malloc(sizeof(nombreArchivoSinExtension));
+	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoSinExtension);
+
+
 	unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
 	TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
 	infoBloque->numeroDeBloque = 0;
@@ -134,6 +229,8 @@ void almacenarArchivo(char **palabras){
 	int fd = fileno(archivoOrigen);
 
 	unsigned long long tamanio = tamanioArchivo(archivoOrigen);
+	archivoAAlmacenar->tamanioTotal = tamanio;
+
 
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
 		logAndExit("Error al hacer mmap");
@@ -155,6 +252,7 @@ void almacenarArchivo(char **palabras){
 			//+1 por el \n faltante
 			if(bytesDisponiblesEnBloque - strlen(lineas[i]) +1 < 0){
 				infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
+				archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
 				enviarBloque(infoBloque);
 				bytesDisponiblesEnBloque = BLOQUE_SIZE;
 				infoBloque->numeroDeBloque++;
@@ -170,6 +268,7 @@ void almacenarArchivo(char **palabras){
 
 		}
 
+		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 		liberarPunteroDePunterosAChar(lineas);
 		free(lineas);
 		free(infoBloque->contenido);
@@ -417,7 +516,7 @@ void mostrarDirectorios(){
 }
 
 
-void levantarTablaArchivos(Tarchivos * tablaArchivos){
+void levantarTablaArchivo(Tarchivo * tablaArchivos){
 
 	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/2/archivo1.txt");
 
@@ -551,10 +650,10 @@ void mostrarBitmap(t_bitarray* bitmap){
 	puts("");
 }
 
-void liberarTablaDeArchivos(Tarchivos * tablaDeArchivos){
+void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	int i;
 	int cantBloques = ceil(tablaDeArchivos->tamanioTotal/1048576.0);
-	tablaDeArchivos->extensionArchivo = malloc(sizeof(Tarchivos));
+	tablaDeArchivos->extensionArchivo = malloc(sizeof(Tarchivo));
 	tablaDeArchivos->bloques = malloc(sizeof(Tbloques));
 
 	for(i = 0; i != cantBloques; i++){

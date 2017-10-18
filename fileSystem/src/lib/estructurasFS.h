@@ -29,14 +29,15 @@ typedef struct{
 typedef struct{
 	TcopiaNodo copiaCero;
 	TcopiaNodo copiaUno;
-	int bytes;
+	unsigned long long bytes;
 }Tbloques;
 
 typedef struct{
-	int tamanioTotal;
+	char * nombreArchivoSinExtension;
+	unsigned long long tamanioTotal;
 	char * extensionArchivo;
 	Tbloques * bloques;
-}Tarchivos;
+}Tarchivo;
 
 typedef struct{
 	int cantBloques;
@@ -61,6 +62,7 @@ typedef struct{
 	int fd;
 	unsigned int cantidadBloquesTotal;
 	unsigned int cantidadBloquesLibres;
+	int primerBloqueLibreBitmap = 0;
 	t_bitarray * bitmap;
 }Tnodo;
 
