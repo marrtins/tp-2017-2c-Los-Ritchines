@@ -4,21 +4,6 @@
 
 
 char * rutaTransformador, * rutaReductor;
-int transformadorLen,reductorLen,fdTransformador;
-
-
-
-
-unsigned long fsize2(char* ruta){
-	FILE *file = fopen(ruta, "rb");
-    fseek(file, 0, SEEK_END);
-    unsigned long len = (unsigned long) ftell(file);
-    fseek(file, 0, SEEK_SET);
-    fclose(file);
-    printf("fsize es: %lu",len);
-    return len+ 1;//+1 para '\0' (revisar)
-
-}
 
 
 
@@ -68,9 +53,9 @@ int main(int argc, char* argv[]) {
 
 
 	rutaTransformador=argv[1];
-	transformadorLen=fsize2(rutaTransformador);
+
 	rutaReductor=argv[2];
-	reductorLen=fsize2(rutaReductor);
+
 	rutaArchivoAReducir=argv[3];
 	rutaResultado=argv[4];
 
@@ -83,7 +68,7 @@ int main(int argc, char* argv[]) {
 	printf("Resultado Path: %s\n",rutaResultado);
 
 
-	fdTransformador = open(rutaTransformador, O_RDONLY);
+
 
 	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
 	cantidadBytesEnviados = enviarHeader(sockYama, head);
@@ -185,62 +170,3 @@ int main(int argc, char* argv[]) {
 	return EXIT_SUCCESS;
 }
 
-int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
-
-
-	int cantConexiones = list_size(bloquesTransformacion);
-
-	int i;
-
-	for(i=0;i< cantConexiones;i++){
-		pthread_t workerThread[i];
-		TpackInfoBloque *infoBloque=list_get(bloquesTransformacion,i);
-		printf("creo hilo %d\n",i);
-		crearHilo(&workerThread[i], (void*)workerHandler, (void*)infoBloque);
-	}
-
-	return 0;
-}
-
-void workerHandler(void *info){
-	TpackInfoBloque *infoBloque = (TpackInfoBloque *)info;
-	char * buffer;
-	int stat,sockWorker,packSize;
-
-	if((sockWorker = conectarAServidor(infoBloque->ipWorker, infoBloque->puertoWorker))<0){
-		puts("No pudo conectarse a worker");
-		return;
-	}
-
-	puts("Nos conectamos a worker");
-
-	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
-
-
-
-
-
-	Theader *headEnvio=malloc(sizeof headEnvio);
-	headEnvio->tipo_de_proceso=MASTER;
-	headEnvio->tipo_de_mensaje=TRANSFORMADORLEN;
-
-	enviarHeader(sockWorker,headEnvio);
-
-	headEnvio->tipo_de_mensaje=transformadorLen;
-	enviarHeader(sockWorker,headEnvio);
-
-	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
-
-		switch (headRcv.tipo_de_mensaje) {
-			case(FIN_LOCALTRANSF):
-				printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
-			break;
-		default:
-			break;
-		}
-
-
-	}
-
-	printf("fin thread de transfo del bloque %d\n",infoBloque->bloque);
-}
