@@ -7,7 +7,7 @@
 #include "funcionesYM.h"
 
 extern t_list * listaHistoricaTareas,*listaCargaGlobal;
-extern pthread_mutex_t mux_listaHistorica,mux_listaCargaGlobal;
+//extern pthread_mutex_t mux_listaHistorica,mux_listaCargaGlobal;
 
 t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
 

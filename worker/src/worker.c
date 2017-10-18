@@ -1,5 +1,5 @@
 #include "lib/funcionesWK.h"
-#include<sys/sendfile.h>
+
 
 int main(int argc, char* argv[]){
 
@@ -10,8 +10,15 @@ int main(int argc, char* argv[]){
 		client_sock,
 		clientSize;
 	struct sockaddr_in client;
-	char  *buffer;
-	TpackSrcCode *entradaTransformador;
+
+
+	char * nombreTransformador;
+	int cont = 1;
+	char buffer[BUFSIZ];
+	int file_size,len;
+    int remain_data = 0;
+
+	FILE *transformadorFile;
 
 	clientSize = sizeof client;
 
@@ -42,7 +49,7 @@ int main(int argc, char* argv[]){
 
 		printf("Cantidad de bytes recibidos: %d\n", estado);
 		printf("El tipo de proceso es %d y el mensaje es %d\n",	head->tipo_de_proceso, head->tipo_de_mensaje);
-		int i=0;
+
 		switch(head->tipo_de_proceso){
 
 		case MASTER:
@@ -50,6 +57,39 @@ int main(int argc, char* argv[]){
 
 			if(head->tipo_de_mensaje==TRANSFORMADORLEN){
 				puts("llego trasnformador len");
+			}
+
+			nombreTransformador=string_new();
+			string_append(&nombreTransformador,"/home/utnso/ScriptTransformadorNro");
+			cont++;
+			string_append(&nombreTransformador,string_itoa(cont));
+			string_append(&nombreTransformador,worker->nombre_nodo);
+			if(head->tipo_de_mensaje==TRANSFORMADORLEN){
+				puts("llego trasnformador len");
+
+
+				/*file size */
+				recv(client_sock, buffer, BUFSIZ, 0);
+				file_size = atoi(buffer);
+				fprintf(stdout, "\nFile size : %d\n", file_size);
+
+				transformadorFile = fopen(nombreTransformador, "w");
+				if (transformadorFile == NULL){
+					fprintf(stderr, "Fallo open transformador file --> %s\n", strerror(errno));
+					exit(EXIT_FAILURE);
+				}
+
+				remain_data = file_size;
+
+				while (remain_data > 0){//todo:cheq
+					len = recv(client_sock, buffer, 1024, 0);
+					fwrite(buffer, sizeof(char), len, transformadorFile);
+					remain_data -= len;
+					fprintf(stdout, "Recinidos %d bytes y espero :- %d bytes\n", len, remain_data);
+				}
+				fclose(transformadorFile);
+				puts("sali");
+			}
 
 			break;
 		default:
@@ -69,5 +109,5 @@ int main(int argc, char* argv[]){
 	free(head);
 
 	return 0;
-	}
 }
+
