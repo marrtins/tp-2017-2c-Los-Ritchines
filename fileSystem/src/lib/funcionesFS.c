@@ -82,7 +82,7 @@ void ocuparProximoBloqueBitmap(Tnodo * nodo){
 	nodo->primerBloqueLibreBitmap++;
 }
 
-void enviarBloque(TbloqueAEnviar* bloque){
+void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
 	Theader *head = malloc(sizeof(Theader));
 	 char * buffer;
 	 head->tipo_de_proceso=FILESYSTEM;
@@ -93,7 +93,7 @@ void enviarBloque(TbloqueAEnviar* bloque){
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	//hacer el send a cada nodo
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
-	 printf("Numero de bloque %d , Tamanio de bloque %d, Cntenido de bloque %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+	 printf("Numero de bloque %d , Tamanio de bloque %llu, Cntenido de bloque %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 	 if ((send(nodo1->fd, buffer , sizeof(Theader), 0)) == -1){
 	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 	}
@@ -103,6 +103,16 @@ void enviarBloque(TbloqueAEnviar* bloque){
 	 		}
 	 puts("Se envio bloque a Nodo2");
 
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(NOMBRE_NODO);
+	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
+
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
+
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(NOMBRE_NODO);
+	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
+
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 
 }
 
@@ -191,7 +201,7 @@ char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension){
 	}
 	q++;
 	while(*q != '\0'){
-		&string_append(extension, *q);
+		string_append(&extension, *q);
 		q++;
 	}
 	return extension;
@@ -202,7 +212,7 @@ char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension){
 	char * q = nombreDeArchivoConExtension;
 	char * nombreDeArchivoSinExtension;
 	while(*q != '\0'){
-		&string_append(nombreDeArchivoSinExtension, *q);
+		string_append(&nombreDeArchivoSinExtension, *q);
 	}
 	return nombreDeArchivoSinExtension;
 }
@@ -253,7 +263,7 @@ void almacenarArchivo(char **palabras){
 			if(bytesDisponiblesEnBloque - strlen(lineas[i]) +1 < 0){
 				infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
 				archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
-				enviarBloque(infoBloque);
+				enviarBloque(infoBloque, archivoAAlmacenar);
 				bytesDisponiblesEnBloque = BLOQUE_SIZE;
 				infoBloque->numeroDeBloque++;
 			}
@@ -539,7 +549,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 	tablaArchivos->bloques = malloc(sizeof(Tbloques)*cantBloques);
 	printf("cant bloques %d\n",cantBloques);
 
-	printf("Tamanio %d\n", tablaArchivos->tamanioTotal);
+	printf("Tamanio %llu\n", tablaArchivos->tamanioTotal);
 	printf("Extension %s\n", tablaArchivos->extensionArchivo);
 
 	while(nroBloque != cantBloques){

@@ -270,9 +270,9 @@ unsigned long fsize(FILE* f){
 
 }
 
-char *empaquetarBloque(Theader * head, int nroBloque, int tamanio, int *contenido){
+char *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio, char *contenido){
 
-	char *chorroBytes = malloc(HEAD_SIZE + sizeof(uint32_t) + sizeof(uint32_t) + tamanio);
+	char *chorroBytes = malloc(HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + tamanio);
 
 	char * p = chorroBytes;
 		memcpy(p, head, sizeof(*head));
@@ -280,7 +280,7 @@ char *empaquetarBloque(Theader * head, int nroBloque, int tamanio, int *contenid
 		memcpy(p, &nroBloque, sizeof(int));
 		p += sizeof(int);
 		memcpy(p, &tamanio, sizeof(int));
-		p += sizeof(int);
+		p += sizeof(unsigned long long);
 		memcpy(p, contenido, tamanio);
 		p += tamanio;
 		puts("estructura creada y lista para mandar");

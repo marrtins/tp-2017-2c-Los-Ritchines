@@ -21,7 +21,7 @@ void conexionesDatanode(void * estructura);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 int cantidadParametros(char **palabras);
 void almacenarArchivo(char **palabras);
-void enviarBloque(TbloqueAEnviar* bloque);
+void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar);
 int existeDirectorio(char * directorio);
 void ocuparProximoBloqueBitmap(Tnodo * nodo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
