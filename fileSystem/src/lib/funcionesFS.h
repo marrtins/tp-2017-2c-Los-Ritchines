@@ -24,10 +24,10 @@ void almacenarArchivo(char **palabras);
 void enviarBloque(TbloqueAEnviar* bloque);
 int existeDirectorio(char * directorio);
 void ocuparProximoBloqueBitmap(Tnodo * nodo);
-void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
+void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar);
 int obtenerIndexDeUnaRuta(char * rutaDestino);
 char * obtenerUltimoElementoDeUnSplit(char ** palabras);
 int buscarIndexPorNombreDeDirectorio(char * directorio);
-void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
+void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, FILE * archivo);
 
 #endif
