@@ -74,10 +74,22 @@ int ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 }
 
 void enviarBloque(TbloqueAEnviar* bloque){
+	Theader *head = malloc(sizeof(Theader));
+	char * buffer;
+	head->tipo_de_proceso=FILESYSTEM;
+	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 	list_sort(listaDeNodos,ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
-	//hacer el send a cada nodo;
+	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+
+	if ((send(nodo1->fd, buffer , sizeof(Theader), 0)) == -1){
+			logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+		}
+	if ((send(nodo2->fd, buffer , sizeof(Theader), 0)) == -1){
+				logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+			}
+
 }
 
 int existeDirectorio(char * directorio){
@@ -115,6 +127,8 @@ void almacenarArchivo(char **palabras){
 	infoBloque->numeroDeBloque = 0;
 	infoBloque->contenido = malloc(BLOQUE_SIZE);
 
+	//palabras[1] --> ruta archivo a almacenar
+	//palabras[2] --> ruta de nuestro directorio
 	FILE * archivoOrigen = fopen(palabras[1], "r");
 	int fd = fileno(archivoOrigen);
 
@@ -182,8 +196,9 @@ void procesarInput(char* linea) {
 				puts("Existe el directorio");
 			}else {
 				puts("No existe el directorio"); //HAY QUE CREARLO
+				printf("ya pude crear el directorio\n");
 			}
-		printf("ya pude crear el directorio\n");
+
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
 		if(cantidad == 2){
 			if(existeDirectorio(palabras[2])){
