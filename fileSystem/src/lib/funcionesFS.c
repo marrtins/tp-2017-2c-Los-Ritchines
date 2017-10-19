@@ -88,7 +88,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 head->tipo_de_proceso=FILESYSTEM;
 	 head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 
-	list_sort(listaDeNodos,ordenarSegunBloquesDisponibles);
+	list_sort(listaDeNodos, &ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	//hacer el send a cada nodo
@@ -103,15 +103,15 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 		}
 	 puts("Se envio bloque a Nodo2");
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(NOMBRE_NODO);
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = string_itoa(nodo1->primerBloqueLibreBitmap);
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(NOMBRE_NODO);
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = string_itoa(nodo2->primerBloqueLibreBitmap);
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 
 }
@@ -171,22 +171,58 @@ int obtenerIndexDeUnaRuta(char * rutaDestino){
 
 }
 
+int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio){
+	return ceil((float)tamanio / BLOQUE_SIZE);
+}
+
+char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia){
+	char * stringGenerado = malloc(TAMANIO_BLOQUE_N_COPIA_N);
+	sprintf(stringGenerado, "BLOQUE%dCOPIA%d", numeroDeBloque, numeroDeCopia);
+	return stringGenerado;
+}
+
+char * generarStringDeBloqueNBytes(int numeroDeBloque){
+	char * stringGenerado = malloc(TAMANIO_BLOQUE_N_COPIA_N);
+	sprintf(stringGenerado, "BLOQUE%dBYTES", numeroDeBloque);
+	return stringGenerado;
+}
+
 void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
 	t_config * archivoConfig = config_create(rutaArchivo);
+	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
+	char * bloqueNCopiaN, bloqueNCopiaN2, bloqueNBytes;
+	int i = 0;
+
 	config_set_value(archivoConfig, "TAMANIO", string_itoa(archivoAAlmacenar->tamanioTotal));
 	config_set_value(archivoConfig, "TIPO", archivoAAlmacenar->extensionArchivo);
 
+	while(cantidadDeBloques != 0){
+
+		bloqueNCopiaN = generarStringDeBloqueNCopiaN(i,0);
+		//aca Meteria el valor de bloqueNcopia0
+		bloqueNCopiaN2 = generarStringDeBloqueNCopiaN(i,1);
+		//aca Meteria el valor de bloqueNcopia1
+
+		//aca hace el tamanio
+		bloqueNBytes = generarStringDeBloqueNBytes(i);
+		//hay que pasar un long a string
+		config_set_value(archivoConfig, bloqueNBytes, string_itoa(archivoAAlmacenar->bloques[i].bytes));
+		cantidadDeBloques--;
+		i++;
+		free(bloqueNCopiaN);
+		free(bloqueNCopiaN2);
+		free(bloqueNBytes);
+	}
+
+	config_save(archivoConfig);
+	config_destroy(archivoConfig);
 
 }
 
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	int index = obtenerIndexDeUnaRuta(rutaDestino);
-	char * rutaArchivo = "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/";
-	string_append(&rutaArchivo, string_itoa(index));
-	string_append(&rutaArchivo, "/");
-	string_append(&rutaArchivo, archivoAAlmacenar->nombreArchivoSinExtension);
-	string_append(&rutaArchivo, ".");
-	string_append(&rutaArchivo, archivoAAlmacenar->extensionArchivo);
+	char * rutaArchivo = malloc(200);
+	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", string_itoa(index), archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnArchivoAbierto(archivoAAlmacenar, rutaArchivo);
@@ -195,26 +231,40 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 
 char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension){
 	char * q = nombreArchivoConExtension;
-	char * extension;
+	char * extension = malloc(TAMANIO_EXTENSION_ARCHIVO);
 	while(*q != '.'){
 		q++;
 	}
 	q++;
 	while(*q != '\0'){
-		string_append(&extension, *q);
+		concatenarStringConChar(extension, *q);
 		q++;
 	}
 	return extension;
 
 }
 
+void concatenarStringConChar(char * string, char caracter){
+	char * q = string;
+	while(*q != '\0'){
+		q++;
+	}
+	*q = caracter;
+	*(q+1) = '\0';
+}
+
 char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension){
 	char * q = nombreDeArchivoConExtension;
-	char * nombreDeArchivoSinExtension;
+	char * nombreDeArchivoSinExtension = malloc(50);
 	while(*q != '\0'){
-		string_append(&nombreDeArchivoSinExtension, *q);
+		concatenarStringConChar(nombreDeArchivoSinExtension, *q);
 	}
 	return nombreDeArchivoSinExtension;
+}
+
+void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
+	free(infoBloque->contenido);
+	free(infoBloque);
 }
 
 void almacenarArchivo(char **palabras){
@@ -248,7 +298,7 @@ void almacenarArchivo(char **palabras){
 	fclose(archivoOrigen);
 	close(fd);
 
-	int cantidadBloques = ceil((float)tamanio / BLOQUE_SIZE);
+	int cantidadBloques = cantidadDeBloquesDeUnArchivo(tamanio);
 	archivoAAlmacenar->bloques = malloc(sizeof(Tbloques) * cantidadBloques);
 
 	if(tamanio == 0){
@@ -280,9 +330,10 @@ void almacenarArchivo(char **palabras){
 
 		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 		liberarPunteroDePunterosAChar(lineas);
+		//hay que ver esto de liberar tabla de archivos
+		liberarTablaDeArchivo(archivoAAlmacenar);
+		liberarEstructuraBloquesAEnviar(infoBloque);
 		free(lineas);
-		free(infoBloque->contenido);
-		free(infoBloque);
 	}
 }
 
@@ -531,21 +582,21 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 
 	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/2/archivo1.txt");
 
-	tablaArchivos->extensionArchivo = malloc(sizeof(char)*10);
+	tablaArchivos->extensionArchivo = malloc(TAMANIO_EXTENSION_ARCHIVO);
 
 
 	int cantBloques,
 			nroBloque = 0;
 	char **temporal1;
 	char **temporal2;
-	char* bloqueCopia0 = malloc(sizeof(char)*20);
-	char* bloqueCopia1 = malloc(sizeof(char)*20);
-	char* bloqueBytes = malloc(sizeof(char)*20);
+	char* bloqueCopia0;
+	char* bloqueCopia1;
+	char* bloqueBytes;
 
 	tablaArchivos->tamanioTotal = config_get_int_value(archivo, "TAMANIO");
 	strcpy(tablaArchivos->extensionArchivo, config_get_string_value(archivo, "TIPO"));
 
-	cantBloques = ceil(tablaArchivos->tamanioTotal/1048576.0);
+	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivos->tamanioTotal);
 	tablaArchivos->bloques = malloc(sizeof(Tbloques)*cantBloques);
 	printf("cant bloques %d\n",cantBloques);
 
@@ -554,14 +605,14 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 
 	while(nroBloque != cantBloques){
 
-		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(sizeof(char)*7);
+		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char)*4);
-		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(sizeof(char)*7);
+		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 
-		sprintf(bloqueCopia0,"BLOQUE%dCOPIA0",nroBloque);
-		sprintf(bloqueCopia1,"BLOQUE%dCOPIA1",nroBloque);
-		sprintf(bloqueBytes,"BLOQUE%dBYTES",nroBloque);
+		bloqueCopia0 = generarStringDeBloqueNCopiaN(nroBloque,0);
+		bloqueCopia1 = generarStringDeBloqueNCopiaN(nroBloque,1);
+		bloqueBytes = generarStringDeBloqueNBytes(nroBloque);
 
 		temporal1 = config_get_array_value(archivo, bloqueCopia0);
 		temporal2 = config_get_array_value(archivo, bloqueCopia1);
@@ -577,19 +628,22 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 		printf("Numero de nodo copia cero %s\n",tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
 		printf("Nombre de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo);
 		printf("Numero de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
-		printf("Bytes %d\n",tablaArchivos->bloques[nroBloque].bytes);
+		printf("Bytes %llu\n",tablaArchivos->bloques[nroBloque].bytes);
 		nroBloque++;
 
 		liberarPunteroDePunterosAChar(temporal1);
 		free(temporal1);
 		liberarPunteroDePunterosAChar(temporal2);
 		free(temporal2);
-	}
+
 		free(bloqueCopia0);
 		free(bloqueCopia1);
 		free(bloqueBytes);
+	}
+
 
 	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
+	//liberarTablaDeArchivo(tablaArchivos);
 	config_destroy(archivo);
 }
 
@@ -662,6 +716,7 @@ void mostrarBitmap(t_bitarray* bitmap){
 }
 
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
+	//deberia liberar todo pero hace malloc de algunas cosas... porque ???
 	int i;
 	int cantBloques = ceil(tablaDeArchivos->tamanioTotal/1048576.0);
 	tablaDeArchivos->extensionArchivo = malloc(sizeof(Tarchivo));

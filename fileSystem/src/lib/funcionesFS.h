@@ -29,5 +29,8 @@ int obtenerIndexDeUnaRuta(char * rutaDestino);
 char * obtenerUltimoElementoDeUnSplit(char ** palabras);
 int buscarIndexPorNombreDeDirectorio(char * directorio);
 void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
+char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
+char * generarStringDeBloqueNBytes(int numeroDeBloque);
+void concatenarStringConChar(char * string, char caracter);
 
 #endif
