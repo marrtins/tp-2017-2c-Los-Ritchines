@@ -172,7 +172,8 @@ int obtenerIndexDeUnaRuta(char * rutaDestino){
 }
 
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio){
-	return ceil((float)tamanio / BLOQUE_SIZE);
+	float tamanioBloque = BLOQUE_SIZE;
+	return ceil((float)tamanio / tamanioBloque);
 }
 
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia){
@@ -470,6 +471,7 @@ void conexionesDatanode(void * estructura){
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	char * streamInfoNodo;
+	Tnodo * nuevoNodo;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -504,14 +506,8 @@ void conexionesDatanode(void * estructura){
 					printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
 					if(fileDescriptor == socketDeEscuchaDatanodes){
-						Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
-						nuevoNodo->fd = nuevoFileDescriptor;
-						list_add(listaDeNodos,nuevoNodo);
-						cantNodosPorConectar--;
-						puts("Filesystem estable");
-
 						fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 						printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 						break;
@@ -533,22 +529,30 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
+								nuevoNodo = malloc(sizeof(Tnodo));
+								nuevoNodo->fd = nuevoFileDescriptor;
+								cantNodosPorConectar--;
 								//hay que volver a recv lo que sigue después del head;
 								//recv el nombre nodo, bloques totales, bloques libres;
 								//y los va a meter en la estructura Tnodo;
 								inicializarNodo(fileDescriptor,streamInfoNodo);
+								list_add(listaDeNodos,nuevoNodo);
 								break;
 
 							default:
-								puts("Hacker detected");
+								puts("Tipo de Mensaje no encontrado en el protocolo");
 								break;
-						}
+					}
 
 					printf("Recibi %d bytes\n",estado);
 					printf("el proceso es %d\n", head->tipo_de_proceso);
 					printf("el mensaje es %d\n", head->tipo_de_mensaje);
 					break;
 
+				} else{
+					puts("Hacker detected");
+					clearAndClose(fileDescriptor, &masterFD);
+					puts("Intruso combatido");
 				}
 
 				} //termine el if
@@ -647,9 +651,6 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 		free(bloqueBytes);
 	}
 
-
-	//NO ESTA HECHO EL FREE DE LA TABLA DE ARCHIVOS PORQUE SON DATOS QUE SIEMPRE NECESITAMOS CREO
-	//liberarTablaDeArchivo(tablaArchivos);
 	config_destroy(archivo);
 }
 

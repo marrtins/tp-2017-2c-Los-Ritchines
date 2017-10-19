@@ -100,7 +100,6 @@ int main(int argc, char* argv[]) {
 						break;
 
 					default:
-						puts("Hacker detected");
 						break;
 					}
 
