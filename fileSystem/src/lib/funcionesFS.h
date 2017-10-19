@@ -31,7 +31,6 @@ int buscarIndexPorNombreDeDirectorio(char * directorio);
 void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
-void concatenarStringConChar(char * string, char caracter);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 
 #endif

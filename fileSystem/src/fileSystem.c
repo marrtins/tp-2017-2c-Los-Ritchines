@@ -10,8 +10,6 @@ int main(int argc, char* argv[]) {
 
 	t_list * listaBitmaps = list_create();
 
-	Tdirectorios tablaDirectorios[100];
-
 	Tarchivo * tablaArchivos = malloc(sizeof(Tarchivo));
 
 	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
