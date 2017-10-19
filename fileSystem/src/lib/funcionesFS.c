@@ -66,7 +66,7 @@ int cantidadParametros(char ** palabras){
 }
 
 
-int ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
+bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	Tnodo* nodoA = (Tnodo*)nodo1;
 	Tnodo* nodoB = (Tnodo*)nodo2;
 
@@ -88,7 +88,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 head->tipo_de_proceso=FILESYSTEM;
 	 head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 
-	list_sort(listaDeNodos, &ordenarSegunBloquesDisponibles);
+	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	//hacer el send a cada nodo
@@ -187,10 +187,16 @@ char * generarStringDeBloqueNBytes(int numeroDeBloque){
 	return stringGenerado;
 }
 
+char* deUnsignedLongLongAString(int number) {
+    return string_from_format("%ull", number);
+}
+
 void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
 	t_config * archivoConfig = config_create(rutaArchivo);
 	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
-	char * bloqueNCopiaN, bloqueNCopiaN2, bloqueNBytes;
+	char * bloqueNCopiaN;
+	char * bloqueNCopiaN2;
+	char * bloqueNBytes;
 	int i = 0;
 
 	config_set_value(archivoConfig, "TAMANIO", string_itoa(archivoAAlmacenar->tamanioTotal));
@@ -222,7 +228,7 @@ void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, ch
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	int index = obtenerIndexDeUnaRuta(rutaDestino);
 	char * rutaArchivo = malloc(200);
-	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", string_itoa(index), archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
+	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", index, archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnArchivoAbierto(archivoAAlmacenar, rutaArchivo);
