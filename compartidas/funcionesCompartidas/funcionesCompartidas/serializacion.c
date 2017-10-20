@@ -316,7 +316,7 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 		p += sizeof(int);
 		memcpy(p, infoBloque->puertoNodo, infoBloque->tamanioPuerto);
 		p += infoBloque->tamanioPuerto;
-		memcpy(p, infoBloque->databinEnMB, sizeof(int));
+		memcpy(p, &infoBloque->databinEnMB, sizeof(int));
 		p += sizeof(int);
 
 		buffer->buffer = malloc(buffer->tamanio);
