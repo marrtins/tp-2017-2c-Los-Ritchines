@@ -499,16 +499,16 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	char * puertoNodo;
 
 	//Recibo el tamaño del nombre del nodo
-	if ((estado = recv(socketFS, &infoBloque->nombreLen, sizeof(int), 0)) == -1) {
+	if ((estado = recv(socketFS, &infoBloque->tamanioNombre, sizeof(int), 0)) == -1) {
 		logAndExit("Error al recibir el tamanio del nombre del nodo");
 		}
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
-	printf("Tamanio del nombre = %d\n", infoBloque->nombreLen);
+	printf("Tamanio del nombre = %d\n", infoBloque->tamanioNombre);
 
-	nombreNodo = malloc(infoBloque->nombreLen);
+	nombreNodo = malloc(infoBloque->tamanioNombre);
 
 	//Recibo el nombre del nodo
-	if ((estado = recv(socketFS, nombreNodo, infoBloque->nombreLen, 0)) == -1) {
+	if ((estado = recv(socketFS, nombreNodo, infoBloque->tamanioNombre, 0)) == -1) {
 		logAndExit("Error al recibir el nombre del nodo");
 		}
 

@@ -84,11 +84,11 @@ typedef struct {
 }TpackageUbicacionBloques;
 
 typedef struct {
-	int nombreLen;
+	int tamanioNombre;
 	char *nombreNodo;
-	int ipLen;
+	int tamanioIp;
 	char *ipNodo;
-	int puertoLen;
+	int tamanioPuerto;
 	char *puertoWorker;
 }TpackageInfoNodo;
 
@@ -96,25 +96,25 @@ typedef struct {
 typedef struct {
 
 	Theader head;
-	int nombreLen;
+	int tamanioNombre;
 	char *nombreNodo;
 	int bloque;
 	int bytesOcupados;
 	int nombreTemporalLen;
 	char *nombreTemporal;
-	int ipLen;
+	int tamanioIp;
 	char * ipWorker;
-	int puertoLen;
+	int tamanioPuerto;
 	char * puertoWorker;
 }__attribute__((packed)) TpackInfoBloque;
 
 typedef struct {
 	Theader head;
-	int nombreLen;
+	int tamanioNombre;
 	char *nombreNodo;
-	int ipLen;
+	int tamanioIp;
 	char * ipNodo;
-	int puertoLen;
+	int tamanioPuerto;
 	char * puertoNodo;
 }TpackInfoBloqueDN;
 

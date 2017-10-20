@@ -52,7 +52,7 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 
 		int espacioPackSize = sizeof(int);
 		int espacioEnteros = sizeof(int) * 6;
-		int espaciosVariables = infoBloque->ipLen+infoBloque->nombreLen+infoBloque->nombreTemporalLen+infoBloque->puertoLen;
+		int espaciosVariables = infoBloque->tamanioIp+infoBloque->tamanioNombre+infoBloque->nombreTemporalLen+infoBloque->tamanioPuerto;
 		int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
 		if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
@@ -69,27 +69,27 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->nombreLen, sizeof(int));
+		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioNombre, sizeof(int));
 		*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, infoBloque->nombreNodo, infoBloque->nombreLen);
-		*pack_size += infoBloque->nombreLen;
+		memcpy(bytes_serial + *pack_size, infoBloque->nombreNodo, infoBloque->tamanioNombre);
+		*pack_size += infoBloque->tamanioNombre;
 
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->ipLen, sizeof(int));
+		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioIp, sizeof(int));
 			*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, infoBloque->ipWorker, infoBloque->ipLen);
-		*pack_size += infoBloque->ipLen;
+		memcpy(bytes_serial + *pack_size, infoBloque->ipWorker, infoBloque->tamanioIp);
+		*pack_size += infoBloque->tamanioIp;
 
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->puertoLen, sizeof(int));
+		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioPuerto, sizeof(int));
 			*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, infoBloque->puertoWorker, infoBloque->puertoLen);
-		*pack_size += infoBloque->puertoLen;
+		memcpy(bytes_serial + *pack_size, infoBloque->puertoWorker, infoBloque->tamanioPuerto);
+		*pack_size += infoBloque->tamanioPuerto;
 
 
 		memcpy(bytes_serial + *pack_size, &infoBloque->bloque, sizeof(int));
@@ -124,44 +124,44 @@ TpackInfoBloque *deserializeInfoBloque(char *bytes_serial){
 
 		off = 0;
 
-		memcpy(&infoBloque->nombreLen, bytes_serial + off, sizeof (int));
+		memcpy(&infoBloque->tamanioNombre, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
-		if ((infoBloque->nombreNodo = malloc(infoBloque->nombreLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->nombreLen);
+		if ((infoBloque->nombreNodo = malloc(infoBloque->tamanioNombre)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->tamanioNombre);
 			return NULL;
 		}
 
-		memcpy(infoBloque->nombreNodo, bytes_serial + off, infoBloque->nombreLen);
-		off += infoBloque->nombreLen;
+		memcpy(infoBloque->nombreNodo, bytes_serial + off, infoBloque->tamanioNombre);
+		off += infoBloque->tamanioNombre;
 
 
 
-		memcpy(&infoBloque->ipLen, bytes_serial + off, sizeof (int));
+		memcpy(&infoBloque->tamanioIp, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
-		if ((infoBloque->ipWorker = malloc(infoBloque->ipLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->ipLen);
+		if ((infoBloque->ipWorker = malloc(infoBloque->tamanioIp)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->tamanioIp);
 			return NULL;
 		}
 
-		memcpy(infoBloque->ipWorker, bytes_serial + off, infoBloque->ipLen);
-		off += infoBloque->ipLen;
+		memcpy(infoBloque->ipWorker, bytes_serial + off, infoBloque->tamanioIp);
+		off += infoBloque->tamanioIp;
 
 
 
 
 
-		memcpy(&infoBloque->puertoLen, bytes_serial + off, sizeof (int));
+		memcpy(&infoBloque->tamanioPuerto, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
-		if ((infoBloque->puertoWorker = malloc(infoBloque->puertoLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->puertoLen);
+		if ((infoBloque->puertoWorker = malloc(infoBloque->tamanioPuerto)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->tamanioPuerto);
 			return NULL;
 		}
 
-		memcpy(infoBloque->puertoWorker, bytes_serial + off, infoBloque->puertoLen);
-		off += infoBloque->puertoLen;
+		memcpy(infoBloque->puertoWorker, bytes_serial + off, infoBloque->tamanioPuerto);
+		off += infoBloque->tamanioPuerto;
 
 
 
@@ -184,7 +184,7 @@ TpackInfoBloque *deserializeInfoBloque(char *bytes_serial){
 		}
 
 		memcpy(infoBloque->nombreTemporal, bytes_serial + off, infoBloque->nombreTemporalLen);
-		off += infoBloque->nombreLen;
+		off += infoBloque->tamanioNombre;
 
 		return infoBloque;
 }
@@ -296,7 +296,7 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 
 		Tbuffer *buffer = malloc(sizeof(Tbuffer));
 		int espacioEnteros = sizeof(int) * 3;
-		int espaciosVariables = infoBloque->ipLen + infoBloque->puertoLen + infoBloque->nombreLen;
+		int espaciosVariables = infoBloque->tamanioIp + infoBloque->tamanioPuerto + infoBloque->tamanioNombre;
 		buffer->tamanio = HEAD_SIZE + espacioEnteros + espaciosVariables;
 
 		char * chorroBytes = malloc(buffer->tamanio);
@@ -304,18 +304,18 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 
 		memcpy(p, &infoBloque->head, sizeof(infoBloque->head));
 		p += sizeof(infoBloque->head);
-		memcpy(p, &infoBloque->nombreLen, sizeof(int));
+		memcpy(p, &infoBloque->tamanioNombre, sizeof(int));
 		p += sizeof(int);
-		memcpy(p, infoBloque->nombreNodo, infoBloque->nombreLen);
-		p += infoBloque->nombreLen;
-		memcpy(p, &infoBloque->ipLen, sizeof(int));
+		memcpy(p, infoBloque->nombreNodo, infoBloque->tamanioNombre);
+		p += infoBloque->tamanioNombre;
+		memcpy(p, &infoBloque->tamanioIp, sizeof(int));
 		p += sizeof(int);
-		memcpy(p, infoBloque->ipNodo, infoBloque->ipLen);
-		p += infoBloque->ipLen;
-		memcpy(p, &infoBloque->puertoLen, sizeof(int));
+		memcpy(p, infoBloque->ipNodo, infoBloque->tamanioIp);
+		p += infoBloque->tamanioIp;
+		memcpy(p, &infoBloque->tamanioPuerto, sizeof(int));
 		p += sizeof(int);
-		memcpy(p, infoBloque->puertoNodo, infoBloque->puertoLen);
-		p += infoBloque->puertoLen;
+		memcpy(p, infoBloque->puertoNodo, infoBloque->tamanioPuerto);
+		p += infoBloque->tamanioPuerto;
 
 		buffer->buffer = malloc(buffer->tamanio);
 		buffer->buffer = chorroBytes;
@@ -325,9 +325,9 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 
 TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo){
 
-	memcpy(infoBloque->nombreNodo, nombreNodo, infoBloque->nombreLen);
-	memcpy(infoBloque->ipNodo, ipNodo, infoBloque->ipLen);
-	memcpy(infoBloque->puertoNodo, puertoNodo, infoBloque->puertoLen);
+	memcpy(infoBloque->nombreNodo, nombreNodo, infoBloque->tamanioNombre);
+	memcpy(infoBloque->ipNodo, ipNodo, infoBloque->tamanioIp);
+	memcpy(infoBloque->puertoNodo, puertoNodo, infoBloque->tamanioPuerto);
 
 	return infoBloque;
 
