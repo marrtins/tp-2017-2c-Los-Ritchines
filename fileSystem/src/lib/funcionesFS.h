@@ -28,7 +28,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 int obtenerIndexDeUnaRuta(char * rutaDestino);
 char * obtenerUltimoElementoDeUnSplit(char ** palabras);
 int buscarIndexPorNombreDeDirectorio(char * directorio);
-void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
+void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);

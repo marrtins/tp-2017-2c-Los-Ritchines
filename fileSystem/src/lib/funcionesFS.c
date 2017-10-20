@@ -201,7 +201,7 @@ char* deUnsignedLongLongAString(int number) {
     return string_from_format("%ull", number);
 }
 
-void almacenarEstructuraArchivoEnArchivoAbierto(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
+void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
 	t_config * archivoConfig = config_create(rutaArchivo);
 	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
 	char * bloqueNCopiaN;
@@ -241,7 +241,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", index, archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
-	almacenarEstructuraArchivoEnArchivoAbierto(archivoAAlmacenar, rutaArchivo);
+	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
 
 }
 
