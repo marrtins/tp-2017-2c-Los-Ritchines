@@ -5,7 +5,6 @@
 
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
-void liberarPunteroDePunterosAChar(char** palabras);
 void procesarInput(char * palabras);
 void consolaFS(void);
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
@@ -19,14 +18,12 @@ t_bitarray* crearBitmap(int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
 void conexionesDatanode(void * estructura);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
-int cantidadParametros(char **palabras);
 void almacenarArchivo(char **palabras);
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar);
 int existeDirectorio(char * directorio);
 void ocuparProximoBloqueBitmap(Tnodo * nodo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 int obtenerIndexDeUnaRuta(char * rutaDestino);
-char * obtenerUltimoElementoDeUnSplit(char ** palabras);
 int buscarIndexPorNombreDeDirectorio(char * directorio);
 void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);

@@ -5,6 +5,64 @@ void logAndExit(char * mensaje){
 	exit(-1);
 }
 
+int contarPunteroDePunteros(char ** puntero){
+	char ** aux = puntero;
+	int contador = 0;
+	while(*aux != NULL){
+		contador++;
+		aux++;
+	}
+	return contador;
+}
+
+void liberarPunteroDePunterosAChar(char** palabras){
+	int i = 0;
+	while(palabras[i] != NULL){
+		free(palabras[i]);
+		i++;
+	}
+
+}
+
+char * obtenerUltimoElementoDeUnSplit(char ** palabras){
+	char * ultimaPalabra;
+	int i = 0;
+	while(palabras[i] != NULL){
+		ultimaPalabra = palabras[i];
+		i++;
+	}
+	return ultimaPalabra;
+}
+
+char* deUnsignedLongLongAString(int number) {
+    return string_from_format("%ull", number);
+}
+
+char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension){
+	char ** palabras = string_split(nombreArchivoConExtension, ".");
+	char * extension = strdup(palabras[1]);
+	liberarPunteroDePunterosAChar(palabras);
+	free(palabras);
+	return extension;
+
+}
+
+char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension){
+	char ** palabras = string_split(nombreDeArchivoConExtension, ".");
+	char * nombreArchivo = strdup(palabras[0]);
+	liberarPunteroDePunterosAChar(palabras);
+	free(palabras);
+	return nombreArchivo;
+}
+
+int cantidadParametros(char ** palabras){
+	int i = 1;
+	while(palabras[i] != NULL){
+		i++;
+	}
+	return i-1;
+}
+
 int tamanioArchivo(FILE * archivo){
 	int tamanio;
 	fseek(archivo, 0L, SEEK_END);

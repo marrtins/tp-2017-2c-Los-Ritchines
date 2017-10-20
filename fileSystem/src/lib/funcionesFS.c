@@ -25,16 +25,6 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	return fileSystem;
 }
 
-int contarPunteroDePunteros(char ** puntero){
-	char ** aux = puntero;
-	int contador = 0;
-	while(*aux != NULL){
-		contador++;
-		aux++;
-	}
-	return contador;
-}
-
 void mostrarConfiguracion(TfileSystem *fileSystem){
 
 	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
@@ -47,24 +37,6 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 void agregarArchivosATablaDeArchivos(){
 
 }
-
-void liberarPunteroDePunterosAChar(char** palabras){
-	int i = 0;
-	while(palabras[i] != NULL){
-		free(palabras[i]);
-		i++;
-	}
-
-}
-
-int cantidadParametros(char ** palabras){
-	int i = 1;
-	while(palabras[i] != NULL){
-		i++;
-	}
-	return i-1;
-}
-
 
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	Tnodo* nodoA = (Tnodo*)nodo1;
@@ -163,16 +135,6 @@ int buscarIndexPorNombreDeDirectorio(char * directorio){
 	return -1;
 }
 
-char * obtenerUltimoElementoDeUnSplit(char ** palabras){
-	char * ultimaPalabra;
-	int i = 0;
-	while(palabras[i] != NULL){
-		ultimaPalabra = palabras[i];
-		i++;
-	}
-	return ultimaPalabra;
-}
-
 int obtenerIndexDeUnaRuta(char * rutaDestino){
 	char ** palabras = string_split(rutaDestino, "/");
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
@@ -195,10 +157,6 @@ char * generarStringDeBloqueNBytes(int numeroDeBloque){
 	char * stringGenerado = malloc(TAMANIO_BLOQUE_N_COPIA_N);
 	sprintf(stringGenerado, "BLOQUE%dBYTES", numeroDeBloque);
 	return stringGenerado;
-}
-
-char* deUnsignedLongLongAString(int number) {
-    return string_from_format("%ull", number);
 }
 
 void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
@@ -243,23 +201,6 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	fclose(archivo);
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
 
-}
-
-char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension){
-	char ** palabras = string_split(nombreArchivoConExtension, ".");
-	char * extension = strdup(palabras[1]);
-	liberarPunteroDePunterosAChar(palabras);
-	free(palabras);
-	return extension;
-
-}
-
-char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension){
-	char ** palabras = string_split(nombreDeArchivoConExtension, ".");
-	char * nombreArchivo = strdup(palabras[0]);
-	liberarPunteroDePunterosAChar(palabras);
-	free(palabras);
-	return nombreArchivo;
 }
 
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){

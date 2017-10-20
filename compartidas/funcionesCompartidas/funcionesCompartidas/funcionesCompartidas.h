@@ -14,6 +14,14 @@ char *recvGenericWFlags(int sock_in, int flags);
 char *recvGeneric(int sock_in);
 int tamanioArchivo(FILE *archivo);
 void freeAndNULL(void **ptr);
+int contarPunteroDePunteros(char ** puntero);
+void liberarPunteroDePunterosAChar(char** palabras);
+int cantidadParametros(char **palabras);
+char * obtenerUltimoElementoDeUnSplit(char ** palabras);
+char* deUnsignedLongLongAString(int number);
+char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension);
+char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension);
+
 
 
 
