@@ -31,5 +31,8 @@ char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void* buscarPorNombreDeDirectorio(char * directorio);
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
+void liberarEstructuraBuffer(Tbuffer * buffer);
+void crearDirectorio(char * ruta);
+
 
 #endif
