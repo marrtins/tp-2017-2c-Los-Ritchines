@@ -515,30 +515,30 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
 
 	//Recibo el tamanio de la ip del nodo
-	if ((estado = recv(socketFS, &infoBloque->ipLen, sizeof(int), 0)) == -1) {
+	if ((estado = recv(socketFS, &infoBloque->tamanioIp, sizeof(int), 0)) == -1) {
 		logAndExit("Error al recibir el tamanio del ip del nodo");
 		}
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
 
-	ipNodo = malloc(infoBloque->ipLen);
+	ipNodo = malloc(infoBloque->tamanioIp);
 
 	//Recibo la ip del nodo
-	if ((estado = recv(socketFS, ipNodo, infoBloque->ipLen, 0)) == -1) {
+	if ((estado = recv(socketFS, ipNodo, infoBloque->tamanioIp, 0)) == -1) {
 		logAndExit("Error al recibir el ip del nodo");
 		}
 
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
 
 	//Recibo el tamanio del puerto del nodo
-	if ((estado = recv(socketFS, &infoBloque->puertoLen, sizeof(int), 0)) == -1) {
+	if ((estado = recv(socketFS, &infoBloque->tamanioPuerto, sizeof(int), 0)) == -1) {
 		logAndExit("Error al recibir el tamanio del puerto del nodo");
 		}
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
 
-	puertoNodo = malloc(infoBloque->puertoLen);
+	puertoNodo = malloc(infoBloque->tamanioPuerto);
 
 	//Recibo el puerto del nodo
-	if ((estado = recv(socketFS, puertoNodo, infoBloque->puertoLen, 0)) == -1) {
+	if ((estado = recv(socketFS, puertoNodo, infoBloque->tamanioPuerto, 0)) == -1) {
 		logAndExit("Error al recibir el puerto del nodo");
 		}
 
@@ -644,6 +644,7 @@ void conexionesDatanode(void * estructura){
 					break;
 
 				} else{
+					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
 					clearAndClose(fileDescriptor, &masterFD);
 					puts("Intruso combatido");

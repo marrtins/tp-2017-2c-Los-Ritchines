@@ -448,25 +448,25 @@ void generarListaInfoNodos(t_list * listaNodos){
 	TpackageInfoNodo *nodo1 = malloc(sizeof(nodo1));
 	nodo1->nombreNodo=malloc(nombreLen);
 	nodo1->nombreNodo="Nodo1";
-	nodo1->nombreLen=strlen(nodo1->nombreNodo)+1;
+	nodo1->tamanioNombre=strlen(nodo1->nombreNodo)+1;
 	nodo1->ipNodo=malloc(ipLen);
 	nodo1->ipNodo="127.0.0.1";
-	nodo1->ipLen=strlen(nodo1->ipNodo)+1;
+	nodo1->tamanioIp=strlen(nodo1->ipNodo)+1;
 	nodo1->puertoWorker=malloc(puertoLen);
 	nodo1->puertoWorker = "5013";
-	nodo1->puertoLen=strlen(nodo1->puertoWorker)+1;
+	nodo1->tamanioPuerto=strlen(nodo1->puertoWorker)+1;
 	list_add(listaNodos,nodo1);
 
 	TpackageInfoNodo *nodo2 = malloc(sizeof(nodo2));
 	nodo2->nombreNodo=malloc(nombreLen);
 	nodo2->nombreNodo="Nodo2";
-	nodo2->nombreLen=strlen(nodo2->nombreNodo)+1;
+	nodo2->tamanioNombre=strlen(nodo2->nombreNodo)+1;
 	nodo2->ipNodo=malloc(ipLen);
 	nodo2->ipNodo="127.0.0.1";
-	nodo2->ipLen=strlen(nodo2->ipNodo)+1;
+	nodo2->tamanioIp=strlen(nodo2->ipNodo)+1;
 	nodo2->puertoWorker=malloc(puertoLen);
 	nodo2->puertoWorker = "5014";
-	nodo2->puertoLen=strlen(nodo2->puertoWorker)+1;
+	nodo2->tamanioPuerto=strlen(nodo2->puertoWorker)+1;
 
 	list_add(listaNodos,nodo2);
 
