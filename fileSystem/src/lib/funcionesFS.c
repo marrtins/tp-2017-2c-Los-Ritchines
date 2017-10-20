@@ -551,9 +551,11 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 		logAndExit("Error al recibir el puerto del nodo");
 		}
 
-	puts(nombreNodo);
-	puts(ipNodo);
-	puts(puertoNodo);
+	//Recibo el databin en MB
+	if ((estado = recv(socketFS, &infoBloque->databinEnMB, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el puerto del nodo");
+		}
+
 	printf("Para el puerto recibi %d bytes\n", estado);
 
 	 infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);

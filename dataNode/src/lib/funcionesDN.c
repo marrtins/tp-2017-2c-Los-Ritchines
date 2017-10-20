@@ -79,7 +79,7 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 	infoBloque->tamanioPuerto = strlen(dataNode->puerto_entrada);
 	infoBloque->puertoNodo = malloc(infoBloque->tamanioPuerto);
 	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
-
+	infoBloque->databinEnMB = dataNode->tamanio_databin_mb;
 
 	buffer = empaquetarInfoBloqueDNaFS(infoBloque);
 	 if ((estado = send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
