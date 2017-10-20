@@ -68,21 +68,21 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu, Cotenido de bloque \n %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
-	 if ((estado = send(nodo1->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
+	 if ((estado = send(nodo1->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 
 	 ocuparProximoBloqueBitmap(nodo1);
-	 mostrarBitmap(nodo1);
+	 mostrarBitmap(nodo1->bitmap);
 
 	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
-	 if ((estado = send(nodo2->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
+	 if ((estado = send(nodo2->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	 ocuparProximoBloqueBitmap(nodo2);
-	 mostrarBitmap(nodo2);
+	 mostrarBitmap(nodo2->bitmap);
 
 
 	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
@@ -94,7 +94,6 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
-	 printf("El numero de bloque es: %d\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo);
 
 	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
 	 nodo2->nombre = malloc(TAMANIO_NOMBRE_NODO);
@@ -105,11 +104,9 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
-	 printf("El numero de bloque es: %d\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	 printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
-	 puts("Metio todo en la estructura");
 
 	 liberarEstructuraBuffer(buffer);
 
@@ -156,8 +153,8 @@ void* buscarPorNombreDeDirectorio(char * directorio){
 }
 
 int buscarIndexPorNombreDeDirectorio(char * directorio){
-
 	Tdirectorio * estructuraDirectorio = (Tdirectorio *)buscarPorNombreDeDirectorio(directorio);
+	puts("rompi todo");
 	if(estructuraDirectorio != NULL){
 		return estructuraDirectorio->index;
 	}
@@ -166,8 +163,10 @@ int buscarIndexPorNombreDeDirectorio(char * directorio){
 }
 
 int obtenerIndexDeUnaRuta(char * rutaDestino){
+	puts("obteniendo index de una ruta");
 	char ** palabras = string_split(rutaDestino, "/");
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
+	puts("index obtenido");
 	return buscarIndexPorNombreDeDirectorio(directorio);
 
 }
@@ -257,9 +256,9 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	int index = obtenerIndexDeUnaRuta(rutaDestino);
 	char * rutaArchivo = malloc(200);
 	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", index, archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
+	//hay que verificar si existe el directorio
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
-	puts("Cree el archivo para guardar la estructura");
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
 
 }
@@ -270,10 +269,8 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 }
 
 void almacenarArchivo(char **palabras){
-
 	//palabras[1] --> ruta archivo a almacenar
 	//palabras[2] --> ruta de nuestro directorio
-	puts("Entre a almacenarArchivo");
 	char * archivoMapeado;
 	char ** lineas;
 	char ** splitDeRuta = string_split(palabras[1], "/");
@@ -284,7 +281,6 @@ void almacenarArchivo(char **palabras){
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
 	puts("obtuvo el nombre del archivo sin extension");
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
-	puts("obtuvo extension");
 	printf("El nombre del archivo es: %s\n", obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension));
 	printf("La extensión es es: %s\n", obtenerExtensionDeUnArchivo(nombreArchivoConExtension));
 
@@ -339,7 +335,6 @@ void almacenarArchivo(char **palabras){
 				}
 			}
 			if((bytesDisponiblesEnBloque - strlen(lineas[i]) +1 < 0) || lineas[i+1] == NULL){
-				puts("Preparando todo para enviar el bloque ya lleno.");
 				infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
 				archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
 				enviarBloque(infoBloque, archivoAAlmacenar);
@@ -358,24 +353,16 @@ void almacenarArchivo(char **palabras){
 			i++;
 
 		}
-
 		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
-		puts("ya almacene el archivo");
 
 		close(fd);
 
 		liberarPunteroDePunterosAChar(splitDeRuta);
-		puts("liberado rutas");
 		free(splitDeRuta);
-		puts("liberado puntero rutas");
 		free(nombreArchivoConExtension);
-		puts("liberado archivo con extension");
 		liberarPunteroDePunterosAChar(lineas);
-		puts("libere lineas");
 		liberarTablaDeArchivo(archivoAAlmacenar);
-		puts("se libero tabla de archivos");
 		liberarEstructuraBloquesAEnviar(infoBloque);
-		puts("se libero la estructura de bloques a enviar");
 		free(lineas);
 	}
 }
@@ -653,11 +640,12 @@ void conexionesDatanode(void * estructura){
 								puts("Es datanode y quiere mandar la información del nodo");
 								//caro, tenes que traer el tamanio del databin
 								infoBloque = recvInfoNodo(fileDescriptor);
-								if(buscarNodoPorFD(fileDescriptor) == NULL){
+								if((Tnodo*)buscarNodoPorFD(fileDescriptor) == NULL){
 									printf("Para el nro de bloque recibi %d bytes\n", estado);
 									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
 									list_add(listaDeNodos, nuevoNodo);
-									mostrarBitmap(nuevoNodo);
+									puts("Nodo inicializado y guardado en la lista");
+									mostrarBitmap(nuevoNodo->bitmap);
 								}
 								else{
 									list_add(listaDeNodos, buscarNodoPorFD(fileDescriptor));
