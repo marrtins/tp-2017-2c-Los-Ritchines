@@ -349,12 +349,17 @@ void almacenarArchivo(char **palabras){
 		close(fd);
 
 		liberarPunteroDePunterosAChar(splitDeRuta);
+		puts("liberado rutas");
 		free(splitDeRuta);
+		puts("liberado puntero rutas");
 		free(nombreArchivoConExtension);
+		puts("liberado archivo con extension");
 		liberarPunteroDePunterosAChar(lineas);
-		//hay que ver esto de liberar tabla de archivos
+		puts("libere lineas");
 		liberarTablaDeArchivo(archivoAAlmacenar);
+		puts("se libero tabla de archivos");
 		liberarEstructuraBloquesAEnviar(infoBloque);
+		puts("se libero la estructura de bloques a enviar");
 		free(lineas);
 	}
 }
@@ -742,14 +747,15 @@ void mostrarBitmap(t_bitarray* bitmap){
 }
 
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
-	//deberia liberar todo pero hace malloc de algunas cosas... porque ???
-	int i;
-	int cantBloques = ceil(tablaDeArchivos->tamanioTotal/1048576.0);
-	tablaDeArchivos->extensionArchivo = malloc(sizeof(Tarchivo));
-	tablaDeArchivos->bloques = malloc(sizeof(Tbloques));
 
-	for(i = 0; i != cantBloques; i++){
-		free(tablaDeArchivos->bloques[i].copiaCero.nombreDeNodo);
-		free(tablaDeArchivos->bloques[i].copiaUno.nombreDeNodo);
+	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaDeArchivos->tamanioTotal)-1;
+	free(tablaDeArchivos->extensionArchivo);
+	free(tablaDeArchivos->nombreArchivoSinExtension);
+
+	for(; cantBloques >= 0; cantBloques--){
+		free(tablaDeArchivos->bloques[cantBloques].copiaCero.nombreDeNodo);
+		free(tablaDeArchivos->bloques[cantBloques].copiaUno.nombreDeNodo);
 	}
+	free(tablaDeArchivos->bloques);
+	free(tablaDeArchivos);
 }
