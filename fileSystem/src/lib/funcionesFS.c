@@ -55,7 +55,7 @@ void ocuparProximoBloqueBitmap(Tnodo * nodo){
 }
 
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
-	Theader *head = malloc(sizeof(Theader));
+	Theader * head = malloc(sizeof(Theader));
 	Tbuffer * buffer;
 	 int estado;
 	 head->tipo_de_proceso=FILESYSTEM;
@@ -72,11 +72,15 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 
+	 ocuparProximoBloqueBitmap(nodo1);
+
 	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
 	 if ((estado = send(nodo2->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
+
+	 ocuparProximoBloqueBitmap(nodo2);
 
 	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
 	 nodo1->nombre = malloc(TAMANIO_NOMBRE_NODO);
@@ -481,6 +485,15 @@ void* buscarNodoPorFD(int fd){
 	return list_find(listaDeNodos, buscarPorFDParaLista);
 }
 
+void borrarNodoDesconectadoPorFD(int fd){
+	Tnodo* nodoABorrar = (Tnodo*)buscarNodoPorFD(fd);
+	bool buscarPorFDParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return nodo->fd==fd;
+	}
+	list_remove_by_condition(listaDeNodosDesconectados,buscarPorFDParaLista);
+}
+
 void borrarNodoPorFD(int fd){
 	Tnodo* nodoABorrar = (Tnodo*)buscarNodoPorFD(fd);
 	bool buscarPorFDParaLista(void* elementoDeLista){
@@ -488,7 +501,6 @@ void borrarNodoPorFD(int fd){
 		return nodo->fd==fd;
 	}
 	list_remove_by_condition(listaDeNodos,buscarPorFDParaLista);
-	liberarNodoDeLaListaGlobal(nodoABorrar);
 }
 
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor){
@@ -624,6 +636,7 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
+							list_add(listaDeNodosDesconectados, buscarNodoPorFD(fileDescriptor));
 							borrarNodoPorFD(fileDescriptor);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
@@ -639,6 +652,10 @@ void conexionesDatanode(void * estructura){
 									printf("Para el nro de bloque recibi %d bytes\n", estado);
 									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
 									list_add(listaDeNodos, nuevoNodo);
+								}
+								else{
+									list_add(listaDeNodos, buscarNodoPorFD(fileDescriptor));
+									borrarNodoDesconectadoPorFD(fileDescriptor);
 								}
 								cantNodosPorConectar--;
 								break;

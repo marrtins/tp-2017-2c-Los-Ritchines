@@ -37,6 +37,7 @@ int getMD5(char**palabras);
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor);
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(int fd);
+void borrarNodoDesconectadoPorFD(int fd);
 
 
 #endif
