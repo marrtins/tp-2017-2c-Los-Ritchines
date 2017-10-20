@@ -30,5 +30,6 @@ char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void* buscarPorNombreDeDirectorio(char * directorio);
+TpackInfoBloqueDN * recvInfoNodo(int socketFS);
 
 #endif

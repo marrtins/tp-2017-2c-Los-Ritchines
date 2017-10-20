@@ -322,3 +322,13 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 		return buffer;
 
 }
+
+TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo){
+
+	memcpy(infoBloque->nombreNodo, nombreNodo, infoBloque->nombreLen);
+	memcpy(infoBloque->ipNodo, ipNodo, infoBloque->ipLen);
+	memcpy(infoBloque->puertoNodo, puertoNodo, infoBloque->puertoLen);
+
+	return infoBloque;
+
+}

@@ -483,6 +483,62 @@ void inicializarNodo(int fileDescriptor, char* buffer){
 	//y se almacena en el puntero nodo que apunta al nodo de la lista global de nodos;
 }
 
+TpackInfoBloqueDN * recvInfoNodo(int socketFS){
+	int estado;
+	TpackInfoBloqueDN * infoBloque = malloc(sizeof(TpackInfoBloqueDN));
+	char * nombreNodo;
+	char * ipNodo;
+	char * puertoNodo;
+
+	//Recibo el tamaño del nombre del nodo
+	if ((estado = recv(socketFS, &infoBloque->nombreLen, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del nombre del nodo");
+		}
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	printf("Tamanio del nombre = %d\n", infoBloque->nombreLen);
+
+	nombreNodo = malloc(infoBloque->nombreLen);
+
+	//Recibo el nombre del nodo
+	if ((estado = recv(socketFS, nombreNodo, infoBloque->nombreLen, 0)) == -1) {
+		logAndExit("Error al recibir el nombre del nodo");
+		}
+
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+
+	//Recibo el tamanio de la ip del nodo
+	if ((estado = recv(socketFS, &infoBloque->ipLen, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del ip del nodo");
+		}
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+
+	ipNodo = malloc(infoBloque->ipLen);
+
+	//Recibo la ip del nodo
+	if ((estado = recv(socketFS, ipNodo, infoBloque->ipLen, 0)) == -1) {
+		logAndExit("Error al recibir el ip del nodo");
+		}
+
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+
+	//Recibo el tamanio del puerto del nodo
+	if ((estado = recv(socketFS, &infoBloque->puertoLen, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del puerto del nodo");
+		}
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+
+	puertoNodo = malloc(infoBloque->puertoLen);
+
+	//Recibo el puerto del nodo
+	if ((estado = recv(socketFS, puertoNodo, infoBloque->puertoLen, 0)) == -1) {
+		logAndExit("Error al recibir el puerto del nodo");
+		}
+
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+
+	 return desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+}
+
 void conexionesDatanode(void * estructura){
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	fd_set readFD, masterFD;
@@ -562,7 +618,7 @@ void conexionesDatanode(void * estructura){
 								//hay que volver a recv lo que sigue después del head;
 								//recv el nombre nodo, bloques totales, bloques libres;
 								//y los va a meter en la estructura Tnodo;
-
+								infoBloque = recvInfoNodo(nuevoNodo->fd);
 								printf("Para el nro de bloque recibi %d bytes\n", estado);
 
 								inicializarNodo(fileDescriptor,streamInfoNodo);
