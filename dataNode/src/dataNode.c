@@ -5,10 +5,9 @@ int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
 	int socketFS, fd, estado, nroBloque;
-	unsigned long long tamanioBloque;
 	char* contenidoBloque;
 	char *bufferHead = malloc(sizeof(Theader));
-	char * buffer;
+	Tbuffer * tBuffer = malloc(sizeof(Tbuffer));
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
 
@@ -61,22 +60,25 @@ int main(int argc, char* argv[]) {
 				printf("Para el nro de bloque recibi %d bytes\n", estado);
 				printf("Recibí el numero de bloque %d\n", nroBloque);
 
-				if ((estado = recv(socketFS, &tamanioBloque, sizeof(unsigned long long), 0)) == -1) {
+				if ((estado = recv(socketFS, &tBuffer->tamanio, sizeof(unsigned long long), 0)) == -1) {
 						logAndExit("Error al recibir el tamaño de bloque");
 				}
 				printf("Para el tamanio de bloque recibi %d bytes\n", estado);
 
 
-				printf("Tamanio de bloque = %llu\n", tamanioBloque);
-				buffer = malloc(tamanioBloque);
+				printf("Tamanio de bloque = %llu\n", tBuffer->tamanio);
+				tBuffer->buffer = malloc(tBuffer->tamanio);
 
-				if ((estado = recv(socketFS, buffer, tamanioBloque, 0)) == -1) {
+				if ((estado = recv(socketFS, tBuffer->buffer, tBuffer->tamanio, 0)) == -1) {
 						logAndExit("Error al recibir el contenido del bloque");
 				}
 				printf("Para el contenido de bloque recibi %d bytes\n", estado);
-
-				memcpy(contenidoBloque,buffer,tamanioBloque);
+				setBloque(nroBloque,tBuffer);
+				memcpy(contenidoBloque,tBuffer->buffer,tBuffer->tamanio);
 				printf("Contenido bloque %s\n",contenidoBloque);
+
+				break;
+			default:;
 	}
 
 
