@@ -325,6 +325,10 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 
 TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo){
 
+	infoBloque->nombreNodo = malloc(infoBloque->tamanioNombre);
+	infoBloque->ipNodo = malloc(infoBloque->tamanioIp);
+	infoBloque->puertoNodo = malloc(infoBloque->tamanioPuerto);
+
 	memcpy(infoBloque->nombreNodo, nombreNodo, infoBloque->tamanioNombre);
 	memcpy(infoBloque->ipNodo, ipNodo, infoBloque->tamanioIp);
 	memcpy(infoBloque->puertoNodo, puertoNodo, infoBloque->tamanioPuerto);
