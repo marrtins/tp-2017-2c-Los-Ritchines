@@ -181,6 +181,7 @@ char * generarArrayParaArchivoConfig(char * dato1, char * dato2){
 	string_append(&concatenacionLoca, ",");
 	string_append(&concatenacionLoca, dato2);
 	string_append(&concatenacionLoca, "]");
+	return concatenacionLoca;
 }
 
 void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
