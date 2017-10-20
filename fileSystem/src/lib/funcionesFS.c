@@ -57,23 +57,26 @@ void ocuparProximoBloqueBitmap(Tnodo * nodo){
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
 	Theader *head = malloc(sizeof(Theader));
 	 char * buffer;
+	 int estado, tamanioBuffer;
 	 head->tipo_de_proceso=FILESYSTEM;
 	 head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
-	//hacer el send a cada nodo
+
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+	tamanioBuffer = HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio;
+
 	printf("Numero de bloque %d , Tamanio de bloque %llu, Cntenido de bloque %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
-	 if ((send(nodo1->fd, buffer , sizeof(Theader), 0)) == -1){
+	 if ((estado = send(nodo1->fd, buffer , tamanioBuffer, 0)) == -1){
 	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 	}
-	 puts("Se envio bloque a Nodo1");
-	 if ((send(nodo2->fd, buffer , sizeof(Theader), 0)) == -1){
+	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
+	 if ((estado = send(nodo2->fd, buffer , tamanioBuffer, 0)) == -1){
 	 			logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 		}
-	 puts("Se envio bloque a Nodo2");
+	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);

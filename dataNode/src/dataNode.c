@@ -56,35 +56,28 @@ int main(int argc, char* argv[]) {
 			case ALMACENAR_BLOQUE:
 				puts("Es FileSystem y quiere almacenar un bloque");
 
-				buffer = malloc(sizeof(int));
-
-				if ((estado = recv(socketFS, buffer, sizeof(int), 0)) == -1) {
+				if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
 						logAndExit("Error al recibir el numero de bloque");
 				}
-				//ESTO VA EN DESERIALIZACION
-				memcpy(&nroBloque,buffer,sizeof(int));
-				free(buffer);
-
+				printf("Para el nro de bloque recibi %d bytes\n", estado);
 				printf("Recibí el numero de bloque %d\n", nroBloque);
 
-				buffer = malloc(sizeof(unsigned long long));
-
-				if ((estado = recv(socketFS, buffer, sizeof(unsigned long long), 0)) == -1) {
+				if ((estado = recv(socketFS, &tamanioBloque, sizeof(unsigned long long), 0)) == -1) {
 						logAndExit("Error al recibir el tamaño de bloque");
 				}
-				//ESTO VA EN DESERIALIZACION
-				memcpy(&tamanioBloque,buffer,sizeof(unsigned long long));
-				free(buffer);
+				printf("Para el tamanio de bloque recibi %d bytes\n", estado);
+
 
 				printf("Tamanio de bloque = %llu\n", tamanioBloque);
-				//contenidoBloque = malloc(tamanioBloque);
+				buffer = malloc(tamanioBloque);
 
-				/*if ((estado = recv(socketFS, buffer, tamanioBloque, 0)) == -1) {
+				if ((estado = recv(socketFS, buffer, tamanioBloque, 0)) == -1) {
 						logAndExit("Error al recibir el contenido del bloque");
 				}
-				buffer = malloc(tamanioBloque);
+				printf("Para el contenido de bloque recibi %d bytes\n", estado);
+
 				memcpy(contenidoBloque,buffer,tamanioBloque);
-				free(buffer);*/
+				printf("Contenido bloque %s\n",contenidoBloque);
 	}
 
 

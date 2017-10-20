@@ -286,5 +286,6 @@ char *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio
 	p += tamanio;
 	puts("estructura creada y lista para mandar");
 
+
 	return chorroBytes;
 }
