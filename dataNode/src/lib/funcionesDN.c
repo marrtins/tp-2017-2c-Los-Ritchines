@@ -81,8 +81,7 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
 
 	buffer = empaquetarInfoBloqueDNaFS(infoBloque);
-
-	 if ((estado = send(socketFS, &buffer->buffer , buffer->tamanio, 0)) == -1){
+	 if ((estado = send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
 	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 	}
 
