@@ -73,6 +73,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 }
 
 	 ocuparProximoBloqueBitmap(nodo1);
+	 mostrarBitmap(nodo1);
 
 	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
 	 if ((estado = send(nodo2->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
@@ -81,6 +82,8 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	 ocuparProximoBloqueBitmap(nodo2);
+	 mostrarBitmap(nodo2);
+
 
 	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
 	 nodo1->nombre = malloc(TAMANIO_NOMBRE_NODO);
@@ -565,10 +568,10 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	//Recibo el databin en MB
 	if ((estado = recv(socketFS, &infoBloque->databinEnMB, sizeof(int), 0)) == -1) {
-		logAndExit("Error al recibir el puerto del nodo");
+		logAndExit("Error al recibir el tamanio del databin");
 		}
 
-	printf("Para el puerto recibi %d bytes\n", estado);
+	printf("Para el tamanio del databin recibi %d bytes\n", estado);
 
 	 infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
 	 puts("desempaqueta la info del nodo");
@@ -654,6 +657,7 @@ void conexionesDatanode(void * estructura){
 									printf("Para el nro de bloque recibi %d bytes\n", estado);
 									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
 									list_add(listaDeNodos, nuevoNodo);
+									mostrarBitmap(nuevoNodo);
 								}
 								else{
 									list_add(listaDeNodos, buscarNodoPorFD(fileDescriptor));
