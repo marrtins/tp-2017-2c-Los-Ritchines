@@ -67,6 +67,7 @@ typedef struct{
 }Tnodo;
 
 t_list * listaDeNodos;
+t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;
 
 #endif

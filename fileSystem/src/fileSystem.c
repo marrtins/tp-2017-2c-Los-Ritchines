@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	listaDeNodos = list_create();
+	listaDeNodosDesconectados = list_create();
 	listaTablaDirectorios = list_create();
 
 	levantarTablas(tablaNodos);

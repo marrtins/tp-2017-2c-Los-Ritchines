@@ -116,6 +116,8 @@ typedef struct {
 	char * ipNodo;
 	int tamanioPuerto;
 	char * puertoNodo;
+	int databinEnMB;
+
 }TpackInfoBloqueDN;
 
 typedef struct {

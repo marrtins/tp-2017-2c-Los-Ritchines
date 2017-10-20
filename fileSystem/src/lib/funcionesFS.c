@@ -472,7 +472,7 @@ void liberarNodoDeLaListaGlobal(Tnodo* nodo){
 	free(nodo);
 }
 
-void* buscarPorFD(int fd){
+void* buscarNodoPorFD(int fd){
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd == fd;
@@ -481,8 +481,8 @@ void* buscarPorFD(int fd){
 	return list_find(listaDeNodos, buscarPorFDParaLista);
 }
 
-void borrarPorFD(int fd){
-	Tnodo* nodoABorrar = (Tnodo*)buscarPorFD(fd);
+void borrarNodoPorFD(int fd){
+	Tnodo* nodoABorrar = (Tnodo*)buscarNodoPorFD(fd);
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd==fd;
@@ -491,11 +491,15 @@ void borrarPorFD(int fd){
 	liberarNodoDeLaListaGlobal(nodoABorrar);
 }
 
-void inicializarNodo(int fileDescriptor, char* buffer){
-	//hay que inicializar el bitarray;
-	Tnodo* nodo = (Tnodo*)buscarPorFD(fileDescriptor);
-	//aca se deserializa el buffer que contiene la info del nodo;
-	//y se almacena en el puntero nodo que apunta al nodo de la lista global de nodos;
+Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor){
+	Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
+	nuevoNodo->fd = fileDescriptor;
+	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
+	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
+	nuevoNodo->primerBloqueLibreBitmap = 0;
+	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
+	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
+	return nuevoNodo;
 }
 
 TpackInfoBloqueDN * recvInfoNodo(int socketFS){
@@ -566,7 +570,6 @@ void conexionesDatanode(void * estructura){
 		estado;
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
-	char * streamInfoNodo;
 	Tnodo * nuevoNodo;
 	TpackInfoBloqueDN * infoBloque;
 
@@ -618,7 +621,7 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
-							borrarPorFD(fileDescriptor);
+							borrarNodoPorFD(fileDescriptor);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
@@ -627,17 +630,15 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
-								nuevoNodo = malloc(sizeof(Tnodo));
-								nuevoNodo->fd = nuevoFileDescriptor;
+								//caro, tenes que traer el tamanio del databin
+								infoBloque = recvInfoNodo(fileDescriptor);
+								if(buscarNodoPorFD(fileDescriptor) == NULL){
+									printf("Para el nro de bloque recibi %d bytes\n", estado);
+									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
+									list_add(listaDeNodos, nuevoNodo);
+								}
 								cantNodosPorConectar--;
-								//hay que volver a recv lo que sigue después del head;
-								//recv el nombre nodo, bloques totales, bloques libres;
-								//y los va a meter en la estructura Tnodo;
-								infoBloque = recvInfoNodo(nuevoNodo->fd);
-								printf("Para el nro de bloque recibi %d bytes\n", estado);
 
-								inicializarNodo(fileDescriptor,streamInfoNodo);
-								list_add(listaDeNodos,nuevoNodo);
 								break;
 
 							default:
