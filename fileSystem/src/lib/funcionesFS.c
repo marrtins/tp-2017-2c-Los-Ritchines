@@ -56,8 +56,8 @@ void ocuparProximoBloqueBitmap(Tnodo * nodo){
 
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
 	Theader *head = malloc(sizeof(Theader));
-	 char * buffer;
-	 int estado, tamanioBuffer;
+	Tbuffer * buffer;
+	 int estado;
 	 head->tipo_de_proceso=FILESYSTEM;
 	 head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 
@@ -66,14 +66,14 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
-	tamanioBuffer = HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio;
+
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu, Cntenido de bloque %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
-	 if ((estado = send(nodo1->fd, buffer , tamanioBuffer, 0)) == -1){
+	 if ((estado = send(nodo1->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
 	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 	}
 	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
-	 if ((estado = send(nodo2->fd, buffer , tamanioBuffer, 0)) == -1){
+	 if ((estado = send(nodo2->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
 	 			logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 		}
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
@@ -477,6 +477,7 @@ void conexionesDatanode(void * estructura){
 	char * mensaje = malloc(100);
 	char * streamInfoNodo;
 	Tnodo * nuevoNodo;
+	TpackInfoBloqueDN * infoBloque;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -534,12 +535,16 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
+								puts("Es datanode y quiere mandar la información del nodo");
 								nuevoNodo = malloc(sizeof(Tnodo));
 								nuevoNodo->fd = nuevoFileDescriptor;
 								cantNodosPorConectar--;
 								//hay que volver a recv lo que sigue después del head;
 								//recv el nombre nodo, bloques totales, bloques libres;
 								//y los va a meter en la estructura Tnodo;
+
+								printf("Para el nro de bloque recibi %d bytes\n", estado);
+
 								inicializarNodo(fileDescriptor,streamInfoNodo);
 								list_add(listaDeNodos,nuevoNodo);
 								break;

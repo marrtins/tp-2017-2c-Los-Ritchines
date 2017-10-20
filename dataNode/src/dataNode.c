@@ -4,15 +4,14 @@
 int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
-	int socketFS, fd, estado, nroBloque = 0;
-	unsigned long long tamanioBloque = 0;
+	int socketFS, fd, estado, nroBloque;
+	unsigned long long tamanioBloque;
 	char* contenidoBloque;
 	char *bufferHead = malloc(sizeof(Theader));
 	char * buffer;
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
-	head->tipo_de_proceso = DATANODE;
-	head->tipo_de_mensaje = INFO_NODO;
+
 	FILE * archivo = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/data1.bin", "rb+");
 
 	if(argc!=2){
@@ -36,8 +35,8 @@ int main(int argc, char* argv[]) {
 
 	puts("Conectado con file system");
 
-	//Aca hay que mandar ip y puerto a fs
-	estado = enviarHeader(socketFS, head);
+	//manda el nombre la ip y el puerto del nodo
+	estado = enviarInfoNodo(socketFS, dataNode);
 	printf("Envie %d bytes\n",estado);
 
 	if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {

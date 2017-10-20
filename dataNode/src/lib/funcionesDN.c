@@ -60,3 +60,33 @@ char * getBloque(int posicion){
 	return bloque;
 
 }
+
+int enviarInfoNodo(int socketFS, TdataNode * dataNode){
+	int estado;
+	Tbuffer * buffer;
+
+	TpackInfoBloqueDN * infoBloque = malloc(sizeof(TpackInfoBloqueDN));
+
+	infoBloque->head.tipo_de_proceso = DATANODE;
+	infoBloque->head.tipo_de_mensaje = INFO_NODO;
+
+	infoBloque->nombreLen = strlen(dataNode->nombre_nodo);
+	infoBloque->nombreNodo = malloc(infoBloque->nombreLen);
+	strcpy(infoBloque->nombreNodo, dataNode->nombre_nodo);
+	infoBloque->ipLen = strlen(dataNode->ip_nodo);
+	infoBloque->ipNodo = malloc(infoBloque->ipLen);
+	strcpy(infoBloque->ipNodo, dataNode->ip_nodo);
+	infoBloque->puertoLen = strlen(dataNode->puerto_entrada);
+	infoBloque->puertoNodo = malloc(infoBloque->puertoLen);
+	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
+
+	buffer = empaquetarInfoBloqueDNaFS(infoBloque);
+
+	 if ((estado = send(socketFS, &buffer->buffer , buffer->tamanio, 0)) == -1){
+	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+	 	}
+
+
+	return estado;
+
+}

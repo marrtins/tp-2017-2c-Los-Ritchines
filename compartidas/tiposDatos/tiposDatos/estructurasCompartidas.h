@@ -110,6 +110,21 @@ typedef struct {
 
 typedef struct {
 	Theader head;
+	int nombreLen;
+	char *nombreNodo;
+	int ipLen;
+	char * ipNodo;
+	int puertoLen;
+	char * puertoNodo;
+}TpackInfoBloqueDN;
+
+typedef struct {
+	char * buffer;
+	unsigned long long tamanio;
+}Tbuffer;
+
+typedef struct {
+	Theader head;
 	int nroBloque;
 	int cantidadBytes;
 	int temporalLen;

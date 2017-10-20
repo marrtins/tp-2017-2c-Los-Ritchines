@@ -15,5 +15,6 @@ TpackBytes *deserializeBytes(char *bytes_serial);
 TpackSrcCode *readFileIntoPack(Tproceso sender, char* ruta);
 unsigned long fsize(FILE* f);
 
-char *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio, char *contenido);
+Tbuffer *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio, char *contenido);
+Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque);
 #endif

@@ -270,10 +270,11 @@ unsigned long fsize(FILE* f){
 
 }
 
-char *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio, char *contenido){
+Tbuffer *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio, char *contenido){
 
-	puts("Entre a empaquetar el bloque");
-	char *chorroBytes = malloc(HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + tamanio);
+	Tbuffer *buffer = malloc(sizeof(Tbuffer));
+	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + tamanio);
+	char *chorroBytes = malloc(buffer->tamanio);
 
 	char * p = chorroBytes;
 	memcpy(p, head, sizeof(*head));
@@ -284,8 +285,40 @@ char *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio
 	p += sizeof(unsigned long long);
 	memcpy(p, contenido, tamanio);
 	p += tamanio;
-	puts("estructura creada y lista para mandar");
 
+	buffer->buffer = malloc(buffer->tamanio);
+	buffer->buffer = chorroBytes;
 
-	return chorroBytes;
+	return buffer;
+}
+
+Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
+
+		Tbuffer *buffer = malloc(sizeof(Tbuffer));
+		int espacioEnteros = sizeof(int) * 3;
+		int espaciosVariables = infoBloque->ipLen + infoBloque->puertoLen + infoBloque->nombreLen;
+		buffer->tamanio = HEAD_SIZE + espacioEnteros + espaciosVariables;
+
+		char * chorroBytes = malloc(buffer->tamanio);
+		char * p = chorroBytes;
+
+		memcpy(p, &infoBloque->head, sizeof(infoBloque->head));
+		p += sizeof(infoBloque->head);
+		memcpy(p, &infoBloque->nombreLen, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, infoBloque->nombreNodo, infoBloque->nombreLen);
+		p += infoBloque->nombreLen;
+		memcpy(p, &infoBloque->ipLen, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, infoBloque->ipNodo, infoBloque->ipLen);
+		p += infoBloque->ipLen;
+		memcpy(p, &infoBloque->puertoLen, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, infoBloque->puertoNodo, infoBloque->puertoLen);
+		p += infoBloque->puertoLen;
+
+		buffer->buffer = malloc(buffer->tamanio);
+		buffer->buffer = chorroBytes;
+		return buffer;
+
 }
