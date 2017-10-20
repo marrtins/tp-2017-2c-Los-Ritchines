@@ -23,7 +23,7 @@ typedef struct{
 
 typedef struct{
 	char * nombreDeNodo;
-	char * numeroBloqueDeNodo;
+	int numeroBloqueDeNodo;
 }TcopiaNodo;
 
 typedef struct{
