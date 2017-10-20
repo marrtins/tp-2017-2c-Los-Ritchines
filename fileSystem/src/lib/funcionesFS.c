@@ -420,7 +420,7 @@ void procesarInput(char* linea) {
 		printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
 	} else if (string_equals_ignore_case(*palabras, "md5")) {
 			if (cantidad ==1){
-				getMD5(palabras);
+				//getMD5(palabras);
 				printf("ya pude solicitar el md5 de un archivo del file system\n");
 			}
 			else {
@@ -514,8 +514,6 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 		logAndExit("Error al recibir el tamanio del nombre del nodo");
 		}
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
-	printf("Tamanio del nombre = %d\n", infoBloque->tamanioNombre);
-
 	nombreNodo = malloc(infoBloque->tamanioNombre);
 
 	//Recibo el nombre del nodo
@@ -523,13 +521,13 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 		logAndExit("Error al recibir el nombre del nodo");
 		}
 
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	printf("Para el nombre del nodo recibi %d bytes\n", estado);
 
 	//Recibo el tamanio de la ip del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioIp, sizeof(int), 0)) == -1) {
 		logAndExit("Error al recibir el tamanio del ip del nodo");
 		}
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	printf("Para el tamaño de la ip recibi %d bytes\n", estado);
 
 	ipNodo = malloc(infoBloque->tamanioIp);
 
@@ -538,13 +536,13 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 		logAndExit("Error al recibir el ip del nodo");
 		}
 
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	printf("Para el la ip recibi %d bytes\n", estado);
 
 	//Recibo el tamanio del puerto del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioPuerto, sizeof(int), 0)) == -1) {
 		logAndExit("Error al recibir el tamanio del puerto del nodo");
 		}
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	printf("Para el tamaño del puerto recibi %d bytes\n", estado);
 
 	puertoNodo = malloc(infoBloque->tamanioPuerto);
 
@@ -553,9 +551,14 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 		logAndExit("Error al recibir el puerto del nodo");
 		}
 
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	puts(nombreNodo);
+	puts(ipNodo);
+	puts(puertoNodo);
+	printf("Para el puerto recibi %d bytes\n", estado);
 
-	 return desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+	 infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+	 puts("desempaqueta la info del nodo");
+	 return infoBloque;
 }
 
 void conexionesDatanode(void * estructura){
@@ -638,7 +641,6 @@ void conexionesDatanode(void * estructura){
 									list_add(listaDeNodos, nuevoNodo);
 								}
 								cantNodosPorConectar--;
-
 								break;
 
 							default:
