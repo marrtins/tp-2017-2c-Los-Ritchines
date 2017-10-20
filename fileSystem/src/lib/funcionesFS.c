@@ -68,7 +68,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 
 
-	printf("Numero de bloque %d , Tamanio de bloque %llu, Cntenido de bloque %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+		printf("Numero de bloque %d , Tamanio de bloque %llu, Cotenido de bloque \n %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 	 if ((estado = send(nodo1->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
 	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 	}
@@ -78,26 +78,31 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 		}
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
+	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
+	 nodo1->nombre = malloc(TAMANIO_NOMBRE_NODO);
+	 strcpy(nodo1->nombre, "Nodo1");
+
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
-	 puts("copia cero nombre de nodo listo");
+	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo,string_itoa(nodo1->primerBloqueLibreBitmap));
-	 puts("numero de bloque de la copia cero");
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
+	 printf("El numero de bloque es: %d\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo);
+
+	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
+	 nodo2->nombre = malloc(TAMANIO_NOMBRE_NODO);
+	 strcpy(nodo2->nombre, "Nodo2");
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
+	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
 
+	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
+	 printf("El numero de bloque es: %d\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo);
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo, string_itoa(nodo2->primerBloqueLibreBitmap));
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
+	 printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 	 puts("Metio todo en la estructura");
-}
-
-void inicializarTablaDeDirectorio(){
-
 }
 
 int existeDirectorio(char * directorio){
@@ -122,29 +127,6 @@ int existeDirectorio(char * directorio){
 	}
 
 	return 1;
-	/*char ** carpeta = string_split(directorio, "/");
-
-	int i=0, j,booleano=0;
-	bool encontrado;
-	int indicePadre = 0;
-
-	while(carpeta[i] != NULL && booleano !=-1){
-
-		for(j=0;j<=99;j++){
-		encontrado = string_equals_ignore_case(tablaDirectorios[j].nombre,carpeta[i]);
-		if(encontrado){
-			if(tablaDirectorios[j].padre == indicePadre){
-				indicePadre = tablaDirectorios[j].index;
-			}else{
-				encontrado = 0;
-				booleano = -1;
-			}
-			break;
-		}
-		}
-		i++;
-	}
-	return encontrado;*/
 
 }
 
@@ -192,12 +174,26 @@ char * generarStringDeBloqueNBytes(int numeroDeBloque){
 	return stringGenerado;
 }
 
+char * generarArrayParaArchivoConfig(char * dato1, char * dato2){
+	char * concatenacionLoca = malloc(1 + TAMANIO_NOMBRE_NODO + 1 + 3);
+	string_append(&concatenacionLoca, "[");
+	string_append(&concatenacionLoca, dato1);
+	string_append(&concatenacionLoca, ",");
+	string_append(&concatenacionLoca, dato2);
+	string_append(&concatenacionLoca, "]");
+	return concatenacionLoca;
+}
+
 void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
 	t_config * archivoConfig = config_create(rutaArchivo);
 	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
-	char * bloqueNCopiaN;
-	char * bloqueNCopiaN2;
+	char * bloque0CopiaN;
+	char * bloque1CopiaN;
 	char * bloqueNBytes;
+	char * concatenacionLoca;
+	char * concatenacionLoca2;
+	char * numeroBloqueEnString;
+	char * numeroBloqueEnString2;
 	int i = 0;
 
 	config_set_value(archivoConfig, "TAMANIO", string_itoa(archivoAAlmacenar->tamanioTotal));
@@ -205,10 +201,19 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 	while(cantidadDeBloques != 0){
 
-		bloqueNCopiaN = generarStringDeBloqueNCopiaN(i,0);
-		//aca Meteria el valor de bloqueNcopia0
-		bloqueNCopiaN2 = generarStringDeBloqueNCopiaN(i,1);
-		//aca Meteria el valor de bloqueNcopia1
+		numeroBloqueEnString = malloc(3);
+		numeroBloqueEnString = malloc(3);
+
+		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
+		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
+		concatenacionLoca = generarArrayParaArchivoConfig(archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo, numeroBloqueEnString);
+
+		config_set_value(archivoConfig, bloque0CopiaN, concatenacionLoca);
+
+		bloque1CopiaN = generarStringDeBloqueNCopiaN(i,1);
+		numeroBloqueEnString2 = string_itoa(archivoAAlmacenar->bloques[i].copiaUno.numeroBloqueDeNodo);
+		concatenacionLoca2 = generarArrayParaArchivoConfig(archivoAAlmacenar->bloques[i].copiaUno.nombreDeNodo, numeroBloqueEnString2);
+		config_set_value(archivoConfig, bloque1CopiaN, concatenacionLoca2);
 
 		//aca hace el tamanio
 		bloqueNBytes = generarStringDeBloqueNBytes(i);
@@ -216,12 +221,19 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 		config_set_value(archivoConfig, bloqueNBytes, string_itoa(archivoAAlmacenar->bloques[i].bytes));
 		cantidadDeBloques--;
 		i++;
-		free(bloqueNCopiaN);
-		free(bloqueNCopiaN2);
+
+		free(numeroBloqueEnString);
+		free(numeroBloqueEnString2);
+		free(bloque0CopiaN);
+		free(bloque1CopiaN);
 		free(bloqueNBytes);
+		free(concatenacionLoca);
+		free(concatenacionLoca2);
 	}
 
+	puts("guardando TODO");
 	config_save(archivoConfig);
+	puts("guardado.");
 	config_destroy(archivoConfig);
 
 }
@@ -232,6 +244,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", index, archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
+	puts("Cree el archivo para guardar la estructura");
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
 
 }
@@ -330,18 +343,24 @@ void almacenarArchivo(char **palabras){
 			i++;
 
 		}
-		puts("ya almacene el archivo");
+
 		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
+		puts("ya almacene el archivo");
 
 		close(fd);
 
 		liberarPunteroDePunterosAChar(splitDeRuta);
+		puts("liberado rutas");
 		free(splitDeRuta);
+		puts("liberado puntero rutas");
 		free(nombreArchivoConExtension);
+		puts("liberado archivo con extension");
 		liberarPunteroDePunterosAChar(lineas);
-		//hay que ver esto de liberar tabla de archivos
+		puts("libere lineas");
 		liberarTablaDeArchivo(archivoAAlmacenar);
+		puts("se libero tabla de archivos");
 		liberarEstructuraBloquesAEnviar(infoBloque);
+		puts("se libero la estructura de bloques a enviar");
 		free(lineas);
 	}
 }
@@ -366,6 +385,8 @@ void procesarInput(char* linea) {
 				puts("Existe el directorio");
 			}else {
 				puts("No existe el directorio"); //HAY QUE CREARLO
+				// cuando se crea un directorio, hay que comprobar
+				// que no supere los 100 elementos de la lista
 				printf("ya pude crear el directorio\n");
 			}
 		}
@@ -470,7 +491,6 @@ void conexionesDatanode(void * estructura){
 		cantModificados = 0,
 		nuevoFileDescriptor,
 		fileDescriptor,
-		estable,
 		cantNodosPorConectar = fileSystem->cant_nodos,
 		estado;
 	Theader * head = malloc(sizeof(Theader));
@@ -626,9 +646,9 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 	while(nroBloque != cantBloques){
 
 		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char)*4);
+		//tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
+		//tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 
 		bloqueCopia0 = generarStringDeBloqueNCopiaN(nroBloque,0);
 		bloqueCopia1 = generarStringDeBloqueNCopiaN(nroBloque,1);
@@ -639,15 +659,15 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 		tablaArchivos->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueBytes);
 
 		strcpy(tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo,temporal1[0]);
-		strcpy(tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo,temporal1[1]);
+		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = atoi(temporal1[1]);
 
 		strcpy(tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo,temporal2[0]);
-		strcpy(tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo,temporal2[1]);
+		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = atoi(temporal2[1]);
 
 		printf("Nombre de nodo copia cero %s\n",tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo);
-		printf("Numero de nodo copia cero %s\n",tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
+		printf("Numero de nodo copia cero %d\n",tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
 		printf("Nombre de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo);
-		printf("Numero de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
+		printf("Numero de nodo copia uno %d\n",tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
 		printf("Bytes %llu\n",tablaArchivos->bloques[nroBloque].bytes);
 		nroBloque++;
 
@@ -733,16 +753,15 @@ void mostrarBitmap(t_bitarray* bitmap){
 }
 
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
-	//deberia liberar todo pero hace malloc de algunas cosas... porque ???
-	int i;
-	int cantBloques = ceil(tablaDeArchivos->tamanioTotal/1048576.0);
-	tablaDeArchivos->extensionArchivo = malloc(sizeof(Tarchivo));
-	tablaDeArchivos->bloques = malloc(sizeof(Tbloques));
 
-	for(i = 0; i != cantBloques; i++){
-		free(tablaDeArchivos->bloques[i].copiaCero.nombreDeNodo);
-		free(tablaDeArchivos->bloques[i].copiaCero.numeroBloqueDeNodo);
-		free(tablaDeArchivos->bloques[i].copiaUno.nombreDeNodo);
-		free(tablaDeArchivos->bloques[i].copiaUno.numeroBloqueDeNodo);
+	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaDeArchivos->tamanioTotal)-1;
+	free(tablaDeArchivos->extensionArchivo);
+	free(tablaDeArchivos->nombreArchivoSinExtension);
+
+	for(; cantBloques >= 0; cantBloques--){
+		free(tablaDeArchivos->bloques[cantBloques].copiaCero.nombreDeNodo);
+		free(tablaDeArchivos->bloques[cantBloques].copiaUno.nombreDeNodo);
 	}
+	free(tablaDeArchivos->bloques);
+	free(tablaDeArchivos);
 }
