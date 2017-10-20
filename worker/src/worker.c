@@ -13,10 +13,13 @@ int main(int argc, char* argv[]){
 
 
 	char * nombreTransformador;
-	int cont = 1;
+	int cont = 0;
 	char buffer[BUFSIZ];
 	int file_size,len;
     int remain_data = 0;
+	pid_t pid;
+	int pidStat;
+
 
 	FILE *transformadorFile;
 
@@ -64,12 +67,13 @@ int main(int argc, char* argv[]){
 			cont++;
 			string_append(&nombreTransformador,string_itoa(cont));
 			string_append(&nombreTransformador,worker->nombre_nodo);
+			string_append(&nombreTransformador,".sh");
 			if(head->tipo_de_mensaje==TRANSFORMADORLEN){
 				puts("llego trasnformador len");
 
 
 				/*file size */
-				recv(client_sock, buffer, BUFSIZ, 0);
+				recv(client_sock, buffer, sizeof(int), 0);
 				file_size = atoi(buffer);
 				fprintf(stdout, "\nFile size : %d\n", file_size);
 
@@ -83,12 +87,39 @@ int main(int argc, char* argv[]){
 
 				while (remain_data > 0){//todo:cheq
 					len = recv(client_sock, buffer, 1024, 0);
+
 					fwrite(buffer, sizeof(char), len, transformadorFile);
 					remain_data -= len;
 					fprintf(stdout, "Recinidos %d bytes y espero :- %d bytes\n", len, remain_data);
-				}
+					}
 				fclose(transformadorFile);
-				puts("sali");
+				puts("recibi archivo transformador, ahora forkeo");
+
+				if ( (pid=fork()) == 0 )
+				{ /* hijo */
+					printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
+					printf("%d\n",cont);
+					char * str = string_new();
+					string_append(&str,"cat WBAN.csv | ./transformador.sh | sort  > /home/utnso/resultado");
+					string_append(&str,string_itoa(cont));
+					string_append(&str,worker->nombre_nodo);
+					system(str);
+					exit(0);
+
+				}
+				else
+				{ /* padre */
+					printf("Soy el padre (%d, hijo de %d)\n", getpid(),	getppid());
+					printf("%d\n",cont);
+					waitpid(pid,pidStat,0);
+				}
+				printf("Cierro fd %d\n",client_sock);
+				close(client_sock);
+
+
+
+
+
 			}
 
 			break;
