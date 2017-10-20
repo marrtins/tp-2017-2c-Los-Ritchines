@@ -13,3 +13,5 @@ IP_YAMA=127.0.0.1
 
 CANT_NODOS=2
 
+RUTAFS=/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem
+

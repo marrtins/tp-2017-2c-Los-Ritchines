@@ -727,12 +727,7 @@ void levantarTablaNodos(Tnodos * tablaNodos){
 		i++;
 		}
 
-
-
-	/*
-	config_set_value(tablaNodosConfig, "Nodo1Libre", "5");
-	config_save(tablaNodosConfig); // escribe algo en el configs
-*/	free(nodoTotal);
+	free(nodoTotal);
 	free(nodoLibre);
 	config_destroy(archivoNodos);
 }
