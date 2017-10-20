@@ -8,8 +8,6 @@ int main(int argc, char* argv[]) {
 		socketYama,
 		cantNodosPorConectar;
 
-	t_list * listaBitmaps = list_create();
-
 	Tarchivo * tablaArchivos = malloc(sizeof(Tarchivo));
 
 	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
@@ -34,7 +32,6 @@ int main(int argc, char* argv[]) {
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	listaDeNodos = list_create();
-	listaBitmaps = list_create();
 	listaTablaDirectorios = list_create();
 
 	levantarTablas(tablaNodos);
@@ -104,14 +101,12 @@ int main(int argc, char* argv[]) {
 
 	}
 
-
 	//tabla de archivos
 	liberarTablaDeArchivo(tablaArchivos);
 	//	FALTA free tablanodos
 
 	//listas
 	list_destroy(listaDeNodos);
-	list_destroy(listaBitmaps);
 
 	//otros
 	free(mensaje);
@@ -119,6 +114,3 @@ int main(int argc, char* argv[]) {
 	return EXIT_SUCCESS;
 
 }
-
-
-

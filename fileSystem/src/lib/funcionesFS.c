@@ -34,8 +34,8 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 	printf("Tipo de proceso: %d\n", fileSystem->tipo_de_proceso);
 }
 
-void agregarArchivosATablaDeArchivos(){
-
+void crearDirectorio(char * ruta){
+	mkdir(ruta, 0700);
 }
 
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
@@ -67,15 +67,15 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 
-
-		printf("Numero de bloque %d , Tamanio de bloque %llu, Cotenido de bloque \n %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+	printf("Numero de bloque %d , Tamanio de bloque %llu, Cotenido de bloque \n %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 	 if ((estado = send(nodo1->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
-	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
-	 	}
+		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+	 }
+
 	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
 	 if ((estado = send(nodo2->fd, &buffer->buffer , buffer->tamanio, 0)) == -1){
-	 			logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
-	 		}
+		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+	 }
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
@@ -103,6 +103,14 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	 printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 	 puts("Metio todo en la estructura");
+
+	 liberarEstructuraBuffer(buffer);
+
+}
+
+void liberarEstructuraBuffer(Tbuffer * buffer){
+	free(buffer->buffer);
+	free(buffer);
 }
 
 int existeDirectorio(char * directorio){
