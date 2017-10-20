@@ -23,8 +23,7 @@ TdataNode *obtenerConfiguracionDN(char* ruta){
 	strcpy(pDataNode->puerto_filesystem, config_get_string_value(dataNodeConfig, "PUERTO_FILESYSTEM"));
 	strcpy(pDataNode->ruta_databin, config_get_string_value(dataNodeConfig, "RUTA_DATABIN"));
 	strcpy(pDataNode->nombre_nodo, config_get_string_value(dataNodeConfig, "NOMBRE_NODO"));
-
-
+	pDataNode->tamanio_databin_mb = config_get_int_value(dataNodeConfig,"TAMANIO_DATABIN_MB");
 
 	pDataNode->tipo_de_proceso = DATANODE;
 
@@ -42,6 +41,7 @@ void mostrarConfiguracion(TdataNode *dn){
 	printf("Puerto Worker: %s\n", dn->puerto_worker);
 	printf("Ruta Databin: %s\n", dn->ruta_databin);
 	printf("Nombre Nodo: %s\n", dn->nombre_nodo);
+	printf("Tamanio databin en MB: %d\n", dn->tamanio_databin_mb);
 	printf("Tipo de proceso: %d\n", dn->tipo_de_proceso);
 }
 
@@ -79,6 +79,7 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 	infoBloque->tamanioPuerto = strlen(dataNode->puerto_entrada);
 	infoBloque->puertoNodo = malloc(infoBloque->tamanioPuerto);
 	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
+	infoBloque->databinEnMB = dataNode->tamanio_databin_mb;
 
 	buffer = empaquetarInfoBloqueDNaFS(infoBloque);
 	 if ((estado = send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){

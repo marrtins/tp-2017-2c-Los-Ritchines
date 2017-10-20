@@ -295,7 +295,7 @@ Tbuffer *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tama
 Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 
 		Tbuffer *buffer = malloc(sizeof(Tbuffer));
-		int espacioEnteros = sizeof(int) * 3;
+		int espacioEnteros = sizeof(int) * 4;
 		int espaciosVariables = infoBloque->tamanioIp + infoBloque->tamanioPuerto + infoBloque->tamanioNombre;
 		buffer->tamanio = HEAD_SIZE + espacioEnteros + espaciosVariables;
 
@@ -316,6 +316,8 @@ Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque){
 		p += sizeof(int);
 		memcpy(p, infoBloque->puertoNodo, infoBloque->tamanioPuerto);
 		p += infoBloque->tamanioPuerto;
+		memcpy(p, infoBloque->databinEnMB, sizeof(int));
+		p += sizeof(int);
 
 		buffer->buffer = malloc(buffer->tamanio);
 		buffer->buffer = chorroBytes;
