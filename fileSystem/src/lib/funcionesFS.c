@@ -833,8 +833,8 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	free(tablaDeArchivos);
 }
 
-/*int getMD5(char**palabras){
-	Tdirectorio * directorio;
+int getMD5(char**palabras){
+	/*Tdirectorio * directorio;
 	char ** splitDeRuta = string_split(palabras[1], "/");
 	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
 	printf("El archivo del que queremos su MD5 es: %s\n", nombreArchivoConExtension);
@@ -855,5 +855,5 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 
 		free(comando);
 		free(ruta_temporal);
-		return 0;
-}*/
+		return 0;*/
+}
