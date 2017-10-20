@@ -33,6 +33,7 @@ void* buscarPorNombreDeDirectorio(char * directorio);
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
 void liberarEstructuraBuffer(Tbuffer * buffer);
 void crearDirectorio(char * ruta);
+int getMD5(char**palabras);
 
 
 #endif
