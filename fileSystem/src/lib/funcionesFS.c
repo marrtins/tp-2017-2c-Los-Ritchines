@@ -419,7 +419,14 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
 		printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
 	} else if (string_equals_ignore_case(*palabras, "md5")) {
-		printf("ya pude solicitar el md5 de un archivo del file system\n");
+			if (cantidad ==1){
+				getMD5(palabras);
+				printf("ya pude solicitar el md5 de un archivo del file system\n");
+			}
+			else {
+				puts("Error en la cantidad de parametros");
+			}
+
 	} else if (string_equals_ignore_case(*palabras, "ls")) {
 		printf("ya pude listar los archivos del directorio\n");
 	} else if (string_equals_ignore_case(*palabras, "info")) {
@@ -825,3 +832,28 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	free(tablaDeArchivos->bloques);
 	free(tablaDeArchivos);
 }
+
+/*int getMD5(char**palabras){
+	Tdirectorio * directorio;
+	char ** splitDeRuta = string_split(palabras[1], "/");
+	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
+	printf("El archivo del que queremos su MD5 es: %s\n", nombreArchivoConExtension);
+
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+	archivo->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
+	archivo->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
+
+	char* ruta_temporal = string_duplicate("/tmp/");
+		string_append(&ruta_temporal, archivo->nombreArchivoSinExtension);
+		string_append(&ruta_temporal, ".");
+		string_append(&ruta_temporal, archivo->extensionArchivo);
+		copiar_archivo_mdfs_a_local(palabras[1], ruta_temporal); //FALTA ESTO
+
+		char* comando = string_duplicate("md5sum ");
+		string_append(&comando, ruta_temporal);
+		system(comando);
+
+		free(comando);
+		free(ruta_temporal);
+		return 0;
+}*/
