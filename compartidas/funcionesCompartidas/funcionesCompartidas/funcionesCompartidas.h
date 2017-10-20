@@ -22,9 +22,4 @@ char* deUnsignedLongLongAString(int number);
 char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension);
 char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension);
 
-
-
-
-
-
 #endif

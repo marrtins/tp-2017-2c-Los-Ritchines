@@ -98,7 +98,28 @@ void inicializarTablaDeDirectorio(){
 }
 
 int existeDirectorio(char * directorio){
-	char ** carpeta = string_split(directorio, "/");
+
+	char ** carpetas = string_split(directorio, "/");
+	int i = 0;
+	int indicePadre = 0;
+
+	while(carpetas[i] != NULL){
+		Tdirectorio * estructuraDirectorio = (Tdirectorio*)buscarPorNombreDeDirectorio(carpetas[i]);
+		if(estructuraDirectorio != NULL){
+			if(estructuraDirectorio->padre == indicePadre){
+				indicePadre = estructuraDirectorio->index;
+				i++;
+			}else{
+				return 0;
+			}
+		}
+		else{
+			return 0;
+		}
+	}
+
+	return 1;
+	/*char ** carpeta = string_split(directorio, "/");
 
 	int i=0, j,booleano=0;
 	bool encontrado;
@@ -120,19 +141,28 @@ int existeDirectorio(char * directorio){
 		}
 		i++;
 	}
-	return encontrado;
+	return encontrado;*/
 
 }
 
+void* buscarPorNombreDeDirectorio(char * directorio){
+	bool buscarPorNombreDeDirectorioParaLista(void* elementoDeLista){
+		Tdirectorio* estructuraDirectorio = (Tdirectorio*) elementoDeLista;
+
+		return !strcmp(directorio, estructuraDirectorio->nombre);
+	}
+
+	return list_find(listaTablaDirectorios, buscarPorNombreDeDirectorioParaLista);
+}
+
 int buscarIndexPorNombreDeDirectorio(char * directorio){
-	int i, comparacion;
-	for(i = 0; i < 100; i++){
-		comparacion = strcmp(tablaDirectorios[i].nombre, directorio);
-		if(comparacion == 0){
-			return tablaDirectorios[i].index;
-		}
+
+	Tdirectorio * estructuraDirectorio = (Tdirectorio *)buscarPorNombreDeDirectorio(directorio);
+	if(estructuraDirectorio != NULL){
+		return estructuraDirectorio->index;
 	}
 	return -1;
+
 }
 
 int obtenerIndexDeUnaRuta(char * rutaDestino){
@@ -335,6 +365,9 @@ void procesarInput(char* linea) {
 				puts("No existe el directorio"); //HAY QUE CREARLO
 				printf("ya pude crear el directorio\n");
 			}
+		}
+		else{
+			puts("Error en la cantidad de parametros");
 		}
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
 		if(cantidad == 2){
@@ -540,12 +573,12 @@ void conexionesDatanode(void * estructura){
 
 void levantarTablasDirectorios(){
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
-	int i = 0;
 
 	while(!feof(archivoDirectorios)){
-		fscanf(archivoDirectorios, "%d %s %d", &tablaDirectorios[i].index, tablaDirectorios[i].nombre, &tablaDirectorios[i].padre);
-		printf("%d \t %s \t %d \n", tablaDirectorios[i].index, tablaDirectorios[i].nombre, tablaDirectorios[i].padre);
-		i++;
+		Tdirectorio * directorio = malloc(sizeof(Tdirectorio));
+		fscanf(archivoDirectorios, "%d %s %d", &directorio->index, directorio->nombre, &directorio->padre);
+		printf("%d \t %s \t %d \n", directorio->index, directorio->nombre, directorio->padre);
+		list_add(listaTablaDirectorios, directorio);
 	}
 
 	fclose(archivoDirectorios);

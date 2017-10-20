@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
 
 	listaDeNodos = list_create();
 	listaBitmaps = list_create();
+	listaTablaDirectorios = list_create();
 
 	levantarTablas(tablaNodos);
 	levantarTablaArchivo(tablaArchivos);

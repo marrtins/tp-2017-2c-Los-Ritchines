@@ -19,7 +19,7 @@ typedef struct{
 	int index;
 	char nombre[255];
 	int padre;
-}Tdirectorios;
+}Tdirectorio;
 
 typedef struct{
 	char * nombreDeNodo;
@@ -67,6 +67,6 @@ typedef struct{
 }Tnodo;
 
 t_list * listaDeNodos;
-Tdirectorios tablaDirectorios[100];
+t_list * listaTablaDirectorios;
 
 #endif
