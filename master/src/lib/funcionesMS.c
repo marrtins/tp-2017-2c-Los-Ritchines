@@ -28,7 +28,7 @@ void workerHandler(void *info){
 	int fdTransformador;
 	int len,offset,remain_data,sent_bytes;
 	struct stat file_stat;
-	char file_size[256];
+	char file_size[sizeof(int)];
 
 
 	if((sockWorker = conectarAServidor(infoBloque->ipWorker, infoBloque->puertoWorker))<0){
