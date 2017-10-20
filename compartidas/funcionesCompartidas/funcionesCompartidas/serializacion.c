@@ -280,7 +280,7 @@ char *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio
 	p += sizeof(*head);
 	memcpy(p, &nroBloque, sizeof(int));
 	p += sizeof(int);
-	memcpy(p, &tamanio, sizeof(int));
+	memcpy(p, &tamanio, sizeof(unsigned long long));
 	p += sizeof(unsigned long long);
 	memcpy(p, contenido, tamanio);
 	p += tamanio;
