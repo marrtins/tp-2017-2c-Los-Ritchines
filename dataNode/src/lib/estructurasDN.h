@@ -14,7 +14,8 @@ typedef struct{
 	char* nombre_nodo;
 	char* ip_nodo;
 	char* puerto_worker;
-	int   tipo_de_proceso;
+	int tipo_de_proceso;
+	int tamanio_databin_mb;
 }TdataNode;
 
 #endif
