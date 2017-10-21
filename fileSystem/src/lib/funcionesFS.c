@@ -72,38 +72,27 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 
-	 ocuparProximoBloqueBitmap(nodo1);
-	 mostrarBitmap(nodo1->bitmap);
-
 	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
 	 if ((estado = send(nodo2->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
-	 ocuparProximoBloqueBitmap(nodo2);
-	 mostrarBitmap(nodo2->bitmap);
-
-
-	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
-	 nodo1->nombre = malloc(TAMANIO_NOMBRE_NODO);
-	 strcpy(nodo1->nombre, "Nodo1");
-
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
 	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
-
-	 //harcodeado hasta que caro haga la parte de que un nodo envie info a FS
-	 nodo2->nombre = malloc(TAMANIO_NOMBRE_NODO);
-	 strcpy(nodo2->nombre, "Nodo2");
+	 ocuparProximoBloqueBitmap(nodo1);
+	 mostrarBitmap(nodo1->bitmap);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
 	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
+	 ocuparProximoBloqueBitmap(nodo2);
+	 mostrarBitmap(nodo2->bitmap);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	 printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
