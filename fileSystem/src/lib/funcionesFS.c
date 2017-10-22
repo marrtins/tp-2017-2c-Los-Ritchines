@@ -57,9 +57,9 @@ void ocuparProximoBloqueBitmap(Tnodo * nodo){
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
 	Theader * head = malloc(sizeof(Theader));
 	Tbuffer * buffer;
-	 int estado;
-	 head->tipo_de_proceso=FILESYSTEM;
-	 head->tipo_de_mensaje=ALMACENAR_BLOQUE;
+	int estado;
+	head->tipo_de_proceso=FILESYSTEM;
+	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
@@ -257,14 +257,21 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 	free(infoBloque);
 }
 
-void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
+void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque){
 	int cantidadDeBloquesDelArchivo = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
+	unsigned long long bytesFaltantesPorEnviar = archivoAAlmacenar->tamanioTotal;
+	char * punteroAuxiliar = archivoMapeado;
+	punteroAuxiliar += BLOQUE_SIZE - 1;
 	while(cantidadDeBloquesDelArchivo != 0){
-		infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
+		//memcpy
 		archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
 		enviarBloque(infoBloque, archivoAAlmacenar);
 		infoBloque->numeroDeBloque++;
+		cantidadDeBloquesDelArchivo--;
 	}
+
+	//ultimo bloque
+
 }
 
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
@@ -277,11 +284,13 @@ void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoM
 	infoBloque->contenido = malloc(BLOQUE_SIZE);
 
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin") == 0){
-		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado);
+		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 	else{
 		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado);
 	}
+
+	liberarEstructuraBloquesAEnviar(infoBloque);
 }
 
 void almacenarArchivo(char **palabras){

@@ -40,7 +40,7 @@ void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);
 void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
-void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
+void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 
 
 #endif
