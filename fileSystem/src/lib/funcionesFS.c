@@ -257,16 +257,23 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 	int cantidadDeBloquesDelArchivo = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
 	unsigned long long bytesFaltantesPorEnviar = archivoAAlmacenar->tamanioTotal;
 	char * punteroAuxiliar = archivoMapeado;
-	punteroAuxiliar += BLOQUE_SIZE - 1;
-	while(cantidadDeBloquesDelArchivo != 0){
-		//memcpy
-		archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
+	infoBloque->tamanio = BLOQUE_SIZE;
+
+	while(cantidadDeBloquesDelArchivo != 1){
+		memcpy(infoBloque->contenido, punteroAuxiliar, BLOQUE_SIZE);
 		enviarBloque(infoBloque, archivoAAlmacenar);
 		infoBloque->numeroDeBloque++;
 		cantidadDeBloquesDelArchivo--;
+		punteroAuxiliar += BLOQUE_SIZE;
+		bytesFaltantesPorEnviar -= BLOQUE_SIZE;
 	}
 
-	//ultimo bloque
+	//el ultimo bloque tiene tamaño <= que BLOQUE_SIZE (1024*1024)
+	infoBloque->tamanio = bytesFaltantesPorEnviar;
+	memcpy(infoBloque->contenido, punteroAuxiliar, bytesFaltantesPorEnviar);
+	enviarBloque(infoBloque, archivoAAlmacenar);
+
+
 
 }
 
@@ -301,8 +308,8 @@ void almacenarArchivo(char **palabras){
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
 	puts("obtuvo el nombre del archivo sin extension");
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
-	printf("El nombre del archivo es: %s\n", obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension));
-	printf("La extensión es es: %s\n", obtenerExtensionDeUnArchivo(nombreArchivoConExtension));
+	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
+	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
 	//esto va adentro de la funcion que voy a llamar
 	//unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
