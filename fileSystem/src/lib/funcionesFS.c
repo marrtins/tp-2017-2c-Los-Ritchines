@@ -258,7 +258,13 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 }
 
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
-
+	int cantidadDeBloquesDelArchivo = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
+	while(cantidadDeBloquesDelArchivo != 0){
+		infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
+		archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
+		enviarBloque(infoBloque, archivoAAlmacenar);
+		infoBloque->numeroDeBloque++;
+	}
 }
 
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
@@ -266,6 +272,10 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
 }
 
 void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
+	TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
+	infoBloque->numeroDeBloque = 0;
+	infoBloque->contenido = malloc(BLOQUE_SIZE);
+
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin") == 0){
 		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado);
 	}
