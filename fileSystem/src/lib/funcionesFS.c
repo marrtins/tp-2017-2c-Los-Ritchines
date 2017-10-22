@@ -257,11 +257,27 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 	free(infoBloque);
 }
 
+void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
+
+}
+
+void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
+	//aca laburas vos torri
+}
+
+void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
+	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin")){
+		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado);
+	}
+	else{
+		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado);
+	}
+}
+
 void almacenarArchivo(char **palabras){
 	//palabras[1] --> ruta archivo a almacenar
 	//palabras[2] --> ruta de nuestro directorio
 	char * archivoMapeado;
-	char ** lineas;
 	char ** splitDeRuta = string_split(palabras[1], "/");
 	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
 	printf("El archivo a guardar es: %s\n", nombreArchivoConExtension);
@@ -273,10 +289,14 @@ void almacenarArchivo(char **palabras){
 	printf("El nombre del archivo es: %s\n", obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension));
 	printf("La extensión es es: %s\n", obtenerExtensionDeUnArchivo(nombreArchivoConExtension));
 
-	unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
-	TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
+	//esto va adentro de la funcion que voy a llamar
+	//unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
+
+	//esto tiene que ir adentro de la funcion que voy a llamar
+	//para no tener que pasarselo a procesarSegunExtension
+	/*TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
 	infoBloque->numeroDeBloque = 0;
-	infoBloque->contenido = malloc(BLOQUE_SIZE);
+	infoBloque->contenido = malloc(BLOQUE_SIZE);*/
 
 	FILE * archivoOrigen = fopen(palabras[1], "r");
 	int fd = fileno(archivoOrigen);
@@ -293,23 +313,25 @@ void almacenarArchivo(char **palabras){
 
 	fclose(archivoOrigen);
 
-	int cantidadBloques = cantidadDeBloquesDeUnArchivo(tamanio);
-	archivoAAlmacenar->bloques = malloc(sizeof(Tbloques) * cantidadBloques);
+	archivoAAlmacenar->bloques = malloc(sizeof(Tbloques) * cantidadDeBloquesDeUnArchivo(tamanio));
 
-	printf("La cantidad de bloquees es: %d \n", cantidadBloques);
+	printf("La cantidad de bloquees es: %d \n", cantidadDeBloquesDeUnArchivo(tamanio));
 
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
 		return;
 	}
 	else {
-		puts("El archivo no es vacio");
+
+		procesarArchivoSegunExtension(archivoAAlmacenar, archivoMapeado);
+
+		/*puts("El archivo no es vacio");
 		lineas = string_split(archivoMapeado,"\n");
 		puts("Pude splitear el archivo mapeado.");
 		int i = 0;
-		printf("%c = caracter final\n",archivoMapeado[tamanio-1]);
+		printf("%c = caracter final\n",archivoMapeado[tamanio-1]);*/
 
-		while(lineas[i]!=NULL){
+		/*while(lineas[i]!=NULL){
 			//+1 por el \n faltante
 			if(lineas[i+1] == NULL){
 				puts("Bloque no lleno, cargandolo...");
@@ -341,7 +363,7 @@ void almacenarArchivo(char **palabras){
 			}
 			i++;
 
-		}
+		}*/
 		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 
 		close(fd);
@@ -349,10 +371,7 @@ void almacenarArchivo(char **palabras){
 		liberarPunteroDePunterosAChar(splitDeRuta);
 		free(splitDeRuta);
 		free(nombreArchivoConExtension);
-		liberarPunteroDePunterosAChar(lineas);
 		liberarTablaDeArchivo(archivoAAlmacenar);
-		liberarEstructuraBloquesAEnviar(infoBloque);
-		free(lineas);
 	}
 }
 

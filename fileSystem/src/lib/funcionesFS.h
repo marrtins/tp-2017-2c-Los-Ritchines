@@ -38,6 +38,9 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);
+void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
+void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
+void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
 
 
 #endif
