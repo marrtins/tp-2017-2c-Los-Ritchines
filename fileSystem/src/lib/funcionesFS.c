@@ -312,8 +312,8 @@ void almacenarArchivo(char **palabras){
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
 	puts("obtuvo el nombre del archivo sin extension");
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
-	printf("El nombre del archivo es: %s\n", obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension));
-	printf("La extensión es es: %s\n", obtenerExtensionDeUnArchivo(nombreArchivoConExtension));
+	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
+	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
 	//esto va adentro de la funcion que voy a llamar
 	//unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
