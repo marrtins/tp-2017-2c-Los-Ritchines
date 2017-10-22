@@ -266,7 +266,7 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
 }
 
 void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
-	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin")){
+	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin") == 0){
 		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado);
 	}
 	else{
