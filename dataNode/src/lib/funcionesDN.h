@@ -3,9 +3,17 @@
 
 #include "estructurasDN.h"
 
+//Configuracion
 TdataNode *obtenerConfiguracionDN(char* ruta);
 void mostrarConfiguracion(TdataNode *dn);
-void setBloque(int posicion, Tbuffer* bloque);
+
+//Bloque
+void setBloque(int posicion, Tbloque* bloque);
 char * getBloque(int posicion);
+
+//Envios
 int enviarInfoNodo(int socketFS, TdataNode * dataNode);
+
+//Recv
+Tbloque * recvBloque(int socketFS);
 #endif

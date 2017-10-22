@@ -45,11 +45,11 @@ void mostrarConfiguracion(TdataNode *dn){
 	printf("Tipo de proceso: %d\n", dn->tipo_de_proceso);
 }
 
-void setBloque(int posicion, Tbuffer * tBuffer){
+void setBloque(int posicion, Tbloque * bloque){
 
-	memcpy(archivoMapeado + posicion* BLOQUE_SIZE, tBuffer->buffer,tBuffer->tamanio);
+	memcpy(archivoMapeado + posicion* BLOQUE_SIZE, bloque->contenido,bloque->tamanioContenido);
 
-	if (msync((void *)archivoMapeado, strlen(tBuffer->buffer), MS_SYNC) < 0) {
+	if (msync((void *)archivoMapeado, strlen(bloque->contenido), MS_SYNC) < 0) {
 				logAndExit("Error al hacer msync");
 		}
 }
@@ -89,4 +89,35 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 
 	return estado;
 
+}
+
+Tbloque * recvBloque(int socketFS) {
+	char* contenidoBloque;
+	int estado;
+	Tbloque * bloque = malloc(sizeof(Tbloque));
+	if ((estado = recv(socketFS, &bloque->nroBloque, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el numero de bloque");
+	}
+	printf("Para el nro de bloque recibi %d bytes\n", estado);
+	printf("Recibí el numero de bloque %d\n", bloque->nroBloque);
+
+	if ((estado = recv(socketFS, &bloque->tamanioContenido, sizeof(unsigned long long),
+			0)) == -1) {
+		logAndExit("Error al recibir el tamaño de bloque");
+	}
+	printf("Para el tamanio de bloque recibi %d bytes\n", estado);
+
+	printf("Tamanio de bloque = %llu\n", bloque->tamanioContenido);
+	bloque->contenido = malloc(bloque->tamanioContenido);
+	contenidoBloque = malloc(bloque->tamanioContenido);
+
+	if ((estado = recv(socketFS, contenidoBloque, bloque->tamanioContenido, 0)) == -1) {
+		logAndExit("Error al recibir el contenido del bloque");
+	}
+	printf("Para el contenido de bloque recibi %d bytes\n", estado);
+	memcpy(bloque->contenido, contenidoBloque, bloque->tamanioContenido);
+
+	printf("Contenido bloque %s\n", bloque->contenido);
+	free(contenidoBloque);
+	return bloque;
 }

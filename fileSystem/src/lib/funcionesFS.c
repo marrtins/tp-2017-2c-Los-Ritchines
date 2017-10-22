@@ -34,10 +34,6 @@ void mostrarConfiguracion(TfileSystem *fileSystem){
 	printf("Tipo de proceso: %d\n", fileSystem->tipo_de_proceso);
 }
 
-void crearDirectorio(char * ruta){
-	mkdir(ruta, 0700);
-}
-
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	Tnodo* nodoA = (Tnodo*)nodo1;
 	Tnodo* nodoB = (Tnodo*)nodo2;
@@ -730,7 +726,6 @@ void mostrarDirectorios(){
 
 }
 
-
 void levantarTablaArchivo(Tarchivo * tablaArchivos){
 
 	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/2/archivo1.txt");
@@ -874,6 +869,10 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	free(tablaDeArchivos);
 }
 
+void crearDirectorio(char * ruta){
+	mkdir(ruta, 0700);
+}
+
 int getMD5(char**palabras){
 	/*Tdirectorio * directorio;
 	char ** splitDeRuta = string_split(palabras[1], "/");
@@ -895,6 +894,6 @@ int getMD5(char**palabras){
 		system(comando);
 
 		free(comando);
-		free(ruta_temporal);
-		return 0;*/
+		free(ruta_temporal);*/
+		return 0;
 }

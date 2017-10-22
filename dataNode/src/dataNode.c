@@ -4,12 +4,11 @@
 int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
-	int socketFS, fd, estado, nroBloque;
-	char* contenidoBloque;
+	int socketFS, fd, estado;
 	char *bufferHead = malloc(sizeof(Theader));
-	Tbuffer * tBuffer = malloc(sizeof(Tbuffer));
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
+	Tbloque * bloque;
 
 	FILE * archivo = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/data1.bin", "rb+");
 
@@ -54,28 +53,11 @@ int main(int argc, char* argv[]) {
 			case ALMACENAR_BLOQUE:
 				puts("Es FileSystem y quiere almacenar un bloque");
 
-				if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
-						logAndExit("Error al recibir el numero de bloque");
-				}
-				printf("Para el nro de bloque recibi %d bytes\n", estado);
-				printf("Recibí el numero de bloque %d\n", nroBloque);
+				bloque = recvBloque(socketFS);
+				setBloque(bloque->nroBloque, bloque);
+				puts("Bloque almacenado");
 
-				if ((estado = recv(socketFS, &tBuffer->tamanio, sizeof(unsigned long long), 0)) == -1) {
-						logAndExit("Error al recibir el tamaño de bloque");
-				}
-				printf("Para el tamanio de bloque recibi %d bytes\n", estado);
-
-
-				printf("Tamanio de bloque = %llu\n", tBuffer->tamanio);
-				tBuffer->buffer = malloc(tBuffer->tamanio);
-
-				if ((estado = recv(socketFS, tBuffer->buffer, tBuffer->tamanio, 0)) == -1) {
-						logAndExit("Error al recibir el contenido del bloque");
-				}
-				printf("Para el contenido de bloque recibi %d bytes\n", estado);
-				setBloque(nroBloque,tBuffer);
-				memcpy(contenidoBloque,tBuffer->buffer,tBuffer->tamanio);
-				printf("Contenido bloque %s\n",contenidoBloque);
+				//hacer free de bloque
 
 				break;
 			default:;

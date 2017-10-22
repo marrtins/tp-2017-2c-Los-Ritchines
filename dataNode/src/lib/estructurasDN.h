@@ -5,7 +5,6 @@
 char * archivoMapeado;
 
 typedef struct{
-
 	char* ip_filesystem;
 	char* puerto_entrada;
 	char* puerto_master;
@@ -17,5 +16,11 @@ typedef struct{
 	int tipo_de_proceso;
 	int tamanio_databin_mb;
 }TdataNode;
+
+typedef struct{
+	int nroBloque;
+	unsigned long long tamanioContenido;
+	char *contenido;
+}Tbloque;
 
 #endif
