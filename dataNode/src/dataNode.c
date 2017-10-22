@@ -10,7 +10,11 @@ int main(int argc, char* argv[]) {
 	Theader *head = malloc(sizeof(Theader));
 	Tbloque * bloque;
 
-	FILE * archivo = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/data1.bin", "rb+");
+	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
+	dataNode = obtenerConfiguracionDN(argv[1]);
+	mostrarConfiguracion(dataNode);
+
+	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 
 	if(argc!=2){
 			printf("Error en la cantidad de parametros\n");
@@ -24,9 +28,6 @@ int main(int argc, char* argv[]) {
 	fclose(archivo);
 	close(fd);
 
-	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
-	dataNode = obtenerConfiguracionDN(argv[1]);
-	mostrarConfiguracion(dataNode);
 	puts("Intentando conectar con file system");
 
 	socketFS = conectarAServidor(dataNode->ip_filesystem,dataNode->puerto_filesystem);
@@ -35,7 +36,7 @@ int main(int argc, char* argv[]) {
 
 	//manda el nombre la ip y el puerto del nodo
 	estado = enviarInfoNodo(socketFS, dataNode);
-	printf("Envie %d bytes\n",estado);
+	printf("Envie %d bytes con la informacion del nodo\n",estado);
 
 	if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {
 		logAndExit("Error al recibir informacion");

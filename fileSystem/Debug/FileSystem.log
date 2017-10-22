@@ -191,3 +191,6 @@
 [ERROR] 19:30:51:340 FileSystem.log/(4020:4020): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 19:31:27:797 FileSystem.log/(4328:4330): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 19:33:02:645 FileSystem.log/(4334:4336): Error al recibir el tamanio del nombre del nodo
+[ERROR] 19:42:39:738 FileSystem.log/(5271:5273): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 19:42:41:855 FileSystem.log/(5274:5276): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 19:49:33:439 FileSystem.log/(5485:5487): Error al recibir el tamanio del nombre del nodo

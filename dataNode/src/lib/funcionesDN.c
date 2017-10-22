@@ -80,7 +80,7 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 	infoBloque->puertoNodo = malloc(infoBloque->tamanioPuerto);
 	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
 	infoBloque->databinEnMB = dataNode->tamanio_databin_mb;
-	puts("HOLI");
+
 	buffer = empaquetarInfoBloqueDNaFS(infoBloque);
 	 if ((estado = send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
 	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
@@ -117,7 +117,7 @@ Tbloque * recvBloque(int socketFS) {
 	printf("Para el contenido de bloque recibi %d bytes\n", estado);
 	memcpy(bloque->contenido, contenidoBloque, bloque->tamanioContenido);
 
-	printf("Contenido bloque %s\n", bloque->contenido);
+
 	free(contenidoBloque);
 	return bloque;
 }
