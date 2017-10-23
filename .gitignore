@@ -2,7 +2,7 @@ data1.bin
 data2.bin
 Release/
 Debug/
-\.log
+*.log
 
 # Prerequisites
 *.d
