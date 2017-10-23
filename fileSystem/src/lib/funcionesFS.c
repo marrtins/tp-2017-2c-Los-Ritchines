@@ -277,8 +277,37 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 
 }
 
-void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
-	//aca laburas vos torri
+void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar* infoBloque){
+	char * punteroAuxiliar = archivoMapeado;
+	unsigned long long bytesFaltantesPorEnviar = archivoAAlmacenar->tamanioTotal;
+	unsigned long long posicionUltimoBarraN = 0;
+	unsigned long long bytesCopiados = 0;
+	infoBloque->numeroDeBloque = 0;
+
+
+	while(bytesFaltantesPorEnviar > 0){
+		if(bytesFaltantesPorEnviar < BLOQUE_SIZE){
+			infoBloque->contenido = malloc(bytesFaltantesPorEnviar);
+			memcpy(infoBloque->contenido,punteroAuxiliar,bytesFaltantesPorEnviar);
+			infoBloque->tamanio = bytesFaltantesPorEnviar;
+		}
+		else {
+			posicionUltimoBarraN = posicionUltimoBarraN + BLOQUE_SIZE;
+			while(archivoMapeado[posicionUltimoBarraN] != '\n'){
+				posicionUltimoBarraN--;
+			}
+			infoBloque->contenido = malloc(posicionUltimoBarraN - bytesCopiados);
+			memcpy(infoBloque->contenido,punteroAuxiliar,posicionUltimoBarraN);
+			infoBloque->tamanio = posicionUltimoBarraN - bytesCopiados;
+			bytesCopiados = posicionUltimoBarraN;
+		}
+		bytesFaltantesPorEnviar-=bytesCopiados;
+		//freir infoBloque->contenido en enviarBloque;
+		//los tamaños varian según la posición del \n;
+		enviarBloque(infoBloque, archivoAAlmacenar);
+		punteroAuxiliar = archivoMapeado + posicionUltimoBarraN;
+		infoBloque->numeroDeBloque++;
+	}
 }
 
 void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
@@ -290,7 +319,8 @@ void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoM
 		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 	else{
-		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado);
+
+		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 
 	liberarEstructuraBloquesAEnviar(infoBloque);
