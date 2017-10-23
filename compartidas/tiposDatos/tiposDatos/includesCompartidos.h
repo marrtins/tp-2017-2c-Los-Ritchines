@@ -14,6 +14,6 @@
 #include <signal.h>
 #include <string.h>
 #include <math.h>
-
+#include <commons/bitarray.h>
 
 #endif
