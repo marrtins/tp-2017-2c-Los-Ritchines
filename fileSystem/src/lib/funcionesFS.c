@@ -245,9 +245,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	//hay que verificar si existe el directorio
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
-	puts("voy a almacenar estructuraArchivoEnUnArchivo");
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
-	puts("voy a freir rutaArchivo");
 	free(rutaArchivo);
 
 }
@@ -399,10 +397,8 @@ void almacenarArchivo(char **palabras){
 	}
 
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
-
 	liberarPunteroDePunterosAChar(splitDeRuta);
 	free(splitDeRuta);
-	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 

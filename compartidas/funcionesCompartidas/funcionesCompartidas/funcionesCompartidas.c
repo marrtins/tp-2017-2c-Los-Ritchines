@@ -31,7 +31,7 @@ char * obtenerUltimoElementoDeUnSplit(char ** palabras){
 		ultimaPalabra = palabras[i];
 		i++;
 	}
-	return ultimaPalabra;
+	return strdup(ultimaPalabra);
 }
 
 char* deUnsignedLongLongAString(int number) {
