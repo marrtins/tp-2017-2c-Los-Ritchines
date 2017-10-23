@@ -733,7 +733,6 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 	//NODOS
 	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
 	char * nodosConNodoEliminado = eliminarNodoDelArrayDeNodos(nodos, nuevoNodo->nombre);
-
 	config_set_value(tablaDeNodos, "NODOS", nodosConNodoEliminado);
 
 	config_save(tablaDeNodos);
@@ -817,6 +816,7 @@ void conexionesDatanode(void * estructura){
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
+							break;
 						}
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
@@ -833,6 +833,10 @@ void conexionesDatanode(void * estructura){
 									mostrarBitmap(nuevoNodo->bitmap);
 								}
 								else{
+									//puede que esto no este bien
+									//habria que probarlo
+									infoBloque = recvInfoNodo(fileDescriptor);
+									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
 									list_add(listaDeNodos, buscarNodoPorFD(fileDescriptor));
 									borrarNodoDesconectadoPorFD(fileDescriptor);
 								}
