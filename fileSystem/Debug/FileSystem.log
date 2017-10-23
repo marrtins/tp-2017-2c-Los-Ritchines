@@ -241,3 +241,4 @@
 [ERROR] 19:42:28:134 FileSystem.log/(9000:9002): Error al recibir el tamanio del nombre del nodo
 [ERROR] 19:42:52:17 FileSystem.log/(9129:9131): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 19:44:57:687 FileSystem.log/(9135:9137): Error al recibir el tamanio del nombre del nodo
+[ERROR] 20:14:01:647 FileSystem.log/(9772:9774): Error al recibir el tamanio del nombre del nodo

@@ -684,6 +684,70 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	free(nodosConNodoAgregado);
 }
 
+char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre){
+	char * nuevoString = string_new();
+	int i = 0;
+	string_append(&nuevoString, "[");
+	while(nodos[i] != NULL){
+		if(strcmp(nodos[i], nombre)){
+			string_append(&nuevoString, nodos[i]);
+			string_append(&nuevoString, ",");
+		}
+		i++;
+	}
+	string_append(&nuevoString, "]");
+	return nuevoString;
+}
+
+void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+
+	//NODONTOTAL
+	char * nodoTotalAString = string_new();
+	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
+	int nodoTotal = config_get_int_value(tablaDeNodos, nodoTotalAString);
+
+	//TAMANIO
+	int tamanio = config_get_int_value(tablaDeNodos, "TAMANIO");
+	tamanio -= nodoTotal;
+	char * tamanioString = string_itoa(tamanio);
+	config_set_value(tablaDeNodos, "TAMANIO", tamanioString);
+
+	//NODONLIBRE
+	char * nodoLibreAString = string_new();
+	string_append_with_format(&nodoLibreAString,"%sLibre", nuevoNodo->nombre);
+	int nodoLibre = config_get_int_value(tablaDeNodos, nodoLibreAString);
+
+	//LIBRE
+	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
+	libre -= nodoLibre;
+	char * libreString = string_itoa(libre);
+	config_set_value(tablaDeNodos, "LIBRE", libreString);
+
+	//SETEAR NODONTOTAL
+	config_set_value(tablaDeNodos, nodoTotalAString, "");
+
+	//SETEAR NODONLIBRE
+	config_set_value(tablaDeNodos, nodoLibreAString, "");
+
+	//NODOS
+	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
+	char * nodosConNodoEliminado = eliminarNodoDelArrayDeNodos(nodos, nuevoNodo->nombre);
+
+	config_set_value(tablaDeNodos, "NODOS", nodosConNodoEliminado);
+
+	config_save(tablaDeNodos);
+	config_destroy(tablaDeNodos);
+
+	free(nodoTotalAString);
+	free(nodoLibreAString);
+	free(libreString);
+	free(tamanioString);
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
+	free(nodosConNodoEliminado);
+}
+
 void conexionesDatanode(void * estructura){
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	fd_set readFD, masterFD;
@@ -749,6 +813,7 @@ void conexionesDatanode(void * estructura){
 						else if( estado == 0){
 							list_add(listaDeNodosDesconectados, buscarNodoPorFD(fileDescriptor));
 							borrarNodoPorFD(fileDescriptor);
+							eliminarNodoDeTablaDeNodos(nuevoNodo);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
