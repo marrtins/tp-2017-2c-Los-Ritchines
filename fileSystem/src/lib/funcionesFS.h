@@ -26,6 +26,7 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
 char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
 void inicializarTablaDeNodos();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
+void ocuparBloqueEnTablaArchivos(char * nombreNodo);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -33,7 +34,7 @@ bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
-void ocuparProximoBloqueBitmap(Tnodo * nodo);
+void ocuparProximoBloque(Tnodo * nodo);
 
 //Directorios
 int existeDirectorio(char * directorio);
