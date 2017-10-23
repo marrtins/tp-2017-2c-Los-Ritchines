@@ -328,7 +328,7 @@ int sumarListasPorTamanioDatabin(){
 
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
 	int tamanioEnMBDisponiblesEnNodos = sumarListasPorTamanioDatabin();
-	if(tamanioEnMBDisponiblesEnNodos < tamanioDelArchivoAGuardar){
+	if(tamanioEnMBDisponiblesEnNodos * BLOQUE_SIZE < tamanioDelArchivoAGuardar){
 		return -1;
 	}
 	return 0;
@@ -363,7 +363,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	}
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
-		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico tio.");
+		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		return -1;
 	}
 
