@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
 			printf("Error en la cantidad de parametros\n");
 			return EXIT_FAILURE;
 		}
-	//argv[1]= "/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/config_node2";
 
 	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
@@ -23,7 +22,7 @@ int main(int argc, char* argv[]) {
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 
 	fd = fileno(archivo);
-	if ((archivoMapeado = mmap(NULL, BLOQUE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+	if ((archivoMapeado = mmap(NULL, dataNode->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
 					logAndExit("Error al hacer mmap");
 			}
 	fclose(archivo);
@@ -58,6 +57,7 @@ int main(int argc, char* argv[]) {
 				puts("Es FileSystem y quiere almacenar un bloque");
 
 				bloque = recvBloque(socketFS);
+				puts("voy a almacenar el bloque");
 				setBloque(bloque->nroBloque, bloque);
 				puts("Bloque almacenado");
 
