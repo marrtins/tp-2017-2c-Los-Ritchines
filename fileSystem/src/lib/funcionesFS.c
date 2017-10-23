@@ -201,8 +201,8 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 	while(cantidadDeBloques != 0){
 
-		numeroBloqueEnString = malloc(3);
-		numeroBloqueEnString = malloc(3);
+		numeroBloqueEnString = malloc(4);
+		numeroBloqueEnString = malloc(4);
 
 		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
 		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
@@ -246,6 +246,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
+	free(rutaArchivo);
 
 }
 
@@ -344,9 +345,8 @@ void almacenarArchivo(char **palabras){
 		puts("Error al almacenar archivo, está vacío");
 		return;
 	}
-	else {
 
-		procesarArchivoSegunExtension(archivoAAlmacenar, archivoMapeado);
+	procesarArchivoSegunExtension(archivoAAlmacenar, archivoMapeado);
 
 		/*puts("El archivo no es vacio");
 		lineas = string_split(archivoMapeado,"\n");
@@ -387,15 +387,14 @@ void almacenarArchivo(char **palabras){
 			i++;
 
 		}*/
-		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
+	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 
-		close(fd);
+	close(fd);
 
-		liberarPunteroDePunterosAChar(splitDeRuta);
-		free(splitDeRuta);
-		free(nombreArchivoConExtension);
-		liberarTablaDeArchivo(archivoAAlmacenar);
-	}
+	liberarPunteroDePunterosAChar(splitDeRuta);
+	free(splitDeRuta);
+	free(nombreArchivoConExtension);
+	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
 void procesarInput(char* linea) {

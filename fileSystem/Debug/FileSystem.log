@@ -194,9 +194,17 @@
 [ERROR] 19:42:39:738 FileSystem.log/(5271:5273): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 19:42:41:855 FileSystem.log/(5274:5276): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 19:49:33:439 FileSystem.log/(5485:5487): Error al recibir el tamanio del nombre del nodo
+<<<<<<< HEAD
 [ERROR] 20:00:34:286 FileSystem.log/(6014:6016): Error al recibir el tamanio del nombre del nodo
 [ERROR] 20:01:05:157 FileSystem.log/(6261:6263): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 20:01:14:44 FileSystem.log/(6299:6301): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 20:01:22:402 FileSystem.log/(6303:6305): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 20:03:07:998 FileSystem.log/(6421:6423): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 21:12:05:599 FileSystem.log/(8143:8145): Error al recibir el tamanio del nombre del nodo
+=======
+[ERROR] 20:22:47:973 FileSystem.log/(5266:5268): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:23:07:964 FileSystem.log/(5270:5272): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:23:22:250 FileSystem.log/(5274:5276): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:23:35:715 FileSystem.log/(5279:5281): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:24:46:246 FileSystem.log/(5283:5285): Error al recibir el tamanio del nombre del nodo
+>>>>>>> 2eebbdf134cfcff2aa71bbeca3c07c2f2efd14fb
