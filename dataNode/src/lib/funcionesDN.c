@@ -46,10 +46,12 @@ void mostrarConfiguracion(TdataNode *dn){
 }
 
 void setBloque(int posicion, Tbloque * bloque){
+	unsigned long long bloqueSize = BLOQUE_SIZE;
+	char *aux = archivoMapeado;
 
-	memcpy(archivoMapeado + posicion* BLOQUE_SIZE, bloque->contenido,bloque->tamanioContenido);
+	memcpy(aux += posicion* bloqueSize, bloque->contenido,bloque->tamanioContenido);
 
-	if (msync((void *)archivoMapeado, strlen(bloque->contenido), MS_SYNC) < 0) {
+	if (msync((void *)archivoMapeado, bloque->tamanioContenido, MS_SYNC) < 0) {
 				logAndExit("Error al hacer msync");
 		}
 }
@@ -111,19 +113,13 @@ Tbloque * recvBloque(int socketFS) {
 	bloque->contenido = malloc(bloque->tamanioContenido);
 	contenidoBloque = malloc(bloque->tamanioContenido);
 
-	if ((estado = recv(socketFS, contenidoBloque, bloque->tamanioContenido, 0)) == -1) {
+	if ((estado = recv(socketFS, contenidoBloque, bloque->tamanioContenido, MSG_WAITALL)) == -1) {
 		logAndExit("Error al recibir el contenido del bloque");
 	}
 	printf("Para el contenido de bloque recibi %d bytes\n", estado);
 
-	if(estado < bloque->tamanioContenido){
-		puts("No recibi todo lo que tenia que recibir del contenido del bloque");
-		puts("CHAU MORI");
-		logAndExit("No recibi el bloque completo");
-	}
 	memcpy(bloque->contenido, contenidoBloque, bloque->tamanioContenido);
-
-
+	puts("hice el memcpy");
 	free(contenidoBloque);
 	return bloque;
 }
