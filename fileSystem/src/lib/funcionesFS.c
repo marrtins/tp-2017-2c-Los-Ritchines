@@ -348,10 +348,10 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	}
 
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
-		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
+		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 	else{
-		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
+		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 
 	liberarEstructuraBloquesAEnviar(infoBloque);
