@@ -290,6 +290,7 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 		if(bytesFaltantesPorEnviar < BLOQUE_SIZE){
 			memcpy(infoBloque->contenido,punteroAuxiliar,bytesFaltantesPorEnviar);
 			infoBloque->tamanio = bytesFaltantesPorEnviar;
+			bytesFaltantesPorEnviar = 0;
 		}
 		else {
 			posicionUltimoBarraN = posicionUltimoBarraN + BLOQUE_SIZE;
