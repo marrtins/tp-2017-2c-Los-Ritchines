@@ -321,7 +321,7 @@ int sumarListasPorTamanioDatabin(){
 		i++;
 		cantidadDeElementos--;
 	}
-
+	printf("La cantidad de MB disponibles en los datanodes es: %d", tamanioTotalDisponible);
 	return tamanioTotalDisponible;
 
 }
