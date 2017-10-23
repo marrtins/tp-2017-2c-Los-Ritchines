@@ -115,6 +115,12 @@ Tbloque * recvBloque(int socketFS) {
 		logAndExit("Error al recibir el contenido del bloque");
 	}
 	printf("Para el contenido de bloque recibi %d bytes\n", estado);
+
+	if(estado < bloque->tamanioContenido){
+		puts("No recibi todo lo que tenia que recibir del contenido del bloque");
+		puts("CHAU MORI");
+		logAndExit("No recibi el bloque completo");
+	}
 	memcpy(bloque->contenido, contenidoBloque, bloque->tamanioContenido);
 
 

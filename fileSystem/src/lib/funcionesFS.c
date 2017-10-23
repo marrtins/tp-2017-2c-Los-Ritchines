@@ -63,7 +63,8 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 
-	printf("Numero de bloque %d , Tamanio de bloque %llu, Cotenido de bloque \n %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
+	printf("Tamanio del buffer que se va a enviar %llu \n", buffer->tamanio);
 	 if ((estado = send(nodo1->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
@@ -200,8 +201,8 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 	while(cantidadDeBloques != 0){
 
-		numeroBloqueEnString = malloc(3);
-		numeroBloqueEnString = malloc(3);
+		numeroBloqueEnString = malloc(4);
+		numeroBloqueEnString = malloc(4);
 
 		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
 		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
@@ -245,6 +246,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
+	free(rutaArchivo);
 
 }
 
@@ -373,9 +375,8 @@ void almacenarArchivo(char **palabras){
 		puts("Error al almacenar archivo, está vacío");
 		return;
 	}
-	else {
 
-		procesarArchivoSegunExtension(archivoAAlmacenar, archivoMapeado);
+	procesarArchivoSegunExtension(archivoAAlmacenar, archivoMapeado);
 
 		/*puts("El archivo no es vacio");
 		lineas = string_split(archivoMapeado,"\n");
@@ -416,15 +417,14 @@ void almacenarArchivo(char **palabras){
 			i++;
 
 		}*/
-		guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
+	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 
-		close(fd);
+	close(fd);
 
-		liberarPunteroDePunterosAChar(splitDeRuta);
-		free(splitDeRuta);
-		free(nombreArchivoConExtension);
-		liberarTablaDeArchivo(archivoAAlmacenar);
-	}
+	liberarPunteroDePunterosAChar(splitDeRuta);
+	free(splitDeRuta);
+	free(nombreArchivoConExtension);
+	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
 void procesarInput(char* linea) {
@@ -503,6 +503,7 @@ void consolaFS(){
 	puts("Bienvenido a la consola. Ingrese un comando:");
 	while(1){
 		char *linea = readline(">");
+		add_history(linea);
 		procesarInput(linea);
 	}
 }
