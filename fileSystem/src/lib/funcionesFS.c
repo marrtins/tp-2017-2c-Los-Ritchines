@@ -310,7 +310,27 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	}
 }
 
-int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio){
+int sumarListasPorTamanioDatabin(){
+	int cantidadDeElementos = listaDeNodos->elements_count;
+	int tamanioTotalDisponible = 0;
+	int i = 0;
+	Tnodo * nodo;
+	while(cantidadDeElementos != 0){
+		nodo = list_get(listaDeNodos, i);
+		tamanioTotalDisponible += nodo->cantidadBloquesLibres;
+		i++;
+		cantidadDeElementos--;
+	}
+
+	return tamanioTotalDisponible;
+
+}
+
+int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
+	int tamanioEnMBDisponiblesEnNodos = sumarListasPorTamanioDatabin();
+	if(tamanioEnMBDisponiblesEnNodos < tamanioDelArchivoAGuardar){
+		return -1;
+	}
 	return 0;
 }
 
@@ -343,7 +363,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	}
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
-		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico tio");
+		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico tio.");
 		return -1;
 	}
 
