@@ -270,21 +270,21 @@ unsigned long fsize(FILE* f){
 
 }
 
-Tbuffer *empaquetarBloque(Theader * head, int nroBloque, unsigned long long tamanio, char *contenido){
+Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 
 	Tbuffer *buffer = malloc(sizeof(Tbuffer));
-	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + tamanio);
+	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio);
 	char *chorroBytes = malloc(buffer->tamanio);
 
 	char * p = chorroBytes;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
-	memcpy(p, &nroBloque, sizeof(int));
+	memcpy(p, &nodo->primerBloqueLibreBitmap, sizeof(int));
 	p += sizeof(int);
-	memcpy(p, &tamanio, sizeof(unsigned long long));
+	memcpy(p, &bloque->tamanio, sizeof(unsigned long long));
 	p += sizeof(unsigned long long);
-	memcpy(p, contenido, tamanio);
-	p += tamanio;
+	memcpy(p, bloque->contenido, bloque->tamanio);
+	p += bloque->tamanio;
 
 	buffer->buffer = malloc(buffer->tamanio);
 	buffer->buffer = chorroBytes;
