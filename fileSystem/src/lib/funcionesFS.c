@@ -328,7 +328,8 @@ int sumarListasPorTamanioDatabin(){
 
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
 	int tamanioEnMBDisponiblesEnNodos = sumarListasPorTamanioDatabin();
-	if(tamanioEnMBDisponiblesEnNodos < tamanioDelArchivoAGuardar){
+	//se multiplica por 2 por que se guarda 1 copia en otro nodo
+	if(tamanioEnMBDisponiblesEnNodos * BLOQUE_SIZE < tamanioDelArchivoAGuardar * 2){
 		return -1;
 	}
 	return 0;
@@ -363,7 +364,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	}
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
-		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico tio.");
+		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		return -1;
 	}
 
@@ -397,10 +398,8 @@ void almacenarArchivo(char **palabras){
 	}
 
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
-
 	liberarPunteroDePunterosAChar(splitDeRuta);
 	free(splitDeRuta);
-	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
@@ -603,6 +602,12 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	 return infoBloque;
 }
 
+void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt");
+	//config_set_value();
+	config_destroy(tablaDeNodos);
+}
+
 void conexionesDatanode(void * estructura){
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	fd_set readFD, masterFD;
@@ -682,6 +687,7 @@ void conexionesDatanode(void * estructura){
 									printf("Para el nro de bloque recibi %d bytes\n", estado);
 									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
 									list_add(listaDeNodos, nuevoNodo);
+									agregarNodoATablaDeNodos(nuevoNodo);
 									puts("Nodo inicializado y guardado en la lista");
 									mostrarBitmap(nuevoNodo->bitmap);
 								}
