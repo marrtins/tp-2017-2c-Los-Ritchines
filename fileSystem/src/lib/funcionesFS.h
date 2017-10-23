@@ -24,6 +24,7 @@ void levantarTablas(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
+char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);

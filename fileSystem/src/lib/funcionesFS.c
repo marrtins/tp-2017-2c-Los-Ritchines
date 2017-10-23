@@ -513,7 +513,6 @@ void* buscarNodoPorFD(int fd){
 }
 
 void borrarNodoDesconectadoPorFD(int fd){
-	Tnodo* nodoABorrar = (Tnodo*)buscarNodoPorFD(fd);
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd==fd;
@@ -522,7 +521,6 @@ void borrarNodoDesconectadoPorFD(int fd){
 }
 
 void borrarNodoPorFD(int fd){
-	Tnodo* nodoABorrar = (Tnodo*)buscarNodoPorFD(fd);
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd==fd;
@@ -602,10 +600,72 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	 return infoBloque;
 }
 
+char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo){
+	puts("Estoy adentro de la funcion que appendea");
+	char * nuevoString = string_new();
+	int i = 0;
+	string_append(&nuevoString, "[");
+	puts("Voy a hacer el while");
+	while(nodos[i] != NULL){
+		string_append(&nuevoString, nodos[i]);
+		string_append(&nuevoString, ",");
+		i++;
+	}
+	string_append(&nuevoString, nombreNodo);
+	string_append(&nuevoString, "]");
+	puts("Por salir");
+	return nuevoString;
+}
+
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
-	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt");
-	//config_set_value();
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+
+	puts("TAMANIO");
+	//TAMANIO
+	int tamanio = config_get_int_value(tablaDeNodos, "TAMANIO");
+	tamanio += nuevoNodo->cantidadBloquesTotal;
+	char * tamanioString = string_itoa(tamanio);
+	config_set_value(tablaDeNodos, "TAMANIO", tamanioString);
+
+	puts("LIBRE");
+	//LIBRE
+	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
+	libre += nuevoNodo->cantidadBloquesLibres;
+	char * libreString = string_itoa(libre);
+	config_set_value(tablaDeNodos, "LIBRE", libreString);
+
+	puts("NODOS");
+	//NODOS
+	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
+	char * nodosConNodoAgregado = agregarNodoAArrayDeNodos(nodos, nuevoNodo->nombre);
+	puts(nodosConNodoAgregado);
+	puts("cargando Nodos");
+	config_set_value(tablaDeNodos, "NODOS", nodosConNodoAgregado);
+
+	puts("NODONTOTAL");
+	//agregar Nodos Dinamicamente
+	char * nodoTotalAString = string_new();
+	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
+	char * bloquesTotalString = string_itoa(nuevoNodo->cantidadBloquesTotal);
+	config_set_value(tablaDeNodos, nodoTotalAString, bloquesTotalString);
+
+	puts("NODONLIBRE");
+	char * nodoLibreAString = string_new();
+	string_append_with_format(&nodoLibreAString,"%sLibre", nuevoNodo->nombre);
+	char * bloquesLibresString = string_itoa(nuevoNodo->cantidadBloquesLibres);
+	config_set_value(tablaDeNodos, nodoLibreAString, bloquesLibresString);
+
+	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
+
+	free(nodoTotalAString);
+	free(nodoLibreAString);
+	free(libreString);
+	free(tamanioString);
+	free(nodos);
+	free(bloquesLibresString);
+	free(bloquesTotalString);
+	free(nodosConNodoAgregado);
 }
 
 void conexionesDatanode(void * estructura){
