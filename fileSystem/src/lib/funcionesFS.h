@@ -39,7 +39,7 @@ int buscarIndexPorNombreDeDirectorio(char * directorio);
 void* buscarPorNombreDeDirectorio(char * directorio);
 int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
-void crearDirectorio(char * ruta);
+int crearDirectorio(char * ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);

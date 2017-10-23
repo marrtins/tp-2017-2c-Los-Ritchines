@@ -106,25 +106,30 @@ void liberarEstructuraBuffer(Tbuffer * buffer){
 int existeDirectorio(char * directorio){
 
 	char ** carpetas = string_split(directorio, "/");
+	char * yamafs = malloc(10);
 	int i = 0;
 	int indicePadre = 0;
-
-	while(carpetas[i] != NULL){
-		Tdirectorio * estructuraDirectorio = (Tdirectorio*)buscarPorNombreDeDirectorio(carpetas[i]);
-		if(estructuraDirectorio != NULL){
-			if(estructuraDirectorio->padre == indicePadre){
-				indicePadre = estructuraDirectorio->index;
-				i++;
-			}else{
+	strcpy(yamafs,"yamafs:");
+	if (string_equals_ignore_case(carpetas[i], yamafs)) {
+		i++;
+		while (carpetas[i] != NULL) {
+			Tdirectorio * estructuraDirectorio = (Tdirectorio*) buscarPorNombreDeDirectorio(carpetas[i]);
+			if (estructuraDirectorio != NULL) {
+				if (estructuraDirectorio->padre == indicePadre) {
+					indicePadre = estructuraDirectorio->index;
+					i++;
+				} else {
+					return 0;
+				}
+			} else {
 				return 0;
 			}
 		}
-		else{
-			return 0;
-		}
-	}
 
-	return 1;
+		return 1;
+	} else {
+		return 0;
+	}
 
 }
 
@@ -423,10 +428,13 @@ void procesarInput(char* linea) {
 				puts("Existe el directorio");
 			}else {
 				puts("No existe el directorio"); //HAY QUE CREARLO
-				crearDirectorio(palabras[1]);
+				if(crearDirectorio(palabras[1])<0){
+					puts("El directorio no se pudo crear");
+				}else{
 				// cuando se crea un directorio, hay que comprobar
 				// que no supere los 100 elementos de la lista
 				printf("ya pude crear el directorio\n");
+				}
 			}
 		}
 		else{
@@ -886,10 +894,12 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 }
 int directorioNoExistente(char ** carpetas) {
 	int cant, indicePadre = 0, i = 0;
-
+	char * yamafs = malloc(10);
 	cant = contarPunteroDePunteros(carpetas);
-
-	for (i = 0; i < cant; i++) {
+	strcpy(yamafs,"yamafs:");
+	if (string_equals_ignore_case(carpetas[i], yamafs)) {
+			i++;
+	for (i = 1; i < cant; i++) {
 		Tdirectorio * estructuraDirectorio = (Tdirectorio*) buscarPorNombreDeDirectorio(carpetas[i]);
 		if (estructuraDirectorio != NULL) {
 			if (estructuraDirectorio->padre == indicePadre) {
@@ -902,6 +912,10 @@ int directorioNoExistente(char ** carpetas) {
 		}
 	}
 	return -1;
+	}else{
+		puts("Falta la referencia al filesystem local : 'yamafs:'");
+		return -1;
+	}
 }
 
 bool ordenarListaPorMayor(void * directorio1, void * directorio2){
@@ -920,30 +934,35 @@ int buscarIndexMayor(){
 	return directorio->index;
 }
 
-void crearDirectorio(char * ruta){
-	int nroDirectorio,cant, index,indicePadre;
+int crearDirectorio(char * ruta) {
+	int nroDirectorio, cant, index, indicePadre;
 	char ** carpetas = string_split(ruta, "/");
 	cant = contarPunteroDePunteros(carpetas);
 	char* directorio = malloc(40);
-	strcpy(directorio,"src/metadata/archivos/");
+	strcpy(directorio, "src/metadata/archivos/");
 	char * indice;
-	if((nroDirectorio = directorioNoExistente(carpetas)) < 0){
-		puts("El directorio existe");
+	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
+		puts("El directorio no se puede crear");
+		return -1;
+	} else {
+		if (nroDirectorio == cant - 1) {
+			index = buscarIndexMayor() + 1;
+			indicePadre = buscarIndexPorNombreDeDirectorio(
+					carpetas[nroDirectorio - 1]);
+			printf("Indice padre del nuevo directorio %d\n", indicePadre);
+			printf("Index asignado al nuevo directorio %d\n", index);
+			indice = string_itoa(index);
+			string_append(&directorio, indice);
+			syscall(SYS_mkdir, directorio);
+			printf("Cree directorio %s\n", carpetas[nroDirectorio]);
+			return 0;
+		} else {
+			puts(
+					"No se puede crear directorio dentro de un directorio que no existe");
+			return -1;
+		}
+		free(indice);
 	}
-	if (nroDirectorio == cant -1){
-		index = buscarIndexMayor()+ 1;
-		indicePadre =buscarIndexPorNombreDeDirectorio(carpetas[nroDirectorio-1]);
-		printf("Indice padre del nuevo directorio %d\n",indicePadre);
-		printf("Index asignado al nuevo directorio %d\n",index);
-		indice = string_itoa(index);
-		string_append(&directorio, indice);
-		syscall(SYS_mkdir, directorio);
-		printf("Cree directorio %s\n",carpetas[nroDirectorio]);
-	}else{
-		puts("No se puede crear directorio dentro de un directorio que no existe");
-	}
-	free(indice);
-
 }
 
 int getMD5(char**palabras){
