@@ -42,7 +42,7 @@ int buscarIndexPorNombreDeDirectorio(char * directorio);
 void* buscarPorNombreDeDirectorio(char * directorio);
 int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
-void crearDirectorio(char * ruta);
+int crearDirectorio(char * ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
@@ -51,6 +51,7 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
+void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
