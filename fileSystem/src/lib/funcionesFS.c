@@ -398,10 +398,8 @@ void almacenarArchivo(char **palabras){
 	}
 
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
-
 	liberarPunteroDePunterosAChar(splitDeRuta);
 	free(splitDeRuta);
-	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
