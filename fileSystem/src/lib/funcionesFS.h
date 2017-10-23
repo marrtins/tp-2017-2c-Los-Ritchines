@@ -20,11 +20,13 @@ void conexionesDatanode(void * estructura);
 void levantarTablasDirectorios();
 void levantarTablaArchivo(Tarchivo * tablaArchivos);
 void levantarTablaNodos(Tnodos * tablaNodos);
-void levantarTablas(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
 char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
+
+//Listas
+bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -36,6 +38,8 @@ int existeDirectorio(char * directorio);
 int obtenerIndexDeUnaRuta(char * rutaDestino);
 int buscarIndexPorNombreDeDirectorio(char * directorio);
 void* buscarPorNombreDeDirectorio(char * directorio);
+int buscarIndexMayor();
+int directorioNoExistente(char ** carpetas);
 void crearDirectorio(char * ruta);
 
 //Almacenar Archivo
@@ -57,7 +61,7 @@ int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 //md5
 int getMD5(char**palabras);
 
-//Archivoa
+//Archivos
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);

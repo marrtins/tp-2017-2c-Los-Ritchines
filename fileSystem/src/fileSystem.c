@@ -35,12 +35,10 @@ int main(int argc, char* argv[]) {
 	listaDeNodosDesconectados = list_create();
 	listaTablaDirectorios = list_create();
 
-	levantarTablas(tablaNodos);
-	levantarTablaArchivo(tablaArchivos);
+	levantarTablasDirectorios();
+
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
-
-
 
 	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);

@@ -7,5 +7,6 @@
 #include <commons/bitarray.h>
 #include <math.h>
 #include <sys/mman.h>
+#include <sys/syscall.h>
 
 #endif

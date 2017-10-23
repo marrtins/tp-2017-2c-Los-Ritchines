@@ -338,3 +338,68 @@ TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char *
 	return infoBloque;
 
 }
+
+char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int bytesOcupadosBloque,int nombreTemporalLen ,char* nombreTemporal, int *pack_size){
+
+	char *bytes_serial;
+	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int)*3 + nombreTemporalLen)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &nroBloque, sizeof (int));
+	*pack_size += sizeof (int);
+
+	memcpy(bytes_serial + *pack_size, &bytesOcupadosBloque, sizeof (int));
+	*pack_size += sizeof (int);
+
+	memcpy(bytes_serial + *pack_size, &nombreTemporalLen, sizeof (int));
+	*pack_size += sizeof (int);
+
+	memcpy(bytes_serial + *pack_size, nombreTemporal, nombreTemporalLen);
+	*pack_size += nombreTemporalLen;
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	printf("Pack size: %d\n",*pack_size);
+	return bytes_serial;
+}
+
+
+TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes_serial){
+
+	int off;
+	TpackDatosTransformacion *datosTransf;
+
+	if ((datosTransf = malloc(sizeof *datosTransf)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete datos transf\n");
+		return NULL;
+	}
+
+	off = 0;
+	memcpy(&datosTransf->nroBloque, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	memcpy(&datosTransf->bytesOcupadosBloque, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	memcpy(&datosTransf->nombreTemporalLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((datosTransf->nombreTemporal = malloc(datosTransf->nombreTemporalLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", datosTransf->nombreTemporalLen);
+		return NULL;
+	}
+
+	memcpy(datosTransf->nombreTemporal, bytes_serial + off, datosTransf->nombreTemporalLen);
+	off += datosTransf->nombreTemporalLen;
+
+	return datosTransf;
+}

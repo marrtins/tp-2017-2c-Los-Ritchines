@@ -423,6 +423,7 @@ void procesarInput(char* linea) {
 				puts("Existe el directorio");
 			}else {
 				puts("No existe el directorio"); //HAY QUE CREARLO
+				crearDirectorio(palabras[1]);
 				// cuando se crea un directorio, hay que comprobar
 				// que no supere los 100 elementos de la lista
 				printf("ya pude crear el directorio\n");
@@ -921,12 +922,6 @@ void levantarTablaNodos(Tnodos * tablaNodos){
 	config_destroy(archivoNodos);
 }
 
-void levantarTablas(Tnodos * tablaNodos){
-	levantarTablasDirectorios();
-	levantarTablaNodos(tablaNodos);
-	mostrarDirectorios(); //no hace nada, pero deberia
-}
-
 void mostrarBitmap(t_bitarray* bitmap){
 	int i;
 	puts("El bitmap es:");
@@ -949,9 +944,66 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	free(tablaDeArchivos->bloques);
 	free(tablaDeArchivos);
 }
+int directorioNoExistente(char ** carpetas) {
+	int cant, indicePadre = 0, i = 0;
+
+	cant = contarPunteroDePunteros(carpetas);
+
+	for (i = 0; i < cant; i++) {
+		Tdirectorio * estructuraDirectorio = (Tdirectorio*) buscarPorNombreDeDirectorio(carpetas[i]);
+		if (estructuraDirectorio != NULL) {
+			if (estructuraDirectorio->padre == indicePadre) {
+				indicePadre = estructuraDirectorio->index;
+			} else {
+				return i;
+			}
+		} else {
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool ordenarListaPorMayor(void * directorio1, void * directorio2){
+	Tdirectorio * directorioA = (Tdirectorio*)directorio1;
+	Tdirectorio * directorioB = (Tdirectorio*)directorio2;
+
+	int obtenerDirectorio(Tdirectorio *directorio) {
+		return directorio->index;
+	}
+	return obtenerDirectorio(directorioA) >= obtenerDirectorio(directorioB);
+}
+
+int buscarIndexMayor(){
+	list_sort(listaTablaDirectorios,ordenarListaPorMayor);
+	Tdirectorio * directorio = (Tdirectorio*)list_get(listaTablaDirectorios,0);
+	return directorio->index;
+}
 
 void crearDirectorio(char * ruta){
-	mkdir(ruta, 0700);
+	int nroDirectorio,cant, index,indicePadre;
+	char ** carpetas = string_split(ruta, "/");
+	cant = contarPunteroDePunteros(carpetas);
+	char* directorio = malloc(40);
+	strcpy(directorio,"src/metadata/archivos/");
+	char * indice;
+	if((nroDirectorio = directorioNoExistente(carpetas)) < 0){
+		puts("El directorio existe");
+	}
+	if (nroDirectorio == cant -1){
+		index = buscarIndexMayor()+ 1;
+		indicePadre =buscarIndexPorNombreDeDirectorio(carpetas[nroDirectorio-1]);
+		printf("Indice padre del nuevo directorio %d\n",indicePadre);
+		printf("Index asignado al nuevo directorio %d\n",index);
+		indice = string_itoa(index);
+		string_append(&directorio, indice);
+		syscall(SYS_mkdir, directorio);
+		printf("Cree directorio %s\n",carpetas[nroDirectorio]);
+	}else{
+		puts("No se puede crear directorio dentro de un directorio que no existe");
+	}
+	free(indice);
+
 }
 
 int getMD5(char**palabras){
