@@ -618,6 +618,20 @@ char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo){
 	return nuevoString;
 }
 
+void inicializarTablaDeNodos(){
+	puts("antes de borrar");
+	remove("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	puts("despues de borrar");
+	FILE * archivo = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", "wb");
+	fclose(archivo);
+	t_config * archivoNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	config_set_value(archivoNodos, "TAMANIO", "0");
+	config_set_value(archivoNodos, "LIBRE","0");
+	config_set_value(archivoNodos, "NODOS", "[]");
+	config_save(archivoNodos);
+	config_destroy(archivoNodos);
+}
+
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
@@ -663,6 +677,7 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	free(nodoLibreAString);
 	free(libreString);
 	free(tamanioString);
+	liberarPunteroDePunterosAChar(nodos);
 	free(nodos);
 	free(bloquesLibresString);
 	free(bloquesTotalString);
