@@ -678,21 +678,18 @@ void inicializarTablaDeNodos(){
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
-	puts("TAMANIO");
 	//TAMANIO
 	int tamanio = config_get_int_value(tablaDeNodos, "TAMANIO");
 	tamanio += nuevoNodo->cantidadBloquesTotal;
 	char * tamanioString = string_itoa(tamanio);
 	config_set_value(tablaDeNodos, "TAMANIO", tamanioString);
 
-	puts("LIBRE");
 	//LIBRE
 	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
 	libre += nuevoNodo->cantidadBloquesLibres;
 	char * libreString = string_itoa(libre);
 	config_set_value(tablaDeNodos, "LIBRE", libreString);
 
-	puts("NODOS");
 	//NODOS
 	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
 	char * nodosConNodoAgregado = agregarNodoAArrayDeNodos(nodos, nuevoNodo->nombre);
@@ -700,14 +697,12 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	puts("cargando Nodos");
 	config_set_value(tablaDeNodos, "NODOS", nodosConNodoAgregado);
 
-	puts("NODONTOTAL");
 	//agregar Nodos Dinamicamente
 	char * nodoTotalAString = string_new();
 	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
 	char * bloquesTotalString = string_itoa(nuevoNodo->cantidadBloquesTotal);
 	config_set_value(tablaDeNodos, nodoTotalAString, bloquesTotalString);
 
-	puts("NODONLIBRE");
 	char * nodoLibreAString = string_new();
 	string_append_with_format(&nodoLibreAString,"%sLibre", nuevoNodo->nombre);
 	char * bloquesLibresString = string_itoa(nuevoNodo->cantidadBloquesLibres);
