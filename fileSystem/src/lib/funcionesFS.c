@@ -63,7 +63,8 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 
 	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
 
-	printf("Numero de bloque %d , Tamanio de bloque %llu, Cotenido de bloque \n %s \n", bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
+	printf("Tamanio del buffer que se va a enviar %llu \n", buffer->tamanio);
 	 if ((estado = send(nodo1->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }

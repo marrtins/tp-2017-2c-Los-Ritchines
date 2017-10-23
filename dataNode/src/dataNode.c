@@ -10,16 +10,17 @@ int main(int argc, char* argv[]) {
 	Theader *head = malloc(sizeof(Theader));
 	Tbloque * bloque;
 
+	if(argc!=2){
+			printf("Error en la cantidad de parametros\n");
+			return EXIT_FAILURE;
+		}
+	//argv[1]= "/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/config_node2";
+
 	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
-
-	if(argc!=2){
-			printf("Error en la cantidad de parametros\n");
-			return EXIT_FAILURE;
-		}
 
 	fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, BLOQUE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
@@ -38,19 +39,21 @@ int main(int argc, char* argv[]) {
 	estado = enviarInfoNodo(socketFS, dataNode);
 	printf("Envie %d bytes con la informacion del nodo\n",estado);
 
-	if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {
-		logAndExit("Error al recibir informacion");
+	while (1) {
 
-	} else if (estado == 0) {
-		sprintf(mensaje, "Se desconecto el socket de fd: %d\n", socketFS);
-		log_trace(logger, mensaje);
+		if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {
+			logAndExit("Error al recibir informacion");
+			break;
 
-	}
-	printf("Recibi %d bytes\n",estado);
+		} else if (estado == 0) {
+			sprintf(mensaje, "Se desconecto el socket de fd: %d\n", socketFS);
+			log_trace(logger, mensaje);
+			break;
+		}
+		printf("Recibi el head %d bytes\n", estado);
 
-
-	if(head->tipo_de_proceso == FILESYSTEM){
-		switch(head->tipo_de_mensaje){
+		if (head->tipo_de_proceso == FILESYSTEM) {
+			switch (head->tipo_de_mensaje) {
 			case ALMACENAR_BLOQUE:
 				puts("Es FileSystem y quiere almacenar un bloque");
 
@@ -58,15 +61,16 @@ int main(int argc, char* argv[]) {
 				setBloque(bloque->nroBloque, bloque);
 				puts("Bloque almacenado");
 
-				//hacer free de bloque
+				free(bloque->contenido);
+				free(bloque);
 
 				break;
-			default:;
+			default:
+				break;
+			}
+
+		}
 	}
-
-
-}
-	while(1);
 
 
 	free(head);
