@@ -3,6 +3,7 @@
 
 #include <funcionesCompartidas/serializacion.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 #include <commons/bitarray.h>
 #include <math.h>
 #include <sys/mman.h>

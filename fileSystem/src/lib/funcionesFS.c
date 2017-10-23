@@ -473,6 +473,7 @@ void consolaFS(){
 	puts("Bienvenido a la consola. Ingrese un comando:");
 	while(1){
 		char *linea = readline(">");
+		add_history(linea);
 		procesarInput(linea);
 	}
 }
