@@ -284,12 +284,10 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	unsigned long long bytesFaltantesPorEnviar = archivoAAlmacenar->tamanioTotal;
 	unsigned long long posicionUltimoBarraN = 0;
 	unsigned long long bytesCopiados = 0;
-	infoBloque->numeroDeBloque = 0;
 
 
 	while(bytesFaltantesPorEnviar > 0){
 		if(bytesFaltantesPorEnviar < BLOQUE_SIZE){
-			infoBloque->contenido = malloc(bytesFaltantesPorEnviar);
 			memcpy(infoBloque->contenido,punteroAuxiliar,bytesFaltantesPorEnviar);
 			infoBloque->tamanio = bytesFaltantesPorEnviar;
 		}
@@ -298,7 +296,6 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 			while(archivoMapeado[posicionUltimoBarraN] != '\n'){
 				posicionUltimoBarraN--;
 			}
-			infoBloque->contenido = malloc(posicionUltimoBarraN - bytesCopiados);
 			memcpy(infoBloque->contenido,punteroAuxiliar,posicionUltimoBarraN);
 			infoBloque->tamanio = posicionUltimoBarraN - bytesCopiados;
 			bytesCopiados = posicionUltimoBarraN;
