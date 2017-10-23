@@ -209,4 +209,8 @@
 [ERROR] 15:41:16:505 FileSystem.log/(3495:3497): Error al recibir el tamanio del nombre del nodo
 [ERROR] 15:43:24:130 FileSystem.log/(3759:3759): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 12:44:57:362 FileSystem.log/(2471:2473): Error al recibir el tamanio del nombre del nodo
-[ERROR] 15:21:35:633 FileSystem.log/(4925:4927): Error al recibir el tamanio del nombre del nodo
+[ERROR] 15:21:35:633 FileSystem.log/(4925:4927): Error al recibir el tamanio del nombre del nodo[ERROR] 15:51:31:739 FileSystem.log/(5805:5805): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 15:55:28:329 FileSystem.log/(6022:6022): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 16:15:13:571 FileSystem.log/(6470:6470): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 16:16:42:539 FileSystem.log/(6594:6594): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 16:58:11:33 FileSystem.log/(7307:7307): Fallo la aceptacion del cliente, del FD servidor (fileSystem
