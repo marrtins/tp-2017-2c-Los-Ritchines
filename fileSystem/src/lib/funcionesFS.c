@@ -309,6 +309,10 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	}
 }
 
+int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio){
+	return 0;
+}
+
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo){
 	FILE * archivoOrigen = fopen(nombreArchivo, "r");
 	int fd = fileno(archivoOrigen);
@@ -337,8 +341,9 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		return -1;
 	}
 
-	if(verificarDisponibilidadDeEspacioEnNodos() == -1){
-
+	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
+		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico tio");
+		return -1;
 	}
 
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){

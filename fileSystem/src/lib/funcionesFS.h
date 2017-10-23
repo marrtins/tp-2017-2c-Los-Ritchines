@@ -50,12 +50,13 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);
+int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 
 //md5
 int getMD5(char**palabras);
 
 //Archivoa
-void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
+int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 
