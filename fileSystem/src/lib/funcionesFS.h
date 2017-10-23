@@ -22,6 +22,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos);
 void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
+void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
