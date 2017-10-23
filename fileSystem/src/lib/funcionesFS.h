@@ -55,7 +55,7 @@ void borrarNodoDesconectadoPorFD(int fd);
 int getMD5(char**palabras);
 
 //Archivoa
-void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado);
+void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 

@@ -312,16 +312,38 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	}
 }
 
-void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoMapeado){
+void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo){
+	FILE * archivoOrigen = fopen(nombreArchivo, "r");
+	int fd = fileno(archivoOrigen);
+	char * archivoMapeado;
+	unsigned long long tamanio = tamanioArchivo(archivoOrigen);
+	archivoAAlmacenar->tamanioTotal = tamanio;
 	TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
 	infoBloque->numeroDeBloque = 0;
 	infoBloque->contenido = malloc(BLOQUE_SIZE);
+
+	printf("El tamaño del archivo es: %llu\n", tamanio);
+
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		logAndExit("Error al hacer mmap");
+	}
+
+	fclose(archivoOrigen);
+	close(fd);
+
+	archivoAAlmacenar->bloques = malloc(sizeof(Tbloques) * cantidadDeBloquesDeUnArchivo(tamanio));
+
+	printf("La cantidad de bloquees es: %d \n", cantidadDeBloquesDeUnArchivo(tamanio));
+
+	if(tamanio == 0){
+		puts("Error al almacenar archivo, está vacío");
+		return;
+	}
 
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin") == 0){
 		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 	else{
-
 		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 
@@ -331,7 +353,6 @@ void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * archivoM
 void almacenarArchivo(char **palabras){
 	//palabras[1] --> ruta archivo a almacenar
 	//palabras[2] --> ruta de nuestro directorio
-	char * archivoMapeado;
 	char ** splitDeRuta = string_split(palabras[1], "/");
 	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
 	printf("El archivo a guardar es: %s\n", nombreArchivoConExtension);
@@ -343,83 +364,9 @@ void almacenarArchivo(char **palabras){
 	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
 	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
-	//esto va adentro de la funcion que voy a llamar
-	//unsigned long long bytesDisponiblesEnBloque = BLOQUE_SIZE;
+	procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]);
 
-	//esto tiene que ir adentro de la funcion que voy a llamar
-	//para no tener que pasarselo a procesarSegunExtension
-	/*TbloqueAEnviar * infoBloque = malloc(sizeof(TbloqueAEnviar));
-	infoBloque->numeroDeBloque = 0;
-	infoBloque->contenido = malloc(BLOQUE_SIZE);*/
-
-	FILE * archivoOrigen = fopen(palabras[1], "r");
-	int fd = fileno(archivoOrigen);
-
-	unsigned long long tamanio = tamanioArchivo(archivoOrigen);
-	archivoAAlmacenar->tamanioTotal = tamanio;
-
-	printf("El tamaño del archivo es: %llu\n", tamanio);
-
-
-	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
-	}
-
-	fclose(archivoOrigen);
-
-	archivoAAlmacenar->bloques = malloc(sizeof(Tbloques) * cantidadDeBloquesDeUnArchivo(tamanio));
-
-	printf("La cantidad de bloquees es: %d \n", cantidadDeBloquesDeUnArchivo(tamanio));
-
-	if(tamanio == 0){
-		puts("Error al almacenar archivo, está vacío");
-		return;
-	}
-
-	procesarArchivoSegunExtension(archivoAAlmacenar, archivoMapeado);
-
-		/*puts("El archivo no es vacio");
-		lineas = string_split(archivoMapeado,"\n");
-		puts("Pude splitear el archivo mapeado.");
-		int i = 0;
-		printf("%c = caracter final\n",archivoMapeado[tamanio-1]);*/
-
-		/*while(lineas[i]!=NULL){
-			//+1 por el \n faltante
-			if(lineas[i+1] == NULL){
-				puts("Bloque no lleno, cargandolo...");
-				bytesDisponiblesEnBloque -= strlen(lineas[i])+1;
-				string_append(&infoBloque->contenido,lineas[i]);
-				if(lineas[i+2] != NULL){
-					string_append(&infoBloque->contenido,"\n");
-				}
-				if(lineas[i+1] == NULL && archivoMapeado[tamanio-1] == '\n'){
-					string_append(&infoBloque->contenido,"\n");
-
-				}
-			}
-			if((bytesDisponiblesEnBloque - strlen(lineas[i]) +1 < 0) || lineas[i+1] == NULL){
-				infoBloque->tamanio = BLOQUE_SIZE - bytesDisponiblesEnBloque;
-				archivoAAlmacenar->bloques->bytes = infoBloque->tamanio;
-				enviarBloque(infoBloque, archivoAAlmacenar);
-				bytesDisponiblesEnBloque = BLOQUE_SIZE;
-				infoBloque->numeroDeBloque++;
-			}
-			else{
-				puts("Bloque no lleno, cargandolo...");
-				bytesDisponiblesEnBloque -= strlen(lineas[i])+1;
-				string_append(&infoBloque->contenido,lineas[i]);
-				if(lineas[i+1] != NULL){
-					string_append(&infoBloque->contenido,"\n");
-				}
-
-			}
-			i++;
-
-		}*/
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
-
-	close(fd);
 
 	liberarPunteroDePunterosAChar(splitDeRuta);
 	free(splitDeRuta);
