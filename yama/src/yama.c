@@ -13,7 +13,7 @@ int main(int argc, char* argv[]){
 	pthread_t master_thread;
 	struct sockaddr client;
 	Theader head;
-	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
+//	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	listaHistoricaTareas=list_create();
 	listaCargaGlobal = list_create();

@@ -23,7 +23,8 @@ typedef enum {
 	INFOULTIMOBLOQUE=17,
 	INFOCONEXIONWORKER=18,
 	TRANSFORMADORLEN=19,
-	ALMACENAR_BLOQUE=20
+	ALMACENAR_BLOQUE=20,
+	NUEVATRANSFORMACION=21
 } Tmensaje;
 
 typedef enum {
@@ -128,8 +129,8 @@ typedef struct {
 typedef struct {
 	Theader head;
 	int nroBloque;
-	int cantidadBytes;
-	int temporalLen;
+	int bytesOcupadosBloque;
+	int nombreTemporalLen;
 	char * nombreTemporal;
 }TpackDatosTransformacion;
 

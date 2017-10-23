@@ -29,7 +29,8 @@ void workerHandler(void *info){
 	int len,offset,remain_data,sent_bytes;
 	struct stat file_stat;
 	char file_size[sizeof(int)];
-
+	char *buffer;
+	int packSize;
 
 	if((sockWorker = conectarAServidor(infoBloque->ipWorker, infoBloque->puertoWorker))<0){
 		puts("No pudo conectarse a worker");
@@ -40,13 +41,27 @@ void workerHandler(void *info){
 
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
-	Theader *headEnvio=malloc(sizeof headEnvio);
-	headEnvio->tipo_de_proceso=MASTER;
-	headEnvio->tipo_de_mensaje=TRANSFORMADORLEN;
 
-	enviarHeader(sockWorker,headEnvio);
+	//enviarHeader(sockWorker,headEnvio);
+
+	//Envio al worker el nro de bloque, el tamaño y el nombre temporal
+	Theader headASerializar;
+	headASerializar.tipo_de_mensaje=NUEVATRANSFORMACION;
+	headASerializar.tipo_de_proceso=MASTER;
+
+	buffer = serializarInfoTransformacionMasterWorker(headASerializar,infoBloque->bloque,infoBloque->bytesOcupados,infoBloque->nombreTemporalLen,infoBloque->nombreTemporal,&packSize);
 
 
+	printf("Info de la transformacion serializada, enviamos\n");
+	if ((stat = send(sockWorker, buffer, packSize, 0)) == -1){
+		puts("no se pudo enviar info de la trasnformacion");
+		return;
+	}
+	printf("se enviaron %d bytes de la info de la transformacion\n",stat);
+
+
+
+	//envio el script
 	fdTransformador = open(rutaTransformador, O_RDONLY);
 	if (fdTransformador == -1){
 		fprintf(stderr, "Error abriendo archivo transformador --> %s", strerror(errno));
@@ -87,7 +102,7 @@ void workerHandler(void *info){
 
 		switch (headRcv.tipo_de_mensaje) {
 		case(FIN_LOCALTRANSF):
-						printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
+			printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
 		break;
 		default:
 			break;

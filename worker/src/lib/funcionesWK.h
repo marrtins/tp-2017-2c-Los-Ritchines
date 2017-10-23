@@ -6,4 +6,6 @@
 Tworker *obtenerConfiguracionWorker(char* ruta);
 void mostrarConfiguracion(Tworker *worker);
 
+void manejarConexionMaster(Theader *header,int client_sock);
+
 #endif
