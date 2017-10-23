@@ -250,3 +250,10 @@
 [ERROR] 19:44:57:687 FileSystem.log/(9135:9137): Error al recibir el tamanio del nombre del nodo
 [ERROR] 20:14:01:647 FileSystem.log/(9772:9774): Error al recibir el tamanio del nombre del nodo
 >>>>>>> fb47fe702fede09d3544e9c351030f4fafd7eb2b
+[ERROR] 20:36:20:706 FileSystem.log/(12642:12644): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:36:24:444 FileSystem.log/(12645:12647): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:36:28:917 FileSystem.log/(12648:12650): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:36:34:525 FileSystem.log/(12687:12689): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:36:39:825 FileSystem.log/(12725:12727): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:36:45:420 FileSystem.log/(12763:12765): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 20:37:02:599 FileSystem.log/(12882:12884): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.

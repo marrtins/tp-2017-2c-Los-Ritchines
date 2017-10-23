@@ -167,6 +167,7 @@ int existeDirectorio(char * directorio){
 
 		return 1;
 	} else {
+		puts("Para referirse al filesystem colocar 'yamafs:' al principio de la ruta");
 		return 0;
 	}
 
