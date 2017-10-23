@@ -309,7 +309,7 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	}
 }
 
-void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo){
+int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo){
 	FILE * archivoOrigen = fopen(nombreArchivo, "r");
 	int fd = fileno(archivoOrigen);
 	char * archivoMapeado;
@@ -334,10 +334,14 @@ void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreAr
 
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
-		return;
+		return -1;
 	}
 
-	if(strcmp(archivoAAlmacenar->extensionArchivo, "bin") == 0){
+	if(verificarDisponibilidadDeEspacioEnNodos() == -1){
+
+	}
+
+	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
 		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
 	else{
@@ -345,6 +349,7 @@ void procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreAr
 	}
 
 	liberarEstructuraBloquesAEnviar(infoBloque);
+	return 0;
 }
 
 void almacenarArchivo(char **palabras){
@@ -361,7 +366,9 @@ void almacenarArchivo(char **palabras){
 	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
 	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
-	procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]);
+	if(procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]) == -1){
+		return;
+	}
 
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 
