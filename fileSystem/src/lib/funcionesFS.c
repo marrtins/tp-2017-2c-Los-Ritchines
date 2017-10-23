@@ -25,6 +25,27 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	return fileSystem;
 }
 
+void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque){
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
+	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
+
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
+	ocuparProximoBloqueBitmap(nodo1);
+	mostrarBitmap(nodo1->bitmap);
+
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
+	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
+
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
+	ocuparProximoBloqueBitmap(nodo2);
+	mostrarBitmap(nodo2->bitmap);
+
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
+	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
+}
+
 void mostrarConfiguracion(TfileSystem *fileSystem){
 
 	printf("Puerto Entrada: %s\n",  fileSystem->puerto_entrada);
@@ -40,7 +61,8 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 
 	double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
 		if(nodo->cantidadBloquesLibres == 0) return 1;
-		return (double)nodo->cantidadBloquesLibres/ nodo->cantidadBloquesTotal;
+		double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
+		return bloquesOcupados / nodo->cantidadBloquesTotal;
 	}
 	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
 }
@@ -62,8 +84,8 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
-	Tnodo* nodo3 = (Tnodo*)list_get(listaDeNodos, 2);
-	Tnodo* nodo4 = (Tnodo*)list_get(listaDeNodos, 3);
+	//Tnodo* nodo3 = (Tnodo*)list_get(listaDeNodos, 2);
+	//Tnodo* nodo4 = (Tnodo*)list_get(listaDeNodos, 3);
 
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
@@ -83,6 +105,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 			double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
 			return bloquesOcupados / nodo->cantidadBloquesTotal;
 		}
+		/*
 	double p1 = obtenerProporcionDeDisponibilidad(nodo1);
 	double p2 = obtenerProporcionDeDisponibilidad(nodo2);
 	double p3 = obtenerProporcionDeDisponibilidad(nodo3);
@@ -99,26 +122,9 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 fputs("\n",archivoDeSeguimiento);
 	 fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
 	 fputs("\n",archivoDeSeguimiento);
-	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
+	*/ printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
-	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
-
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
-	 ocuparProximoBloqueBitmap(nodo1);
-	 mostrarBitmap(nodo1->bitmap);
-
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	 strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
-	 printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
-
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
-	 ocuparProximoBloqueBitmap(nodo2);
-	 mostrarBitmap(nodo2->bitmap);
-
-	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
-	 printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
+	 almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
 
 	 liberarEstructuraBuffer(buffer1);
 	 liberarEstructuraBuffer(buffer2);
@@ -571,6 +577,8 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->primerBloqueLibreBitmap = 0;
+	puts("\n\n\nACA SALE EL NOMBRE DEL DATANODE QUE SE CONECTO\n\n\n");
+	puts(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
 	return nuevoNodo;
