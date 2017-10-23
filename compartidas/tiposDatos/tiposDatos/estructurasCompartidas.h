@@ -126,6 +126,21 @@ typedef struct {
 	unsigned long long tamanio;
 }Tbuffer;
 
+typedef struct{
+	int numeroDeBloque;
+	char *contenido;
+	unsigned long long tamanio;
+}TbloqueAEnviar;
+
+typedef struct{
+	char* nombre;
+	int fd;
+	unsigned int cantidadBloquesTotal;
+	unsigned int cantidadBloquesLibres;
+	int primerBloqueLibreBitmap;
+	t_bitarray * bitmap;
+}Tnodo;
+
 typedef struct {
 	Theader head;
 	int nroBloque;

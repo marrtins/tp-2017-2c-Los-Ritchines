@@ -48,11 +48,13 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 void ocuparProximoBloqueBitmap(Tnodo * nodo){
 	bitarray_set_bit(nodo->bitmap, nodo->primerBloqueLibreBitmap);
 	nodo->primerBloqueLibreBitmap++;
+	nodo->cantidadBloquesLibres--;
 }
 
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
 	Theader * head = malloc(sizeof(Theader));
-	Tbuffer * buffer;
+	Tbuffer * buffer1;
+	Tbuffer * buffer2;
 	int estado;
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
@@ -60,19 +62,43 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
+	Tnodo* nodo3 = (Tnodo*)list_get(listaDeNodos, 2);
+	Tnodo* nodo4 = (Tnodo*)list_get(listaDeNodos, 3);
 
-	buffer = empaquetarBloque(head,bloque->numeroDeBloque,bloque->tamanio,bloque->contenido);
+	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
-	printf("Tamanio del buffer que se va a enviar %llu \n", buffer->tamanio);
-	 if ((estado = send(nodo1->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+	printf("Tamanio del buffer que se va a enviar %llu \n", buffer1->tamanio);
+	 if ((estado = send(nodo1->fd, buffer1->buffer , buffer1->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 
-	 printf("Se envio bloque a Nodo1 %d bytes\n", estado);
-	 if ((estado = send(nodo2->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+	buffer2 = empaquetarBloque(head,bloque,nodo2);
+	printf("Se envio bloque a Nodo1 %d bytes\n", estado);
+	 if ((estado = send(nodo2->fd, buffer2->buffer , buffer2->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
+		double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
+			if(nodo->cantidadBloquesLibres == 0) return 1;
+			double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
+			return bloquesOcupados / nodo->cantidadBloquesTotal;
+		}
+	double p1 = obtenerProporcionDeDisponibilidad(nodo1);
+	double p2 = obtenerProporcionDeDisponibilidad(nodo2);
+	double p3 = obtenerProporcionDeDisponibilidad(nodo3);
+	double p4 = obtenerProporcionDeDisponibilidad(nodo4);
+	 FILE * archivoDeSeguimiento = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/envioBloques.txt","a");
+	 fseek(archivoDeSeguimiento,0,SEEK_END);
+	 fprintf(archivoDeSeguimiento, "%s %d \n","Bloque nro: ", bloque->numeroDeBloque);
+	 fprintf(archivoDeSeguimiento, "%s\n%f\n%f\n%f\n%f\n", "proporciones: ",p1,p2,p3,p4);
+	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo1->cantidadBloquesTotal,nodo1->cantidadBloquesLibres,nodo1->cantidadBloquesTotal);
+	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo2->cantidadBloquesTotal,nodo2->cantidadBloquesLibres,nodo2->cantidadBloquesTotal);
+	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo3->cantidadBloquesTotal,nodo3->cantidadBloquesLibres,nodo3->cantidadBloquesTotal);
+	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo4->cantidadBloquesTotal,nodo4->cantidadBloquesLibres,nodo4->cantidadBloquesTotal);
+	 fwrite(nodo1->nombre, strlen(nodo1->nombre), 1, archivoDeSeguimiento);
+	 fputs("\n",archivoDeSeguimiento);
+	 fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
+	 fputs("\n",archivoDeSeguimiento);
 	 printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
@@ -94,9 +120,10 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	 printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 
-	 liberarEstructuraBuffer(buffer);
-
+	 liberarEstructuraBuffer(buffer1);
+	 liberarEstructuraBuffer(buffer2);
 }
+
 
 void liberarEstructuraBuffer(Tbuffer * buffer){
 	free(buffer->buffer);

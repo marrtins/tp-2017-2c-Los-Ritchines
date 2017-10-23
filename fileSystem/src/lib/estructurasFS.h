@@ -51,21 +51,6 @@ typedef struct{
 	TnodoBloque * nodoBloques;
 }Tnodos;
 
-typedef struct{
-	int numeroDeBloque;
-	char *contenido;
-	unsigned long long tamanio;
-}TbloqueAEnviar;
-
-typedef struct{
-	char* nombre;
-	int fd;
-	unsigned int cantidadBloquesTotal;
-	unsigned int cantidadBloquesLibres;
-	int primerBloqueLibreBitmap;
-	t_bitarray * bitmap;
-}Tnodo;
-
 t_list * listaDeNodos;
 t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;
