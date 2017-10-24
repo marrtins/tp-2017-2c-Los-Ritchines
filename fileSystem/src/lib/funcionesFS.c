@@ -68,7 +68,27 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 }
 
 void ocuparBloqueEnTablaArchivos(char * nombreNodo){
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
+	//LIBRE
+	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
+	libre--;
+	char * libreString = string_itoa(libre);
+	config_set_value(tablaDeNodos, "LIBRE", libreString);
+
+	char * nodoLibreAString = string_new();
+	string_append_with_format(&nodoLibreAString,"%sLibre", nombreNodo);
+	int nodoLibre = config_get_int_value(tablaDeNodos, nodoLibreAString);
+	nodoLibre--;
+	char * nodoLibreString = string_itoa(nodoLibre);
+	config_set_value(tablaDeNodos, nodoLibreAString, nodoLibreString);
+
+	config_save(tablaDeNodos);
+	config_destroy(tablaDeNodos);
+
+	free(nodoLibreAString);
+	free(nodoLibreString);
+	free(libreString);
 }
 
 void ocuparProximoBloque(Tnodo * nodo){
