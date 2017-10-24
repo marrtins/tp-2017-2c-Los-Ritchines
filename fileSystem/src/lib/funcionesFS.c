@@ -751,6 +751,7 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 
 char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre){
 	char * nuevoString = string_new();
+	char * definitivo = string_new();
 	int i = 0;
 	string_append(&nuevoString, "[");
 	while(nodos[i] != NULL){
@@ -760,8 +761,10 @@ char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre){
 		}
 		i++;
 	}
-	string_append(&nuevoString, "]");
-	return nuevoString;
+	definitivo = string_substring(nuevoString, 0, strlen(nuevoString)-1);
+	string_append(&definitivo, "]");
+	free(nuevoString);
+	return definitivo;
 }
 
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
