@@ -17,6 +17,7 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);
 
 //Tablas
+void persistirTablaDeDirectorios();
 void levantarTablasDirectorios();
 void levantarTablaArchivo(Tarchivo * tablaArchivos);
 void levantarTablaNodos(Tnodos * tablaNodos);
@@ -27,6 +28,7 @@ char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
 void inicializarTablaDeNodos();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
+
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
