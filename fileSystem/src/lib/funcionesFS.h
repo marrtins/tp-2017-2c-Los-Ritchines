@@ -17,15 +17,13 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);
 
 //Tablas
+void persistirTablaDeDirectorios();
 void levantarTablasDirectorios();
 void levantarTablaArchivo(Tarchivo * tablaArchivos);
 void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
-char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
-void inicializarTablaDeNodos();
-void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -51,7 +49,7 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
-void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar);
+void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);

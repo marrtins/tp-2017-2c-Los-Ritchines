@@ -441,6 +441,10 @@ void almacenarArchivo(char **palabras){
 	free(splitDeRuta);
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
+void persistirTablaDeDirectorios(){
+
+
+}
 
 void procesarInput(char* linea) {
 	int cantidad = 0;
@@ -516,6 +520,7 @@ void procesarInput(char* linea) {
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
 	free(linea);
+	persistirTablaDeDirectorios();
 }
 
 void consolaFS(){
@@ -1121,6 +1126,8 @@ int crearDirectorio(char * ruta) {
 	char* directorio = malloc(40);
 	strcpy(directorio, "src/metadata/archivos/");
 	char * indice;
+	Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
+
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
 		puts("El directorio no se puede crear");
 		return -1;
@@ -1135,13 +1142,18 @@ int crearDirectorio(char * ruta) {
 			string_append(&directorio, indice);
 			syscall(SYS_mkdir, directorio);
 			printf("Cree directorio %s\n", carpetas[nroDirectorio]);
+
+			tDirectorio->index = index;
+			strcpy(tDirectorio->nombre,carpetas[nroDirectorio]);
+			tDirectorio->padre = indicePadre;
+
+			list_add(listaTablaDirectorios,tDirectorio);
 			return 0;
-		} else {
-			puts(
-					"No se puede crear directorio dentro de un directorio que no existe");
-			return -1;
 		}
-		free(indice);
+			puts("No se puede crear directorio dentro de un directorio que no existe");
+			return -1;
+
+			free(indice);
 	}
 }
 
