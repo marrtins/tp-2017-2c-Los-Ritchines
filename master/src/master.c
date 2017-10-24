@@ -125,9 +125,9 @@ int main(int argc, char* argv[]) {
 				puts("Fallo deserializacion de Bytes del path_res_file");
 				return -1;
 			}
-			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
+			printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
 			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloque,
+			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
 											infoBloque->bytesOcupados,infoBloque->nombreTemporal);
 
 			list_add(bloquesTransformacion,infoBloque);
@@ -145,14 +145,14 @@ int main(int argc, char* argv[]) {
 				puts("Fallo deserializacion de Bytes del path_res_file");
 				return -1;
 			}
-			printf("Nos llego info del bloque %d \n",infoBloque->bloque);
+			printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
 			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloque,
+			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
 								infoBloque->bytesOcupados,infoBloque->nombreTemporal);
 			list_add(bloquesTransformacion,infoBloque);
 			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 
-			stat = conectarseAWorkersTransformacion(bloquesTransformacion);
+			stat = conectarseAWorkersTransformacion(bloquesTransformacion,sockYama);
 
 
 			break;

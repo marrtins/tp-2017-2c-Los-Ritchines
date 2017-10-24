@@ -24,7 +24,9 @@ typedef enum {
 	INFOCONEXIONWORKER=18,
 	TRANSFORMADORLEN=19,
 	ALMACENAR_BLOQUE=20,
-	NUEVATRANSFORMACION=21
+	NUEVATRANSFORMACION=21,
+	FINTRANSFORMACIONLOCALOK=22,
+	FINTRANSFORMACIONLOCALFAIL=23
 } Tmensaje;
 
 typedef enum {
@@ -99,7 +101,8 @@ typedef struct {
 	Theader head;
 	int tamanioNombre;
 	char *nombreNodo;
-	int bloque;
+	int bloqueDelArchivo;
+	int bloqueDelDatabin;
 	int bytesOcupados;
 	int nombreTemporalLen;
 	char *nombreTemporal;

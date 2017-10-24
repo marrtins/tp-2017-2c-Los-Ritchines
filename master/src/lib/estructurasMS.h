@@ -18,7 +18,7 @@ typedef struct{
 
 typedef struct{
 	TpackInfoBloque infoBloque;
-	TinfoWorker infoWorker;
+	int sockYama;
 }TatributosHilo;
 
 #endif

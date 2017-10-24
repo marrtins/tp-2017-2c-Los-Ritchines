@@ -4,7 +4,7 @@ extern char * rutaTransformador;
 
 
 
-int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
+int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama){
 
 
 	int cantConexiones = list_size(bloquesTransformacion);
@@ -14,15 +14,32 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion){
 	for(i=0;i< cantConexiones;i++){
 		pthread_t workerThread[i];
 		TpackInfoBloque *infoBloque=list_get(bloquesTransformacion,i);
+		TatributosHilo * atributos = malloc(sizeof atributos);
+		atributos->infoBloque.bloqueDelDatabin = infoBloque->bloqueDelDatabin;
+		atributos->infoBloque.bloqueDelArchivo=infoBloque->bloqueDelArchivo;
+		atributos->infoBloque.bytesOcupados = infoBloque->bytesOcupados;
+		atributos->infoBloque.ipWorker=malloc(sizeof(infoBloque->tamanioIp));
+		atributos->infoBloque.ipWorker = infoBloque->ipWorker;
+		atributos->infoBloque.nombreNodo =malloc(sizeof( infoBloque->tamanioNombre));
+		atributos->infoBloque.nombreNodo = infoBloque->nombreNodo;
+		atributos->infoBloque.nombreTemporal =malloc(sizeof( infoBloque->nombreTemporalLen));
+		atributos->infoBloque.puertoWorker = malloc(sizeof(infoBloque->tamanioPuerto));
+		atributos->infoBloque.puertoWorker = infoBloque->puertoWorker;
+		atributos->sockYama=sockYama;
+
 		printf("creo hilo %d\n",i);
-		crearHilo(&workerThread[i], (void*)workerHandler, (void*)infoBloque);
+		crearHilo(&workerThread[i], (void*)workerHandler, (void*)atributos);
 	}
 
 	return 0;
 }
 
 void workerHandler(void *info){
-	TpackInfoBloque *infoBloque = (TpackInfoBloque *)info;
+	TatributosHilo *atributos = (TatributosHilo *)info;
+
+
+	int sockYama = atributos->sockYama;
+
 
 	int stat,sockWorker;
 	int fdTransformador;
@@ -31,8 +48,10 @@ void workerHandler(void *info){
 	char file_size[sizeof(int)];
 	char *buffer;
 	int packSize;
+	Theader *headEnvio = malloc(sizeof(headEnvio));
+	bool finCorrecto = false;
 
-	if((sockWorker = conectarAServidor(infoBloque->ipWorker, infoBloque->puertoWorker))<0){
+	if((sockWorker = conectarAServidor(atributos->infoBloque.ipWorker, atributos->infoBloque.puertoWorker))<0){
 		puts("No pudo conectarse a worker");
 		return;
 	}
@@ -49,7 +68,7 @@ void workerHandler(void *info){
 	headASerializar.tipo_de_mensaje=NUEVATRANSFORMACION;
 	headASerializar.tipo_de_proceso=MASTER;
 
-	buffer = serializarInfoTransformacionMasterWorker(headASerializar,infoBloque->bloque,infoBloque->bytesOcupados,infoBloque->nombreTemporalLen,infoBloque->nombreTemporal,&packSize);
+	buffer = serializarInfoTransformacionMasterWorker(headASerializar,atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bytesOcupados,atributos->infoBloque.nombreTemporalLen,atributos->infoBloque.nombreTemporal,&packSize);
 
 
 	printf("Info de la transformacion serializada, enviamos\n");
@@ -102,7 +121,9 @@ void workerHandler(void *info){
 
 		switch (headRcv.tipo_de_mensaje) {
 		case(FIN_LOCALTRANSF):
-			printf("Worker me avisa que termino de transformar el bloque %d\n",infoBloque->bloque);
+			printf("Worker me avisa que termino de transformar el bloque %d\n",atributos->infoBloque.bloqueDelDatabin);
+			finCorrecto = true;
+			close(sockWorker);
 		break;
 		default:
 			break;
@@ -110,8 +131,19 @@ void workerHandler(void *info){
 
 
 	}
+	if(finCorrecto){
+		puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
+		headEnvio->tipo_de_proceso=MASTER;
+		headEnvio->tipo_de_mensaje=FINTRANSFORMACIONLOCALOK;
+		enviarHeader(sockYama,headEnvio);
 
-	printf("fin thread de transfo del bloque %d\n",infoBloque->bloque);
+	}else{
+		puts("termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
+		headEnvio->tipo_de_proceso=MASTER;
+		headEnvio->tipo_de_mensaje=FINTRANSFORMACIONLOCALFAIL;
+		enviarHeader(sockYama,headEnvio);
+	}
+	printf("fin thread de transfo del bloque del databin %d (bloque deol archivo :%d)\n",atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bloqueDelArchivo);
 }
 
 

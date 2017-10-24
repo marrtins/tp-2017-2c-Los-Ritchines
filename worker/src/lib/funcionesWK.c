@@ -3,41 +3,8 @@
 
 extern Tworker *worker;
 
+int cont=0;
 
-char *recvGenericWFlags2(int sock_in, int flags){
-	//printf("Se recibe el paquete serializado, usando flags %x\n", flags);
-
-	int stat, pack_size;
-	char *p_serial;
-
-	if ((stat = recv(sock_in, &pack_size, sizeof(int), flags)) == -1){
-		perror("Fallo de recv. error");
-		return NULL;
-
-	} else if (stat == 0){
-		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
-		return NULL;
-	}
-
-	pack_size -= (sizeof(Theader) + sizeof(int)); // ya se recibieron estas dos cantidades
-	printf("Paquete de size: %d\n", pack_size);
-
-	if ((p_serial = malloc(pack_size)) == NULL){
-		printf("No se pudieron mallocar %d bytes para paquete generico\n", pack_size);
-		return NULL;
-	}
-
-	if ((stat = recv(sock_in, p_serial, pack_size, flags)) == -1){
-		perror("Fallo de recv. error");
-		return NULL;
-
-	} else if (stat == 0){
-		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
-		return NULL;
-	}
-
-	return p_serial;
-}
 
 
 Tworker *obtenerConfiguracionWorker(char* ruta){
@@ -79,12 +46,15 @@ void mostrarConfiguracion(Tworker *worker){
 
 void manejarConexionMaster(Theader *head, int client_sock){
 	char * nombreScriptTransformador;
-	int cont = 0;
+
 	char buffer[BUFSIZ];
 	int file_size,len;
 	int remain_data = 0;
 	pid_t pid;
 	//int pidStat;
+
+	Theader *headEnvio  = malloc(sizeof headEnvio);
+
 
 
 	FILE *transformadorFile;
@@ -103,7 +73,7 @@ void manejarConexionMaster(Theader *head, int client_sock){
 	if(head->tipo_de_mensaje==NUEVATRANSFORMACION){
 		puts("llego solicitud para nueva transformacion. recibimos bloque cant bytes y nombre temporal..");
 
-		if ((buff = recvGenericWFlags2(client_sock,0)) == NULL){
+		if ((buff = recvGenericWFlags(client_sock,0)) == NULL){
 			puts("Fallo recepcion de datos de la transformacion");
 			return ;
 		}
@@ -144,10 +114,21 @@ void manejarConexionMaster(Theader *head, int client_sock){
 			printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
 			printf("%d\n",cont);
 			char * str = string_new();
+
+
+
 			string_append(&str,"cat WBAN.csv | ./transformador.sh | sort  > /home/utnso/resultado");
 			string_append(&str,string_itoa(cont));
 			string_append(&str,worker->nombre_nodo);
+			//aca hafo el system con mis datos.. esto x ahora es hardcode
 			system(str);
+
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_LOCALTRANSF;
+
+			puts("Envio header. fin transfo ok");
+			enviarHeader(client_sock,headEnvio);
+
 			exit(0);
 
 		}
@@ -157,8 +138,8 @@ void manejarConexionMaster(Theader *head, int client_sock){
 			printf("%d\n",cont);
 			//waitpid(pid,pidStat,0);
 		}
-		printf("Cierro fd %d\n",client_sock);
-		close(client_sock);
+		//printf("Cierro fd %d\n",client_sock);
+		//close(client_sock);
 
 
 

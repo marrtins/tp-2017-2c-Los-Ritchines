@@ -1,1 +1,1 @@
-./m.out
+./m.out /home/utnso/yama-test1/transformador.sh /home/utnso/yama-test1/reductor.pl yamafs:/datos.csv yamafs:/analisis/resultado.json

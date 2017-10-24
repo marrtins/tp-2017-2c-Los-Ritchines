@@ -92,8 +92,11 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 		*pack_size += infoBloque->tamanioPuerto;
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->bloque, sizeof(int));
+		memcpy(bytes_serial + *pack_size, &infoBloque->bloqueDelArchivo, sizeof(int));
 		*pack_size += sizeof(int);
+
+		memcpy(bytes_serial + *pack_size, &infoBloque->bloqueDelDatabin, sizeof(int));
+				*pack_size += sizeof(int);
 
 
 		memcpy(bytes_serial + *pack_size, &infoBloque->bytesOcupados, sizeof(int));
@@ -166,8 +169,12 @@ TpackInfoBloque *deserializeInfoBloque(char *bytes_serial){
 
 
 
-		memcpy(&infoBloque->bloque, bytes_serial + off, sizeof (int));
+		memcpy(&infoBloque->bloqueDelArchivo, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
+
+		memcpy(&infoBloque->bloqueDelDatabin, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
 
 
 		memcpy(&infoBloque->bytesOcupados, bytes_serial + off, sizeof (int));

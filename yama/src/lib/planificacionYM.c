@@ -56,7 +56,7 @@ t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
 	int q;
 	for(q=0;q<list_size(listaPlanificada);q++){
 		TpackInfoBloque *aux = list_get(listaPlanificada,q);
-		printf("%d %d %s\n",aux->bloque,aux->bytesOcupados,aux->nombreNodo);
+		printf("%d %d %s\n",aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
 	}
 
 
@@ -101,10 +101,10 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 	if((nodoApuntado->availability > 0 && bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo) ||
 			(nodoApuntado->availability > 0 && bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo)){
 		if(bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo ){
-			bloqueRet->bloque=bloqueAux->bloqueC1;
+			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
 		}
 		if(bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo ){
-			bloqueRet->bloque=bloqueAux->bloqueC2;
+			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
 		}
 		mergeBloque(bloqueRet,nodoApuntado,bloqueAux);
 		nodoApuntado->availability-=1;
@@ -115,9 +115,9 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 		Tplanificacion *siguienteNodo = getSiguienteNodoDisponible(listaWorkersPlanificacion,bloqueAux->nombreNodoC1,bloqueAux->nombreNodoC2);
 
 		if(siguienteNodo->infoNodo.nombreNodo == bloqueAux->nombreNodoC1){
-			bloqueRet->bloque=bloqueAux->bloqueC1;
+			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
 		}else{
-			bloqueRet->bloque=bloqueAux->bloqueC2;
+			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
 		}
 
 		mergeBloque(bloqueRet,siguienteNodo,bloqueAux);
@@ -168,7 +168,7 @@ void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,Tpackag
 	bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
 	bloqueRet->puertoWorker=nodoApuntado->infoNodo.puertoWorker;
 	bloqueRet->tamanioPuerto=nodoApuntado->infoNodo.tamanioPuerto;
-
+	bloqueRet->bloqueDelArchivo = bloqueAux->bloque;
 }
 
 Tplanificacion * getNodoApuntado(t_list * listaWorkersPlanificacion){

@@ -188,9 +188,12 @@ void masterHandler(void *client_sock){
 				puts("No se pudo responder la solicitud de transferencia");
 				return;
 			}
-
-
-
+			break;
+		case FINTRANSFORMACIONLOCALOK:
+			puts("Master mando fin transf ok");
+			break;
+		case FINTRANSFORMACIONLOCALFAIL:
+			puts("Master mando fin transf fail");
 			break;
 		default:
 			break;
@@ -253,7 +256,7 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 		TpackInfoBloque *bloqueAEnviar = list_get(listaBloques,i);
 		buffer=serializeInfoBloque(head,bloqueAEnviar,&packSize);
 
-		printf("Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloque);
+		printf("Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloqueDelArchivo);
 		if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 			puts("no se pudo enviar info del bloque. ");
 			return  FALLO_SEND;
@@ -312,6 +315,7 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 	TpackInfoBloque *bloque2 = malloc(sizeof bloque2);
 	bloque2->nombreNodo=malloc(nombreLen);
 	bloque2->nombreNodo="Nodo1";
+
 	bloque2->nombreLen=strlen(bloque2->nombreNodo)+1;
 	bloque2->ipNodo=malloc(ipLen);
 	bloque2->ipNodo="127.0.0.1";
