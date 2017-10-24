@@ -31,7 +31,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
-	ocuparProximoBloqueBitmap(nodo1);
+	ocuparProximoBloque(nodo1);
 	mostrarBitmap(nodo1->bitmap);
 
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
@@ -39,7 +39,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
 
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
-	ocuparProximoBloqueBitmap(nodo2);
+	ocuparProximoBloque(nodo2);
 	mostrarBitmap(nodo2->bitmap);
 
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
@@ -67,10 +67,35 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
 }
 
-void ocuparProximoBloqueBitmap(Tnodo * nodo){
+void ocuparBloqueEnTablaArchivos(char * nombreNodo){
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+
+	//LIBRE
+	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
+	libre--;
+	char * libreString = string_itoa(libre);
+	config_set_value(tablaDeNodos, "LIBRE", libreString);
+
+	char * nodoLibreAString = string_new();
+	string_append_with_format(&nodoLibreAString,"%sLibre", nombreNodo);
+	int nodoLibre = config_get_int_value(tablaDeNodos, nodoLibreAString);
+	nodoLibre--;
+	char * nodoLibreString = string_itoa(nodoLibre);
+	config_set_value(tablaDeNodos, nodoLibreAString, nodoLibreString);
+
+	config_save(tablaDeNodos);
+	config_destroy(tablaDeNodos);
+
+	free(nodoLibreAString);
+	free(nodoLibreString);
+	free(libreString);
+}
+
+void ocuparProximoBloque(Tnodo * nodo){
 	bitarray_set_bit(nodo->bitmap, nodo->primerBloqueLibreBitmap);
 	nodo->primerBloqueLibreBitmap++;
 	nodo->cantidadBloquesLibres--;
+	ocuparBloqueEnTablaArchivos(nodo->nombre);
 }
 
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
@@ -100,34 +125,35 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 if ((estado = send(nodo2->fd, buffer2->buffer , buffer2->tamanio, 0)) == -1){
 		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
-		double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
-			if(nodo->cantidadBloquesLibres == 0) return 1;
-			double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
-			return bloquesOcupados / nodo->cantidadBloquesTotal;
-		}
-		/*
+	/*double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
+		if(nodo->cantidadBloquesLibres == 0) return 1;
+		double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
+		return bloquesOcupados / nodo->cantidadBloquesTotal;
+	}*/
+	/*
 	double p1 = obtenerProporcionDeDisponibilidad(nodo1);
 	double p2 = obtenerProporcionDeDisponibilidad(nodo2);
 	double p3 = obtenerProporcionDeDisponibilidad(nodo3);
 	double p4 = obtenerProporcionDeDisponibilidad(nodo4);
-	 FILE * archivoDeSeguimiento = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/envioBloques.txt","a");
-	 fseek(archivoDeSeguimiento,0,SEEK_END);
-	 fprintf(archivoDeSeguimiento, "%s %d \n","Bloque nro: ", bloque->numeroDeBloque);
-	 fprintf(archivoDeSeguimiento, "%s\n%f\n%f\n%f\n%f\n", "proporciones: ",p1,p2,p3,p4);
-	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo1->cantidadBloquesTotal,nodo1->cantidadBloquesLibres,nodo1->cantidadBloquesTotal);
-	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo2->cantidadBloquesTotal,nodo2->cantidadBloquesLibres,nodo2->cantidadBloquesTotal);
-	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo3->cantidadBloquesTotal,nodo3->cantidadBloquesLibres,nodo3->cantidadBloquesTotal);
-	 fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo4->cantidadBloquesTotal,nodo4->cantidadBloquesLibres,nodo4->cantidadBloquesTotal);
-	 fwrite(nodo1->nombre, strlen(nodo1->nombre), 1, archivoDeSeguimiento);
-	 fputs("\n",archivoDeSeguimiento);
-	 fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
-	 fputs("\n",archivoDeSeguimiento);
-	*/ printf("Se envio bloque a Nodo2 %d bytes\n",estado);
+	FILE * archivoDeSeguimiento = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/envioBloques.txt","a");
+	fseek(archivoDeSeguimiento,0,SEEK_END);
+	fprintf(archivoDeSeguimiento, "%s %d \n","Bloque nro: ", bloque->numeroDeBloque);
+	fprintf(archivoDeSeguimiento, "%s\n%f\n%f\n%f\n%f\n", "proporciones: ",p1,p2,p3,p4);
+	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo1->cantidadBloquesTotal,nodo1->cantidadBloquesLibres,nodo1->cantidadBloquesTotal);
+	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo2->cantidadBloquesTotal,nodo2->cantidadBloquesLibres,nodo2->cantidadBloquesTotal);
+	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo3->cantidadBloquesTotal,nodo3->cantidadBloquesLibres,nodo3->cantidadBloquesTotal);
+	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo4->cantidadBloquesTotal,nodo4->cantidadBloquesLibres,nodo4->cantidadBloquesTotal);
+	fwrite(nodo1->nombre, strlen(nodo1->nombre), 1, archivoDeSeguimiento);
+	fputs("\n",archivoDeSeguimiento);
+	fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
+	fputs("\n",archivoDeSeguimiento);
+	*/
+	printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
-	 almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
+	almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
 
-	 liberarEstructuraBuffer(buffer1);
-	 liberarEstructuraBuffer(buffer2);
+	liberarEstructuraBuffer(buffer1);
+	liberarEstructuraBuffer(buffer2);
 }
 
 
@@ -684,21 +710,18 @@ void inicializarTablaDeNodos(){
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
-	puts("TAMANIO");
 	//TAMANIO
 	int tamanio = config_get_int_value(tablaDeNodos, "TAMANIO");
 	tamanio += nuevoNodo->cantidadBloquesTotal;
 	char * tamanioString = string_itoa(tamanio);
 	config_set_value(tablaDeNodos, "TAMANIO", tamanioString);
 
-	puts("LIBRE");
 	//LIBRE
 	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
 	libre += nuevoNodo->cantidadBloquesLibres;
 	char * libreString = string_itoa(libre);
 	config_set_value(tablaDeNodos, "LIBRE", libreString);
 
-	puts("NODOS");
 	//NODOS
 	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
 	char * nodosConNodoAgregado = agregarNodoAArrayDeNodos(nodos, nuevoNodo->nombre);
@@ -706,14 +729,12 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	puts("cargando Nodos");
 	config_set_value(tablaDeNodos, "NODOS", nodosConNodoAgregado);
 
-	puts("NODONTOTAL");
 	//agregar Nodos Dinamicamente
 	char * nodoTotalAString = string_new();
 	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
 	char * bloquesTotalString = string_itoa(nuevoNodo->cantidadBloquesTotal);
 	config_set_value(tablaDeNodos, nodoTotalAString, bloquesTotalString);
 
-	puts("NODONLIBRE");
 	char * nodoLibreAString = string_new();
 	string_append_with_format(&nodoLibreAString,"%sLibre", nuevoNodo->nombre);
 	char * bloquesLibresString = string_itoa(nuevoNodo->cantidadBloquesLibres);

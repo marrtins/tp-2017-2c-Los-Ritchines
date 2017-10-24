@@ -24,6 +24,11 @@ void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
+char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
+void inicializarTablaDeNodos();
+void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
+void ocuparBloqueEnTablaArchivos(char * nombreNodo);
+
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -31,7 +36,7 @@ bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
-void ocuparProximoBloqueBitmap(Tnodo * nodo);
+void ocuparProximoBloque(Tnodo * nodo);
 
 //Directorios
 int existeDirectorio(char * directorio);
@@ -49,7 +54,7 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
-void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
+void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
