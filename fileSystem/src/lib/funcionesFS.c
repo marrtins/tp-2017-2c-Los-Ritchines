@@ -468,7 +468,18 @@ void almacenarArchivo(char **palabras){
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 void persistirTablaDeDirectorios(){
+	int tamanio, i=0;
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
+	tamanio = list_size(listaTablaDirectorios);
+	Tdirectorio * directorio = malloc(sizeof(Tdirectorio));
 
+	while(tamanio != i){
+		directorio = list_get(listaTablaDirectorios, i);
+		fprintf(archivoDirectorios, "%d %s %d\n", directorio->index, directorio->nombre, directorio->padre);
+		i++;
+	}
+
+	fclose(archivoDirectorios);
 
 }
 
@@ -491,12 +502,8 @@ void procesarInput(char* linea) {
 			if(existeDirectorio(palabras[1])){
 				puts("Existe el directorio");
 			}else {
-				puts("No existe el directorio"); //HAY QUE CREARLO
-				if(crearDirectorio(palabras[1])<0){
-					puts("El directorio no se pudo crear");
-				}else{
-				// cuando se crea un directorio, hay que comprobar
-				// que no supere los 100 elementos de la lista
+				puts("No existe el directorio");
+				if(crearDirectorio(palabras[1])>=0){
 				printf("ya pude crear el directorio\n");
 				}
 			}
@@ -1152,19 +1159,25 @@ int crearDirectorio(char * ruta) {
 	char * indice;
 	Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
 
+	if(list_size(listaTablaDirectorios)>=100){
+		puts("Ya hay 100 directorios creados, no se pueden crear mas");
+		return -1;
+	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
 		puts("El directorio no se puede crear");
 		return -1;
 	} else {
 		if (nroDirectorio == cant - 1) {
 			index = buscarIndexMayor() + 1;
-			indicePadre = buscarIndexPorNombreDeDirectorio(
-					carpetas[nroDirectorio - 1]);
+			indicePadre = buscarIndexPorNombreDeDirectorio(carpetas[nroDirectorio - 1]);
+
 			printf("Indice padre del nuevo directorio %d\n", indicePadre);
 			printf("Index asignado al nuevo directorio %d\n", index);
+
 			indice = string_itoa(index);
 			string_append(&directorio, indice);
 			syscall(SYS_mkdir, directorio);
+
 			printf("Cree directorio %s\n", carpetas[nroDirectorio]);
 
 			tDirectorio->index = index;
