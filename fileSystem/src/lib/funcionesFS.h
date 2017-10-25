@@ -26,6 +26,7 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
 char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
 void inicializarTablaDeNodos();
+void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
 

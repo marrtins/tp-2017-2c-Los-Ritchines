@@ -187,7 +187,6 @@ int existeDirectorio(char * directorio){
 
 		return 1;
 	} else {
-		puts("Para referirse al filesystem colocar 'yamafs:' al principio de la ruta");
 		return 0;
 	}
 
@@ -205,7 +204,7 @@ void* buscarPorNombreDeDirectorio(char * directorio){
 
 int buscarIndexPorNombreDeDirectorio(char * directorio){
 	Tdirectorio * estructuraDirectorio = (Tdirectorio *)buscarPorNombreDeDirectorio(directorio);
-	puts("rompi todo");
+
 	if(estructuraDirectorio != NULL){
 		return estructuraDirectorio->index;
 	}
@@ -504,7 +503,7 @@ void procesarInput(char* linea) {
 			}else {
 				puts("No existe el directorio");
 				if(crearDirectorio(palabras[1])>=0){
-				printf("ya pude crear el directorio\n");
+					persistirTablaDeDirectorios();
 				}
 			}
 		}
@@ -553,7 +552,7 @@ void procesarInput(char* linea) {
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
 	free(linea);
-	persistirTablaDeDirectorios();
+
 }
 
 void consolaFS(){
@@ -1129,7 +1128,7 @@ int directorioNoExistente(char ** carpetas) {
 	}
 	return -1;
 	}else{
-		puts("Falta la referencia al filesystem local : 'yamafs:'");
+		puts("Falta la referencia al filesystem local 'yamafs:'");
 		return -1;
 	}
 }
@@ -1154,31 +1153,34 @@ int crearDirectorio(char * ruta) {
 	int nroDirectorio, cant, index, indicePadre;
 	char ** carpetas = string_split(ruta, "/");
 	cant = contarPunteroDePunteros(carpetas);
-	char* directorio = malloc(40);
-	strcpy(directorio, "src/metadata/archivos/");
+	char* directorio = malloc(100);
+	strcpy(directorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	char * indice;
 	Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
 
 	if(list_size(listaTablaDirectorios)>=100){
-		puts("Ya hay 100 directorios creados, no se pueden crear mas");
+		puts("Ya hay 100 directorios creados, no se puede crear el directorio");
 		return -1;
 	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
-		puts("El directorio no se puede crear");
+		puts("No se puede crear el directorio");
 		return -1;
 	} else {
 		if (nroDirectorio == cant - 1) {
 			index = buscarIndexMayor() + 1;
 			indicePadre = buscarIndexPorNombreDeDirectorio(carpetas[nroDirectorio - 1]);
-
+			if(indicePadre == -1){
+				indicePadre = 0;
+			}
 			printf("Indice padre del nuevo directorio %d\n", indicePadre);
 			printf("Index asignado al nuevo directorio %d\n", index);
 
 			indice = string_itoa(index);
 			string_append(&directorio, indice);
-			syscall(SYS_mkdir, directorio);
+			//syscall(SYS_mkdir, directorio);
+			mkdir(directorio,0777);
 
-			printf("Cree directorio %s\n", carpetas[nroDirectorio]);
+			printf("Directorio /%s creado\n", carpetas[nroDirectorio]);
 
 			tDirectorio->index = index;
 			strcpy(tDirectorio->nombre,carpetas[nroDirectorio]);
@@ -1218,3 +1220,11 @@ int getMD5(char**palabras){
 		free(ruta_temporal);*/
 		return 0;
 }
+
+void inicializarTablaDirectorios(){
+		FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
+		list_clean(listaTablaDirectorios);
+		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
+		fclose(archivoDirectorios);
+}
+

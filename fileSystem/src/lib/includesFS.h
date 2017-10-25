@@ -8,5 +8,8 @@
 #include <math.h>
 #include <sys/mman.h>
 #include <sys/syscall.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 
 #endif
