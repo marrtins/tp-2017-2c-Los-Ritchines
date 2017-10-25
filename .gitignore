@@ -3,6 +3,7 @@ data2.bin
 Release/
 Debug/
 *.log
+yama/yama.log
 
 # Prerequisites
 *.d

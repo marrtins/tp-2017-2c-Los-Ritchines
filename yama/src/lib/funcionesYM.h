@@ -8,13 +8,13 @@ void mostrarConfiguracion(Tyama *yama);
 void conectarAFS(int* socketFS, Tyama *yama);
 void masterHandler(void *client_sock);
 int responderSolicTransf(int sockMaster,t_list * listaBloques);
-char *  generarNombreTemporal(int idMaster);
+
 
 void generarListaBloquesHardcode(t_list *listaBloques);
 void generarListaComposicionArchivoHardcode(t_list * listaInfo);
 void generarListaInfoNodos(t_list * listaNodos);
-void setearGlobales();
 
+void agregarAListaEnProceso(int jobActual,int idTarea, int etapa, TpackInfoBloque *bloque);
 
 //Funciones Planificacion
 int posicionarClock(t_list * listaWorkers);
@@ -30,5 +30,14 @@ void actualizarCargaWorkerEn(char * nombreNodo, int cantidadAAumentar);
 t_list * planificar(t_list * listaInfoBloques,t_list * listaInfoNodos);
 void aumentarHistoricoEn(char * nombreNodo,int cantidadAAumentar);
 void sumarDisponibilidadBaseATodos(t_list * listaWorkersPlanificacion);
+
+int moverAListaFinalizadosOK(int idTareaFinalizada);
+int moverAListaError(int idTareaFinalizada);
+char * getNombreEtapa(int etapaEnum);
+void mostrarTablaDeEstados();
+
+char * generarNombreTemporal();
+
+
 #endif
 

@@ -126,9 +126,9 @@ int main(int argc, char* argv[]) {
 				return -1;
 			}
 			printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
-			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
-											infoBloque->bytesOcupados,infoBloque->nombreTemporal);
+			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
+			printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
+					infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
 
 			list_add(bloquesTransformacion,infoBloque);
 			break;
@@ -146,9 +146,9 @@ int main(int argc, char* argv[]) {
 				return -1;
 			}
 			printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
-			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal\n");
-			printf("%s,%s:%s,%d,%d,%s\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
-								infoBloque->bytesOcupados,infoBloque->nombreTemporal);
+			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
+			printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
+								infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
 			list_add(bloquesTransformacion,infoBloque);
 			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 

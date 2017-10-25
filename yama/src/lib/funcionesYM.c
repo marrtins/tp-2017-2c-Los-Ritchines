@@ -6,12 +6,12 @@
 int idTempName,idPropio;
 
 
-extern int idMasterGlobal;
+extern int idMasterGlobal,idJobGlobal,idTareaGlobal;
 
 
+extern t_list * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
+extern pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 
-
-pthread_mutex_t mux_idGlobal;
 
 
 
@@ -83,10 +83,15 @@ void masterHandler(void *client_sock){
 	int sockMaster = (int *)client_sock;
 	int stat;
 	int estado;
+	int idTareaFinalizada;
+	idTempName=0;
 
 
 
-	setearGlobales();
+
+	pthread_mutex_lock(&mux_idGlobal);
+	idPropio=idMasterGlobal++;
+	pthread_mutex_unlock(&mux_idGlobal);
 
 	Theader head = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
@@ -190,10 +195,18 @@ void masterHandler(void *client_sock){
 			}
 			break;
 		case FINTRANSFORMACIONLOCALOK:
-			puts("Master mando fin transf ok");
+			idTareaFinalizada = recibirValor(sockMaster);
+			printf("FINTRANSFORMACIONLOCAL OK de la tarea%d\n",idTareaFinalizada);
+			puts("actuializo tbala de estados");
+			moverAListaFinalizadosOK(idTareaFinalizada);
+
 			break;
 		case FINTRANSFORMACIONLOCALFAIL:
-			puts("Master mando fin transf fail");
+			idTareaFinalizada = recibirValor(sockMaster);
+			printf("FINTRANSFORMACIONLOCAL FAIL de la tarea%d\n",idTareaFinalizada);
+			puts("actuializo tbala de estados");
+			moverAListaError(idTareaFinalizada);
+
 			break;
 		default:
 			break;
@@ -203,33 +216,64 @@ void masterHandler(void *client_sock){
 	}
 	freeAndNULL((void **) &buffer);
 }
+int moverAListaFinalizadosOK(int idTareaFinalizada){
 
-char *  generarNombreTemporal(int idMaster){
+	int i;
+	MUX_LOCK(&mux_listaEnProceso);
+	MUX_LOCK(&mux_listaFinalizado);
+	for(i=0;i<list_size(listaEstadoEnProceso);i++){
+		TpackTablaEstados *aux  = list_get(listaEstadoEnProceso,i);
+		if(aux->idTarea==idTareaFinalizada){
+			list_add(listaEstadoFinalizadoOK,aux);
+			list_remove(listaEstadoEnProceso,i);
+			mostrarTablaDeEstados();
+			MUX_UNLOCK(&mux_listaFinalizado);
+			MUX_UNLOCK(&mux_listaEnProceso);
+			return 0;
+		}
+	}
+	mostrarTablaDeEstados();
+	MUX_UNLOCK(&mux_listaFinalizado);
+	MUX_UNLOCK(&mux_listaEnProceso);
+	return -1;
+}
 
-	char *temp = malloc(MAXSIZETEMPNAME);
+int moverAListaError (int idTareaFinalizada){
+
+	int i;
+	MUX_LOCK(&mux_listaEnProceso);
+	MUX_LOCK(&mux_listaError);
+	for(i=0;i<list_size(listaEstadoEnProceso);i++){
+		TpackTablaEstados *aux  = list_get(listaEstadoEnProceso,i);
+		if(aux->idTarea==idTareaFinalizada){
+			list_add(listaEstadoError,aux);
+			list_remove(listaEstadoEnProceso,i);
+			mostrarTablaDeEstados();
+			MUX_UNLOCK(&mux_listaError);
+			MUX_UNLOCK(&mux_listaEnProceso);
+			return 0;
+		}
+	}
+	mostrarTablaDeEstados();
+	MUX_UNLOCK(&mux_listaError);
+	MUX_UNLOCK(&mux_listaEnProceso);
+	return -1;
+}
+
+char *  generarNombreTemporal(){
+
+	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");
-	string_append(&temp,string_itoa(idMaster));
+	string_append(&temp,string_itoa(idPropio));
 	string_append(&temp,"-temp");
 	string_append(&temp,string_itoa(idTempName++));
 
 
 	return temp;
-
-
 }
 
-void setearGlobales(){
 
-	idTempName=0;
-	pthread_mutex_init(&mux_idGlobal,   NULL);
-
-
-	pthread_mutex_lock(&mux_idGlobal);
-	idPropio=idMasterGlobal++;
-	pthread_mutex_unlock(&mux_idGlobal);
-
-}
 
 int responderSolicTransf(int sockMaster,t_list * listaBloques){
 
@@ -237,8 +281,13 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 	//aca planifico, pido la inf del archivo,etcetc
 
 	//x ahora envio una rta hardcodeada pero siguiendo el formato
-	int i,packSize,stat;
+	int i,packSize,stat,jobActual;
 	char *buffer;
+
+
+	pthread_mutex_lock(&mux_jobIdGlobal);
+	jobActual=idJobGlobal++;
+	pthread_mutex_unlock(&mux_jobIdGlobal);
 
 	Theader head;
 	head.tipo_de_proceso=YAMA;
@@ -254,14 +303,22 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 		}
 		packSize=0;
 		TpackInfoBloque *bloqueAEnviar = list_get(listaBloques,i);
+		MUX_LOCK(&mux_idTareaGlobal);
+		bloqueAEnviar->idTarea = idTareaGlobal++;
+		MUX_UNLOCK(&mux_idTareaGlobal);
 		buffer=serializeInfoBloque(head,bloqueAEnviar,&packSize);
 
 		printf("Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloqueDelArchivo);
+
 		if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 			puts("no se pudo enviar info del bloque. ");
 			return  FALLO_SEND;
 		}
 		printf("se enviaron %d bytes de la info del bloque\n",stat);
+
+		agregarAListaEnProceso(jobActual,bloqueAEnviar->idTarea,TRANSFORMACION,bloqueAEnviar);
+
+
 	}
 
 	puts("Se envio la info de todos los bloques.");
@@ -275,7 +332,84 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 
 }
 
+void agregarAListaEnProceso(int jobActual, int idTarea,int etapa, TpackInfoBloque *bloque){
 
+	MUX_LOCK(&mux_listaEnProceso);
+	TpackTablaEstados * estado = malloc(sizeof estado);
+	estado->idTarea=idTarea;
+	estado->job=jobActual;
+	estado->master= idPropio;
+	estado->nodo=malloc(TAMANIO_NOMBRE_NODO);
+	estado->nodo=bloque->nombreNodo;
+	estado->bloque=bloque->bloqueDelArchivo;
+	estado->etapa=etapa;
+	estado->nombreArchTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
+	estado->nombreArchTemporal=bloque->nombreTemporal;
+	list_add(listaEstadoEnProceso,estado);
+	MUX_UNLOCK(&mux_listaEnProceso);
+
+	mostrarTablaDeEstados();
+
+}
+
+void mostrarTablaDeEstados(){
+	puts("Hubo un cambio de estado, va la tabla actual:");
+	int i;
+	int id,job,master,bloque;
+	char * etapa;
+	char * nodo;
+	char * archivoTemporal;
+	printf("%-10s%-10s%-10s%-25s%-10s%-25s%-25s%-25s\n", "idTarea", "Job", "Master", "Nodo", "Bloque","Etapa","Archivo Temporal","Estado");
+	for(i=0;i<list_size(listaEstadoEnProceso);i++){
+		TpackTablaEstados * aux = list_get(listaEstadoEnProceso,i);
+		id = aux->idTarea;
+		job=aux->job;
+		master = aux->master;
+		bloque=aux->bloque;
+		etapa=getNombreEtapa(aux->etapa);
+		nodo = aux->nodo;
+		archivoTemporal=aux->nombreArchTemporal;
+		printf("%-10d%-10d%-10d%-25s%-10d%-25s%-25s%-25s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"En Proceso");
+	}
+
+	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+		TpackTablaEstados * aux = list_get(listaEstadoFinalizadoOK,i);
+		id = aux->idTarea;
+		job=aux->job;
+		master = aux->master;
+		bloque=aux->bloque;
+		etapa=getNombreEtapa(aux->etapa);
+		nodo = aux->nodo;
+		archivoTemporal=aux->nombreArchTemporal;
+		printf("%-10d%-10d%-10d%-25s%-10d%-25s%-25s%-25s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"Finalizado OK");
+	}
+
+	for(i=0;i<list_size(listaEstadoError);i++){
+		TpackTablaEstados * aux = list_get(listaEstadoError,i);
+		id = aux->idTarea;
+		job=aux->job;
+		master = aux->master;
+		bloque=aux->bloque;
+		etapa=getNombreEtapa(aux->etapa);
+		nodo = aux->nodo;
+		archivoTemporal=aux->nombreArchTemporal;
+		printf("%-10d%-10d%-10d%-25s%-10d%-25s%-25s%-25s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERROR");
+	}
+}
+
+char * getNombreEtapa(int etapaEnum){
+	char * ret = string_new();
+	if(etapaEnum==TRANSFORMACION){
+		string_append(&ret,"Transformacion");
+	}else if(etapaEnum==REDUCCIONGLOBAL){
+		string_append(&ret,"Reduccion Global");
+	}else if(etapaEnum==REDUCCIONLOCAL){
+		string_append(&ret,"Reduccion Local");
+	}else{
+		string_append(&ret,"");
+	}
+	return ret;
+}
 
 /*void generarListaBloquesHardcode(t_list * listaBloques){
 

@@ -49,6 +49,16 @@ typedef struct {
 
 }Tplanificacion;
 
+typedef struct {
+	int idTarea;
+	int job;
+	int master;
+	char * nodo;
+	int bloque;
+	int etapa;
+	char * nombreArchTemporal;
+
+}TpackTablaEstados;
 
 
 t_log* logger;
