@@ -51,7 +51,7 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 	char *bytes_serial;
 
 		int espacioPackSize = sizeof(int);
-		int espacioEnteros = sizeof(int) * 6;
+		int espacioEnteros = sizeof(int) * 8;
 		int espaciosVariables = infoBloque->tamanioIp+infoBloque->tamanioNombre+infoBloque->nombreTemporalLen+infoBloque->tamanioPuerto;
 		int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
@@ -67,7 +67,8 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 		// hacemos lugar para el payload_size
 		*pack_size += sizeof(int);
 
-
+		memcpy(bytes_serial + *pack_size, &infoBloque->idTarea, sizeof(int));
+		*pack_size += sizeof(int);
 
 		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioNombre, sizeof(int));
 		*pack_size += sizeof(int);
@@ -126,6 +127,9 @@ TpackInfoBloque *deserializeInfoBloque(char *bytes_serial){
 		}
 
 		off = 0;
+
+		memcpy(&infoBloque->idTarea, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
 
 		memcpy(&infoBloque->tamanioNombre, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
@@ -367,6 +371,8 @@ char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int b
 	memcpy(bytes_serial + *pack_size, &bytesOcupadosBloque, sizeof (int));
 	*pack_size += sizeof (int);
 
+
+
 	memcpy(bytes_serial + *pack_size, &nombreTemporalLen, sizeof (int));
 	*pack_size += sizeof (int);
 
@@ -408,5 +414,47 @@ TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes
 	memcpy(datosTransf->nombreTemporal, bytes_serial + off, datosTransf->nombreTemporalLen);
 	off += datosTransf->nombreTemporalLen;
 
+
+
+
 	return datosTransf;
+}
+
+int enviarHeaderYValor(Theader head, int valorAEnviar,int socketDestino){
+
+	char *bytes_serial;
+	int pack_size;
+	int estado;
+	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int))) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return -1;
+	}
+
+	pack_size = 0;
+	memcpy(bytes_serial + pack_size, &head, HEAD_SIZE);
+	pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	pack_size += sizeof(int);
+
+	memcpy(bytes_serial + pack_size, &valorAEnviar, sizeof (int));
+	pack_size += sizeof (int);
+
+
+	memcpy(bytes_serial + HEAD_SIZE, &pack_size, sizeof(int));
+
+	if ((estado = send(socketDestino, bytes_serial, pack_size, 0)) == -1){
+		logAndExit("Fallo al enviar el header");
+	}
+
+
+	return estado;
+}
+
+int recibirValor(int fd){
+	int valorRet;
+	char* buffer=recvGeneric(fd);
+	memcpy(&valorRet,buffer, sizeof (int));
+	free(buffer);
+	return valorRet;
 }

@@ -1,8 +1,8 @@
 #include "lib/funcionesYM.h"
 
-int socketFS, idMasterGlobal;
-t_list * listaHistoricaTareas,*listaCargaGlobal;
-pthread_mutex_t mux_listaHistorica,mux_listaCargaGlobal;
+int socketFS, idMasterGlobal,idJobGlobal,idTareaGlobal;
+t_list * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
+pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 int main(int argc, char* argv[]){
 	int estado,
 		socketMasters,
@@ -10,16 +10,33 @@ int main(int argc, char* argv[]){
 		tamanioCliente;
 	Tyama *yama;
 
-	pthread_t master_thread;
+	//pthread_t master_thread;
+
+	pthread_attr_t attr_ondemand;
+	pthread_attr_init(&attr_ondemand);
+	pthread_attr_setdetachstate(&attr_ondemand, PTHREAD_CREATE_DETACHED);
+
+
 	struct sockaddr client;
 	Theader head;
+
 //	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	listaHistoricaTareas=list_create();
 	listaCargaGlobal = list_create();
 
+	listaEstadoEnProceso=list_create();
+	listaEstadoError = list_create();
+	listaEstadoFinalizadoOK=list_create();
+
 	pthread_mutex_init(&mux_listaHistorica, NULL);
 	pthread_mutex_init(&mux_listaCargaGlobal,NULL);
+	pthread_mutex_init(&mux_idGlobal,   NULL);
+	pthread_mutex_init(&mux_jobIdGlobal,   NULL);
+	pthread_mutex_init(&mux_listaEnProceso,NULL);
+	pthread_mutex_init(&mux_listaError,   NULL);
+	pthread_mutex_init(&mux_listaFinalizado,   NULL);
+	pthread_mutex_init(&mux_idTareaGlobal,   NULL);
 
 
 	if(argc!=1){
@@ -28,7 +45,7 @@ int main(int argc, char* argv[]){
 	}
 
 
-	logger = log_create("yama.log", "yama.log", false, LOG_LEVEL_INFO);
+	logger = log_create("yama.log", "yama.log", true, LOG_LEVEL_INFO);
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 	tamanioCliente = sizeof(client);
@@ -59,7 +76,15 @@ int main(int argc, char* argv[]){
 		case MASTER:
 			puts("Se conecto master, creamos hilo manejador");
 
-			crearHilo(&master_thread, (void*)masterHandler, (void*)sockMaster);
+
+			pthread_t masterthread;
+			if( pthread_create(&masterthread, &attr_ondemand, (void*) masterHandler, (void*) sockMaster) < 0){
+				//log_error(logTrace,"no pudo creasr hilo");
+				perror("no pudo crear hilo. error");
+				return FALLO_GRAL;
+			}
+
+
 
 			break;
 		default:

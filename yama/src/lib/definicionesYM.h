@@ -4,7 +4,7 @@
 #include "includesYM.h"
 
 
-#define MAXSIZETEMPNAME 35
+
 #define YESCLOCK 87
 #define NOCLOCK 88
 

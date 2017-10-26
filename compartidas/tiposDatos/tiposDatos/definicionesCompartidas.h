@@ -11,6 +11,18 @@
 #define TAMANIO_EXTENSION_ARCHIVO 10
 #define TAMANIO_NOMBRE_NODO 7
 #define TAMANIO_BLOQUE_N_COPIA_N 15
+#define TAMANIO_NOMBRE_TEMPORAL 25
 #define BLOQUE_SIZE 1024*1024
+
+
+
+#ifndef MUX_LOCK_M
+#define MUX_LOCK(M) (pthread_mutex_lock(M))
+#endif
+#ifndef MUX_UNLOCK_M
+#define MUX_UNLOCK(M) (pthread_mutex_unlock(M))
+#endif
+
+
 
 #endif

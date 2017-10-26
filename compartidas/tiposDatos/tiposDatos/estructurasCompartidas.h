@@ -3,6 +3,12 @@
 
 #include "definicionesCompartidas.h"
 
+typedef enum{
+	TRANSFORMACION = 80,
+	REDUCCIONLOCAL=81,
+	REDUCCIONGLOBAL=82
+}Etapa;
+
 typedef enum {
 	INICIO      = 1,
 	NEW_DN=2,
@@ -26,7 +32,7 @@ typedef enum {
 	ALMACENAR_BLOQUE=20,
 	NUEVATRANSFORMACION=21,
 	FINTRANSFORMACIONLOCALOK=22,
-	FINTRANSFORMACIONLOCALFAIL=23
+	FINTRANSFORMACIONLOCALFAIL=23,
 } Tmensaje;
 
 typedef enum {
@@ -99,6 +105,7 @@ typedef struct {
 typedef struct {
 
 	Theader head;
+	int idTarea;
 	int tamanioNombre;
 	char *nombreNodo;
 	int bloqueDelArchivo;

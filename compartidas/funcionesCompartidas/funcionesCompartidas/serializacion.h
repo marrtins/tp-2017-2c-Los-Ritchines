@@ -21,4 +21,8 @@ TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char *
 
 char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int bytesOcupadosBloque,int nombreTemporalLen ,char* nombreTemporal, int *pack_size);
 TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes_serial);
+
+int enviarHeaderYValor(Theader head, int valorAEnviar,int socketDestino);
+int recibirValor(int fd);
+
 #endif

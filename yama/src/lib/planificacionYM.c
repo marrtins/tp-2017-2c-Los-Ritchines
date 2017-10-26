@@ -23,7 +23,7 @@ t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
 	for(i=0;i<list_size(listaInfoNodos);i++){
 		aux = list_get(listaInfoNodos,i);
 		Tplanificacion * nodo = malloc(sizeof nodo);
-		nodo->infoNodo.nombreNodo=malloc(MAXSIZETEMPNAME);
+		nodo->infoNodo.nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 		nodo->infoNodo.nombreNodo=aux->nombreNodo;
 		nodo->infoNodo.tamanioNombre=aux->tamanioNombre;
 		nodo->infoNodo.ipNodo=malloc(MAXIMA_LONGITUD_IP);
@@ -152,14 +152,14 @@ void avanzarClock(t_list *listaWorkersPlanificacion){
 	}
 }
 void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,TpackageUbicacionBloques *bloqueAux){
-	int nombreLen=6;
 
 
-	bloqueRet->nombreNodo=malloc(nombreLen);
+
+	bloqueRet->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 	bloqueRet->nombreNodo=nodoApuntado->infoNodo.nombreNodo;
 	bloqueRet->tamanioNombre=nodoApuntado->infoNodo.tamanioNombre;
-	bloqueRet->nombreTemporal=malloc(MAXSIZETEMPNAME);
-	bloqueRet->nombreTemporal="tmp-asd";
+	bloqueRet->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
+	bloqueRet->nombreTemporal=generarNombreTemporal();
 	bloqueRet->nombreTemporalLen=strlen(bloqueRet->nombreTemporal)+1;
 	bloqueRet->bytesOcupados=bloqueAux->finBloque;
 	bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
@@ -169,6 +169,7 @@ void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,Tpackag
 	bloqueRet->puertoWorker=nodoApuntado->infoNodo.puertoWorker;
 	bloqueRet->tamanioPuerto=nodoApuntado->infoNodo.tamanioPuerto;
 	bloqueRet->bloqueDelArchivo = bloqueAux->bloque;
+
 }
 
 Tplanificacion * getNodoApuntado(t_list * listaWorkersPlanificacion){
