@@ -75,7 +75,6 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
-								//caro, tenes que traer el tamanio del databin
 								infoBloque = recvInfoNodo(fileDescriptor);
 								if((Tnodo*)buscarNodoPorFD(fileDescriptor) == NULL){
 									printf("Para el nro de bloque recibi %d bytes\n", estado);
@@ -90,14 +89,16 @@ void conexionesDatanode(void * estructura){
 									//habria que probarlo
 									infoBloque = recvInfoNodo(fileDescriptor);
 									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
-									list_add(listaDeNodos, buscarNodoPorFD(fileDescriptor));
+									list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
 									borrarNodoDesconectadoPorFD(fileDescriptor);
+									log_trace(logger, "Nodo que se habia caído, se reconecto");
 								}
 								cantNodosPorConectar--;
 								break;
 
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
+								log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
 								break;
 					}
 
@@ -109,6 +110,7 @@ void conexionesDatanode(void * estructura){
 				} else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
+					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
 					clearAndClose(fileDescriptor, &masterFD);
 					puts("Intruso combatido");
 				}
@@ -128,7 +130,6 @@ void conexionesDatanode(void * estructura){
 }
 
 int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){
-
 		int nuevoFileDescriptor = aceptarCliente(fileDescriptor);
 		FD_SET(nuevoFileDescriptor, bolsaDeFileDescriptors);
 		return nuevoFileDescriptor;
@@ -137,5 +138,4 @@ int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){
 void clearAndClose(int fileDescriptor, fd_set* masterFD){
 	FD_CLR(fileDescriptor, masterFD);
 	close(fileDescriptor);
-
 }

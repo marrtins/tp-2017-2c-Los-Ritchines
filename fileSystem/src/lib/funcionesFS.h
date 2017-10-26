@@ -43,6 +43,7 @@ int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 int sumarListasPorTamanioDatabin();
+void* buscarNodoDesconectadoPorFD(int fd);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);

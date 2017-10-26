@@ -6,9 +6,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos){
 
 	tablaArchivos->extensionArchivo = malloc(TAMANIO_EXTENSION_ARCHIVO);
 
-
-	int cantBloques,
-			nroBloque = 0;
+	int cantBloques, nroBloque = 0;
 	char **temporal1;
 	char **temporal2;
 	char* bloqueCopia0;

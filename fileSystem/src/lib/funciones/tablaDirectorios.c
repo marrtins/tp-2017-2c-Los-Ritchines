@@ -48,6 +48,7 @@ int crearDirectorio(char * ruta) {
 		liberarPunteroDePunterosAChar(carpetas);
 		free(carpetas);
 		free(directorio);
+		log_trace(logger, "Ya exiten 100 directorios, no se pudo crear otro.");
 		return -1;
 	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
@@ -88,6 +89,7 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
+			log_trace(logger, "No se pudo crear un directorio dentro de un directorio que no existe");
 			return -1;
 	}
 }
@@ -124,16 +126,15 @@ int directorioNoExistente(char ** carpetas) {
 	return -1;
 	}else{
 		puts("Falta la referencia al filesystem local 'yamafs:'");
+		log_trace(logger, "No se pudo crear el directorio por que no existe la referencia 'yamafs:'");
 		free(yamafs);
 		return -1;
 	}
 }
 
 int obtenerIndexDeUnaRuta(char * rutaDestino){
-	puts("obteniendo index de una ruta");
 	char ** palabras = string_split(rutaDestino, "/");
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
-	puts("index obtenido");
 	return buscarIndexPorNombreDeDirectorio(directorio);
 
 }
@@ -144,8 +145,8 @@ int buscarIndexPorNombreDeDirectorio(char * directorio){
 	if(estructuraDirectorio != NULL){
 		return estructuraDirectorio->index;
 	}
+	log_trace(logger, "No existe el nombre de directorio.");
 	return -1;
-
 }
 
 int existeDirectorio(char * directorio){

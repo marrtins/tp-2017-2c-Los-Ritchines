@@ -43,6 +43,15 @@ void* buscarNodoPorFD(int fd){
 	return list_find(listaDeNodos, buscarPorFDParaLista);
 }
 
+void* buscarNodoDesconectadoPorFD(int fd){
+	bool buscarPorFDParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return nodo->fd == fd;
+	}
+
+	return list_find(listaDeNodosDesconectados, buscarPorFDParaLista);
+}
+
 void borrarNodoDesconectadoPorFD(int fd){
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
