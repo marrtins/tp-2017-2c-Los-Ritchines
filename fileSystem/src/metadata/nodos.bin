@@ -1,11 +1,7 @@
-Nodo3Libre=0
-Nodo4Total=
-TAMANIO=100
-NODOS=[Nodo1,Nodo2,Nodo3]
-Nodo3Total=50
-Nodo4Libre=
-Nodo1Libre=0
-Nodo2Libre=0
+TAMANIO=20
+NODOS=[Nodo1]
+Nodo1Libre=10
+Nodo2Libre=
 Nodo1Total=20
-LIBRE=0
-Nodo2Total=30
+LIBRE=10
+Nodo2Total=
