@@ -54,12 +54,16 @@ typedef struct {
 	int job;
 	int master;
 	char * nodo;
-	int bloque;
+	int bloqueDelArchivo;
 	int etapa;
 	char * nombreArchTemporal;
+	bool fueReplanificada;
 
 }TpackTablaEstados;
 
+typedef struct{
+	int fdMaster;
+}TatributosHiloMaster;
 
 t_log* logger;
 

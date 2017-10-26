@@ -1,176 +1,50 @@
 #include "funcionesMS.h"
 
-extern char * rutaTransformador;
 
+int enviarScript(char * rutaScript,int sockDestino){
 
-
-int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama){
-
-	pthread_attr_t attr_ondemand;
-	pthread_attr_init(&attr_ondemand);
-	pthread_attr_setdetachstate(&attr_ondemand, PTHREAD_CREATE_DETACHED);
-
-	int cantConexiones = list_size(bloquesTransformacion);
-
-	int i;
-
-	for(i=0;i< cantConexiones;i++){
-
-		TpackInfoBloque *infoBloque=list_get(bloquesTransformacion,i);
-		TatributosHilo * atributos = malloc(sizeof atributos);
-		atributos->infoBloque.idTarea=infoBloque->idTarea;
-		atributos->infoBloque.bloqueDelDatabin = infoBloque->bloqueDelDatabin;
-		atributos->infoBloque.bloqueDelArchivo=infoBloque->bloqueDelArchivo;
-		atributos->infoBloque.bytesOcupados = infoBloque->bytesOcupados;
-		atributos->infoBloque.ipWorker=malloc(MAXIMA_LONGITUD_IP);
-		atributos->infoBloque.ipWorker = infoBloque->ipWorker;
-		atributos->infoBloque.tamanioIp = infoBloque->tamanioIp;
-		atributos->infoBloque.nombreNodo =malloc( TAMANIO_NOMBRE_NODO);
-		atributos->infoBloque.nombreNodo = infoBloque->nombreNodo;
-		atributos->infoBloque.tamanioNombre = infoBloque->tamanioNombre;
-		atributos->infoBloque.nombreTemporal =malloc(TAMANIO_NOMBRE_TEMPORAL);
-		atributos->infoBloque.nombreTemporal=infoBloque->nombreTemporal;
-		atributos->infoBloque.nombreTemporalLen = infoBloque->nombreTemporalLen;
-		atributos->infoBloque.puertoWorker = malloc(MAXIMA_LONGITUD_PUERTO);
-		atributos->infoBloque.puertoWorker = infoBloque->puertoWorker;
-		atributos->infoBloque.tamanioPuerto = infoBloque->tamanioPuerto;
-		atributos->sockYama=sockYama;
-
-		printf("creo hilo %d\n",i);
-		pthread_t workerThread;
-		if( pthread_create(&workerThread, &attr_ondemand, (void*) workerHandler, (void*) atributos) < 0){
-			//log_error(logTrace,"no pudo creasr hilo");
-			perror("no pudo crear hilo. error");
-			return FALLO_GRAL;
-		}
-		//pthread_t workerThread[i];
-		//crearHilo(&workerThread[i], (void*)workerHandler, (void*)atributos);
-	}
-
-	return 0;
-}
-
-void workerHandler(void *info){
-	TatributosHilo *atributos = (TatributosHilo *)info;
-
-
-	int sockYama = atributos->sockYama;
-
-
-	int stat,sockWorker,bloqueDelArchivo,idTarea;
-	int fdTransformador;
-	int len,offset,remain_data,sent_bytes;
+	int fdScript;
+	int len,remain_data,sent_bytes;
+	off_t offset;
 	struct stat file_stat;
 	char file_size[sizeof(int)];
-	char *buffer;
-	int packSize;
-	Theader *headEnvio = malloc(sizeof(headEnvio));
-	bool finCorrecto = false;
-
-	bloqueDelArchivo=atributos->infoBloque.bloqueDelArchivo;
-	idTarea=atributos->infoBloque.idTarea;
-	printf("Hilo del bloque del archivo %d\n",bloqueDelArchivo);
-	printf("ID tarea%d\n",idTarea);
-	printf("Nombre nodo %s\n ip nodo %s\n puerto nodo %s\n Nombre tempo %s\n",atributos->infoBloque.nombreNodo,atributos->infoBloque.ipWorker,atributos->infoBloque.puertoWorker,atributos->infoBloque.nombreTemporal);
-
-	if((sockWorker = conectarAServidor(atributos->infoBloque.ipWorker, atributos->infoBloque.puertoWorker))<0){
-		puts("No pudo conectarse a worker");
-		return;
-	}
-
-	puts("Nos conectamos a worker");
-
-	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
-
-
-	//enviarHeader(sockWorker,headEnvio);
-
-	//Envio al worker el nro de bloque, el tamaño y el nombre temporal
-	Theader headASerializar;
-	headASerializar.tipo_de_mensaje=NUEVATRANSFORMACION;
-	headASerializar.tipo_de_proceso=MASTER;
-
-	buffer = serializarInfoTransformacionMasterWorker(headASerializar,atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bytesOcupados,atributos->infoBloque.nombreTemporalLen,atributos->infoBloque.nombreTemporal,&packSize);
-
-
-	printf("Info de la transformacion serializada, enviamos\n");
-	if ((stat = send(sockWorker, buffer, packSize, 0)) == -1){
-		puts("no se pudo enviar info de la trasnformacion");
-		return;
-	}
-	printf("se enviaron %d bytes de la info de la transformacion\n",stat);
-
-
-
-	//envio el script
-	fdTransformador = open(rutaTransformador, O_RDONLY);
-	if (fdTransformador == -1){
+	fdScript = open(rutaScript, O_RDONLY);
+	if (fdScript == -1){
 		fprintf(stderr, "Error abriendo archivo transformador --> %s", strerror(errno));
-		exit(EXIT_FAILURE);
+		return FALLO_GRAL;
 	}
 
 	/* file stats */
-	if (fstat(fdTransformador, &file_stat) < 0){
+	if (fstat(fdScript, &file_stat) < 0){
 		fprintf(stderr, "Error fstat --> %s", strerror(errno));
-		exit(EXIT_FAILURE);
+		return FALLO_GRAL;
 	}
 
-    fprintf(stdout, "File Size: \n %d bytes\n", file_stat.st_size);
-	sprintf(file_size, "%d", file_stat.st_size);
+	fprintf(stdout, "File Size: \n %ld bytes\n",(long) file_stat.st_size);
+	sprintf(file_size, "%ld",(long) file_stat.st_size);
 
 
 	/* envio file size */
-	len = send(sockWorker, file_size, sizeof(file_size), 0);
+	len = send(sockDestino, file_size, sizeof(file_size), 0);
 	if (len < 0){
 		fprintf(stderr, "Error enviando filesize --> %s", strerror(errno));
-		exit(EXIT_FAILURE);
+		return FALLO_GRAL;
 	}
 
-	fprintf(stdout, "Enviamos %d bytes del tamanio(%d) del script transformador \n", len,file_stat.st_size);
+	fprintf(stdout, "Enviamos %d bytes del tamanio(%ld) del script transformador \n", len,(long)file_stat.st_size);
 
 	offset = 0;
 	remain_data = file_stat.st_size;
 	/* envio script data */
-	while (((sent_bytes = sendfile(sockWorker, fdTransformador, &offset, BUFSIZ)) > 0) && (remain_data > 0)){
+
+	while (((sent_bytes = sendfile(sockDestino, fdScript, &offset, 1024)) > 0) && (remain_data > 0)){
 		remain_data -= sent_bytes;
-		fprintf(stdout, "2.enviados %d bytes de data, offset : %d and remain data = %d\n", sent_bytes, offset, remain_data);
+		fprintf(stdout, "2.enviados %d bytes de data, offset : %ld and remain data = %d\n", sent_bytes,(long) offset, remain_data);
 	}
 
-	close(fdTransformador);
-	puts("al while");
-
-	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
-
-		switch (headRcv.tipo_de_mensaje) {
-		case(FIN_LOCALTRANSF):
-			printf("Worker me avisa que termino de transformar el bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
-			finCorrecto = true;
-			close(sockWorker);
-		break;
-		default:
-			break;
-		}
-
-
-	}
-	if(finCorrecto){
-		puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
-		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALOK;
-		enviarHeaderYValor(headASerializar,idTarea,sockYama);
-
-
-	}else{
-		puts("termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
-		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALFAIL;
-		enviarHeaderYValor(headASerializar,idTarea,sockYama);
-
-	}
-	printf("fin thread de transfo del bloque del databin %d (bloque deol archivo :%d)\n",atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bloqueDelArchivo);
+	close(fdScript);
+	return 0;
 }
-
-
 
 
 Tmaster * obtenerConfiguracionMaster(char* ruta){

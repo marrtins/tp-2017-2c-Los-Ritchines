@@ -53,9 +53,7 @@ int main(int argc, char* argv[]) {
 
 
 	rutaTransformador=argv[1];
-
 	rutaReductor=argv[2];
-
 	rutaArchivoAReducir=argv[3];
 	rutaResultado=argv[4];
 
@@ -71,7 +69,10 @@ int main(int argc, char* argv[]) {
 
 
 	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
-	cantidadBytesEnviados = enviarHeader(sockYama, head);
+
+	if((cantidadBytesEnviados = enviarHeader(sockYama, head))<0){
+		printf("Error enviar header");
+	}
 
 	puts("Enviamos a YAMA las rutas a reducir y almacenar");
 
@@ -80,8 +81,6 @@ int main(int argc, char* argv[]) {
 	packSize = 0;
 	buffer=serializeBytes(headTmp,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
 	puts("Path del archivo a reducir serializado; lo enviamos");
-
-	//cantidadBytesEnviados = enviarHeader(sockYama, head);
 
 	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
@@ -116,19 +115,11 @@ int main(int argc, char* argv[]) {
 
 		case (INFOBLOQUE):
 			puts("Nos llega info de un bloque");
-			if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
-				puts("Fallo recepcion de INFOBLOQUE");
-				return -1;
-			}
 
-			if ((infoBloque = deserializeInfoBloque(buffer)) == NULL){
-				puts("Fallo deserializacion de Bytes del path_res_file");
-				return -1;
+			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
+				puts("Error no pudimos recibir la info bloque. se cierra");
+				return FALLO_CONEXION;
 			}
-			printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
-			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
-			printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
-					infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
 
 			list_add(bloquesTransformacion,infoBloque);
 			break;
@@ -137,18 +128,12 @@ int main(int argc, char* argv[]) {
 
 		case (INFOULTIMOBLOQUE):
 			puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
-			if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
-				puts("Fallo recepcion de INFOBLOQUE");
-				return -1;
+
+			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
+				puts("Error no pudimos recibir la info bloque. se cierra");
+				return FALLO_CONEXION;
 			}
-			if ((infoBloque = deserializeInfoBloque(buffer)) == NULL){
-				puts("Fallo deserializacion de Bytes del path_res_file");
-				return -1;
-			}
-			printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
-			printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
-			printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
-								infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
+
 			list_add(bloquesTransformacion,infoBloque);
 			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 
@@ -156,6 +141,17 @@ int main(int argc, char* argv[]) {
 
 
 			break;
+		case(INFOBLOQUEREPLANIFICADO):
+			puts("nos llega info de un bloque a replanificar");
+			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
+				puts("Error no pudimos recibir la info bloque. se cierra");
+				return FALLO_CONEXION;
+			}
+			stat = conectarseAWorkerParaReplanificarTransformacion(infoBloque,sockYama);
+
+
+
+		break;
 
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);
@@ -169,4 +165,27 @@ int main(int argc, char* argv[]) {
 	freeAndNULL((void **) &buffer);
 	return EXIT_SUCCESS;
 }
+
+
+
+TpackInfoBloque *recibirInfoBloque(int sockYama){
+	char * buffer;
+	TpackInfoBloque *infoBloque;
+	if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
+		puts("Fallo recepcion de INFOBLOQUE");
+		return NULL;
+	}
+
+	if ((infoBloque = deserializeInfoBloque(buffer)) == NULL){
+		puts("Fallo deserializacion de Bytes del path_res_file");
+		return NULL;
+	}
+	printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
+	printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
+	printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
+			infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
+
+	return infoBloque;
+}
+
 
