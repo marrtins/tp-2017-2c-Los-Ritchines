@@ -3,6 +3,12 @@
 
 #include "estructurasFS.h"
 
+//Operaciones
+long sumaDeDosNumerosLong(long valor1, long valor2);
+long restaDeDosNumerosLong(long valor1, long valor2);
+int sumaDeDosNumerosInt(int valor1, int valor2);
+int restaDeDosNumerosInt(int valor1, int valor2);
+
 //Configuracion
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
