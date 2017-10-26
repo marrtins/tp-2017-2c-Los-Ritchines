@@ -31,7 +31,7 @@ void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
-char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
+char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento);
 char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre);
 void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
@@ -90,5 +90,6 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
+void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 
 #endif
