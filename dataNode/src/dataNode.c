@@ -21,6 +21,11 @@ int main(int argc, char* argv[]) {
 
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 
+	if(archivo == NULL){
+		puts("No existe el databin, o esta mal la ruta al archivo.");
+		logAndExit("No existe el databin, o esta mal la ruta al archivo.");
+	}
+
 	fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, dataNode->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
 					logAndExit("Error al hacer mmap");

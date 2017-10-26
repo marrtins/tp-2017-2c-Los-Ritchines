@@ -1,9 +1,7 @@
 #include "../funcionesFS.h"
 
 void inicializarTablaDeNodos(){
-	puts("antes de borrar");
 	remove("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-	puts("despues de borrar");
 	FILE * archivo = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", "wb");
 	fclose(archivo);
 	t_config * archivoNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");

@@ -123,8 +123,6 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 	memcpy(infoBloque->contenido, punteroAuxiliar, bytesFaltantesPorEnviar);
 	enviarBloque(infoBloque, archivoAAlmacenar);
 
-
-
 }
 
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar* infoBloque){
@@ -192,11 +190,13 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
+		log_trace(logger, "Error al almacenar archivo, está vacío");
 		return -1;
 	}
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
+		log_trace(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		return -1;
 	}
 
@@ -226,6 +226,7 @@ void almacenarArchivo(char **palabras){
 	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
 	if(procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]) == -1){
+		log_trace(logger, "Error al");
 		return;
 	}
 
