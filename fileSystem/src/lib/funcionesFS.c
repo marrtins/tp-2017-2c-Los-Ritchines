@@ -178,15 +178,26 @@ int existeDirectorio(char * directorio){
 					indicePadre = estructuraDirectorio->index;
 					i++;
 				} else {
+					liberarPunteroDePunterosAChar(carpetas);
+					free(carpetas);
+					free(yamafs);
 					return 0;
 				}
 			} else {
+				liberarPunteroDePunterosAChar(carpetas);
+				free(carpetas);
+				free(yamafs);
 				return 0;
 			}
 		}
-
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
+		free(yamafs);
 		return 1;
 	} else {
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
+		free(yamafs);
 		return 0;
 	}
 
@@ -1120,15 +1131,19 @@ int directorioNoExistente(char ** carpetas) {
 			if (estructuraDirectorio->padre == indicePadre) {
 				indicePadre = estructuraDirectorio->index;
 			} else {
+				free(yamafs);
 				return i;
 			}
 		} else {
+			free(yamafs);
 			return i;
 		}
 	}
+	free(yamafs);
 	return -1;
 	}else{
 		puts("Falta la referencia al filesystem local 'yamafs:'");
+		free(yamafs);
 		return -1;
 	}
 }
@@ -1160,10 +1175,16 @@ int crearDirectorio(char * ruta) {
 
 	if(list_size(listaTablaDirectorios)>=100){
 		puts("Ya hay 100 directorios creados, no se puede crear el directorio");
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
+		free(directorio);
 		return -1;
 	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
 		puts("No se puede crear el directorio");
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
+		free(directorio);
 		return -1;
 	} else {
 		if (nroDirectorio == cant - 1) {
@@ -1177,6 +1198,7 @@ int crearDirectorio(char * ruta) {
 
 			indice = string_itoa(index);
 			string_append(&directorio, indice);
+			free(indice);
 			//syscall(SYS_mkdir, directorio);
 			mkdir(directorio,0777);
 
@@ -1187,12 +1209,16 @@ int crearDirectorio(char * ruta) {
 			tDirectorio->padre = indicePadre;
 
 			list_add(listaTablaDirectorios,tDirectorio);
+			liberarPunteroDePunterosAChar(carpetas);
+			free(carpetas);
+			free(directorio);
 			return 0;
 		}
 			puts("No se puede crear directorio dentro de un directorio que no existe");
+			liberarPunteroDePunterosAChar(carpetas);
+			free(carpetas);
+			free(directorio);
 			return -1;
-
-			free(indice);
 	}
 }
 
