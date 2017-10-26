@@ -8,6 +8,7 @@ long sumaDeDosNumerosLong(long valor1, long valor2);
 long restaDeDosNumerosLong(long valor1, long valor2);
 int sumaDeDosNumerosInt(int valor1, int valor2);
 int restaDeDosNumerosInt(int valor1, int valor2);
+void setearAtributoDeArchivoConfigConInts(t_config * archivoConf, char * key, int value, int(*funcion)(int valor1, int valor2));
 
 //Configuracion
 TfileSystem *obtenerConfiguracionFS(char* ruta);

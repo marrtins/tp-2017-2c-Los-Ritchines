@@ -307,6 +307,7 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	 infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
 	 puts("desempaqueta la info del nodo");
+	 printf("ACAAAAA HOLIIII %s\n", infoBloque->nombreNodo);
 	 return infoBloque;
 }
 
