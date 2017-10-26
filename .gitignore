@@ -1,5 +1,8 @@
 data1.bin
 data2.bin
+data3.bin
+data4.bin
+metadata/archivos/
 Release/
 Debug/
 *.log
