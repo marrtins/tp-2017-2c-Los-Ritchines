@@ -78,7 +78,9 @@ int main(int argc, char* argv[]){
 
 
 			pthread_t masterthread;
-			if( pthread_create(&masterthread, &attr_ondemand, (void*) masterHandler, (void*) sockMaster) < 0){
+			TatributosHiloMaster * attrHilo = malloc(sizeof attrHilo);
+			attrHilo->fdMaster=sockMaster;
+			if( pthread_create(&masterthread, &attr_ondemand, (void*) masterHandler, (void*) attrHilo) < 0){
 				//log_error(logTrace,"no pudo creasr hilo");
 				perror("no pudo crear hilo. error");
 				return FALLO_GRAL;

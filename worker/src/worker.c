@@ -21,12 +21,14 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}*/
 
-	logger = log_create("worker.log", "worker.log", false, LOG_LEVEL_INFO);
+	logger = log_create("worker.log", "worker.log", true, LOG_LEVEL_INFO);
 
 	worker=obtenerConfiguracionWorker(argv[1]);
 	mostrarConfiguracion(worker);
 
-	socketDeMaster = crearSocketDeEscucha(worker->puerto_entrada);
+	if((socketDeMaster = crearSocketDeEscucha(worker->puerto_entrada))<0){
+		return FALLO_CONEXION;
+	}
 
 	//Listen
 	while ((estado = listen(socketDeMaster , BACKLOG)) < 0){

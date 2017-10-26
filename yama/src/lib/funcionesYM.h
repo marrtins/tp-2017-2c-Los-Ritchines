@@ -37,7 +37,9 @@ char * getNombreEtapa(int etapaEnum);
 void mostrarTablaDeEstados();
 
 char * generarNombreTemporal();
-
+TpackTablaEstados * getTareaPorId(int idTarea);
+bool sePuedeReplanificar(int idTarea,t_list * listaComposicionArchivo);
+int replanificar(int idTarea,int fdMaster,t_list * listaComposicionArchivo);
 
 #endif
 
