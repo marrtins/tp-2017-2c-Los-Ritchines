@@ -44,6 +44,7 @@ int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 int sumarListasPorTamanioDatabin();
 void* buscarNodoDesconectadoPorFD(int fd);
+bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -75,6 +76,7 @@ void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
+int bloquesOcupadosDeNodo(Tnodo * nodo);
 
 //md5
 int getMD5(char**palabras);

@@ -1,6 +1,17 @@
 #include "../funcionesFS.h"
 
-bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
+int bloquesOcupadosDeNodo(Tnodo * nodo){
+	return nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
+}
+
+bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2){
+	Tnodo * nodoA = (Tnodo *) nodo1;
+	Tnodo * nodoB = (Tnodo *) nodo2;
+
+	return nodoA->cantidadBloquesLibres >= nodoB->cantidadBloquesLibres;
+}
+
+/*bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 	Tnodo* nodoA = (Tnodo*)nodo1;
 	Tnodo* nodoB = (Tnodo*)nodo2;
 
@@ -10,7 +21,7 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
 		return bloquesOcupados / nodo->cantidadBloquesTotal;
 	}
 	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
-}
+}*/
 
 int sumarListasPorTamanioDatabin(){
 	int cantidadDeElementos = listaDeNodos->elements_count;
