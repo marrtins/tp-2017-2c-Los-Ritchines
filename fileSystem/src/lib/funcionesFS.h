@@ -31,10 +31,12 @@ void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
 char * generarArrayParaArchivoConfig(char * dato1, char * dato2);
+int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
+int sumarListasPorTamanioDatabin();
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -77,5 +79,6 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);
+void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 
 #endif
