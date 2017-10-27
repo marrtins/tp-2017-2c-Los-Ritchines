@@ -4,7 +4,7 @@ void persistirTablaDeDirectorios(){
 	int tamanio, i=0;
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 	tamanio = list_size(listaTablaDirectorios);
-	Tdirectorio * directorio = malloc(sizeof(Tdirectorio));
+	Tdirectorio * directorio;
 
 	while(tamanio != i){
 		directorio = list_get(listaTablaDirectorios, i);
@@ -13,7 +13,6 @@ void persistirTablaDeDirectorios(){
 	}
 
 	fclose(archivoDirectorios);
-
 }
 
 void levantarTablasDirectorios(){
@@ -98,6 +97,7 @@ void inicializarTablaDirectorios(){
 		FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 		list_clean(listaTablaDirectorios);
 		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
+		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
 		fclose(archivoDirectorios);
 }
 
@@ -109,6 +109,7 @@ int directorioNoExistente(char ** carpetas) {
 	if (string_equals_ignore_case(carpetas[i], yamafs)) {
 			i++;
 	for (i = 1; i < cant; i++) {
+
 		Tdirectorio * estructuraDirectorio = (Tdirectorio*) buscarPorNombreDeDirectorio(carpetas[i]);
 		if (estructuraDirectorio != NULL) {
 			if (estructuraDirectorio->padre == indicePadre) {
@@ -133,10 +134,14 @@ int directorioNoExistente(char ** carpetas) {
 }
 
 int obtenerIndexDeUnaRuta(char * rutaDestino){
+	int indice;
 	char ** palabras = string_split(rutaDestino, "/");
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
-	return buscarIndexPorNombreDeDirectorio(directorio);
-
+	liberarPunteroDePunterosAChar(palabras);
+	free(palabras);
+	indice = buscarIndexPorNombreDeDirectorio(directorio);
+	free(directorio);
+	return indice;
 }
 
 int buscarIndexPorNombreDeDirectorio(char * directorio){

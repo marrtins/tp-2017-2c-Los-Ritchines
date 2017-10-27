@@ -110,15 +110,17 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 	char * concatenacionLoca2;
 	char * numeroBloqueEnString;
 	char * numeroBloqueEnString2;
+	char * tamanioTotal;
+	char * bytes;
 	int i = 0;
 
-	config_set_value(archivoConfig, "TAMANIO", string_itoa(archivoAAlmacenar->tamanioTotal));
+	tamanioTotal = string_itoa(archivoAAlmacenar->tamanioTotal);
+	config_set_value(archivoConfig, "TAMANIO", tamanioTotal);
 	config_set_value(archivoConfig, "TIPO", archivoAAlmacenar->extensionArchivo);
 
-	while(cantidadDeBloques != 0){
+	free(tamanioTotal);
 
-		numeroBloqueEnString = malloc(4);
-		numeroBloqueEnString = malloc(4);
+	while(cantidadDeBloques != 0){
 
 		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
 		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
@@ -134,10 +136,12 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 		//aca hace el tamanio
 		bloqueNBytes = generarStringDeBloqueNBytes(i);
 		//hay que pasar un long a string
-		config_set_value(archivoConfig, bloqueNBytes, string_itoa(archivoAAlmacenar->bloques[i].bytes));
+		bytes = string_itoa(archivoAAlmacenar->bloques[i].bytes);
+		config_set_value(archivoConfig, bloqueNBytes, bytes);
 		cantidadDeBloques--;
 		i++;
 
+		free(bytes);
 		free(numeroBloqueEnString);
 		free(numeroBloqueEnString2);
 		free(bloque0CopiaN);

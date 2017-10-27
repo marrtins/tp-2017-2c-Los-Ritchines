@@ -285,9 +285,9 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 
 	Tbuffer *buffer = malloc(sizeof(Tbuffer));
 	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio);
-	char *chorroBytes = malloc(buffer->tamanio);
+	buffer->buffer = malloc(buffer->tamanio);
 
-	char * p = chorroBytes;
+	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
 	memcpy(p, &nodo->primerBloqueLibreBitmap, sizeof(int));
@@ -296,9 +296,6 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	p += sizeof(unsigned long long);
 	memcpy(p, bloque->contenido, bloque->tamanio);
 	p += bloque->tamanio;
-
-	buffer->buffer = malloc(buffer->tamanio);
-	buffer->buffer = chorroBytes;
 
 	return buffer;
 }

@@ -81,7 +81,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
-
+	free(head);
 	liberarEstructuraBuffer(buffer1);
 	liberarEstructuraBuffer(buffer2);
 }
@@ -191,12 +191,14 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
 		log_trace(logger, "Error al almacenar archivo, está vacío");
+		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_trace(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
+		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
 
@@ -226,13 +228,17 @@ void almacenarArchivo(char **palabras){
 	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
 	if(procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]) == -1){
-		log_trace(logger, "Error al");
+		liberarPunteroDePunterosAChar(splitDeRuta);
+		free(splitDeRuta);
+		free(nombreArchivoConExtension);
+		liberarTablaDeArchivo(archivoAAlmacenar);
 		return;
 	}
 
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 	liberarPunteroDePunterosAChar(splitDeRuta);
 	free(splitDeRuta);
+	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
@@ -242,7 +248,6 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->primerBloqueLibreBitmap = 0;
-	puts("\n\n\nACA SALE EL NOMBRE DEL DATANODE QUE SE CONECTO\n\n\n");
 	puts(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
@@ -304,8 +309,13 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 		}
 
 	printf("Para el tamanio del databin recibi %d bytes\n", estado);
-	printf("HOLIIIII %s", nombreNodo);
+
 	 infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+
+	 free(nombreNodo);
+	 free(ipNodo);
+	 free(puertoNodo);
+
 	 puts("desempaqueta la info del nodo");
 	 return infoBloque;
 }

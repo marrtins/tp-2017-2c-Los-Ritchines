@@ -28,4 +28,5 @@ void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque){
 	free(bloque->ipNodo);
 	free(bloque->nombreNodo);
 	free(bloque->puertoNodo);
+	free(bloque);
 }

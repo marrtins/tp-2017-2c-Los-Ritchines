@@ -93,7 +93,7 @@ void conexionesDatanode(void * estructura){
 									borrarNodoDesconectadoPorFD(fileDescriptor);
 									log_trace(logger, "Nodo que se habia caído, se reconecto");
 								}
-								//liberarTPackInfoBloqueDN(infoBloque);
+								liberarTPackInfoBloqueDN(infoBloque);
 								cantNodosPorConectar--;
 								break;
 
