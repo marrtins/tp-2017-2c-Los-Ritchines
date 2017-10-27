@@ -38,13 +38,13 @@ int main(int argc, char* argv[]){
 	//acepta y escucha
 	puts("esperando comunicaciones entrantes...");
 	while((client_sock = accept(socketDeMaster, (struct sockaddr*) &client, (socklen_t*) &clientSize)) != -1){
-		puts("Conexion aceptada");
+		//puts("Conexion aceptada");
 		while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
 			log_trace(logger,"Error en la recepcion del header.");
 		}
 
-		printf("Cantidad de bytes recibidos: %d\n", estado);
-		printf("El tipo de proceso es %d y el mensaje es %d\n",	head->tipo_de_proceso, head->tipo_de_mensaje);
+		//printf("Cantidad de bytes recibidos: %d\n", estado);
+		//printf("El tipo de proceso es %d y el mensaje es %d\n",	head->tipo_de_proceso, head->tipo_de_mensaje);
 
 		switch(head->tipo_de_proceso){
 

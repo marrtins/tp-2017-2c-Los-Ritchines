@@ -36,8 +36,9 @@ typedef enum {
 	FINTRANSFORMACIONLOCALFAIL=23,
 	INFOBLOQUEREPLANIFICADO=24,
 	FINJOB_ERRORREPLANIFICACION=25,
-	INFOREDUCCIONLOCAL=26
-
+	INFOREDUCCIONLOCAL=26,
+	INICIARREDUCCIONLOCAL=27,
+	FIN_REDUCCIONLOCAL=28
 } Tmensaje;
 
 typedef enum {
@@ -185,6 +186,15 @@ typedef struct {
 	int nombreTemporalLen;
 	char * nombreTemporal;
 }TreduccionLista;
+
+
+
+typedef struct {
+	int nombreTempReduccionLen;
+	char * nombreTempReduccion;
+	int listaSize;
+	t_list * listaTemporales;
+}TinfoReduccionLocalMasterWorker;
 
 t_log* logger;
 

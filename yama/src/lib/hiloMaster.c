@@ -293,15 +293,16 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	TreduccionLocal * infoReduccion = malloc(sizeof(infoReduccion));
 	infoReduccion->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 	infoReduccion->nombreNodo=nodoReductor;
-	infoReduccion->nombreNodoLen=strlen(infoReduccion->nombreNodo);
+	infoReduccion->nombreNodoLen=strlen(infoReduccion->nombreNodo)+1;
 	infoReduccion->ipNodo=malloc(MAXIMA_LONGITUD_IP);
 	infoReduccion->ipNodo=getIpNodo(nodoReductor);
-	infoReduccion->ipLen=strlen(infoReduccion->ipNodo);
+	infoReduccion->ipLen=strlen(infoReduccion->ipNodo)+1;
 	infoReduccion->puertoNodo=malloc(MAXIMA_LONGITUD_PUERTO);
 	infoReduccion->puertoNodo=getPuertoNodo(nodoReductor);
-	infoReduccion->puertoLen=strlen(infoReduccion->puertoNodo);
+	infoReduccion->puertoLen=strlen(infoReduccion->puertoNodo)+1;
 	infoReduccion->tempRed=malloc(TAMANIO_NOMBRE_TEMPORAL);
 	infoReduccion->tempRed=generarNombreReductorTemporal(nodoReductor);
+	infoReduccion->tempRedLen=strlen(infoReduccion->tempRed)+1;
 	infoReduccion->job=nuevoJob;
 	infoReduccion->idTarea=idTareaActual;
 
@@ -310,9 +311,9 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 		TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
 		if(tareaOk->job==jobAReducir && tareaOk->nodo==nodoReductor){
 			TreduccionLista * reduccionAux=  malloc(sizeof reduccionAux);
-			reduccionAux->nombreTemporalLen=strlen(tareaOk->nombreArchTemporal);
-			reduccionAux->nombreTemporal=malloc(reduccionAux->nombreTemporalLen);
+			reduccionAux->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
 			reduccionAux->nombreTemporal=tareaOk->nombreArchTemporal;
+			reduccionAux->nombreTemporalLen=strlen(reduccionAux->nombreTemporal)+1;
 			list_add(listaTemporales,reduccionAux);
 		}
 	}
@@ -481,7 +482,7 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 		}
 		printf("se enviaron %d bytes de la info del bloque\n",stat);
 
-		agregarAListaEnProceso(jobActual,bloqueAEnviar->idTarea,REDUCCIONLOCAL,bloqueAEnviar);
+		agregarAListaEnProceso(jobActual,bloqueAEnviar->idTarea,TRANSFORMACION,bloqueAEnviar);
 
 
 	}
@@ -511,7 +512,7 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion){
 	estado->etapa=REDUCCIONLOCAL;
 	estado->nombreArchTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
 	estado->nombreArchTemporal=infoReduccion->tempRed;
-
+	list_add(listaEstadoEnProceso,estado);
 	MUX_UNLOCK(&mux_listaEnProceso);
 	mostrarTablaDeEstados();
 }

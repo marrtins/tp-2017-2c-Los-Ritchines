@@ -81,25 +81,25 @@ int main(int argc, char* argv[]) {
 	headTmp.tipo_de_mensaje = PATH_FILE_TOREDUCE ;
 	packSize = 0;
 	buffer=serializeBytes(headTmp,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
-	puts("Path del archivo a reducir serializado; lo enviamos");
+	//puts("Path del archivo a reducir serializado; lo enviamos");
 
 	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
 		return  FALLO_SEND;
 	}
-	printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
+	//printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
 
 
 	headTmp.tipo_de_proceso = MASTER; headTmp.tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
 	buffer=serializeBytes(headTmp,rutaResultado,(strlen(rutaResultado)+1),&packSize);
-	puts("Path del resultado serializado; lo enviamos");
+	//puts("Path del resultado serializado; lo enviamos");
 
 
 	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar Path del aresultado a YAMA. ");
 		return  FALLO_SEND;
 	}
-	printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
+	//printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
 
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 	while ((stat=recv(sockYama, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 
-		puts("Recibimos un paquete de YAMA");
+		//puts("Recibimos un paquete de YAMA");
 
 		TpackInfoBloque *infoBloque;
 		TreduccionLocal *infoReduccionLocal;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 		switch (headRcv.tipo_de_mensaje) {
 
 		case (INFOBLOQUE):
-			puts("Nos llega info de un bloque");
+			//puts("Nos llega info de un bloque");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 
 
 		case (INFOULTIMOBLOQUE):
-			puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
+			//puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
 
 			break;
 		case(INFOBLOQUEREPLANIFICADO):
-			puts("nos llega info de un bloque a replanificar");
+		//	puts("nos llega info de un bloque a replanificar");
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
 				return FALLO_CONEXION;
@@ -190,10 +190,10 @@ TpackInfoBloque *recibirInfoBloque(int sockYama){
 		puts("Fallo deserializacion de Bytes del path_res_file");
 		return NULL;
 	}
-	printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
-	printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
-	printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
-			infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
+//	printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
+//	printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
+//	printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
+//			infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
 
 	return infoBloque;
 }
@@ -211,16 +211,16 @@ TreduccionLocal *recibirInfoReduccionLocal(int sockYama){
 		return NULL;
 	}
 
-	printf("Nos llego la info reduccion local de %s",infoReduccion->nombreNodo);
-	printf("job idtarea nombre nodo ipnodo puertonodo tempReductor tempTransf\n");
-	printf("%d\n%d\n%s\n%s\n%s\n%s\n",infoReduccion->job,infoReduccion->idTarea,infoReduccion->nombreNodo,
-			infoReduccion->ipNodo,infoReduccion->puertoNodo,infoReduccion->tempRed);
-	printf("list size %d\n",infoReduccion->listaSize);
+//	printf("Nos llego la info reduccion local de %s",infoReduccion->nombreNodo);
+//	printf("job idtarea nombre nodo ipnodo puertonodo tempReductor tempTransf\n");
+//	printf("%d\n%d\n%s\n%s\n%s\n%s\n",infoReduccion->job,infoReduccion->idTarea,infoReduccion->nombreNodo,
+//			infoReduccion->ipNodo,infoReduccion->puertoNodo,infoReduccion->tempRed);
+//	printf("list size %d\n",infoReduccion->listaSize);
 
 	int i;
 	for(i=0;i<list_size(infoReduccion->listaTemporalesTransformacion);i++){
 		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporalesTransformacion,i);
-		printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
+	//	printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
 	}
 
 	return infoReduccion;

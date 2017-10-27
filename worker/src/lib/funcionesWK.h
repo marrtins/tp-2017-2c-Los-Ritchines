@@ -8,4 +8,6 @@ void mostrarConfiguracion(Tworker *worker);
 
 void manejarConexionMaster(Theader *header,int client_sock);
 
+int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar);
+
 #endif
