@@ -54,12 +54,12 @@ void hiloWorkerTransformacion(void *info){
 	buffer = serializarInfoTransformacionMasterWorker(headASerializar,atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bytesOcupados,atributos->infoBloque.nombreTemporalLen,atributos->infoBloque.nombreTemporal,&packSize);
 
 
-	printf("Info de la transformacion serializada, enviamos\n");
+	//printf("Info de la transformacion serializada, enviamos\n");
 	if ((stat = send(sockWorker, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar info de la trasnformacion");
 		return;
 	}
-	printf("se enviaron %d bytes de la info de la transformacion\n",stat);
+//	printf("se enviaron %d bytes de la info de la transformacion\n",stat);
 
 
 
@@ -68,13 +68,13 @@ void hiloWorkerTransformacion(void *info){
 	if(stat<0){
 		puts("Error al enviar el script transformador");
 	}
-	puts("al while");
+	//puts("al while");
 
 	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 		switch (headRcv.tipo_de_mensaje) {
 		case(FIN_LOCALTRANSF):
-			printf("Worker me avisa que termino de transformar el bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
+			//printf("Worker me avisa que termino de transformar el bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
 			finCorrecto = true;
 			close(sockWorker);
 		break;
@@ -101,103 +101,6 @@ void hiloWorkerTransformacion(void *info){
 	printf("fin thread de transfo del bloque del databin %d (bloque deol archivo :%d)\n",atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bloqueDelArchivo);
 }
 
-void hiloWorkerReduccionLocal(void *info){
-	TatributosHiloReduccionLocal *atributos = (TatributosHiloReduccionLocal *)info;
-
-
-	int sockYama = atributos->sockYama;
-
-
-	int stat,sockWorker,idTarea;
-//	int fdTransformador;
-//	int len,remain_data,sent_bytes;
-//	off_t offset;
-//	struct stat file_stat;
-//	char file_size[sizeof(int)];
-	char *buffer;
-	int packSize;
-	Theader *headEnvio = malloc(sizeof(headEnvio));
-	bool finCorrecto = false;
-
-
-	idTarea=atributos->infoReduccion.idTarea;
-
-
-	printf("ID tarea%d\n",idTarea);
-	printf("Nombre nodo %s\n ip nodo %s\n puerto nodo %s\n Nombre tempored %s \n",
-			atributos->infoReduccion.nombreNodo,atributos->infoReduccion.ipNodo,atributos->infoReduccion.puertoNodo,
-			atributos->infoReduccion.tempRed);
-
-
-	int i;
-	for(i=0;i<list_size(atributos->infoReduccion.listaTemporalesTransformacion);i++){
-		TreduccionLista *infoAux = list_get(atributos->infoReduccion.listaTemporalesTransformacion,i);
-		printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
-	}
-
-
-	if((sockWorker = conectarAServidor(atributos->infoReduccion.ipNodo, atributos->infoReduccion.puertoNodo))<0){
-		puts("No pudo conectarse a worker");
-		return;
-	}
-
-	puts("Nos conectamos a worker");
-	while(1);
-	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
-
-
-	//enviarHeader(sockWorker,headEnvio);
-
-	//Envio al worker el nro de bloque, el tamaño y el nombre temporal
-	Theader headASerializar;
-	headASerializar.tipo_de_mensaje=NUEVATRANSFORMACION;
-	headASerializar.tipo_de_proceso=MASTER;
-
-	//buffer = serializarInfoTransformacionMasterWorker(headASerializar,atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bytesOcupados,atributos->infoBloque.nombreTemporalLen,atributos->infoBloque.nombreTemporal,&packSize);
-
-
-	printf("Info de la transformacion serializada, enviamos\n");
-	if ((stat = send(sockWorker, buffer, packSize, 0)) == -1){
-		puts("no se pudo enviar info de la trasnformacion");
-		return;
-	}
-	printf("se enviaron %d bytes de la info de la transformacion\n",stat);
-
-
-
-	//envio el script
-	stat=enviarScript(rutaTransformador,sockWorker);
-	if(stat<0){
-		puts("Error al enviar el script transformador");
-	}
-	puts("al while");
-
-	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
-
-		switch (headRcv.tipo_de_mensaje) {
-
-		default:
-			break;
-		}
-
-
-	}
-	if(finCorrecto){
-		puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
-		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALOK;
-		enviarHeaderYValor(headASerializar,idTarea,sockYama);
-
-
-	}else{
-		puts("termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
-		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALFAIL;
-		enviarHeaderYValor(headASerializar,idTarea,sockYama);
-
-	}
-	printf("fin thread de reduccion local del nodo %s \n",atributos->infoReduccion.nombreNodo);
-}
 
 
 
@@ -260,7 +163,7 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama
 		atributos->infoBloque.tamanioPuerto = infoBloque->tamanioPuerto;
 		atributos->sockYama=sockYama;
 
-		printf("creo hilo %d\n",i);
+	//	printf("creo hilo %d\n",i);
 		pthread_t workerThread;
 		if( pthread_create(&workerThread, &attr_ondemand, (void*) hiloWorkerTransformacion, (void*) atributos) < 0){
 			//log_error(logTrace,"no pudo creasr hilo");
@@ -276,35 +179,6 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama
 
 
 
-int conectarseAWorkerParaReduccionLocal(TreduccionLocal *infoReduccion,int sockYama){
 
-
-	TatributosHiloReduccionLocal * atributos = malloc(sizeof atributos);
-	atributos->infoReduccion.idTarea=infoReduccion->idTarea;
-	atributos->infoReduccion.ipLen=infoReduccion->ipLen;
-	atributos->infoReduccion.ipNodo=malloc(MAXIMA_LONGITUD_IP);
-	atributos->infoReduccion.ipNodo=infoReduccion->ipNodo;
-	atributos->infoReduccion.job=infoReduccion->job;
-	atributos->infoReduccion.nombreNodoLen=infoReduccion->nombreNodoLen;
-	atributos->infoReduccion.nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
-	atributos->infoReduccion.nombreNodo=infoReduccion->nombreNodo;
-	atributos->infoReduccion.puertoLen=infoReduccion->puertoLen;
-	atributos->infoReduccion.puertoNodo=malloc(MAXIMA_LONGITUD_PUERTO);
-	atributos->infoReduccion.puertoNodo=infoReduccion->puertoNodo;
-	atributos->infoReduccion.tempRedLen=infoReduccion->tempRedLen;
-	atributos->infoReduccion.tempRed=malloc(TAMANIO_NOMBRE_TEMPORAL);
-	atributos->infoReduccion.tempRed=infoReduccion->tempRed;
-	atributos->infoReduccion.listaSize=infoReduccion->listaSize;
-	atributos->infoReduccion.listaTemporalesTransformacion=infoReduccion->listaTemporalesTransformacion;
-	atributos->sockYama=sockYama;
-
-	printf("creo hilo \n");
-
-	pthread_t workerReduccionLocalThread;
-	crearHilo(&workerReduccionLocalThread, (void*)hiloWorkerReduccionLocal, (void*)atributos);
-
-
-	return 0;
-}
 
 

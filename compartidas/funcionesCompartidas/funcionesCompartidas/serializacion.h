@@ -27,4 +27,9 @@ int recibirValor(int fd);
 
 char *serializeInfoReduccionLocal(Theader head, TreduccionLocal * infoReduccion, int *pack_size);
 TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial);
+
+char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalReduccionLen,char * nombreTemporalReduccion,t_list * listaTemporales, int *pack_size);
+TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char *bytes_serial);
+
+
 #endif
