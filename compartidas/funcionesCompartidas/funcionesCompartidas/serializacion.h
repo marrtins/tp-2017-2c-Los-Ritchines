@@ -25,4 +25,6 @@ TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes
 int enviarHeaderYValor(Theader head, int valorAEnviar,int socketDestino);
 int recibirValor(int fd);
 
+char *serializeInfoReduccionLocal(Theader head, TreduccionLocal * infoReduccion, int *pack_size);
+TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial);
 #endif

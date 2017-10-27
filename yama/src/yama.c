@@ -1,7 +1,7 @@
 #include "lib/funcionesYM.h"
 
 int socketFS, idMasterGlobal,idJobGlobal,idTareaGlobal;
-t_list * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
+t_list *listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 int main(int argc, char* argv[]){
 	int estado,
@@ -24,6 +24,7 @@ int main(int argc, char* argv[]){
 
 	listaHistoricaTareas=list_create();
 	listaCargaGlobal = list_create();
+	listaJobFinalizados= list_create();
 
 	listaEstadoEnProceso=list_create();
 	listaEstadoError = list_create();

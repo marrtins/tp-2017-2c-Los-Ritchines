@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
 	//char * chorroDeBytes;
 	t_list *bloquesTransformacion = list_create();
 
+
 	rutaTransformador = string_new();
 	rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -110,6 +111,7 @@ int main(int argc, char* argv[]) {
 		puts("Recibimos un paquete de YAMA");
 
 		TpackInfoBloque *infoBloque;
+		TreduccionLocal *infoReduccionLocal;
 
 		switch (headRcv.tipo_de_mensaje) {
 
@@ -153,6 +155,14 @@ int main(int argc, char* argv[]) {
 
 		break;
 
+		case(INFOREDUCCIONLOCAL):
+				if((infoReduccionLocal=recibirInfoReduccionLocal(sockYama))==NULL){
+					puts("Error no pudimos recibir la info bloque. se cierra");
+					return FALLO_CONEXION;
+				}
+
+			stat = conectarseAWorkerParaReduccionLocal(infoReduccionLocal,sockYama);
+		break;
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);
 			printf("Mensaje: %d \n", headTmp.tipo_de_mensaje);
@@ -186,6 +196,34 @@ TpackInfoBloque *recibirInfoBloque(int sockYama){
 			infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
 
 	return infoBloque;
+}
+
+TreduccionLocal *recibirInfoReduccionLocal(int sockYama){
+	char * buffer;
+	TreduccionLocal *infoReduccion;
+	if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
+		puts("Fallo recepcion de INFOBLOQUE");
+		return NULL;
+	}
+
+	if ((infoReduccion = deserializeInfoReduccionLocal(buffer)) == NULL){
+		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
+		return NULL;
+	}
+
+	printf("Nos llego la info reduccion local de %s",infoReduccion->nombreNodo);
+	printf("job idtarea nombre nodo ipnodo puertonodo tempReductor tempTransf\n");
+	printf("%d\n%d\n%s\n%s\n%s\n%s\n",infoReduccion->job,infoReduccion->idTarea,infoReduccion->nombreNodo,
+			infoReduccion->ipNodo,infoReduccion->puertoNodo,infoReduccion->tempRed);
+	printf("list size %d\n",infoReduccion->listaSize);
+
+	int i;
+	for(i=0;i<list_size(infoReduccion->listaTemporalesTransformacion);i++){
+		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+		printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
+	}
+
+	return infoReduccion;
 }
 
 

@@ -50,69 +50,69 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 
 	char *bytes_serial;
 
-		int espacioPackSize = sizeof(int);
-		int espacioEnteros = sizeof(int) * 8;
-		int espaciosVariables = infoBloque->tamanioIp+infoBloque->tamanioNombre+infoBloque->nombreTemporalLen+infoBloque->tamanioPuerto;
-		int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
+	int espacioPackSize = sizeof(int);
+	int espacioEnteros = sizeof(int) * 8;
+	int espaciosVariables = infoBloque->tamanioIp+infoBloque->tamanioNombre+infoBloque->nombreTemporalLen+infoBloque->tamanioPuerto;
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
-		if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
-			return NULL;
-		}
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
 
-		*pack_size = 0;
-		memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
-		*pack_size += HEAD_SIZE;
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
 
-		// hacemos lugar para el payload_size
-		*pack_size += sizeof(int);
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->idTarea, sizeof(int));
-		*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, &infoBloque->idTarea, sizeof(int));
+	*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioNombre, sizeof(int));
-		*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, &infoBloque->tamanioNombre, sizeof(int));
+	*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, infoBloque->nombreNodo, infoBloque->tamanioNombre);
-		*pack_size += infoBloque->tamanioNombre;
-
-
-
-		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioIp, sizeof(int));
-			*pack_size += sizeof(int);
-
-		memcpy(bytes_serial + *pack_size, infoBloque->ipWorker, infoBloque->tamanioIp);
-		*pack_size += infoBloque->tamanioIp;
+	memcpy(bytes_serial + *pack_size, infoBloque->nombreNodo, infoBloque->tamanioNombre);
+	*pack_size += infoBloque->tamanioNombre;
 
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->tamanioPuerto, sizeof(int));
-			*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, &infoBloque->tamanioIp, sizeof(int));
+	*pack_size += sizeof(int);
 
-		memcpy(bytes_serial + *pack_size, infoBloque->puertoWorker, infoBloque->tamanioPuerto);
-		*pack_size += infoBloque->tamanioPuerto;
-
-
-		memcpy(bytes_serial + *pack_size, &infoBloque->bloqueDelArchivo, sizeof(int));
-		*pack_size += sizeof(int);
-
-		memcpy(bytes_serial + *pack_size, &infoBloque->bloqueDelDatabin, sizeof(int));
-				*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoBloque->ipWorker, infoBloque->tamanioIp);
+	*pack_size += infoBloque->tamanioIp;
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->bytesOcupados, sizeof(int));
-		*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoBloque->tamanioPuerto, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, infoBloque->puertoWorker, infoBloque->tamanioPuerto);
+	*pack_size += infoBloque->tamanioPuerto;
 
 
-		memcpy(bytes_serial + *pack_size, &infoBloque->nombreTemporalLen, sizeof(int));
-		*pack_size += sizeof(int);
-		memcpy(bytes_serial + *pack_size, infoBloque->nombreTemporal, infoBloque->nombreTemporalLen);
-		*pack_size += infoBloque->nombreTemporalLen;
+	memcpy(bytes_serial + *pack_size, &infoBloque->bloqueDelArchivo, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoBloque->bloqueDelDatabin, sizeof(int));
+	*pack_size += sizeof(int);
 
 
-		memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+	memcpy(bytes_serial + *pack_size, &infoBloque->bytesOcupados, sizeof(int));
+	*pack_size += sizeof(int);
 
-		return bytes_serial;
+
+	memcpy(bytes_serial + *pack_size, &infoBloque->nombreTemporalLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoBloque->nombreTemporal, infoBloque->nombreTemporalLen);
+	*pack_size += infoBloque->nombreTemporalLen;
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
 }
 
 
@@ -458,3 +458,264 @@ int recibirValor(int fd){
 	free(buffer);
 	return valorRet;
 }
+
+
+char *serializeInfoReduccionLocal(Theader head, TreduccionLocal * infoReduccion, int *pack_size){
+	char *bytes_serial;
+	int i;
+	int espacioPackSize = sizeof(int);
+	int espacioEnteros = sizeof(int) * 7;
+	int espacioLista;
+
+	int sizeLista = list_size(infoReduccion->listaTemporalesTransformacion);
+	for(i=0;i< sizeLista;i++){
+		TreduccionLista * aux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+		espacioLista += aux->nombreTemporalLen;
+	}
+	espacioLista+=sizeof(int)*sizeLista;
+
+
+	int espaciosVariables = infoReduccion->ipLen+infoReduccion->puertoLen+infoReduccion->nombreNodoLen+infoReduccion->tempRedLen+espacioLista;
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
+
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->job, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->idTarea, sizeof(int));
+	*pack_size += sizeof(int);
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->nombreNodoLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->nombreNodo, infoReduccion->nombreNodoLen);
+	*pack_size += infoReduccion->nombreNodoLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->ipLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->ipNodo, infoReduccion->ipLen);
+	*pack_size += infoReduccion->ipLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->puertoLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->puertoNodo, infoReduccion->puertoLen);
+	*pack_size += infoReduccion->puertoLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->tempRedLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->tempRed, infoReduccion->tempRedLen);
+	*pack_size += infoReduccion->tempRedLen;
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->listaSize, sizeof(int));
+	*pack_size += sizeof(int);
+
+	for(i=0;i<sizeLista;i++){
+		TreduccionLista * aux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+		memcpy(bytes_serial + *pack_size, &aux->nombreTemporalLen, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, aux->nombreTemporal, aux->nombreTemporalLen);
+		*pack_size += aux->nombreTemporalLen;
+	}
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
+
+	int off;
+	TreduccionLocal *infoReduccion;
+
+	if ((infoReduccion = malloc(sizeof *infoReduccion)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+
+	memcpy(&infoReduccion->job, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	memcpy(&infoReduccion->idTarea, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	memcpy(&infoReduccion->nombreNodoLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((infoReduccion->nombreNodo = malloc(infoReduccion->nombreNodoLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->nombreNodoLen);
+		return NULL;
+	}
+
+	memcpy(infoReduccion->nombreNodo, bytes_serial + off, infoReduccion->nombreNodoLen);
+	off += infoReduccion->nombreNodoLen;
+
+
+
+	memcpy(&infoReduccion->ipLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((infoReduccion->ipNodo = malloc(infoReduccion->ipLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->ipLen);
+		return NULL;
+	}
+
+	memcpy(infoReduccion->ipNodo, bytes_serial + off, infoReduccion->ipLen);
+	off += infoReduccion->ipLen;
+
+
+
+
+
+	memcpy(&infoReduccion->puertoLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((infoReduccion->puertoNodo = malloc(infoReduccion->puertoLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->puertoLen);
+		return NULL;
+	}
+
+	memcpy(infoReduccion->puertoNodo, bytes_serial + off, infoReduccion->puertoLen);
+	off += infoReduccion->puertoLen;
+
+
+
+
+	memcpy(&infoReduccion->tempRedLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((infoReduccion->tempRed = malloc(infoReduccion->tempRedLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->tempRedLen);
+		return NULL;
+	}
+
+	memcpy(infoReduccion->tempRed, bytes_serial + off, infoReduccion->tempRedLen);
+	off += infoReduccion->tempRedLen;
+
+
+	memcpy(&infoReduccion->listaSize, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+
+	int i;
+	t_list *listaTemporales = list_create();
+	for(i=0;i<infoReduccion->listaSize;i++){
+
+		TreduccionLista *aux = malloc(sizeof aux);
+		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((aux->nombreTemporal = malloc(aux->nombreTemporalLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", aux->nombreTemporalLen);
+			return NULL;
+		}
+
+		memcpy(aux->nombreTemporal, bytes_serial + off, aux->nombreTemporalLen);
+		off += aux->nombreTemporalLen;
+		list_add(listaTemporales,aux);
+	}
+
+	infoReduccion->listaTemporalesTransformacion=listaTemporales;
+
+
+	return infoReduccion;
+}
+
+
+char * serializarListaNombresTemporales(Theader head,t_list * listaNombres,int *pack_size){
+	char *bytes_serial;
+	int i;
+	int espacioPackSize = sizeof(int);
+	int espacioListSize = sizeof(int);
+
+	int sizeLista = list_size(listaNombres);
+	int espacioEnteros = sizeof(int) * sizeLista;
+	int espaciosVariables=0;
+	for(i=0;i< sizeLista;i++){
+		TreduccionLista * aux = list_get(listaNombres,i);
+		espaciosVariables += aux->nombreTemporalLen;
+	}
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioListSize+espacioEnteros+espaciosVariables;
+
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	// hacemos lugar para el lista_size
+	*pack_size += sizeof(int);
+
+	for(i=0;i<sizeLista;i++){
+		TreduccionLista * aux = list_get(listaNombres,i);
+		memcpy(bytes_serial + *pack_size, &aux->nombreTemporalLen, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, aux->nombreTemporal, aux->nombreTemporalLen);
+		*pack_size += aux->nombreTemporalLen;
+	}
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+	memcpy(bytes_serial + HEAD_SIZE+espacioPackSize, &sizeLista, sizeof(int));
+
+	return bytes_serial;
+}
+
+t_list * deserializarListaNombresTemporales(char * bytes_serial){
+	t_list * listaRet=list_create();
+
+	int off;
+	off = 0;
+	int listaSize;
+
+	memcpy(&listaSize, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	int i;
+	for(i=0;i<listaSize;i++){
+
+		TreduccionLista *aux = malloc(sizeof aux);
+		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+
+		if ((aux->nombreTemporal = malloc(aux->nombreTemporalLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", aux->nombreTemporalLen);
+			return NULL;
+		}
+
+		memcpy(aux->nombreTemporal, bytes_serial + off, aux->nombreTemporalLen);
+		off += aux->nombreTemporalLen;
+		list_add(listaRet,aux);
+	}
+
+
+
+	return listaRet;
+}
+

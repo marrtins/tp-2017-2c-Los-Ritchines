@@ -10,8 +10,8 @@ int idTempName,idPropio;
 
 extern int idMasterGlobal,idJobGlobal,idTareaGlobal;
 
-
-extern t_list * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
+t_list *listaNodos;
+extern t_list *listaJobFinalizados, * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 extern pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 
 
@@ -26,7 +26,7 @@ void masterHandler(void *atributos){
 	int idTareaFinalizada;
 	idTempName=0;
 
-
+	listaNodos=list_create();
 
 
 	pthread_mutex_lock(&mux_idGlobal);
@@ -34,7 +34,7 @@ void masterHandler(void *atributos){
 	pthread_mutex_unlock(&mux_idGlobal);
 
 	Theader head = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
-
+	Theader *headEnvio = malloc(sizeof(headEnvio));
 
 	TpackBytes *pathArchivoAReducir;
 	TpackBytes *pathResultado;
@@ -119,12 +119,12 @@ void masterHandler(void *atributos){
 			generarListaComposicionArchivoHardcode(listaComposicionArchivo);
 
 
-			t_list *listaInfoNodos=list_create();
-			generarListaInfoNodos(listaInfoNodos);
+
+			generarListaInfoNodos();
 
 
 
-			t_list *listaBloquesPlanificados=planificar(listaComposicionArchivo,listaInfoNodos);
+			t_list *listaBloquesPlanificados=planificar(listaComposicionArchivo);
 
 
 			//generarListaBloquesHardcode(listaBloquesPlanificados);
@@ -140,13 +140,50 @@ void masterHandler(void *atributos){
 			puts("actuializo tbala de estados");
 			moverAListaFinalizadosOK(idTareaFinalizada);
 
+
+			if(sePuedeComenzarReduccionLocal(idTareaFinalizada)){
+				comenzarReduccionLocal(idTareaFinalizada,sockMaster);
+			}
+
+
 			break;
 		case FINTRANSFORMACIONLOCALFAIL:
 			idTareaFinalizada = recibirValor(sockMaster);
 			printf("FINTRANSFORMACIONLOCAL FAIL de la tarea%d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
+
 			moverAListaError(idTareaFinalizada);
-			replanificar(idTareaFinalizada,sockMaster,listaComposicionArchivo);
+
+			if(sePuedeReplanificar(idTareaFinalizada,listaComposicionArchivo)){
+
+				stat = replanificar(idTareaFinalizada,sockMaster,listaComposicionArchivo);
+				if(stat<0){
+					//esto no deberia pasar nunca.. lo dejo aca para que no rompa tod
+					printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+					puts("Se da x terminado el job");
+					headEnvio->tipo_de_proceso=YAMA;
+					headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+					enviarHeader(sockMaster,headEnvio);
+					TjobFinalizado *job = malloc(sizeof job);
+					TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+					job->nroJob = tareaFinalizada->job;
+					job->finCorrecto=false;
+					list_add(listaJobFinalizados,job);
+				}
+			}else{
+
+				printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+				puts("Se da x terminado el job");
+				headEnvio->tipo_de_proceso=YAMA;
+				headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+				enviarHeader(sockMaster,headEnvio);
+				TjobFinalizado *job = malloc(sizeof job);
+				TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+				job->nroJob = tareaFinalizada->job;
+				job->finCorrecto=false;
+				list_add(listaJobFinalizados,job);
+			}
+
 			break;
 		default:
 			break;
@@ -156,6 +193,182 @@ void masterHandler(void *atributos){
 	}
 	freeAndNULL((void **) &buffer);
 }
+char *serializeInfoReduccionLocal2(Theader head, TreduccionLocal * infoReduccion, int *pack_size){
+	char *bytes_serial;
+	int i;
+	int espacioPackSize = sizeof(int);
+	int espacioEnteros = sizeof(int) * 7;
+	int espacioLista=0;
+
+	int sizeLista = list_size(infoReduccion->listaTemporalesTransformacion);
+	for(i=0;i< sizeLista;i++){
+		TreduccionLista * aux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+		espacioLista += aux->nombreTemporalLen;
+	}
+	espacioLista+=sizeof(int)*sizeLista;
+
+
+	int espaciosVariables = infoReduccion->ipLen+infoReduccion->puertoLen+infoReduccion->nombreNodoLen+infoReduccion->tempRedLen+espacioLista;
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
+
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->job, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->idTarea, sizeof(int));
+	*pack_size += sizeof(int);
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->nombreNodoLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->nombreNodo, infoReduccion->nombreNodoLen);
+	*pack_size += infoReduccion->nombreNodoLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->ipLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->ipNodo, infoReduccion->ipLen);
+	*pack_size += infoReduccion->ipLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->puertoLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->puertoNodo, infoReduccion->puertoLen);
+	*pack_size += infoReduccion->puertoLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->tempRedLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccion->tempRed, infoReduccion->tempRedLen);
+	*pack_size += infoReduccion->tempRedLen;
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccion->listaSize, sizeof(int));
+	*pack_size += sizeof(int);
+
+	for(i=0;i<sizeLista;i++){
+		TreduccionLista * aux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+		memcpy(bytes_serial + *pack_size, &aux->nombreTemporalLen, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, aux->nombreTemporal, aux->nombreTemporalLen);
+		*pack_size += aux->nombreTemporalLen;
+	}
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
+
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+	char * buffer;
+	int packSize,stat;
+
+	int jobAReducir = tareaFinalizada->job;
+	MUX_LOCK(&mux_jobIdGlobal);
+	int nuevoJob = idJobGlobal;
+	MUX_UNLOCK(&mux_jobIdGlobal);
+	MUX_LOCK(&mux_idTareaGlobal);
+	int idTareaActual = idTareaGlobal++;
+	MUX_UNLOCK(&mux_idTareaGlobal);
+
+	char *  nodoReductor = tareaFinalizada->nodo;
+	int i;
+
+	TreduccionLocal * infoReduccion = malloc(sizeof(infoReduccion));
+	infoReduccion->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
+	infoReduccion->nombreNodo=nodoReductor;
+	infoReduccion->nombreNodoLen=strlen(infoReduccion->nombreNodo);
+	infoReduccion->ipNodo=malloc(MAXIMA_LONGITUD_IP);
+	infoReduccion->ipNodo=getIpNodo(nodoReductor);
+	infoReduccion->ipLen=strlen(infoReduccion->ipNodo);
+	infoReduccion->puertoNodo=malloc(MAXIMA_LONGITUD_PUERTO);
+	infoReduccion->puertoNodo=getPuertoNodo(nodoReductor);
+	infoReduccion->puertoLen=strlen(infoReduccion->puertoNodo);
+	infoReduccion->tempRed=malloc(TAMANIO_NOMBRE_TEMPORAL);
+	infoReduccion->tempRed=generarNombreReductorTemporal(nodoReductor);
+	infoReduccion->job=nuevoJob;
+	infoReduccion->idTarea=idTareaActual;
+
+	t_list *listaTemporales= list_create();
+	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+		TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
+		if(tareaOk->job==jobAReducir && tareaOk->nodo==nodoReductor){
+			TreduccionLista * reduccionAux=  malloc(sizeof reduccionAux);
+			reduccionAux->nombreTemporalLen=strlen(tareaOk->nombreArchTemporal);
+			reduccionAux->nombreTemporal=malloc(reduccionAux->nombreTemporalLen);
+			reduccionAux->nombreTemporal=tareaOk->nombreArchTemporal;
+			list_add(listaTemporales,reduccionAux);
+		}
+	}
+	infoReduccion->listaSize=list_size(listaTemporales);
+	infoReduccion->listaTemporalesTransformacion=listaTemporales;
+
+	Theader head;
+	head.tipo_de_proceso=YAMA;
+	head.tipo_de_mensaje=INFOREDUCCIONLOCAL;
+
+
+	packSize=0;
+	buffer=serializeInfoReduccionLocal2(head,infoReduccion,&packSize);
+	printf("Info de la reduccion local serializado, total %d bytes\n",packSize);
+	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
+		puts("no se pudo enviar info del bloque. ");
+		return  FALLO_SEND;
+	}
+	printf("se enviaron %d bytes de la info del bloque\n",stat);
+
+	agregarReduccionLocalAListaEnProceso(infoReduccion);
+
+	return 0;
+}
+
+
+bool sePuedeComenzarReduccionLocal(int idTareaFinalizada){
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+
+//1-Verifico q el job no se haya terminado x error de replanificacion .
+	int i;
+	for(i=0;i<list_size(listaJobFinalizados);i++){
+		TjobFinalizado *jobAux = list_get(listaJobFinalizados,i);
+		if(jobAux->nroJob == tareaFinalizada->job){
+			return false;
+		}
+	}
+
+//2-Verifico si ya se terminaron todas las transformaciones relacionadas con este archivo
+//en el nodo q acaba de finalizar
+
+	TpackTablaEstados *tareaAuxiliar;
+	for(i=0;i<list_size(listaEstadoEnProceso);i++){
+		tareaAuxiliar=list_get(listaEstadoEnProceso,i);
+		if(tareaFinalizada->job == tareaAuxiliar->job){
+			if((tareaFinalizada->nodo == tareaAuxiliar->nodo) && (tareaAuxiliar->etapa == TRANSFORMACION)){
+				return false;
+			}
+		}
+	}
+
+
+	return true;
+}
+
+
 int moverAListaFinalizadosOK(int idTareaFinalizada){
 
 	int i;
@@ -213,6 +426,18 @@ char *  generarNombreTemporal(){
 	return temp;
 }
 
+char *  generarNombreReductorTemporal(char * nombreNodo){
+
+	char *temp = string_new();
+
+	string_append(&temp,"tmp/Master");
+	string_append(&temp,string_itoa(idPropio));
+	string_append(&temp,"-");
+	string_append(&temp,nombreNodo);
+
+
+	return temp;
+}
 
 
 int responderSolicTransf(int sockMaster,t_list * listaBloques){
@@ -256,7 +481,7 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 		}
 		printf("se enviaron %d bytes de la info del bloque\n",stat);
 
-		agregarAListaEnProceso(jobActual,bloqueAEnviar->idTarea,TRANSFORMACION,bloqueAEnviar);
+		agregarAListaEnProceso(jobActual,bloqueAEnviar->idTarea,REDUCCIONLOCAL,bloqueAEnviar);
 
 
 	}
@@ -270,6 +495,25 @@ int responderSolicTransf(int sockMaster,t_list * listaBloques){
 	return 0;
 
 
+}
+
+void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion){
+	MUX_LOCK(&mux_listaEnProceso);
+
+
+	TpackTablaEstados * estado = malloc(sizeof estado);
+	estado->idTarea=infoReduccion->idTarea;
+	estado->job=infoReduccion->job;
+	estado->master=idPropio;
+	estado->nodo=malloc(TAMANIO_NOMBRE_NODO);
+	estado->nodo=infoReduccion->nombreNodo;
+	estado->bloqueDelArchivo=-1; //todo:preguntar.
+	estado->etapa=REDUCCIONLOCAL;
+	estado->nombreArchTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
+	estado->nombreArchTemporal=infoReduccion->tempRed;
+
+	MUX_UNLOCK(&mux_listaEnProceso);
+	mostrarTablaDeEstados();
 }
 
 void agregarAListaEnProceso(int jobActual, int idTarea,int etapa, TpackInfoBloque *bloque){
@@ -356,7 +600,29 @@ char * getNombreEtapa(int etapaEnum){
 
 
 
+char * getIpNodo(char * nombreNodo){
+	TpackageInfoNodo *nodoAux;
+	int i;
+	for(i=0;i<list_size(listaNodos);i++){
+		nodoAux=list_get(listaNodos,i);
+		if(nodoAux->nombreNodo == nombreNodo){
+			return nodoAux->ipNodo;
+		}
+	}
+	return NULL;
+}
 
+char * getPuertoNodo(char * nombreNodo){
+	TpackageInfoNodo *nodoAux;
+	int i;
+	for(i=0;i<list_size(listaNodos);i++){
+		nodoAux=list_get(listaNodos,i);
+		if(nodoAux->nombreNodo == nombreNodo){
+			return nodoAux->puertoWorker;
+		}
+	}
+	return NULL;
+}
 
 
 
@@ -364,7 +630,7 @@ char * getNombreEtapa(int etapaEnum){
 ///Funciones Planificacion
 
 
-t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
+t_list * planificar(t_list * listaComposicionArchivo){
 
 	t_list * listaPlanificada=list_create();
 	t_list * listaWorkersPlanificacion = list_create();
@@ -372,11 +638,11 @@ t_list * planificar(t_list * listaComposicionArchivo,t_list * listaInfoNodos){
 	int base = 2;
 	int pwlClock=0;
 	int stat;
-	TpackageInfoNodo *aux;// = malloc(sizeof aux);
+	TpackageInfoNodo *aux;
 	//lleno la lista con los workers asociados a esta transfo.
 	int i;
-	for(i=0;i<list_size(listaInfoNodos);i++){
-		aux = list_get(listaInfoNodos,i);
+	for(i=0;i<list_size(listaNodos);i++){
+		aux = list_get(listaNodos,i);
 		Tplanificacion * nodo = malloc(sizeof nodo);
 		nodo->infoNodo.nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 		nodo->infoNodo.nombreNodo=aux->nombreNodo;
@@ -759,7 +1025,7 @@ TpackTablaEstados * getTareaPorId(int idTarea){
 
 	MUX_LOCK(&mux_listaError);
 	for(i=0;i<list_size(listaEstadoError);i++){
-			TpackTablaEstados * aux = list_get(listaEstadoEnProceso,i);
+			TpackTablaEstados * aux = list_get(listaEstadoError,i);
 			if(aux->idTarea==idTarea){
 				MUX_UNLOCK(&mux_listaError);
 				return aux;
@@ -769,7 +1035,7 @@ TpackTablaEstados * getTareaPorId(int idTarea){
 
 	MUX_LOCK(&mux_listaFinalizado);
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
-			TpackTablaEstados * aux = list_get(listaEstadoEnProceso,i);
+			TpackTablaEstados * aux = list_get(listaEstadoFinalizadoOK,i);
 			if(aux->idTarea==idTarea){
 				MUX_UNLOCK(&mux_listaFinalizado);
 				return aux;
@@ -952,7 +1218,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 
 }
 
-void generarListaInfoNodos(t_list * listaNodos){
+void generarListaInfoNodos(){
 
 
 

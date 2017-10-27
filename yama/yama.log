@@ -20,3 +20,5 @@
 [ERROR] 17:02:33:789 yama.log/(19989:19989): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
 [ERROR] 15:31:55:701 yama.log/(7029:7029): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
 [ERROR] 15:32:03:939 yama.log/(7071:7071): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
+[ERROR] 13:38:38:163 yama.log/(18395:18395): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
+[ERROR] 13:38:53:364 yama.log/(18434:18434): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.

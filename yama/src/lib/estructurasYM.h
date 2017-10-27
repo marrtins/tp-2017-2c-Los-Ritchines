@@ -65,6 +65,11 @@ typedef struct{
 	int fdMaster;
 }TatributosHiloMaster;
 
+typedef struct {
+	int nroJob;
+	bool finCorrecto;
+}TjobFinalizado;
+
 t_log* logger;
 
 #endif
