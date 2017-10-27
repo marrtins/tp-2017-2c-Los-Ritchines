@@ -23,3 +23,9 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	free(tablaDeArchivos->bloques);
 	free(tablaDeArchivos);
 }
+
+void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque){
+	free(bloque->ipNodo);
+	free(bloque->nombreNodo);
+	free(bloque->puertoNodo);
+}

@@ -8,6 +8,7 @@ long sumaDeDosNumerosLong(long valor1, long valor2);
 long restaDeDosNumerosLong(long valor1, long valor2);
 int sumaDeDosNumerosInt(int valor1, int valor2);
 int restaDeDosNumerosInt(int valor1, int valor2);
+void setearAtributoDeArchivoConfigConInts(t_config * archivoConf, char * key, int value, int(*funcion)(int valor1, int valor2));
 
 //Configuracion
 TfileSystem *obtenerConfiguracionFS(char* ruta);
@@ -30,7 +31,7 @@ void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
-char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo);
+char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento);
 char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre);
 void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
@@ -89,5 +90,6 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
+void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 
 #endif

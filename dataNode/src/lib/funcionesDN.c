@@ -72,13 +72,13 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 	infoBloque->head.tipo_de_proceso = DATANODE;
 	infoBloque->head.tipo_de_mensaje = INFO_NODO;
 
-	infoBloque->tamanioNombre = strlen(dataNode->nombre_nodo);
+	infoBloque->tamanioNombre = strlen(dataNode->nombre_nodo) + 1;
 	infoBloque->nombreNodo = malloc(infoBloque->tamanioNombre);
 	strcpy(infoBloque->nombreNodo, dataNode->nombre_nodo);
-	infoBloque->tamanioIp = strlen(dataNode->ip_nodo);
+	infoBloque->tamanioIp = strlen(dataNode->ip_nodo) + 1;
 	infoBloque->ipNodo = malloc(infoBloque->tamanioIp);
 	strcpy(infoBloque->ipNodo, dataNode->ip_nodo);
-	infoBloque->tamanioPuerto = strlen(dataNode->puerto_entrada);
+	infoBloque->tamanioPuerto = strlen(dataNode->puerto_entrada) + 1;
 	infoBloque->puertoNodo = malloc(infoBloque->tamanioPuerto);
 	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
 	infoBloque->databinEnMB = dataNode->tamanio_databin_mb;

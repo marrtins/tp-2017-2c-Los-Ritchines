@@ -16,26 +16,17 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
 	//TAMANIO
-	int tamanio = config_get_int_value(tablaDeNodos, "TAMANIO");
-	tamanio += nuevoNodo->cantidadBloquesTotal;
-	char * tamanioString = string_itoa(tamanio);
-	config_set_value(tablaDeNodos, "TAMANIO", tamanioString);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "TAMANIO", nuevoNodo->cantidadBloquesTotal, sumaDeDosNumerosInt);
 
 	//LIBRE
-	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
-	libre += nuevoNodo->cantidadBloquesLibres;
-	char * libreString = string_itoa(libre);
-	config_set_value(tablaDeNodos, "LIBRE", libreString);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", nuevoNodo->cantidadBloquesLibres, sumaDeDosNumerosInt);
 
 	//NODOS
-	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
-	char * nodosConNodoAgregado = agregarNodoAArrayDeNodos(nodos, nuevoNodo->nombre);
-	puts(nodosConNodoAgregado);
-	puts("cargando Nodos");
-	config_set_value(tablaDeNodos, "NODOS", nodosConNodoAgregado);
+	agregarNodoAArrayDeNodos(tablaDeNodos, "NODOS", nuevoNodo->nombre);
 
 	//agregar Nodos Dinamicamente
 	char * nodoTotalAString = string_new();
+	printf("nombreDeNodo %s", nuevoNodo->nombre);
 	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
 	char * bloquesTotalString = string_itoa(nuevoNodo->cantidadBloquesTotal);
 	config_set_value(tablaDeNodos, nodoTotalAString, bloquesTotalString);
@@ -50,13 +41,8 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 
 	free(nodoTotalAString);
 	free(nodoLibreAString);
-	free(libreString);
-	free(tamanioString);
-	liberarPunteroDePunterosAChar(nodos);
-	free(nodos);
 	free(bloquesLibresString);
 	free(bloquesTotalString);
-	free(nodosConNodoAgregado);
 }
 
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
@@ -166,19 +152,21 @@ char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre){
 	return definitivo;
 }
 
-char * agregarNodoAArrayDeNodos(char ** nodos, char * nombreNodo){
-	puts("Estoy adentro de la funcion que appendea");
+char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento){
+	char ** nodos = config_get_array_value(tablaDeNodos, key);
 	char * nuevoString = string_new();
 	int i = 0;
 	string_append(&nuevoString, "[");
-	puts("Voy a hacer el while");
 	while(nodos[i] != NULL){
 		string_append(&nuevoString, nodos[i]);
 		string_append(&nuevoString, ",");
 		i++;
 	}
-	string_append(&nuevoString, nombreNodo);
+	string_append(&nuevoString, nombreElemento);
 	string_append(&nuevoString, "]");
-	puts("Por salir");
+	config_set_value(tablaDeNodos, key, nuevoString);
+	free(nuevoString);
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
 	return nuevoString;
 }

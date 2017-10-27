@@ -8,10 +8,6 @@ int main(int argc, char* argv[]) {
 		socketYama,
 		cantNodosPorConectar;
 
-	Tarchivo * tablaArchivos = malloc(sizeof(Tarchivo));
-
-	Tnodos * tablaNodos = malloc(sizeof(Tnodos));
-
 	TfileSystem * fileSystem;
 
 	pthread_t consolaThread, datanodesThread;
@@ -103,8 +99,6 @@ int main(int argc, char* argv[]) {
 
 	}
 
-	//tabla de archivos
-	liberarTablaDeArchivo(tablaArchivos);
 	//	FALTA free tablanodos
 
 	//listas
