@@ -95,7 +95,6 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	int index = obtenerIndexDeUnaRuta(rutaDestino);
 	char * rutaArchivo = malloc(200);
 	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", index, archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
-	//hay que verificar si existe el directorio
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);

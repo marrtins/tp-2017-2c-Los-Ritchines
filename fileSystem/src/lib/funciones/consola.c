@@ -76,6 +76,12 @@ void procesarInput(char* linea) {
 			}
 		}
 	} else if (string_equals_ignore_case(*palabras, "info")) {
+		/*if (cantidad == 1){
+			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+			levantarTablaArchivo(tablaArchivo, palabras[1]);
+			mostrarTablaArchivo(tablaArchivo);
+
+		}*/
 		printf("ya pude mostrar la informacion del archivo\n");
 	} else if(string_equals_ignore_case(*palabras, "exit")){
 		printf("Finalizando consola\n");

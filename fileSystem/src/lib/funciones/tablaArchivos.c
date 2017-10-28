@@ -31,7 +31,9 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 		//tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 
 		bloqueCopia0 = generarStringDeBloqueNCopiaN(nroBloque,0);
+		printf("BLOQUENCOPIA0 = %s", bloqueCopia0);
 		bloqueCopia1 = generarStringDeBloqueNCopiaN(nroBloque,1);
+		printf("BLOQUENCOPIA1 = %s", bloqueCopia1);
 		bloqueBytes = generarStringDeBloqueNBytes(nroBloque);
 
 		temporal1 = config_get_array_value(archivo, bloqueCopia0);
@@ -157,3 +159,24 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 	config_destroy(archivoConfig);
 
 }
+
+
+void mostrarTablaArchivo(Tarchivo* tablaArchivo){
+	/*
+	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
+	int i = 0;
+	printf("Nombre: %s.%s",tablaArchivo->nombreArchivoSinExtension,tablaArchivo->extensionArchivo);
+	printf("Tamanio: %d", tablaArchivo->tamanioTotal);
+
+	while(i != cantBloques){
+		printf("Tamanio de bloque %d = %d\n",i, tablaArchivo->bloques[i].bytes);
+		printf("Nombre del nodo donde esta la copia cero = %s",tablaArchivo->bloques[i].copiaCero.nombreDeNodo);
+		printf("Número de bloque del nodo donde esta la copia cero = %d", tablaArchivo->bloques[i].copiaCero.numeroBloqueDeNodo);
+		printf("Nombre del nodo donde esta la copia uno = %s",tablaArchivo->bloques[i].copiaUno.nombreDeNodo);
+		printf("Número de bloque del nodo donde esta la copia uno = %d", tablaArchivo->bloques[i].copiaUno.numeroBloqueDeNodo);
+		i++;
+	}
+	liberarTablaDeArchivo(tablaArchivo);
+	*/
+}
+

@@ -29,6 +29,7 @@ void levantarTablasDirectorios();
 void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta);
 void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
+void mostrarTablaArchivo(Tarchivo* tablaArchivo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
 char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento);
