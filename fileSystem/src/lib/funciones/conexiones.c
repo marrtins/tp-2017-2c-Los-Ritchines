@@ -63,8 +63,11 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
+							puts("vamos a agregar el nodo desconectado a lista de desconectados");
 							list_add(listaDeNodosDesconectados, buscarNodoPorFD(fileDescriptor));
+							puts("vamos a borrar al negro por su file descriptor");
 							borrarNodoPorFD(fileDescriptor);
+							puts("eliminamos al nodo de la tabla do nodos");
 							eliminarNodoDeTablaDeNodos(nuevoNodo);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
@@ -75,25 +78,31 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
-								infoBloque = recvInfoNodo(fileDescriptor);
+
 								if((Tnodo*)buscarNodoPorFD(fileDescriptor) == NULL){
-									printf("Para el nro de bloque recibi %d bytes\n", estado);
-									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
-									list_add(listaDeNodos, nuevoNodo);
-									agregarNodoATablaDeNodos(nuevoNodo);
-									puts("Nodo inicializado y guardado en la lista");
-									mostrarBitmap(nuevoNodo->bitmap);
-								}
-								else{
-									//puede que esto no este bien
-									//habria que probarlo
 									infoBloque = recvInfoNodo(fileDescriptor);
-									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
-									list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
-									borrarNodoDesconectadoPorFD(fileDescriptor);
-									log_trace(logger, "Nodo que se habia caído, se reconecto");
+									if((Tnodo*)buscarNodoDesconectadoPorFD(fileDescriptor) == NULL){
+										//nodo nuevo;
+										nuevoNodo = malloc(sizeof(Tnodo));
+										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										printf("Para el nro de bloque recibi %d bytes\n", estado);
+										list_add(listaDeNodos, nuevoNodo);
+										agregarNodoATablaDeNodos(nuevoNodo);
+										puts("Nodo inicializado y guardado en la lista");
+										mostrarBitmap(nuevoNodo->bitmap);
+									}
+									else {//se reconecta;
+										//pensar si hay que volver a inicializarlo al nodo que
+										//se reconecta
+										list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
+										borrarNodoDesconectadoPorFD(fileDescriptor);
+										log_trace(logger, "Nodo que se habia caído, se reconecto");
+									}
+									liberarTPackInfoBloqueDN(infoBloque);
 								}
-								liberarTPackInfoBloqueDN(infoBloque);
+								else {
+									puts("viejo me estas mandando la info otra vez, media pila che");
+								}
 								cantNodosPorConectar--;
 								break;
 

@@ -264,3 +264,18 @@
 [ERROR] 14:11:09:734 FileSystem.log/(6553:6555): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 14:11:26:986 FileSystem.log/(6557:6559): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 14:55:59:929 FileSystem.log/(8274:8276): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 13:39:28:459 FileSystem.log/(3831:3831): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 13:43:24:723 FileSystem.log/(4081:4081): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 13:43:42:730 FileSystem.log/(4140:4142): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 13:44:11:392 FileSystem.log/(4147:4149): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 13:45:19:602 FileSystem.log/(4153:4153): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 13:47:01:364 FileSystem.log/(4210:4210): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 14:01:12:697 FileSystem.log/(4473:4473): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 14:56:29:725 FileSystem.log/(5707:5707): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 15:04:00:309 FileSystem.log/(6226:6228): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 15:07:53:262 FileSystem.log/(6286:6288): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 15:55:48:261 FileSystem.log/(7000:7000): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 16:32:36:764 FileSystem.log/(7691:7693): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:41:02:56 FileSystem.log/(7812:7814): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:41:26:661 FileSystem.log/(7818:7820): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 16:41:33:906 FileSystem.log/(7823:7825): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
