@@ -60,6 +60,10 @@ void* buscarPorNombreDeDirectorio(char * directorio);
 int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
 int crearDirectorio(char * ruta);
+int esDirectorio(char * ruta);
+char** buscarDirectorios(char * ruta);
+char** buscarArchivos(char * ruta);
+void removerDirectorios(char * ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);

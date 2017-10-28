@@ -1,3 +1,1 @@
-1 user 0
 0 root -1
-2 lolo 1

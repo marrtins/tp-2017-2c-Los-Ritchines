@@ -94,11 +94,17 @@ int crearDirectorio(char * ruta) {
 }
 
 void inicializarTablaDirectorios(){
+		char * ruta = malloc(100);
 		FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
+
+		strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+
 		list_clean(listaTablaDirectorios);
 		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
 		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
 		fclose(archivoDirectorios);
+		removerDirectorios(ruta);
+		free(ruta);
 }
 
 int directorioNoExistente(char ** carpetas) {
@@ -194,3 +200,137 @@ int existeDirectorio(char * directorio){
 	}
 
 }
+
+int esDirectorio(char * ruta){
+	struct stat estado;
+	int i;
+
+	stat(ruta,&estado);
+	i = S_ISDIR(estado.st_mode);
+
+
+	return i;
+}
+
+char** buscarDirectorios(char * ruta){
+	
+	  DIR *directorioActual;
+	  struct dirent *directorio;
+	  char ** directorios = malloc(100);
+	  char * rutaNueva;
+	  int i = 0;
+
+	  directorioActual = opendir (ruta);
+
+	  if (directorioActual == NULL){
+	    puts("No puedo abrir el directorio");
+
+	  }else
+	  // Leo uno por uno los directorios que estan adentro del directorio actual
+	  while ((directorio = readdir(directorioActual)) != NULL) {
+
+		  //Con readdir aparece siempre . y .. como no me interesa no lo contemplo
+		if ((strcmp(directorio->d_name, ".") != 0) && (strcmp(directorio->d_name, "..") != 0)) {
+
+
+			rutaNueva = string_duplicate(ruta);
+			string_append(&rutaNueva,directorio->d_name);
+
+			directorios[i] = malloc(256);
+			if(esDirectorio(rutaNueva)){
+				strcpy(directorios[i],rutaNueva);
+				i++;
+			}
+			free(rutaNueva);
+		}
+
+	}
+	  directorios[i] = NULL;
+
+	  closedir (directorioActual);
+	  return directorios;
+}
+
+char** buscarArchivos(char * ruta){
+
+	  DIR *directorioActual;
+	  struct dirent *archivo;
+	  char ** archivos = malloc(100);
+	  char * rutaNueva;
+	  int i = 0;
+
+	  directorioActual = opendir (ruta);
+
+	  if (directorioActual == NULL){
+	    puts("No puedo abrir el archivo");
+
+	  }else
+	  // Leo uno por uno los directorios que estan adentro del archivo actual
+	  while ((archivo = readdir(directorioActual)) != NULL) {
+
+		  //Con readdir aparece siempre . y .. como no me interesa no lo contemplo
+		if ((strcmp(archivo->d_name, ".") != 0) && (strcmp(archivo->d_name, "..") != 0)) {
+
+			rutaNueva = string_duplicate(ruta);
+			string_append(&rutaNueva,"/");
+			string_append(&rutaNueva,archivo->d_name);
+			archivos[i] = malloc(256);
+				if(!esDirectorio(rutaNueva)){
+					strcpy(archivos[i],rutaNueva);
+					i++;
+				}
+			free(rutaNueva);
+
+		}
+
+	}
+
+	  archivos[i] = NULL;
+	  closedir (directorioActual);
+	  return archivos;
+}
+
+void removerArchivos(char * ruta){
+	char ** archivos;
+	int i = 0;
+	archivos = buscarArchivos(ruta);
+
+	if(archivos[i] != NULL){
+		while(archivos[i] != NULL){
+
+			remove(archivos[i]);
+			i++;
+
+		}
+		liberarPunteroDePunterosAChar(archivos);
+		free(archivos);
+	}else
+	free(archivos);
+
+}
+
+void removerDirectorios(char *ruta){
+	char ** directorios;
+	int i = 0;
+
+	directorios = buscarDirectorios(ruta);
+
+	if(directorios[i] != NULL){
+
+		while(directorios[i] != NULL){
+
+			removerArchivos(directorios[i]);
+			rmdir(directorios[i]);
+			i++;
+
+		}
+		liberarPunteroDePunterosAChar(directorios);
+		free(directorios);
+	}else
+
+	free(directorios);
+
+
+}
+
+
