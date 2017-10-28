@@ -840,7 +840,7 @@ Tbuffer *empaquetarBytes(Theader * head, char * bytes){
 
 	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
-	p += sizeof(*head);;
+	p += sizeof(*head);
 	memcpy(p, &buffer->tamanio, sizeof(int));
 	p += sizeof(int);
 	memcpy(p, bytes, buffer->tamanio);

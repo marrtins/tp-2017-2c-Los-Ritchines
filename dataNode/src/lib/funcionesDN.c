@@ -126,7 +126,7 @@ Tbloque * recvBloque(int socketFS) {
 
 void enviarBloqueAFS(int nroBloque, int socketFS){
 	Tbuffer * buffer;
-	Theader * head = malloc(sizeof(Theader));;
+	Theader * head = malloc(sizeof(Theader));
 
 	head->tipo_de_proceso = DATANODE;
 	head->tipo_de_mensaje =OBTENER_BLOQUE;
