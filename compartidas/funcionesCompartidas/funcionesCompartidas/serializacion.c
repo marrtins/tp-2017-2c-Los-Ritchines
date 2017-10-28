@@ -831,3 +831,21 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 	return datosReduccion;
 }
 
+Tbuffer *empaquetarBytes(Theader * head, char * bytes){
+
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+	int tamanio = strlen(bytes) +1;
+	buffer->tamanio = (HEAD_SIZE + sizeof(int) + tamanio);
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &buffer->tamanio, sizeof(int));
+	p += sizeof(int);
+	memcpy(p, bytes, buffer->tamanio);
+	p += buffer->tamanio;
+
+	return buffer;
+}
+

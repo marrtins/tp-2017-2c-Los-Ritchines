@@ -123,3 +123,19 @@ Tbloque * recvBloque(int socketFS) {
 	free(contenidoBloque);
 	return bloque;
 }
+
+void enviarBloqueAFS(int nroBloque, int socketFS){
+	Tbuffer * buffer;
+	Theader * head = malloc(sizeof(Theader));
+
+	head->tipo_de_proceso = DATANODE;
+	head->tipo_de_mensaje =OBTENER_BLOQUE;
+	char * bloque = getBloque(nroBloque);
+
+	buffer = empaquetarBytes(head, bloque);
+	if ((send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
+		logAndExit("Fallo al enviar a FS el bloque que pidió");
+	}
+
+	free(head);
+}
