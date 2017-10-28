@@ -13,6 +13,7 @@ void conexionesDatanode(void * estructura){
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	Tnodo * nuevoNodo;
+	Tnodo * nodoEncontrado;
 	TpackInfoBloqueDN * infoBloque;
 
 	FD_ZERO(&masterFD);
@@ -64,11 +65,12 @@ void conexionesDatanode(void * estructura){
 						}
 						else if( estado == 0){
 							puts("vamos a agregar el nodo desconectado a lista de desconectados");
-							list_add(listaDeNodosDesconectados, buscarNodoPorFD(fileDescriptor));
+							nodoEncontrado = buscarNodoPorFD(fileDescriptor);
+							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							puts("vamos a borrar al negro por su file descriptor");
 							borrarNodoPorFD(fileDescriptor);
 							puts("eliminamos al nodo de la tabla do nodos");
-							eliminarNodoDeTablaDeNodos(nuevoNodo);
+							eliminarNodoDeTablaDeNodos(nodoEncontrado);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
@@ -87,7 +89,6 @@ void conexionesDatanode(void * estructura){
 										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										printf("Para el nro de bloque recibi %d bytes\n", estado);
 										list_add(listaDeNodos, nuevoNodo);
-										agregarNodoATablaDeNodos(nuevoNodo);
 										puts("Nodo inicializado y guardado en la lista");
 										mostrarBitmap(nuevoNodo->bitmap);
 									}
@@ -95,9 +96,11 @@ void conexionesDatanode(void * estructura){
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
 										list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
+										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoDesconectadoPorFD(fileDescriptor);
 										log_trace(logger, "Nodo que se habia caído, se reconecto");
 									}
+									agregarNodoATablaDeNodos(nuevoNodo);
 									liberarTPackInfoBloqueDN(infoBloque);
 								}
 								else {
