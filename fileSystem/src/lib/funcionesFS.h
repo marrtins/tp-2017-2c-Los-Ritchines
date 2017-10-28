@@ -26,7 +26,7 @@ void conexionesDatanode(void * estructura);
 //Tablas
 void persistirTablaDeDirectorios();
 void levantarTablasDirectorios();
-void levantarTablaArchivo(Tarchivo * tablaArchivos);
+void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta);
 void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
@@ -64,6 +64,8 @@ int esDirectorio(char * ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
 void removerDirectorios(char * ruta);
+int verificarRutaArchivo(char * ruta);
+char * obtenerRutaSinArchivo(char * ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
@@ -73,6 +75,7 @@ char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
+void copiarArchivo(char ** palabras);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
