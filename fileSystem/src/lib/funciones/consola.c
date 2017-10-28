@@ -64,7 +64,14 @@ void procesarInput(char* linea) {
 			}
 
 	} else if (string_equals_ignore_case(*palabras, "ls")) {
-		printf("ya pude listar los archivos del directorio\n");
+		if(cantidad == 1){
+			if(existeDirectorio(palabras[1])){
+					puts("Existe el directorio");
+					listarArchivos(palabras[1]);
+					}else {
+					puts("No existe el directorio");
+			}
+		}
 	} else if (string_equals_ignore_case(*palabras, "info")) {
 		printf("ya pude mostrar la informacion del archivo\n");
 	} else if(string_equals_ignore_case(*palabras, "exit")){

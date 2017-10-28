@@ -212,6 +212,16 @@ int esDirectorio(char * ruta){
 	return i;
 }
 
+int esArchivo (char* ruta){
+	struct stat estado;
+	int i;
+
+	stat(ruta,&estado);
+	i= S_ISREG(estado.st_mode);
+
+	return i;
+}
+
 char** buscarDirectorios(char * ruta){
 	
 	  DIR *directorioActual;
@@ -225,7 +235,7 @@ char** buscarDirectorios(char * ruta){
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
 
-	  }else
+	  }else{
 	  // Leo uno por uno los directorios que estan adentro del directorio actual
 	  while ((directorio = readdir(directorioActual)) != NULL) {
 
@@ -245,9 +255,11 @@ char** buscarDirectorios(char * ruta){
 		}
 
 	}
-	  directorios[i] = NULL;
+
 
 	  closedir (directorioActual);
+}
+	  directorios[i] = NULL;
 	  return directorios;
 }
 
@@ -262,10 +274,10 @@ char** buscarArchivos(char * ruta){
 	  directorioActual = opendir (ruta);
 
 	  if (directorioActual == NULL){
-	    puts("No puedo abrir el archivo");
+	    puts("No puedo abrir el directorio");
 
-	  }else
-	  // Leo uno por uno los directorios que estan adentro del archivo actual
+	  }else{
+	  // Leo uno por uno los archivos que estan adentro del directorio actual
 	  while ((archivo = readdir(directorioActual)) != NULL) {
 
 		  //Con readdir aparece siempre . y .. como no me interesa no lo contemplo
@@ -275,18 +287,19 @@ char** buscarArchivos(char * ruta){
 			string_append(&rutaNueva,"/");
 			string_append(&rutaNueva,archivo->d_name);
 			archivos[i] = malloc(256);
-				if(!esDirectorio(rutaNueva)){
+				if(esArchivo(rutaNueva)){
 					strcpy(archivos[i],rutaNueva);
 					i++;
 				}
 			free(rutaNueva);
 
 		}
-
-	}
+	  }
+	  closedir (directorioActual);
+	  }
 
 	  archivos[i] = NULL;
-	  closedir (directorioActual);
+
 	  return archivos;
 }
 
@@ -304,9 +317,9 @@ void removerArchivos(char * ruta){
 		}
 		liberarPunteroDePunterosAChar(archivos);
 		free(archivos);
-	}else
+	}else{
 	free(archivos);
-
+	}
 }
 
 void removerDirectorios(char *ruta){
@@ -326,11 +339,45 @@ void removerDirectorios(char *ruta){
 		}
 		liberarPunteroDePunterosAChar(directorios);
 		free(directorios);
-	}else
+	}else {
 
 	free(directorios);
-
+	}
 
 }
+
+void listarArchivos(char* ruta){
+
+	char ** archivos;
+	int i = 0, index;
+	char * rutaArchivosDirectorio = malloc(200);
+	char ** divisionRuta;
+	char * nombreArchivoConExtension;
+	index = obtenerIndexDeUnaRuta(ruta);
+	sprintf(rutaArchivosDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	archivos = buscarArchivos(rutaArchivosDirectorio);
+
+	if(archivos[i] != NULL){
+		while(archivos[i] != NULL){
+
+				divisionRuta = string_split(archivos[i], "/");
+				nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(divisionRuta);
+				puts(nombreArchivoConExtension);
+				i++;
+
+			}
+			liberarPunteroDePunterosAChar(archivos);
+			liberarPunteroDePunterosAChar(divisionRuta);
+			free(divisionRuta);
+			free(archivos);
+			free(rutaArchivosDirectorio);
+		}else {
+		printf("El directorio de ruta %s no tiene archivos\n", ruta);
+		free(archivos);
+		free(rutaArchivosDirectorio);
+	}
+	}
+
+
 
 
