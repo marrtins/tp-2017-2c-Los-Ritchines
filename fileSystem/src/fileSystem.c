@@ -34,10 +34,6 @@ int main(int argc, char* argv[]) {
 	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
-	char*ruta=malloc(100);
-	strcpy(ruta,"utn/lala/pepe/juan/torri.txt");
-	verificarRutaArchivo(ruta);
-
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
