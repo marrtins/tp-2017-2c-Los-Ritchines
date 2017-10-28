@@ -11,17 +11,37 @@ bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2){
 	return nodoA->cantidadBloquesLibres >= nodoB->cantidadBloquesLibres;
 }
 
-/*bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
-	Tnodo* nodoA = (Tnodo*)nodo1;
-	Tnodo* nodoB = (Tnodo*)nodo2;
-
-	double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
-		if(nodo->cantidadBloquesLibres == 0) return 1;
-		double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
-		return bloquesOcupados / nodo->cantidadBloquesTotal;
+int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo){
+	int cantidad = listaDeNodos->elements_count;
+	int i = 0;
+	Tnodo * nodo;
+	int sumador = 0;
+	while(i != cantidad){
+		nodo = (Tnodo*)list_get(listaDeNodos, i);
+		if(nodo != maximo){
+			sumador += nodo->cantidadBloquesLibres;
+		}
+		i++;
 	}
-	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
-}*/
+	return sumador;
+}
+
+Tnodo * obtenerNodoPorTamanioMaximo(){
+	int cantidad = listaDeNodos->elements_count;
+	Tnodo * nodo = NULL;
+	Tnodo * nodoMaximo = NULL;
+	int maximo = 0;
+	int i = 0;
+	while(i != cantidad){
+		nodo = (Tnodo * )list_get(listaDeNodos,i);
+		if(nodo->cantidadBloquesLibres > maximo){
+			nodoMaximo = nodo;
+			maximo = nodo->cantidadBloquesLibres;
+		}
+		i++;
+	}
+	return nodoMaximo;
+}
 
 int sumarListasPorTamanioDatabin(){
 	int cantidadDeElementos = listaDeNodos->elements_count;

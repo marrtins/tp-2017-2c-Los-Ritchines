@@ -155,10 +155,34 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	}
 }
 
+int esPar(int numero){
+	return !(numero % 2);
+}
+
+int capacidadDeAlmacenamientoDeFileSystem(Tnodo * nodoMaximo, int sumaSinMaximo){
+	int total = nodoMaximo->cantidadBloquesLibres + sumaSinMaximo;
+	if(nodoMaximo->cantidadBloquesLibres > sumaSinMaximo){
+		return sumaSinMaximo;
+	}else if(nodoMaximo->cantidadBloquesLibres == sumaSinMaximo){
+		return nodoMaximo->cantidadBloquesLibres;
+	}else if(esPar(total)){
+		return total/2;
+	}
+	else{
+		return (total-1)/2;
+	}
+
+}
+
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
-	int tamanioEnMBDisponiblesEnNodos = sumarListasPorTamanioDatabin();
-	//se multiplica por 2 por que se guarda 1 copia en otro nodo
-	if(tamanioEnMBDisponiblesEnNodos * BLOQUE_SIZE < tamanioDelArchivoAGuardar * 2){
+	Tnodo * nodoMaximo = obtenerNodoPorTamanioMaximo();
+	printf("EL NODO MAXIMO ES %s\n", nodoMaximo->nombre);
+	int sumaSinMaximo = sumarBloquesLibresDeNodoSinElMaximo(nodoMaximo);
+	printf("La suma sin el maximo es %d\n", sumaSinMaximo);
+	int capacidadEnMB = capacidadDeAlmacenamientoDeFileSystem(nodoMaximo, sumaSinMaximo);
+	printf("La capacidad en MB de filesystem es %d\n", capacidadEnMB);
+	if(tamanioDelArchivoAGuardar > capacidadEnMB){
+		printf("Es mas grande que el filesystem loco");
 		return -1;
 	}
 	return 0;
@@ -241,8 +265,7 @@ void almacenarArchivo(char **palabras){
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
-Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor){
-	Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
+Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo){
 	nuevoNodo->fd = fileDescriptor;
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;

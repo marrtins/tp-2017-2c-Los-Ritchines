@@ -32,8 +32,8 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void mostrarTablaArchivo(Tarchivo* tablaArchivo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
-char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento);
-char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre);
+void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, char * nombreElemento);
+void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento);
 void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
@@ -47,6 +47,8 @@ bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 int sumarListasPorTamanioDatabin();
 void* buscarNodoDesconectadoPorFD(int fd);
 bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2);
+Tnodo * obtenerNodoPorTamanioMaximo();
+int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -82,7 +84,7 @@ void copiarArchivo(char ** palabras);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
-Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor);
+Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo);
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);

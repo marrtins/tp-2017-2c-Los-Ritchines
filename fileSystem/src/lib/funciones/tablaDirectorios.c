@@ -388,7 +388,7 @@ char * obtenerRutaSinArchivo(char * ruta){
 
 	directorios = string_split(ruta, "/");
 	archivo = obtenerUltimoElementoDeUnSplit(directorios);
-	tamanioNombreArchivo = strlen(archivo);
+	tamanioNombreArchivo = strlen(archivo) +1;
 	tamanioRuta = strlen(ruta);
 
 	liberarPunteroDePunterosAChar(directorios);
@@ -398,13 +398,58 @@ char * obtenerRutaSinArchivo(char * ruta){
 
 }
 
+int existeArchivo(int indiceDirectorio , char * rutaYamafs){
+	int i =0;
+	char ** archivos;
+	char *archivo;
+	char * ruta = malloc(100);
+	char ** carpetas = string_split(rutaYamafs,"/");
+
+	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	string_append_with_format(&ruta,"%d",indiceDirectorio);
+	archivos = buscarArchivos(ruta);
+
+	string_append(&ruta,"/");
+	archivo = obtenerUltimoElementoDeUnSplit(carpetas);
+	string_append(&ruta,archivo);
+
+	if (archivos[i] != NULL) {
+		while (archivos[i] != NULL) {
+			if (string_equals_ignore_case(archivos[i], ruta)) {
+				liberarPunteroDePunterosAChar(carpetas);
+				free(carpetas);
+				liberarPunteroDePunterosAChar(archivos);
+				free(archivos);
+				free(archivo);
+				free(ruta);
+				return 1;
+			}
+		}
+		liberarPunteroDePunterosAChar(archivos);
+	}
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	free(archivos);
+	free(archivo);
+	free(ruta);
+	return 0;
+}
+
 int verificarRutaArchivo(char * ruta){
 
+	int indice;
 	char * rutaSinArchivo;
 	rutaSinArchivo =  obtenerRutaSinArchivo(ruta);
 
+	if(existeDirectorio(rutaSinArchivo)){
+		indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
+		if(existeArchivo(indice,ruta)){
+			free(rutaSinArchivo);
+			return 1;
+		}
+	}
 	free(rutaSinArchivo);
-	return existeDirectorio(ruta);
+	return 0;
 
 }
 
