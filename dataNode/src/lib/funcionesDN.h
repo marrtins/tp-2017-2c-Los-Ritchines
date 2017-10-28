@@ -13,6 +13,7 @@ char * getBloque(int posicion);
 
 //Envios
 int enviarInfoNodo(int socketFS, TdataNode * dataNode);
+void enviarBloqueAFS(int nroBloque, int socketFS);
 
 //Recv
 Tbloque * recvBloque(int socketFS);
