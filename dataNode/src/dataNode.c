@@ -70,6 +70,18 @@ int main(int argc, char* argv[]) {
 				free(bloque);
 
 				break;
+			case OBTENER_BLOQUE:
+				puts("Es fileSystem y quiere un bloque");
+				int nroBloque;
+
+
+				if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
+						logAndExit("Error al recibir el numero de bloque");
+					}
+				enviarBloqueAFS(nroBloque, socketFS);
+				break;
+
+
 			default:
 				break;
 			}

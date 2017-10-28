@@ -346,6 +346,7 @@ void removerDirectorios(char *ruta){
 
 }
 
+
 void listarArchivos(char* ruta){
 
 	char ** archivos;
@@ -379,5 +380,32 @@ void listarArchivos(char* ruta){
 	}
 
 
+char * obtenerRutaSinArchivo(char * ruta){
+	char ** directorios;
+	char * archivo;
+	int tamanioNombreArchivo;
+	int tamanioRuta;
+
+	directorios = string_split(ruta, "/");
+	archivo = obtenerUltimoElementoDeUnSplit(directorios);
+	tamanioNombreArchivo = strlen(archivo);
+	tamanioRuta = strlen(ruta);
+
+	liberarPunteroDePunterosAChar(directorios);
+	free(directorios);
+	free(archivo);
+	return string_substring_until(ruta,tamanioRuta-tamanioNombreArchivo);
+
+}
+
+int verificarRutaArchivo(char * ruta){
+
+	char * rutaSinArchivo;
+	rutaSinArchivo =  obtenerRutaSinArchivo(ruta);
+
+	free(rutaSinArchivo);
+	return existeDirectorio(ruta);
+
+}
 
 

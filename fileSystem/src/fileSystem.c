@@ -35,7 +35,6 @@ int main(int argc, char* argv[]) {
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
-
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
 

@@ -1,8 +1,8 @@
 #include "../funcionesFS.h"
 
-void levantarTablaArchivo(Tarchivo * tablaArchivos){
+void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 
-	t_config *archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/2/archivo1.txt");
+	t_config *archivo = config_create(ruta);
 
 	tablaArchivos->extensionArchivo = malloc(TAMANIO_EXTENSION_ARCHIVO);
 
