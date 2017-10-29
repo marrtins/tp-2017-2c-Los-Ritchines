@@ -104,6 +104,9 @@ void conexionesDatanode(void * estructura){
 								cantNodosPorConectar--;
 								break;
 
+							case INFO_BLOQUE:
+								puts("Aca se procesa el bloque recibido");
+
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
 								log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
@@ -115,7 +118,8 @@ void conexionesDatanode(void * estructura){
 					printf("el mensaje es %d\n", head->tipo_de_mensaje);
 					break;
 
-				} else{
+				}
+				else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
 					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");

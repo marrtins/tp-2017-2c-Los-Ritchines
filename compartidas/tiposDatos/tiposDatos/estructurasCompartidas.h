@@ -41,7 +41,8 @@ typedef enum {
 	FIN_REDUCCIONLOCAL=28,
 	OBTENER_BLOQUE=29,
 	INICIO_YAMA=30,
-	INFO_ARCHIVO= 31
+	INFO_ARCHIVO= 31,
+	INFO_BLOQUE = 32
 } Tmensaje;
 
 typedef enum {
