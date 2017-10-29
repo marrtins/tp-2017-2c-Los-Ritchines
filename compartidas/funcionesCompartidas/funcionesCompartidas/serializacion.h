@@ -19,6 +19,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo);
 Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque);
 TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo);
 Tbuffer *empaquetarBytes(Theader * head, char * bytes);
+Tbuffer * empaquetarInt(Theader * head, int numero);
 
 char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int bytesOcupadosBloque,int nombreTemporalLen ,char* nombreTemporal, int *pack_size);
 TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes_serial);

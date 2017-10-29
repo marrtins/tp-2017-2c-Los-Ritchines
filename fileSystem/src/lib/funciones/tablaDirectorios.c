@@ -234,7 +234,7 @@ char** buscarDirectorios(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No pudo abrir el directorio");
-	    log_trace("No se pudo abrir el directorio, hubo un error.");
+	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los directorios que estan adentro del directorio actual
@@ -276,7 +276,7 @@ char** buscarArchivos(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
-	    log_trace("No se pudo abrir el directorio, hubo un error.");
+	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los archivos que estan adentro del directorio actual
@@ -376,7 +376,7 @@ void listarArchivos(char* ruta){
 			free(rutaArchivosDirectorio);
 		}else {
 		printf("El directorio de ruta %s no tiene archivos\n", ruta);
-		log_trace("El directorio no tiene archivos");
+		log_trace(logger,"El directorio no tiene archivos");
 		free(archivos);
 		free(rutaArchivosDirectorio);
 	}
@@ -399,6 +399,29 @@ char * obtenerRutaSinArchivo(char * ruta){
 	free(archivo);
 	return string_substring_until(ruta,tamanioRuta-tamanioNombreArchivo);
 
+}
+
+char * obtenerRutaLocalDeArchivo(char * rutaYamafs){
+	int indice;
+	char * rutaSinArchivo;
+	char * archivo;
+	char * ruta = malloc(100);
+	char ** carpetas = string_split(rutaYamafs,"/");
+
+	rutaSinArchivo =  obtenerRutaSinArchivo(rutaYamafs);
+	indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
+
+	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	string_append_with_format(&ruta,"%d",indice);
+	string_append(&ruta,"/");
+	archivo = obtenerUltimoElementoDeUnSplit(carpetas);
+	string_append(&ruta,archivo);
+
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	free(rutaSinArchivo);
+	free(archivo);
+	return ruta;
 }
 
 int existeArchivo(int indiceDirectorio , char * rutaYamafs){
@@ -438,20 +461,35 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs){
 	return 0;
 }
 
-int verificarRutaArchivo(char * ruta){
+int validarQueLaRutaTengaElNombreDelArchivo(char * ruta){
+	char ** carpetas = string_split(ruta,"/");
+	char * archivo;
+	int valor;
+	archivo = obtenerUltimoElementoDeUnSplit(carpetas);
+
+	valor = (int) string_contains(archivo, ".");
+
+	return valor;
+
+}
+
+int verificarRutaArchivo(char * rutaYamafs){
 
 	int indice;
 	char * rutaSinArchivo;
-	rutaSinArchivo =  obtenerRutaSinArchivo(ruta);
-
-	if(existeDirectorio(rutaSinArchivo)){
-		indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
-		if(existeArchivo(indice,ruta)){
-			free(rutaSinArchivo);
-			return 1;
+	if(validarQueLaRutaTengaElNombreDelArchivo(rutaYamafs)){
+		rutaSinArchivo =  obtenerRutaSinArchivo(rutaYamafs);
+		if(existeDirectorio(rutaSinArchivo)){
+			indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
+			if(existeArchivo(indice,rutaYamafs)){
+				free(rutaSinArchivo);
+				return 1;
+			}
 		}
+		free(rutaSinArchivo);
+	}else{
+	puts("La ruta yamafs debe contener el nombre del archivo y la extensión");
 	}
-	free(rutaSinArchivo);
 	return 0;
 
 }

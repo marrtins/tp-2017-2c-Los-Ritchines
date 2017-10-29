@@ -1,10 +1,10 @@
 #include "../funcionesFS.h"
 
-void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
+void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 	t_config *archivo = config_create(ruta);
 
-	tablaArchivos->extensionArchivo = malloc(TAMANIO_EXTENSION_ARCHIVO);
+	tablaArchivo->extensionArchivo = malloc(TAMANIO_EXTENSION_ARCHIVO);
 
 	int cantBloques, nroBloque = 0;
 	char **temporal1;
@@ -13,17 +13,17 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 	char* bloqueCopia1;
 	char* bloqueBytes;
 
-	tablaArchivos->tamanioTotal = config_get_int_value(archivo, "TAMANIO");
-	strcpy(tablaArchivos->extensionArchivo, config_get_string_value(archivo, "TIPO"));
+	tablaArchivo->tamanioTotal = config_get_int_value(archivo, "TAMANIO");
+	strcpy(tablaArchivo->extensionArchivo, config_get_string_value(archivo, "TIPO"));
 
-	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivos->tamanioTotal);
-	tablaArchivos->bloques = malloc(sizeof(Tbloques)*cantBloques);
+	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
+	tablaArchivo->bloques = malloc(sizeof(Tbloques)*cantBloques);
 
 	while(nroBloque != cantBloques){
 
-		tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+		tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 		//tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char)*4);
-		tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+		tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 		//tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 
 		bloqueCopia0 = generarStringDeBloqueNCopiaN(nroBloque,0);
@@ -32,19 +32,19 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 
 		temporal1 = config_get_array_value(archivo, bloqueCopia0);
 		temporal2 = config_get_array_value(archivo, bloqueCopia1);
-		tablaArchivos->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueBytes);
+		tablaArchivo->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueBytes);
 
-		strcpy(tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo,temporal1[0]);
-		tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = atoi(temporal1[1]);
+		strcpy(tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo,temporal1[0]);
+		tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = atoi(temporal1[1]);
 
-		strcpy(tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo,temporal2[0]);
-		tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = atoi(temporal2[1]);
+		strcpy(tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo,temporal2[0]);
+		tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = atoi(temporal2[1]);
 
-		printf("Nombre de nodo copia cero %s\n",tablaArchivos->bloques[nroBloque].copiaCero.nombreDeNodo);
-		printf("Numero de nodo copia cero %d\n",tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
-		printf("Nombre de nodo copia uno %s\n",tablaArchivos->bloques[nroBloque].copiaUno.nombreDeNodo);
-		printf("Numero de nodo copia uno %d\n",tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
-		printf("Bytes %llu\n",tablaArchivos->bloques[nroBloque].bytes);
+		printf("Nombre de nodo copia cero %s\n",tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo);
+		printf("Numero de nodo copia cero %d\n",tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
+		printf("Nombre de nodo copia uno %s\n",tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo);
+		printf("Numero de nodo copia uno %d\n",tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
+		printf("Bytes %llu\n",tablaArchivo->bloques[nroBloque].bytes);
 		nroBloque++;
 
 		liberarPunteroDePunterosAChar(temporal1);

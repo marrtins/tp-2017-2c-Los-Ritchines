@@ -2,7 +2,6 @@
 
 
 int main(int argc, char* argv[]) {
-	puts("Holi empiezo");
 	int estado,
 		socketDeEscuchaYama,
 		socketYama,
@@ -32,7 +31,7 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 
 
-	inicializarTablaDirectorios();
+	//inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
@@ -65,7 +64,7 @@ int main(int argc, char* argv[]) {
 			log_trace(logger, mensaje);
 			break;
 		}
-		if(head->tipo_de_proceso){
+		if(head->tipo_de_proceso == YAMA){
 		switch(head->tipo_de_mensaje){
 			case INICIO_YAMA:
 				puts("Es yama");

@@ -78,6 +78,7 @@ int main(int argc, char* argv[]) {
 				if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
 						logAndExit("Error al recibir el numero de bloque");
 					}
+				printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
 				enviarBloqueAFS(nroBloque, socketFS);
 				break;
 

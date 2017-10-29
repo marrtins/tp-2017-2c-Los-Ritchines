@@ -70,8 +70,11 @@ char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
 void listarArchivos(char * ruta);
 void removerDirectorios(char * ruta);
-int verificarRutaArchivo(char * ruta);
+int verificarRutaArchivo(char * rutaYamafs);
+int existeArchivo(int indiceDirectorio , char * rutaYamafs);
 char * obtenerRutaSinArchivo(char * ruta);
+char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
+int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
@@ -81,6 +84,9 @@ char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
 char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
+
+//Obtener Archivo
+void pedirBloques(Tarchivo * archivo);
 void copiarArchivo(char ** palabras);
 
 //Nodos
