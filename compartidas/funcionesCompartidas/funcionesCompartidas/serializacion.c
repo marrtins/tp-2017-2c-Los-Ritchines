@@ -287,6 +287,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio);
 	buffer->buffer = malloc(buffer->tamanio);
 
+	puts("rompe1");
 	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
@@ -296,6 +297,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	p += sizeof(unsigned long long);
 	memcpy(p, bloque->contenido, bloque->tamanio);
 	p += bloque->tamanio;
+	puts("rompe2");
 
 	return buffer;
 }

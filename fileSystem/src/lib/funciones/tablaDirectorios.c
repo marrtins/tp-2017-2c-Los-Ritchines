@@ -234,7 +234,7 @@ char** buscarDirectorios(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No pudo abrir el directorio");
-	    log_trace("No se pudo abrir el directorio, hubo un error.");
+	    log_trace(logger, "No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los directorios que estan adentro del directorio actual
@@ -276,7 +276,7 @@ char** buscarArchivos(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
-	    log_trace("No se pudo abrir el directorio, hubo un error.");
+	    log_trace(logger, "No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los archivos que estan adentro del directorio actual
@@ -376,7 +376,7 @@ void listarArchivos(char* ruta){
 			free(rutaArchivosDirectorio);
 		}else {
 		printf("El directorio de ruta %s no tiene archivos\n", ruta);
-		log_trace("El directorio no tiene archivos");
+		log_trace(logger, "El directorio no tiene archivos");
 		free(archivos);
 		free(rutaArchivosDirectorio);
 	}
