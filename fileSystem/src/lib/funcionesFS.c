@@ -31,16 +31,19 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	Theader * head = malloc(sizeof(Theader));
 	Tbuffer * buffer1;
 	Tbuffer * buffer2;
+	//Tnodo * nodo1 = NULL;
+	//Tnodo * nodo2 = NULL;
 	int estado;
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
-
+	puts("llegue y rompi");
+	//buscarLosDosNodosConMasDisponibilidad(listaDeNodos, nodo1, nodo2);
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	//Tnodo* nodo3 = (Tnodo*)list_get(listaDeNodos, 2);
 	//Tnodo* nodo4 = (Tnodo*)list_get(listaDeNodos, 3);
-
+	puts("che, pude pasar");
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);

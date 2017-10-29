@@ -50,6 +50,7 @@ bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2);
 Tnodo * obtenerNodoPorTamanioMaximo();
 int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
 void mostrarListaDeNodos(t_list * lista);
+void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
