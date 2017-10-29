@@ -38,7 +38,7 @@ void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
-char * generarArrayParaArchivoConfig(char * dato1, char * dato2);
+void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 
 
@@ -49,6 +49,7 @@ void* buscarNodoDesconectadoPorFD(int fd);
 bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2);
 Tnodo * obtenerNodoPorTamanioMaximo();
 int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
+void mostrarListaDeNodos(t_list * lista);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);

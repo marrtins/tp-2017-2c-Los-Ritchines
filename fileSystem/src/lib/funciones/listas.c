@@ -11,6 +11,24 @@ bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2){
 	return nodoA->cantidadBloquesLibres >= nodoB->cantidadBloquesLibres;
 }
 
+void mostrarListaDeNodos(t_list * lista){
+	int i = 0;
+	int cantidadNodos = lista->elements_count;
+	Tnodo * nodo;
+	printf("La lista contiene la siguiente informacion:\n");
+	while(i != cantidadNodos){
+		nodo = (Tnodo *) list_get(lista, i);
+		printf("Nombre: %s\n", nodo->nombre);
+		printf("Cantidad De Bloques Total: %d\n", nodo->cantidadBloquesTotal);
+		printf("Cantidad De Bloques Libres: %d\n", nodo->cantidadBloquesLibres);
+		printf("File Descriptor: %d\n", nodo->fd);
+		printf("Primer Bloque Libre en Bitmap: %d\n", nodo->primerBloqueLibreBitmap);
+		printf("Bitmap: ");
+		mostrarBitmap(nodo->bitmap);
+		i++;
+	}
+}
+
 int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo){
 	int cantidad = listaDeNodos->elements_count;
 	int i = 0;

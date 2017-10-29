@@ -90,7 +90,6 @@ void conexionesDatanode(void * estructura){
 										printf("Para el nro de bloque recibi %d bytes\n", estado);
 										list_add(listaDeNodos, nuevoNodo);
 										puts("Nodo inicializado y guardado en la lista");
-										mostrarBitmap(nuevoNodo->bitmap);
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -105,6 +104,7 @@ void conexionesDatanode(void * estructura){
 								}
 								else {
 									puts("viejo me estas mandando la info otra vez, media pila che");
+									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
 								cantNodosPorConectar--;
 								break;

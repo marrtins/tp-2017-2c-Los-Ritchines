@@ -1,13 +1,16 @@
 #include "../funcionesFS.h"
 
-char * generarArrayParaArchivoConfig(char * dato1, char * dato2){
-	char * concatenacionLoca = malloc(1 + TAMANIO_NOMBRE_NODO + 1 + 3);
+void generarArrayParaArchivoConfig(t_config * archivoConf, char * key, char * dato1, char * dato2){
+	char * concatenacionLoca = string_new();
 	string_append(&concatenacionLoca, "[");
 	string_append(&concatenacionLoca, dato1);
 	string_append(&concatenacionLoca, ",");
 	string_append(&concatenacionLoca, dato2);
 	string_append(&concatenacionLoca, "]");
-	return concatenacionLoca;
+	printf("Soy lo que rompe: %s", concatenacionLoca);
+	config_set_value(archivoConf, key, concatenacionLoca);
+	free(concatenacionLoca);
+	while(1);
 }
 
 void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento){

@@ -100,8 +100,6 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 	char * bloque0CopiaN;
 	char * bloque1CopiaN;
 	char * bloqueNBytes;
-	char * concatenacionLoca;
-	char * concatenacionLoca2;
 	char * numeroBloqueEnString;
 	char * numeroBloqueEnString2;
 	char * tamanioTotal;
@@ -116,22 +114,21 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 	while(cantidadDeBloques != 0){
 
+		printf("ACA ROMPE: %s",archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo);
 		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
 		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
-		concatenacionLoca = generarArrayParaArchivoConfig(archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo, numeroBloqueEnString);
-
-		config_set_value(archivoConfig, bloque0CopiaN, concatenacionLoca);
+		generarArrayParaArchivoConfig(archivoConfig, bloque0CopiaN, archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo, numeroBloqueEnString);
 
 		bloque1CopiaN = generarStringDeBloqueNCopiaN(i,1);
 		numeroBloqueEnString2 = string_itoa(archivoAAlmacenar->bloques[i].copiaUno.numeroBloqueDeNodo);
-		concatenacionLoca2 = generarArrayParaArchivoConfig(archivoAAlmacenar->bloques[i].copiaUno.nombreDeNodo, numeroBloqueEnString2);
-		config_set_value(archivoConfig, bloque1CopiaN, concatenacionLoca2);
+		generarArrayParaArchivoConfig(archivoConfig, bloque1CopiaN, archivoAAlmacenar->bloques[i].copiaUno.nombreDeNodo, numeroBloqueEnString2);
 
 		//aca hace el tamanio
 		bloqueNBytes = generarStringDeBloqueNBytes(i);
 		//hay que pasar un long a string
 		bytes = string_itoa(archivoAAlmacenar->bloques[i].bytes);
 		config_set_value(archivoConfig, bloqueNBytes, bytes);
+
 		cantidadDeBloques--;
 		i++;
 
@@ -141,8 +138,6 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 		free(bloque0CopiaN);
 		free(bloque1CopiaN);
 		free(bloqueNBytes);
-		free(concatenacionLoca);
-		free(concatenacionLoca2);
 	}
 
 	puts("guardando TODO");

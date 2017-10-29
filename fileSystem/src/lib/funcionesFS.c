@@ -2,6 +2,8 @@
 
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque){
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+	puts("Esto es lo que llega mal supuestamente");
+	puts(nodo1->nombre);
 	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
@@ -175,14 +177,15 @@ int capacidadDeAlmacenamientoDeFileSystem(Tnodo * nodoMaximo, int sumaSinMaximo)
 }
 
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
+	int tamanioEnMBArchivo = cantidadDeBloquesDeUnArchivo(tamanioDelArchivoAGuardar);
 	Tnodo * nodoMaximo = obtenerNodoPorTamanioMaximo();
 	printf("EL NODO MAXIMO ES %s\n", nodoMaximo->nombre);
 	int sumaSinMaximo = sumarBloquesLibresDeNodoSinElMaximo(nodoMaximo);
 	printf("La suma sin el maximo es %d\n", sumaSinMaximo);
 	int capacidadEnMB = capacidadDeAlmacenamientoDeFileSystem(nodoMaximo, sumaSinMaximo);
 	printf("La capacidad en MB de filesystem es %d\n", capacidadEnMB);
-	if(tamanioDelArchivoAGuardar > capacidadEnMB){
-		printf("Es mas grande que el filesystem loco");
+	if(tamanioEnMBArchivo > capacidadEnMB){
+		printf("Es mas grande que el filesystem loco\n");
 		return -1;
 	}
 	return 0;
@@ -221,6 +224,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_trace(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
+		puts("voy a violar el segmento");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
