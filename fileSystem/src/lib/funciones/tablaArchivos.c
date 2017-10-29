@@ -18,10 +18,6 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivos->tamanioTotal);
 	tablaArchivos->bloques = malloc(sizeof(Tbloques)*cantBloques);
-	printf("cant bloques %d\n",cantBloques);
-
-	printf("Tamanio %llu\n", tablaArchivos->tamanioTotal);
-	printf("Extension %s\n", tablaArchivos->extensionArchivo);
 
 	while(nroBloque != cantBloques){
 
@@ -31,9 +27,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 		//tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
 
 		bloqueCopia0 = generarStringDeBloqueNCopiaN(nroBloque,0);
-		printf("BLOQUENCOPIA0 = %s", bloqueCopia0);
 		bloqueCopia1 = generarStringDeBloqueNCopiaN(nroBloque,1);
-		printf("BLOQUENCOPIA1 = %s", bloqueCopia1);
 		bloqueBytes = generarStringDeBloqueNBytes(nroBloque);
 
 		temporal1 = config_get_array_value(archivo, bloqueCopia0);
@@ -114,7 +108,6 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 	while(cantidadDeBloques != 0){
 
-		printf("ACA ROMPE: %s",archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo);
 		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
 		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
 		generarArrayParaArchivoConfig(archivoConfig, bloque0CopiaN, archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo, numeroBloqueEnString);

@@ -47,7 +47,7 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-puts("holi entre a eliminar nodo do tabla do nodos");
+
 	//NODONTOTAL
 	char * nodoTotalAString = string_new();
 	puts("holi voy a appendear con format a nodototalastring");
@@ -55,27 +55,27 @@ puts("holi entre a eliminar nodo do tabla do nodos");
 	puts("holi voy a obtener el get int value de la tabla de nodos con nodoTotalAString");
 	puts(nodoTotalAString);
 	int nodoTotal = config_get_int_value(tablaDeNodos, nodoTotalAString);
-puts("holi termine con nodoNTOTAL");
+
 	//TAMANIO
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "TAMANIO", nodoTotal, restaDeDosNumerosInt);
-puts("holi termine con tamanio");
+
 	//NODONLIBRE
 	char * nodoLibreAString = string_new();
 	string_append_with_format(&nodoLibreAString,"%sLibre", nuevoNodo->nombre);
 	int nodoLibre = config_get_int_value(tablaDeNodos, nodoLibreAString);
-puts("holi termine con nodonlibre");
+
 	//LIBRE
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", nodoLibre, restaDeDosNumerosInt);
-puts("holi termine con libre");
+
 	//SETEAR NODONTOTAL
 	config_set_value(tablaDeNodos, nodoTotalAString, "");
 
 	//SETEAR NODONLIBRE
 	config_set_value(tablaDeNodos, nodoLibreAString, "");
-puts("holi voy a eliminar un elemento de array archivos config");
+
 	//NODOS
 	eliminarElementoDeArrayArchivosConfig(tablaDeNodos, "NODOS", nuevoNodo->nombre);
-puts("holi ya hice todo, vamos a savear y destroyir el config");
+
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
 

@@ -7,10 +7,8 @@ void generarArrayParaArchivoConfig(t_config * archivoConf, char * key, char * da
 	string_append(&concatenacionLoca, ",");
 	string_append(&concatenacionLoca, dato2);
 	string_append(&concatenacionLoca, "]");
-	printf("Soy lo que rompe: %s", concatenacionLoca);
 	config_set_value(archivoConf, key, concatenacionLoca);
 	free(concatenacionLoca);
-	while(1);
 }
 
 void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento){

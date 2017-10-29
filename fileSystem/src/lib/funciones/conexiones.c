@@ -64,12 +64,9 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
-							puts("vamos a agregar el nodo desconectado a lista de desconectados");
 							nodoEncontrado = buscarNodoPorFD(fileDescriptor);
 							list_add(listaDeNodosDesconectados, nodoEncontrado);
-							puts("vamos a borrar al negro por su file descriptor");
 							borrarNodoPorFD(fileDescriptor);
-							puts("eliminamos al nodo de la tabla do nodos");
 							eliminarNodoDeTablaDeNodos(nodoEncontrado);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
@@ -87,9 +84,7 @@ void conexionesDatanode(void * estructura){
 										//nodo nuevo;
 										nuevoNodo = malloc(sizeof(Tnodo));
 										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
-										printf("Para el nro de bloque recibi %d bytes\n", estado);
 										list_add(listaDeNodos, nuevoNodo);
-										puts("Nodo inicializado y guardado en la lista");
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -103,7 +98,7 @@ void conexionesDatanode(void * estructura){
 									liberarTPackInfoBloqueDN(infoBloque);
 								}
 								else {
-									puts("viejo me estas mandando la info otra vez, media pila che");
+									puts("Un nodo ya conectado, se esta volviendo a conectar");
 									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
 								cantNodosPorConectar--;
@@ -125,7 +120,6 @@ void conexionesDatanode(void * estructura){
 					puts("Hacker detected");
 					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
 					clearAndClose(fileDescriptor, &masterFD);
-					puts("Intruso combatido");
 				}
 
 				} //termine el if

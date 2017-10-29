@@ -16,7 +16,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
 	ocuparProximoBloque(nodo2);
 	mostrarBitmap(nodo2->bitmap);
-	printf("por que mierda rompeeeeeeees\n");
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 }
@@ -176,13 +175,9 @@ int capacidadDeAlmacenamientoDeFileSystem(Tnodo * nodoMaximo, int sumaSinMaximo)
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
 	int tamanioEnMBArchivo = cantidadDeBloquesDeUnArchivo(tamanioDelArchivoAGuardar);
 	Tnodo * nodoMaximo = obtenerNodoPorTamanioMaximo();
-	printf("EL NODO MAXIMO ES %s\n", nodoMaximo->nombre);
 	int sumaSinMaximo = sumarBloquesLibresDeNodoSinElMaximo(nodoMaximo);
-	printf("La suma sin el maximo es %d\n", sumaSinMaximo);
 	int capacidadEnMB = capacidadDeAlmacenamientoDeFileSystem(nodoMaximo, sumaSinMaximo);
-	printf("La capacidad en MB de filesystem es %d\n", capacidadEnMB);
 	if(tamanioEnMBArchivo > capacidadEnMB){
-		printf("Es mas grande que el filesystem loco\n");
 		return -1;
 	}
 	return 0;
@@ -246,7 +241,6 @@ void almacenarArchivo(char **palabras){
 
 	Tarchivo * archivoAAlmacenar = malloc(sizeof(Tarchivo));
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
-	puts("obtuvo el nombre del archivo sin extension");
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
 	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
@@ -271,7 +265,6 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->primerBloqueLibreBitmap = 0;
-	puts(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
 	return nuevoNodo;
@@ -339,7 +332,6 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	 free(ipNodo);
 	 free(puertoNodo);
 
-	 puts("desempaqueta la info del nodo");
 	 return infoBloque;
 }
 
