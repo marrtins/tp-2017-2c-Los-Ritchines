@@ -2,8 +2,6 @@
 
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque){
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	puts("Esto es lo que llega mal supuestamente");
-	puts(nodo1->nombre);
 	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
@@ -18,7 +16,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
 	ocuparProximoBloque(nodo2);
 	mostrarBitmap(nodo2->bitmap);
-
+	printf("por que mierda rompeeeeeeees\n");
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 }
@@ -80,7 +78,6 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
 	fputs("\n",archivoDeSeguimiento);
 	*/
-	printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
 	free(head);
