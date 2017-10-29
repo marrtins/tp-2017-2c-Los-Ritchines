@@ -106,6 +106,7 @@ void conexionesDatanode(void * estructura){
 
 							case INFO_BLOQUE:
 								puts("Aca se procesa el bloque recibido");
+								break;
 
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");

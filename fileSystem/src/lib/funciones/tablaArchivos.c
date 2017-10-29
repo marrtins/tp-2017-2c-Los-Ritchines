@@ -13,6 +13,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta){
 	char* bloqueCopia1;
 	char* bloqueBytes;
 
+
 	tablaArchivos->tamanioTotal = config_get_int_value(archivo, "TAMANIO");
 	strcpy(tablaArchivos->extensionArchivo, config_get_string_value(archivo, "TIPO"));
 
@@ -156,7 +157,6 @@ void mostrarTablaArchivo(Tarchivo* tablaArchivo){
 		printf("Número de bloque del nodo donde esta la copia uno = %d", tablaArchivo->bloques[i].copiaUno.numeroBloqueDeNodo);
 		i++;
 	}
-	liberarTablaDeArchivo(tablaArchivo);
 	*/
 }
 
