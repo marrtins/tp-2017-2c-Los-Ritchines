@@ -51,10 +51,14 @@ void procesarInput(char* linea) {
 		}
 
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
-		if(verificarRutaArchivo(palabras[1])){
-		//copiarArchivo(palabras);
+		if(cantidad == 2){
+			if(verificarRutaArchivo(palabras[1])){
+				copiarArchivo(palabras);
+				printf("ya pude copiar un archivo local al file system\n");
+			}
+		}else {
+			puts("Error en la cantidad de parametros");
 		}
-		printf("ya pude copiar un archivo local al file system\n");
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
 		printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
 	} else if (string_equals_ignore_case(*palabras, "md5")) {

@@ -362,3 +362,44 @@ int getMD5(char**palabras){
 		free(ruta_temporal);*/
 		return 0;
 }
+
+void pedirBloques(Tarchivo * archivo){
+	int cantBloques, nroBloque=0;
+	Tbuffer * buffer;
+	Tnodo * nodo;
+	Theader * head = malloc(sizeof(Theader));
+
+	head->tipo_de_proceso = FILESYSTEM;
+	head->tipo_de_mensaje = OBTENER_BLOQUE;
+	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+
+	while(nroBloque != cantBloques){
+
+
+		//esto solo lo hice para ver que mandara bien las cosas
+		nodo = list_get(listaDeNodos,1);
+
+		buffer = empaquetarInt(head,archivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
+
+		if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+				logAndExit("Fallo al enviar al DATANODE el nro de bloque");
+			}
+
+		nroBloque++;
+	}
+
+
+}
+
+void copiarArchivo(char ** palabras){
+	//palabras[1] --> ruta archivo yamafs
+	//palabras[2] --> directorio
+	char * ruta;
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+	ruta = obtenerRutaLocalDeArchivo(palabras[1]);
+
+	levantarTablaArchivo(archivo,ruta);
+
+	pedirBloques(archivo);
+
+}

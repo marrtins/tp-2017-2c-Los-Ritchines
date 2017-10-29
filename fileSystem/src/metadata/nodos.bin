@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Nodo4Total=100
 Nodo3Libre=40
 TAMANIO=200
@@ -8,4 +9,12 @@ Nodo1Libre=20
 Nodo2Libre=30
 Nodo1Total=20
 LIBRE=180
+=======
+TAMANIO=50
+NODOS=[Nodo2,Nodo1]
+Nodo1Libre=20
+Nodo2Libre=30
+Nodo1Total=20
+LIBRE=50
+>>>>>>> a4894c9be9b59975d9dbf382a0ae65aa6eac0860
 Nodo2Total=30

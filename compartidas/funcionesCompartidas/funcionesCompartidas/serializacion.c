@@ -851,3 +851,18 @@ Tbuffer *empaquetarBytes(Theader * head, char * bytes){
 	return buffer;
 }
 
+Tbuffer * empaquetarInt(Theader * head, int numero){
+
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+
+	buffer->tamanio = (HEAD_SIZE + sizeof(int));
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &numero, sizeof(int));
+	p += sizeof(int);
+
+	return buffer;
+}
