@@ -51,6 +51,7 @@ Tnodo * obtenerNodoPorTamanioMaximo();
 int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
 void mostrarListaDeNodos(t_list * lista);
 void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2);
+Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);

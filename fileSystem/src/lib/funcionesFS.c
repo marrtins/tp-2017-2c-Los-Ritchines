@@ -363,31 +363,42 @@ int getMD5(char**palabras){
 		return 0;
 }
 
-void pedirBloques(Tarchivo * archivo){
+void pedirBloques(Tarchivo * tablaArchivo){
 	int cantBloques, nroBloque=0;
 	Tbuffer * buffer;
 	Tnodo * nodo;
 	Theader * head = malloc(sizeof(Theader));
+	int bloqueAEnviar;
 
 	head->tipo_de_proceso = FILESYSTEM;
 	head->tipo_de_mensaje = OBTENER_BLOQUE;
-	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 
 	while(nroBloque != cantBloques){
 
+		if((nodo = buscarNodoPorNombre(listaDeNodos, tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo)) != NULL){
+			bloqueAEnviar = tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo;
+		}
+		else if((nodo = buscarNodoPorNombre(listaDeNodos, tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo)) != NULL){
+			bloqueAEnviar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
+		}
+		else{
+			log_trace(logger, "Los nodos que contienen el bloque, no estan conectados.");
+			puts("Los nodos que contienen el bloque, no estan conectados.");
+			return;
+		}
 
-		//esto solo lo hice para ver que mandara bien las cosas
-		nodo = list_get(listaDeNodos,1);
-
-		buffer = empaquetarInt(head,archivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
+		buffer = empaquetarInt(head, bloqueAEnviar);
 
 		if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
-				logAndExit("Fallo al enviar al DATANODE el nro de bloque");
-			}
+			logAndExit("Fallo al enviar al DATANODE el nro de bloque");
+		}
 
 		nroBloque++;
 	}
 
+	free(head);
+	liberarEstructuraBuffer(buffer);
 
 }
 
@@ -401,5 +412,7 @@ void copiarArchivo(char ** palabras){
 	levantarTablaArchivo(archivo,ruta);
 
 	pedirBloques(archivo);
+	liberarTablaDeArchivo(archivo);
+	free(ruta);
 
 }

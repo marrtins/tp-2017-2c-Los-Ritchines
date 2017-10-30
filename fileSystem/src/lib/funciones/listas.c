@@ -103,6 +103,16 @@ Tnodo * obtenerNodoPorTamanioMaximo(){
 	return nodoMaximo;
 }
 
+Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre){
+
+	bool buscarPorNombre(void * nodo){
+		Tnodo * nodoA = (Tnodo *) nodo;
+		return !strcmp(nombre, nodoA->nombre);
+	}
+
+	return (Tnodo *)list_find(lista, buscarPorNombre);
+}
+
 int sumarListasPorTamanioDatabin(){
 	int cantidadDeElementos = listaDeNodos->elements_count;
 	int tamanioTotalDisponible = 0;

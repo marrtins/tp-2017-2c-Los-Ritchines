@@ -15,6 +15,7 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	int i = 0;
 	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaDeArchivos->tamanioTotal);
 	free(tablaDeArchivos->extensionArchivo);
+	free(tablaDeArchivos->nombreArchivoSinExtension);
 
 	for(; i != cantBloques; i++){
 		free(tablaDeArchivos->bloques[i].copiaCero.nombreDeNodo);
