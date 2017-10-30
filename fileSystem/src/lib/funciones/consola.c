@@ -14,7 +14,14 @@ void procesarInput(char* linea) {
 	char **palabras = string_split(linea, " ");
 	cantidad = cantidadParametros(palabras);
 	if (string_equals_ignore_case(*palabras, "format")) {
-		printf("ya pude formatear el fs\n");
+		if(cantidad == 0){
+			formatearFS();
+			puts("FileSystem formateado.");
+		}
+		else{
+			puts("Error en la cantidad de parametros.");
+		}
+
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
 		printf("ya pude remover el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
@@ -23,7 +30,7 @@ void procesarInput(char* linea) {
 				//falta corroborar que el archivo y los directorios existen
 				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 				puts(rutaLocal);
-				renombrarArchivo(rutaLocal, palabras[2]);
+				renombrarArchivoODirectorio(rutaLocal, palabras[2]);
 				free(rutaLocal);
 			}
 			else{

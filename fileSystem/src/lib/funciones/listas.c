@@ -129,10 +129,15 @@ int sumarListasPorTamanioDatabin(){
 
 }
 
-void liberarNodoDeLaListaGlobal(Tnodo* nodo){
+void liberarNodo(Tnodo* nodo){
 	free(nodo->nombre);
 	bitarray_destroy(nodo->bitmap);
 	free(nodo);
+}
+
+void liberarNodosDeLista(void * nodo){
+	Tnodo * nodoA = (Tnodo *) nodo;
+	liberarNodo(nodoA);
 }
 
 void* buscarNodoPorFD(int fd){

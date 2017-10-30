@@ -342,3 +342,5 @@
 [ERROR] 22:44:12:712 FileSystem.log/(8813:8813): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 14:02:20:378 FileSystem.log/(2407:2407): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 16:31:51:474 FileSystem.log/(6000:6002): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 17:14:10:61 FileSystem.log/(7412:7414): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 17:14:33:994 FileSystem.log/(7416:7418): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
