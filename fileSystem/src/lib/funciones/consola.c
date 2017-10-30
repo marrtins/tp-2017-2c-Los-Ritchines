@@ -18,6 +18,21 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
 		printf("ya pude remover el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
+		if(cantidad == 2){
+			if(verificarRutaArchivo(palabras[1])){
+				//falta corroborar que el archivo y los directorios existen
+				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+				puts(rutaLocal);
+				renombrarArchivo(rutaLocal, palabras[2]);
+				free(rutaLocal);
+			}
+			else{
+				puts("No existe el directorio o falta la referencia a yamafs:");
+			}
+		}
+		else{
+			puts("Error en la cantidad de parametros.");
+		}
 		printf("ya pude renombrar el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "mv")) {
 		printf("ya pude mover el archivo\n");

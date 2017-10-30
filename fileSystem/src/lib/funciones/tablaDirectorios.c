@@ -201,6 +201,32 @@ int existeDirectorio(char * directorio){
 
 }
 
+char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
+	char ** nuevoSplit = malloc(1);
+	int i = 0;
+	while(desde <= hasta){
+		nuevoSplit = realloc(nuevoSplit, i+1);
+		nuevoSplit[i] = strdup(split[desde]);
+		i++;
+		desde++;
+	}
+
+	return nuevoSplit;
+}
+
+void renombrarArchivo(char * ruta, char * nombre){
+	char * nuevaRuta = obtenerRutaSinArchivo(ruta);
+	string_append(&nuevaRuta, "/");
+	string_append(&nuevaRuta, nombre);
+	if(rename(ruta, nuevaRuta) == 0){
+		puts("Se ha renombrado el archivo");
+	}
+	else{
+		puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
+	}
+	free(nuevaRuta);
+}
+
 int esDirectorio(char * ruta){
 	struct stat estado;
 	int i;
@@ -277,7 +303,6 @@ char** buscarArchivos(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
-
 	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{

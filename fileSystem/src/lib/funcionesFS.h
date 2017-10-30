@@ -41,6 +41,7 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
+void renombrarArchivo(char * ruta, char * nombre);
 
 
 //Listas
