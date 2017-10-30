@@ -56,7 +56,7 @@ void procesarInput(char* linea) {
 		}
 		printf("ya pude copiar un archivo local al file system\n");
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
-		printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
+		procesarCpblock(palabras);
 	} else if (string_equals_ignore_case(*palabras, "md5")) {
 			if (cantidad ==1){
 				//getMD5(palabras);
@@ -105,4 +105,23 @@ void procesarInput(char* linea) {
 	free(palabras);
 	free(linea);
 
+}
+
+void procesarCpblock(char ** palabras){
+	if(verificarRutaArchivo(palabras[1])){
+		if(tieneBloque(palabras[1], palabras[2])){
+			if((buscarNodoPorNombre(listaDeNodos, palabras[3]))->nombre != NULL){
+
+			}
+			else {
+				puts("El nodo no existe o no esta conectado.");
+			}
+		}
+		else{
+			puts("Numero de bloque incorrecto");
+		}
+	}
+	else{
+		puts("Ruta de archivo incorrecta.");
+	}
 }

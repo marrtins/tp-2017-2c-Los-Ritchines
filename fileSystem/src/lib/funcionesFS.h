@@ -15,7 +15,8 @@ TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 
 //Consola
-void procesarInput(char * palabras);
+void procesarCpblock(char ** palabras);
+void procesarInput(char * linea);
 void consolaFS(void);
 
 //Conexiones
@@ -107,6 +108,7 @@ int getMD5(char**palabras);
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
+int tieneBloque(char * rutaYamafs, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);

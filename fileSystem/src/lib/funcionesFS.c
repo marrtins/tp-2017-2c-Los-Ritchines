@@ -416,3 +416,7 @@ void copiarArchivo(char ** palabras){
 	free(ruta);
 
 }
+
+int tieneBloque(char * rutaYamafs, char * nroBloque){
+	return 0;
+}
