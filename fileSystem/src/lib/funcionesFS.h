@@ -46,6 +46,7 @@ void renombrarArchivoODirectorio(char * ruta, char * nombre);
 void formatearFS();
 
 
+
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 int sumarListasPorTamanioDatabin();
@@ -82,6 +83,7 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs);
 char * obtenerRutaSinArchivo(char * ruta);
 char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
+void removerArchivo(char* ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
