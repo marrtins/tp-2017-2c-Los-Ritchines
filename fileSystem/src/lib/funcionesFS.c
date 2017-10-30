@@ -371,7 +371,7 @@ void pedirBloques(Tarchivo * tablaArchivo){
 	int bloqueAEnviar;
 
 	head->tipo_de_proceso = FILESYSTEM;
-	head->tipo_de_mensaje = OBTENER_BLOQUE;
+	head->tipo_de_mensaje = OBTENER_BLOQUE_Y_NRO;
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 
 	while(nroBloque != cantBloques){
