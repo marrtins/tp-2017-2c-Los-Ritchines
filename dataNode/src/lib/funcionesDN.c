@@ -132,7 +132,7 @@ void enviarBloqueAFS(int nroBloque, int socketFS){
 	head->tipo_de_mensaje =OBTENER_BLOQUE;
 	char * bloque = getBloque(nroBloque);
 
-	buffer = empaquetarBytes(head, bloque);
+	buffer = empaquetarBytesMasInt(head, bloque, nroBloque);
 	if ((send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
 		logAndExit("Fallo al enviar a FS el bloque que pidió");
 	}
