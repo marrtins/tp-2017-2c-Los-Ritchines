@@ -107,6 +107,12 @@ void inicializarTablaDirectorios(){
 		free(ruta);
 }
 
+void formatearFS(){
+	inicializarTablaDirectorios();
+	inicializarTablaDeNodos();
+	formatearNodos();
+}
+
 int directorioNoExistente(char ** carpetas) {
 	int cant, indicePadre = 0, i = 0;
 	char * yamafs = malloc(10);
@@ -214,7 +220,7 @@ char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
 	return nuevoSplit;
 }
 
-void renombrarArchivo(char * ruta, char * nombre){
+void renombrarArchivoODirectorio(char * ruta, char * nombre){
 	char * nuevaRuta = obtenerRutaSinArchivo(ruta);
 	string_append(&nuevaRuta, "/");
 	string_append(&nuevaRuta, nombre);
