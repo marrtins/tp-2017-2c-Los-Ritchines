@@ -104,9 +104,25 @@ void conexionesDatanode(void * estructura){
 								cantNodosPorConectar--;
 								break;
 
-							case INFO_BLOQUE:
-								puts("Aca se procesa el bloque recibido");
+							case OBTENER_BLOQUE:
+								puts("Es datanode y nos manda un bloque");
+								int tamanio,nroBloque;
+								char * bloque;
 
+								if ((estado = recv(fileDescriptor, &nroBloque, sizeof(int), 0)) == -1) {
+										logAndExit("Error al recibir el ip del nodo");
+										}
+
+								if ((estado = recv(fileDescriptor, &tamanio, sizeof(int), 0)) == -1) {
+										logAndExit("Error al recibir el ip del nodo");
+										}
+								bloque = malloc(tamanio);
+
+								if ((estado = recv(fileDescriptor, bloque, sizeof(int), 0)) == -1) {
+										logAndExit("Error al recibir el ip del nodo");
+										}
+
+								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
 								log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");

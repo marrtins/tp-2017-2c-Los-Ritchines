@@ -18,6 +18,8 @@ unsigned long fsize(FILE* f);
 Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo);
 Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque);
 TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo);
+
+Tbuffer * empaquetarBytesMasInt(Theader* head, char * bytes, int numero);
 Tbuffer *empaquetarBytes(Theader * head, char * bytes);
 Tbuffer * empaquetarInt(Theader * head, int numero);
 
