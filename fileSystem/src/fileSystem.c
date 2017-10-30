@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 				if(verificarRutaArchivo(rutaArchivo)){
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
-					buffer = empaquetarInfoArchivo(head , archivo);//no esta terminada
+					buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
 
 					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
 							 logAndExit("Fallo al enviar la informacion de un archivo");

@@ -103,7 +103,7 @@ void masterHandler(void *atributos){
 			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
 
 			//FS envia: cant de bloques del archivo (si es cero la ruta no es valida) para saber cuantos recv va a tener que hacer sobre
-			//info de un bloque: nro de bloque +copiacero nombrenodo+ copiacero nrobloquedatabin +copiauno nombrenodo+ copiauno nrobloquedatabin
+			//info de un bloque: nro de bloque + tamanioNombreNodo +copiacero nombrenodo+ copiacero nrobloquedatabin + tamanioNombreNodo +copiauno nombrenodo+ copiauno nrobloquedatabin
 			/*while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
 				if(head->tipo_char  *nombre =malloc(MAXSIZETEMPNAME)de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
 					//recibimos la lista de bloques y demases que componen al archivo a reducir
