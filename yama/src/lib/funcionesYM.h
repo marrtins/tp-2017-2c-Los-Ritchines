@@ -5,7 +5,7 @@
 
 Tyama *obtenerConfiguracionYama(char* ruta);
 void mostrarConfiguracion(Tyama *yama);
-void conectarAFS(int* socketFS, Tyama *yama);
+void conectarAFS(Tyama *yama);
 void masterHandler(void *client_sock);
 int responderSolicTransf(int sockMaster,t_list * listaBloques);
 

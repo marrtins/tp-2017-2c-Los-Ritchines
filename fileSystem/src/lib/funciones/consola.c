@@ -84,9 +84,9 @@ void procesarInput(char* linea) {
 				mostrarTablaArchivo(tablaArchivo);
 				liberarTablaDeArchivo(tablaArchivo);
 				free(rutaLocal);
-		}
+			}
 			else{
-				puts("No existe el directorio o falta la referencia a yamafs");
+				puts("No existe el directorio o falta la referencia a yamafs:");
 			}
 		}
 		else{

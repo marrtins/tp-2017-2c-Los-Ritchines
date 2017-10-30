@@ -43,7 +43,7 @@ void mostrarConfiguracion(Tyama *yama){
 	printf("Tipo de proceso: %d\n", yama->tipo_de_proceso);
 }
 
-void conectarAFS(int* socketFS, Tyama *yama){
+void conectarAFS(Tyama *yama){
 	int estado;
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
@@ -53,15 +53,15 @@ void conectarAFS(int* socketFS, Tyama *yama){
 
 	//Theader head;
 	// Se trata de conectar con FS
-	if ((*socketFS = conectarAServidor(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
-		sprintf(mensaje, "No se pudo conectar con FS! sock_fs: %d\n", *socketFS);
+	if ((socketFS = conectarAServidor(yama->ip_filesystem, yama->puerto_filesystem)) < 0){
+		sprintf(mensaje, "No se pudo conectar con FS! sock_fs: %d\n", socketFS);
 		logAndExit(mensaje);
 	}
 
 
 	// No permitimos continuar la ejecucion hasta lograr un handshake con FS
-	if ((estado = send(*socketFS, head, sizeof(Theader), 0)) == -1){
-		sprintf(mensaje, "Fallo send() al socket: %d\n", *socketFS);
+	if ((estado = send(socketFS, head, sizeof(Theader), 0)) == -1){
+		sprintf(mensaje, "Fallo send() al socket: %d\n", socketFS);
 		logAndExit(mensaje);
 	}
 

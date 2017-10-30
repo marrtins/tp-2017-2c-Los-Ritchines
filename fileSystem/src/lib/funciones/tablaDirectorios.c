@@ -454,6 +454,7 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs){
 				free(ruta);
 				return 1;
 			}
+			i++;
 		}
 		liberarPunteroDePunterosAChar(archivos);
 	}

@@ -112,4 +112,8 @@ void liberarEstructuraBuffer(Tbuffer * buffer);
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 
+//YAMA
+char * recvRutaArchivo(int socket);
+Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo);
+
 #endif

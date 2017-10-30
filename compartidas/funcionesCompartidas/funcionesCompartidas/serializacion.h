@@ -3,9 +3,6 @@
 
 #include "funcionesCompartidas.h"
 
-char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado);
-void desempaquetarRutasYamafs(TpackageRutas * estructuraDeRutas, int socket);
-
 char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_size);
 TpackInfoBloque *deserializeInfoBloque(char *bytes_serial);
 

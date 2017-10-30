@@ -72,4 +72,6 @@ typedef struct {
 
 t_log* logger;
 
+int socketFS;
+
 #endif

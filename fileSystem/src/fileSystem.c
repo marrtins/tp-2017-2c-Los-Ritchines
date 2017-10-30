@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
 
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
+	char * rutaArchivo;
+	Tbuffer * buffer;
 
 	if(argc != 1){
 		puts("Error en la cantidad de parametros.");
@@ -32,7 +34,7 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 
 
-	inicializarTablaDirectorios();
+	//inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
@@ -76,7 +78,30 @@ int main(int argc, char* argv[]) {
 
 			case INFO_ARCHIVO:
 				puts("Es yama y quiere informacion sobre un archivo");
+				char * ruta;
+				Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
+				head->tipo_de_proceso = FILESYSTEM;
+				head->tipo_de_mensaje = INFO_ARCHIVO;
+
+				rutaArchivo = recvRutaArchivo(socketYama);
+
+				//verifico que la ruta que me manda yama sea valida
+				if(verificarRutaArchivo(rutaArchivo)){
+					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
+					levantarTablaArchivo(archivo,ruta);
+					buffer = empaquetarInfoArchivo(head , archivo);//no esta terminada
+
+					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+							 logAndExit("Fallo al enviar la informacion de un archivo");
+						 }
+				}else {
+					//si no es valida se manda cant de bloques en cero
+					buffer = empaquetarInt(head,0);
+					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+						 logAndExit("Fallo al enviar la informacion de un archivo");
+						}
+				}
 
 			break;
 			default:
