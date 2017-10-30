@@ -12,11 +12,12 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 
+	int i = 0;
 	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaDeArchivos->tamanioTotal)-1;
 	free(tablaDeArchivos->extensionArchivo);
 	free(tablaDeArchivos->nombreArchivoSinExtension);
 
-	for(; cantBloques >= 0; cantBloques--){
+	for(; i != cantBloques; i++){
 		free(tablaDeArchivos->bloques[cantBloques].copiaCero.nombreDeNodo);
 		free(tablaDeArchivos->bloques[cantBloques].copiaUno.nombreDeNodo);
 	}

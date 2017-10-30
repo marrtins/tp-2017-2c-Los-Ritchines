@@ -40,11 +40,6 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 		strcpy(tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo,temporal2[0]);
 		tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = atoi(temporal2[1]);
 
-		printf("Nombre de nodo copia cero %s\n",tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo);
-		printf("Numero de nodo copia cero %d\n",tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
-		printf("Nombre de nodo copia uno %s\n",tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo);
-		printf("Numero de nodo copia uno %d\n",tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo);
-		printf("Bytes %llu\n",tablaArchivo->bloques[nroBloque].bytes);
 		nroBloque++;
 
 		liberarPunteroDePunterosAChar(temporal1);
@@ -142,20 +137,18 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 
 void mostrarTablaArchivo(Tarchivo* tablaArchivo){
-	/*
+
 	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 	int i = 0;
-	printf("Nombre: %s.%s",tablaArchivo->nombreArchivoSinExtension,tablaArchivo->extensionArchivo);
-	printf("Tamanio: %d", tablaArchivo->tamanioTotal);
+	printf("TIPO = %s\n",tablaArchivo->extensionArchivo);
+	printf("TAMANIO = %llu\n", tablaArchivo->tamanioTotal);
 
 	while(i != cantBloques){
-		printf("Tamanio de bloque %d = %d\n",i, tablaArchivo->bloques[i].bytes);
-		printf("Nombre del nodo donde esta la copia cero = %s",tablaArchivo->bloques[i].copiaCero.nombreDeNodo);
-		printf("Número de bloque del nodo donde esta la copia cero = %d", tablaArchivo->bloques[i].copiaCero.numeroBloqueDeNodo);
-		printf("Nombre del nodo donde esta la copia uno = %s",tablaArchivo->bloques[i].copiaUno.nombreDeNodo);
-		printf("Número de bloque del nodo donde esta la copia uno = %d", tablaArchivo->bloques[i].copiaUno.numeroBloqueDeNodo);
+		printf("BLOQUE%dCOPIA0 = [%s, %d]\n", i, tablaArchivo->bloques[i].copiaCero.nombreDeNodo, tablaArchivo->bloques[i].copiaCero.numeroBloqueDeNodo);
+		printf("BLOQUE%dCOPIA1 = [%s, %d]\n",i, tablaArchivo->bloques[i].copiaUno.nombreDeNodo, tablaArchivo->bloques[i].copiaUno.numeroBloqueDeNodo);
+		printf("BLOQUE%dBYTES = %llu\n",i, tablaArchivo->bloques[i].bytes);
 		i++;
 	}
-	*/
+
 }
 
