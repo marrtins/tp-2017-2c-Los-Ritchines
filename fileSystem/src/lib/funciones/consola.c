@@ -51,14 +51,10 @@ void procesarInput(char* linea) {
 		}
 
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
-		if(cantidad == 2){
-			if(verificarRutaArchivo(palabras[1])){
-				copiarArchivo(palabras);
-				printf("ya pude copiar un archivo local al file system\n");
-			}
-		}else {
-			puts("Error en la cantidad de parametros");
+		if(verificarRutaArchivo(palabras[1])){
+		//copiarArchivo(palabras);
 		}
+		printf("ya pude copiar un archivo local al file system\n");
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
 		printf("ya pude crear una copia de un bloque del archivo en un nodo\n");
 	} else if (string_equals_ignore_case(*palabras, "md5")) {
@@ -67,7 +63,7 @@ void procesarInput(char* linea) {
 				printf("ya pude solicitar el md5 de un archivo del file system\n");
 			}
 			else {
-				puts("Error en la cantidad de parametros");
+				puts("Error en la cantidad de parametros.");
 			}
 
 	} else if (string_equals_ignore_case(*palabras, "ls")) {
@@ -80,13 +76,24 @@ void procesarInput(char* linea) {
 			}
 		}
 	} else if (string_equals_ignore_case(*palabras, "info")) {
-		/*if (cantidad == 1){
-			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
-			levantarTablaArchivo(tablaArchivo, palabras[1]);
-			mostrarTablaArchivo(tablaArchivo);
-
-		}*/
-		printf("ya pude mostrar la informacion del archivo\n");
+		if (cantidad == 1){
+			if(verificarRutaArchivo(palabras[1])){
+				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+				levantarTablaArchivo(tablaArchivo, rutaLocal);
+				mostrarTablaArchivo(tablaArchivo);
+				puts("antes de liberar");
+				liberarTablaDeArchivo(tablaArchivo);
+				puts("rompi liberando");
+				free(rutaLocal);
+			}
+			else{
+				puts("No existe el directorio o falta la referencia a yamafs");
+			}
+		}
+		else{
+			puts("Error en la cantidad de parametros");
+		}
 	} else if(string_equals_ignore_case(*palabras, "exit")){
 		printf("Finalizando consola\n");
 		liberarPunteroDePunterosAChar(palabras);
