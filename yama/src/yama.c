@@ -1,6 +1,6 @@
 #include "lib/funcionesYM.h"
 
-int socketFS, idMasterGlobal,idJobGlobal,idTareaGlobal;
+int idMasterGlobal,idJobGlobal,idTareaGlobal;
 t_list *listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 int main(int argc, char* argv[]){
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
 	tamanioCliente = sizeof(client);
 
 	//yama cliente
-	//conectarAFS(&socketFS,yama);
+	//conectarAFS(yama);
 
 	//yama como servidor
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);

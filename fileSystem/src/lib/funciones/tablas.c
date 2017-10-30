@@ -1,13 +1,47 @@
 #include "../funcionesFS.h"
 
-char * generarArrayParaArchivoConfig(char * dato1, char * dato2){
-	char * concatenacionLoca = malloc(1 + TAMANIO_NOMBRE_NODO + 1 + 3);
+void generarArrayParaArchivoConfig(t_config * archivoConf, char * key, char * dato1, char * dato2){
+	char * concatenacionLoca = string_new();
 	string_append(&concatenacionLoca, "[");
 	string_append(&concatenacionLoca, dato1);
 	string_append(&concatenacionLoca, ",");
 	string_append(&concatenacionLoca, dato2);
 	string_append(&concatenacionLoca, "]");
-	return concatenacionLoca;
+	config_set_value(archivoConf, key, concatenacionLoca);
+	free(concatenacionLoca);
+}
+
+void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento){
+	char ** elementos = config_get_array_value(archivoConfig, key);
+	int i = 0;
+	char * definitivo = string_new();
+	char * nuevoString = string_new();
+	string_append(&nuevoString, "[");
+	int verificacion = 0;
+	while(elementos[i] != NULL){
+		if(strcmp(elementos[i], nombreElemento)){
+			string_append(&nuevoString, elementos[i]);
+			string_append(&nuevoString, ",");
+			verificacion++;
+		}
+		i++;
+	}
+
+	liberarPunteroDePunterosAChar(elementos);
+	free(elementos);
+
+	if(verificacion > 0){
+		definitivo = string_substring(nuevoString, 0, strlen(nuevoString)-1);
+		string_append(&definitivo, "]");
+		config_set_value(archivoConfig, key, definitivo);
+		free(definitivo);
+		free(nuevoString);
+		return;
+	}
+	string_append(&nuevoString, "]");
+	config_set_value(archivoConfig, key, nuevoString);
+	free(definitivo);
+	free(nuevoString);
 }
 
 int sumaDeDosNumerosInt(int valor1, int valor2){

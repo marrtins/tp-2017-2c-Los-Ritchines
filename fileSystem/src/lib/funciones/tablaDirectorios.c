@@ -212,6 +212,16 @@ int esDirectorio(char * ruta){
 	return i;
 }
 
+int esArchivo (char* ruta){
+	struct stat estado;
+	int i;
+
+	stat(ruta,&estado);
+	i= S_ISREG(estado.st_mode);
+
+	return i;
+}
+
 char** buscarDirectorios(char * ruta){
 	
 	  DIR *directorioActual;
@@ -220,12 +230,14 @@ char** buscarDirectorios(char * ruta){
 	  char * rutaNueva;
 	  int i = 0;
 
-	  directorioActual = opendir (ruta);
+	  directorioActual = opendir(ruta);
 
 	  if (directorioActual == NULL){
-	    puts("No puedo abrir el directorio");
+	    puts("No pudo abrir el directorio");
 
-	  }else
+	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
+
+	  }else{
 	  // Leo uno por uno los directorios que estan adentro del directorio actual
 	  while ((directorio = readdir(directorioActual)) != NULL) {
 
@@ -245,9 +257,11 @@ char** buscarDirectorios(char * ruta){
 		}
 
 	}
-	  directorios[i] = NULL;
+
 
 	  closedir (directorioActual);
+}
+	  directorios[i] = NULL;
 	  return directorios;
 }
 
@@ -262,10 +276,12 @@ char** buscarArchivos(char * ruta){
 	  directorioActual = opendir (ruta);
 
 	  if (directorioActual == NULL){
-	    puts("No puedo abrir el archivo");
+	    puts("No puedo abrir el directorio");
 
-	  }else
-	  // Leo uno por uno los directorios que estan adentro del archivo actual
+	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
+
+	  }else{
+	  // Leo uno por uno los archivos que estan adentro del directorio actual
 	  while ((archivo = readdir(directorioActual)) != NULL) {
 
 		  //Con readdir aparece siempre . y .. como no me interesa no lo contemplo
@@ -275,18 +291,19 @@ char** buscarArchivos(char * ruta){
 			string_append(&rutaNueva,"/");
 			string_append(&rutaNueva,archivo->d_name);
 			archivos[i] = malloc(256);
-				if(!esDirectorio(rutaNueva)){
+				if(esArchivo(rutaNueva)){
 					strcpy(archivos[i],rutaNueva);
 					i++;
 				}
 			free(rutaNueva);
 
 		}
-
-	}
+	  }
+	  closedir (directorioActual);
+	  }
 
 	  archivos[i] = NULL;
-	  closedir (directorioActual);
+
 	  return archivos;
 }
 
@@ -304,9 +321,9 @@ void removerArchivos(char * ruta){
 		}
 		liberarPunteroDePunterosAChar(archivos);
 		free(archivos);
-	}else
+	}else{
 	free(archivos);
-
+	}
 }
 
 void removerDirectorios(char *ruta){
@@ -326,10 +343,162 @@ void removerDirectorios(char *ruta){
 		}
 		liberarPunteroDePunterosAChar(directorios);
 		free(directorios);
-	}else
+	}else {
 
 	free(directorios);
+	}
 
+}
+
+
+void listarArchivos(char* ruta){
+
+	char ** archivos;
+	int i = 0, index;
+	char * rutaArchivosDirectorio = malloc(200);
+	char ** divisionRuta;
+	char * nombreArchivoConExtension;
+	index = obtenerIndexDeUnaRuta(ruta);
+	sprintf(rutaArchivosDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	archivos = buscarArchivos(rutaArchivosDirectorio);
+
+	if(archivos[i] != NULL){
+		while(archivos[i] != NULL){
+
+				divisionRuta = string_split(archivos[i], "/");
+				nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(divisionRuta);
+				puts(nombreArchivoConExtension);
+				i++;
+
+				free(nombreArchivoConExtension);
+			}
+			liberarPunteroDePunterosAChar(archivos);
+			liberarPunteroDePunterosAChar(divisionRuta);
+			free(divisionRuta);
+			free(archivos);
+			free(rutaArchivosDirectorio);
+		}else {
+		printf("El directorio de ruta %s no tiene archivos\n", ruta);
+
+		log_trace(logger,"El directorio no tiene archivos");
+		free(archivos);
+		free(rutaArchivosDirectorio);
+	}
+	}
+
+
+char * obtenerRutaSinArchivo(char * ruta){
+	char ** directorios;
+	char * archivo;
+	int tamanioNombreArchivo;
+	int tamanioRuta;
+
+	directorios = string_split(ruta, "/");
+	archivo = obtenerUltimoElementoDeUnSplit(directorios);
+	tamanioNombreArchivo = strlen(archivo) +1;
+	tamanioRuta = strlen(ruta);
+
+	liberarPunteroDePunterosAChar(directorios);
+	free(directorios);
+	free(archivo);
+	return string_substring_until(ruta,tamanioRuta-tamanioNombreArchivo);
+
+}
+
+char * obtenerRutaLocalDeArchivo(char * rutaYamafs){
+	int indice;
+	char * rutaSinArchivo;
+	char * archivo;
+	char * ruta = malloc(100);
+	char ** carpetas = string_split(rutaYamafs,"/");
+
+	rutaSinArchivo =  obtenerRutaSinArchivo(rutaYamafs);
+	indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
+
+	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	string_append_with_format(&ruta,"%d",indice);
+	string_append(&ruta,"/");
+	archivo = obtenerUltimoElementoDeUnSplit(carpetas);
+	string_append(&ruta,archivo);
+
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	free(rutaSinArchivo);
+	free(archivo);
+	return ruta;
+}
+
+int existeArchivo(int indiceDirectorio , char * rutaYamafs){
+	int i =0;
+	char ** archivos;
+	char *archivo;
+	char * ruta = malloc(100);
+	char ** carpetas = string_split(rutaYamafs,"/");
+
+	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	string_append_with_format(&ruta,"%d",indiceDirectorio);
+	archivos = buscarArchivos(ruta);
+
+	string_append(&ruta,"/");
+	archivo = obtenerUltimoElementoDeUnSplit(carpetas);
+	string_append(&ruta,archivo);
+
+	if (archivos[i] != NULL) {
+		while (archivos[i] != NULL) {
+			if (string_equals_ignore_case(archivos[i], ruta)) {
+				liberarPunteroDePunterosAChar(carpetas);
+				free(carpetas);
+				liberarPunteroDePunterosAChar(archivos);
+				free(archivos);
+				free(archivo);
+				free(ruta);
+				return 1;
+			}
+			i++;
+		}
+		liberarPunteroDePunterosAChar(archivos);
+	}
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	free(archivos);
+	free(archivo);
+	free(ruta);
+	return 0;
+}
+
+int validarQueLaRutaTengaElNombreDelArchivo(char * ruta){
+	char ** carpetas = string_split(ruta,"/");
+	char * archivo;
+	int valor;
+	archivo = obtenerUltimoElementoDeUnSplit(carpetas);
+
+	valor = (int) string_contains(archivo, ".");
+
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	free(archivo);
+	return valor;
+
+}
+
+int verificarRutaArchivo(char * rutaYamafs){
+
+	int indice;
+	char * rutaSinArchivo;
+	if(validarQueLaRutaTengaElNombreDelArchivo(rutaYamafs)){
+		rutaSinArchivo =  obtenerRutaSinArchivo(rutaYamafs);
+		if(existeDirectorio(rutaSinArchivo)){
+			indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
+			if(existeArchivo(indice,rutaYamafs)){
+				free(rutaSinArchivo);
+				return 1;
+			}
+		}
+		free(rutaSinArchivo);
+	}else{
+	puts("La ruta yamafs debe contener el nombre del archivo y la extensión");
+	}
+	return 0;
 
 }
 

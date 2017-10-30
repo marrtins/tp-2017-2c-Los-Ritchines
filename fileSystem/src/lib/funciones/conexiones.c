@@ -13,6 +13,7 @@ void conexionesDatanode(void * estructura){
 	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	Tnodo * nuevoNodo;
+	Tnodo * nodoEncontrado;
 	TpackInfoBloqueDN * infoBloque;
 
 	FD_ZERO(&masterFD);
@@ -63,9 +64,10 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
-							list_add(listaDeNodosDesconectados, buscarNodoPorFD(fileDescriptor));
+							nodoEncontrado = buscarNodoPorFD(fileDescriptor);
+							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							borrarNodoPorFD(fileDescriptor);
-							eliminarNodoDeTablaDeNodos(nuevoNodo);
+							eliminarNodoDeTablaDeNodos(nodoEncontrado);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
@@ -75,28 +77,52 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
-								infoBloque = recvInfoNodo(fileDescriptor);
+
 								if((Tnodo*)buscarNodoPorFD(fileDescriptor) == NULL){
-									printf("Para el nro de bloque recibi %d bytes\n", estado);
-									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
-									list_add(listaDeNodos, nuevoNodo);
-									agregarNodoATablaDeNodos(nuevoNodo);
-									puts("Nodo inicializado y guardado en la lista");
-									mostrarBitmap(nuevoNodo->bitmap);
-								}
-								else{
-									//puede que esto no este bien
-									//habria que probarlo
 									infoBloque = recvInfoNodo(fileDescriptor);
-									nuevoNodo = inicializarNodo(infoBloque, fileDescriptor);
-									list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
-									borrarNodoDesconectadoPorFD(fileDescriptor);
-									log_trace(logger, "Nodo que se habia caído, se reconecto");
+									if((Tnodo*)buscarNodoDesconectadoPorFD(fileDescriptor) == NULL){
+										//nodo nuevo;
+										nuevoNodo = malloc(sizeof(Tnodo));
+										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										list_add(listaDeNodos, nuevoNodo);
+									}
+									else {//se reconecta;
+										//pensar si hay que volver a inicializarlo al nodo que
+										//se reconecta
+										list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
+										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										borrarNodoDesconectadoPorFD(fileDescriptor);
+										log_trace(logger, "Nodo que se habia caído, se reconecto");
+									}
+									agregarNodoATablaDeNodos(nuevoNodo);
+									liberarTPackInfoBloqueDN(infoBloque);
 								}
-								liberarTPackInfoBloqueDN(infoBloque);
+								else {
+									puts("Un nodo ya conectado, se esta volviendo a conectar");
+									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
+								}
 								cantNodosPorConectar--;
 								break;
 
+							case OBTENER_BLOQUE:
+								puts("Es datanode y nos manda un bloque");
+								int tamanio,nroBloque;
+								char * bloque;
+
+								if ((estado = recv(fileDescriptor, &nroBloque, sizeof(int), 0)) == -1) {
+										logAndExit("Error al recibir el ip del nodo");
+										}
+
+								if ((estado = recv(fileDescriptor, &tamanio, sizeof(int), 0)) == -1) {
+										logAndExit("Error al recibir el ip del nodo");
+										}
+								bloque = malloc(tamanio);
+
+								if ((estado = recv(fileDescriptor, bloque, sizeof(int), 0)) == -1) {
+										logAndExit("Error al recibir el ip del nodo");
+										}
+
+								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
 								log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
@@ -108,12 +134,12 @@ void conexionesDatanode(void * estructura){
 					printf("el mensaje es %d\n", head->tipo_de_mensaje);
 					break;
 
-				} else{
+				}
+				else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
 					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
 					clearAndClose(fileDescriptor, &masterFD);
-					puts("Intruso combatido");
 				}
 
 				} //termine el if

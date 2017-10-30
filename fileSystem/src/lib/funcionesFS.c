@@ -16,7 +16,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
 	ocuparProximoBloque(nodo2);
 	mostrarBitmap(nodo2->bitmap);
-
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 }
@@ -32,16 +31,19 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	Theader * head = malloc(sizeof(Theader));
 	Tbuffer * buffer1;
 	Tbuffer * buffer2;
+	//Tnodo * nodo1 = NULL;
+	//Tnodo * nodo2 = NULL;
 	int estado;
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
-
+	puts("llegue y rompi");
+	//buscarLosDosNodosConMasDisponibilidad(listaDeNodos, nodo1, nodo2);
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	//Tnodo* nodo3 = (Tnodo*)list_get(listaDeNodos, 2);
 	//Tnodo* nodo4 = (Tnodo*)list_get(listaDeNodos, 3);
-
+	puts("che, pude pasar");
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
@@ -78,7 +80,6 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
 	fputs("\n",archivoDeSeguimiento);
 	*/
-	printf("Se envio bloque a Nodo2 %d bytes\n",estado);
 
 	almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
 	free(head);
@@ -95,7 +96,6 @@ void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino){
 	int index = obtenerIndexDeUnaRuta(rutaDestino);
 	char * rutaArchivo = malloc(200);
 	sprintf(rutaArchivo, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/%s.%s", index, archivoAAlmacenar->nombreArchivoSinExtension, archivoAAlmacenar->extensionArchivo);
-	//hay que verificar si existe el directorio
 	FILE * archivo = fopen(rutaArchivo, "w+");
 	fclose(archivo);
 	almacenarEstructuraArchivoEnUnArchivo(archivoAAlmacenar, rutaArchivo);
@@ -156,10 +156,31 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 	}
 }
 
+int esPar(int numero){
+	return !(numero % 2);
+}
+
+int capacidadDeAlmacenamientoDeFileSystem(Tnodo * nodoMaximo, int sumaSinMaximo){
+	int total = nodoMaximo->cantidadBloquesLibres + sumaSinMaximo;
+	if(nodoMaximo->cantidadBloquesLibres > sumaSinMaximo){
+		return sumaSinMaximo;
+	}else if(nodoMaximo->cantidadBloquesLibres == sumaSinMaximo){
+		return nodoMaximo->cantidadBloquesLibres;
+	}else if(esPar(total)){
+		return total/2;
+	}
+	else{
+		return (total-1)/2;
+	}
+
+}
+
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
-	int tamanioEnMBDisponiblesEnNodos = sumarListasPorTamanioDatabin();
-	//se multiplica por 2 por que se guarda 1 copia en otro nodo
-	if(tamanioEnMBDisponiblesEnNodos * BLOQUE_SIZE < tamanioDelArchivoAGuardar * 2){
+	int tamanioEnMBArchivo = cantidadDeBloquesDeUnArchivo(tamanioDelArchivoAGuardar);
+	Tnodo * nodoMaximo = obtenerNodoPorTamanioMaximo();
+	int sumaSinMaximo = sumarBloquesLibresDeNodoSinElMaximo(nodoMaximo);
+	int capacidadEnMB = capacidadDeAlmacenamientoDeFileSystem(nodoMaximo, sumaSinMaximo);
+	if(tamanioEnMBArchivo > capacidadEnMB){
 		return -1;
 	}
 	return 0;
@@ -198,6 +219,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_trace(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
+		puts("voy a violar el segmento");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
@@ -222,7 +244,6 @@ void almacenarArchivo(char **palabras){
 
 	Tarchivo * archivoAAlmacenar = malloc(sizeof(Tarchivo));
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
-	puts("obtuvo el nombre del archivo sin extension");
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
 	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
@@ -242,13 +263,11 @@ void almacenarArchivo(char **palabras){
 	liberarTablaDeArchivo(archivoAAlmacenar);
 }
 
-Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor){
-	Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
+Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo){
 	nuevoNodo->fd = fileDescriptor;
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->primerBloqueLibreBitmap = 0;
-	puts(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
 	return nuevoNodo;
@@ -316,7 +335,6 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	 free(ipNodo);
 	 free(puertoNodo);
 
-	 puts("desempaqueta la info del nodo");
 	 return infoBloque;
 }
 
@@ -343,4 +361,45 @@ int getMD5(char**palabras){
 		free(comando);
 		free(ruta_temporal);*/
 		return 0;
+}
+
+void pedirBloques(Tarchivo * archivo){
+	int cantBloques, nroBloque=0;
+	Tbuffer * buffer;
+	Tnodo * nodo;
+	Theader * head = malloc(sizeof(Theader));
+
+	head->tipo_de_proceso = FILESYSTEM;
+	head->tipo_de_mensaje = OBTENER_BLOQUE;
+	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+
+	while(nroBloque != cantBloques){
+
+
+		//esto solo lo hice para ver que mandara bien las cosas
+		nodo = list_get(listaDeNodos,1);
+
+		buffer = empaquetarInt(head,archivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo);
+
+		if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+				logAndExit("Fallo al enviar al DATANODE el nro de bloque");
+			}
+
+		nroBloque++;
+	}
+
+
+}
+
+void copiarArchivo(char ** palabras){
+	//palabras[1] --> ruta archivo yamafs
+	//palabras[2] --> directorio
+	char * ruta;
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+	ruta = obtenerRutaLocalDeArchivo(palabras[1]);
+
+	levantarTablaArchivo(archivo,ruta);
+
+	pedirBloques(archivo);
+
 }

@@ -1,50 +1,5 @@
 #include "serializacion.h"
 
-char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado){
-	puts("Creando estructura de empaquetacion.");
-	char *chorroBytes = malloc(sizeof(*head) + sizeof(uint32_t) + strlen(rutaArchivoAReducir) +
-								sizeof(sizeof(uint32_t)) + strlen(rutaResultado));
-
-	uint32_t t1 = strlen(rutaArchivoAReducir);
-	uint32_t t2 = strlen(rutaResultado);
-
-	char * p = chorroBytes;
-	memcpy(p, head, sizeof(*head));
-	p += sizeof(*head);
-	memcpy(p, &t1, sizeof(uint32_t));
-	p += sizeof(uint32_t);
-	memcpy(p, rutaArchivoAReducir, strlen(rutaArchivoAReducir));
-	p += strlen(rutaArchivoAReducir);
-	memcpy(p, &t2, sizeof(uint32_t));
-	p += sizeof(uint32_t);
-	memcpy(p, rutaResultado, strlen(rutaResultado));
-	p += strlen(rutaResultado);
-	puts("estructura creada y lista para mandar");
-	return chorroBytes;
-}
-
-void desempaquetarRutasYamafs(TpackageRutas * estructuraDeRutas, int socket){
-
-	if (recv(socket, &estructuraDeRutas->tamanioRutaOrigen, sizeof(uint32_t), 0) < 0) {
-		logAndExit("Error en la recepcion del header de master.");
-	}
-	estructuraDeRutas->rutaOrigen = malloc(estructuraDeRutas->tamanioRutaOrigen);
-
-	if (recv(socket, &estructuraDeRutas->rutaOrigen, sizeof(estructuraDeRutas->tamanioRutaOrigen), 0) < 0) {
-		logAndExit("Error en la recepcion del header de master.");
-	}
-
-	if (recv(socket, &estructuraDeRutas->tamanioRutaResultado, sizeof(uint32_t), 0) < 0) {
-		logAndExit("Error en la recepcion del header de master.");
-	}
-
-	estructuraDeRutas->rutaResultado = malloc(estructuraDeRutas->tamanioRutaResultado);
-
-	if (recv(socket, &estructuraDeRutas->rutaResultado, sizeof(estructuraDeRutas->tamanioRutaResultado), 0) < 0) {
-		logAndExit("Error en la recepcion del header de master.");
-	}
-}
-
 
 char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_size){
 
@@ -287,6 +242,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio);
 	buffer->buffer = malloc(buffer->tamanio);
 
+	puts("rompe1");
 	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
@@ -296,6 +252,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	p += sizeof(unsigned long long);
 	memcpy(p, bloque->contenido, bloque->tamanio);
 	p += bloque->tamanio;
+	puts("rompe2");
 
 	return buffer;
 }
@@ -831,3 +788,55 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 	return datosReduccion;
 }
 
+Tbuffer * empaquetarBytesMasInt(Theader* head, char * bytes, int numero) {
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+	int tamanio = strlen(bytes) + 1;
+	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(int) + tamanio);
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &numero, sizeof(int));
+	p += sizeof(int);
+	memcpy(p, &buffer->tamanio, sizeof(int));
+	p += sizeof(int);
+	memcpy(p, bytes, buffer->tamanio);
+	p += buffer->tamanio;
+
+	return buffer;
+}
+
+Tbuffer *empaquetarBytes(Theader * head, char * bytes){
+
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+	int tamanio = strlen(bytes) +1;
+	buffer->tamanio = (HEAD_SIZE + sizeof(int) + tamanio);
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &buffer->tamanio, sizeof(int));
+	p += sizeof(int);
+	memcpy(p, bytes, buffer->tamanio);
+	p += buffer->tamanio;
+
+	return buffer;
+}
+
+Tbuffer * empaquetarInt(Theader * head, int numero){
+
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+
+	buffer->tamanio = (HEAD_SIZE + sizeof(int));
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &numero, sizeof(int));
+	p += sizeof(int);
+
+	return buffer;
+}

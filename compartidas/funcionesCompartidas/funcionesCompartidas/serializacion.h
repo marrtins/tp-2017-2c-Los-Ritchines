@@ -3,9 +3,6 @@
 
 #include "funcionesCompartidas.h"
 
-char * empaquetarRutasYamafs(Theader *head,char *rutaArchivoAReducir,char* rutaResultado);
-void desempaquetarRutasYamafs(TpackageRutas * estructuraDeRutas, int socket);
-
 char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_size);
 TpackInfoBloque *deserializeInfoBloque(char *bytes_serial);
 
@@ -18,6 +15,10 @@ unsigned long fsize(FILE* f);
 Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo);
 Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque);
 TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo);
+
+Tbuffer * empaquetarBytesMasInt(Theader* head, char * bytes, int numero);
+Tbuffer *empaquetarBytes(Theader * head, char * bytes);
+Tbuffer * empaquetarInt(Theader * head, int numero);
 
 char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int bytesOcupadosBloque,int nombreTemporalLen ,char* nombreTemporal, int *pack_size);
 TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes_serial);

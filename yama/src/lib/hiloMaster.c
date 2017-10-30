@@ -40,6 +40,7 @@ void masterHandler(void *atributos){
 	TpackBytes *pathResultado;
 
 	char* buffer;
+	Tbuffer * buffer1;
 
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
@@ -87,12 +88,12 @@ void masterHandler(void *atributos){
 			puts("Pido info a filesystem sobre el archivo a transformar");
 
 			head.tipo_de_proceso=YAMA;
-			head.tipo_de_mensaje=PREG_FILEINFO;
-			//packSize = 0;
+			head.tipo_de_mensaje=INFO_ARCHIVO;
 
-			/*buffer=serializeBytes(head,pathArchivoAReducir,(strlen(pathArchivoAReducir)+1),&packSize);
+			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
+			buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
 			puts("Path del archivo a reducir serializado; lo enviamos");
-			if ((stat = send(socketFS, buffer, packSize, 0)) == -1){
+			if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
 				puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
 				return;
 			}
@@ -101,7 +102,9 @@ void masterHandler(void *atributos){
 
 			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
 
-			while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
+			//FS envia: cant de bloques del archivo (si es cero la ruta no es valida) para saber cuantos recv va a tener que hacer sobre
+			//info de un bloque: nro de bloque + tamanioNombreNodo +copiacero nombrenodo+ copiacero nrobloquedatabin + tamanioNombreNodo +copiauno nombrenodo+ copiauno nrobloquedatabin
+			/*while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
 				if(head->tipo_char  *nombre =malloc(MAXSIZETEMPNAME)de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
 					//recibimos la lista de bloques y demases que componen al archivo a reducir
 				}

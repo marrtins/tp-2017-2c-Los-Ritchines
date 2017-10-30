@@ -1,5 +1,47 @@
 #include "../funcionesFS.h"
 
+void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2){
+	int cantidadElementos = list_size(lista);
+	int i = 0;
+	int maximo = 0;
+	int maximo2 = 0;
+	Tnodo * auxiliar = NULL;
+	nodo1 = NULL;
+	nodo2 = NULL;
+	while(i != cantidadElementos){
+		puts("voy a romper");
+		auxiliar = (Tnodo * ) list_get(lista, i);
+		puts("antes");
+		printf("%p\n", auxiliar);
+		printf("%p\n", nodo1);
+		printf("%p\n", nodo2);
+		if(auxiliar->cantidadBloquesLibres >= maximo){
+			nodo2 = nodo1;
+			nodo1 = auxiliar;
+			maximo2 = maximo;
+			maximo = auxiliar->cantidadBloquesLibres;
+		}
+		else if(auxiliar->cantidadBloquesLibres >= maximo2){
+			nodo2 = auxiliar;
+			maximo2 = auxiliar->cantidadBloquesLibres;
+		}
+		i++;
+		printf("%p\n", auxiliar);
+		printf("%p\n", nodo1);
+		printf("%p\n", nodo2);
+	}
+	printf("nombre: %s\n", nodo1->nombre);
+	printf("libres: %d\n", nodo1->cantidadBloquesLibres);
+	printf("total: %d\n", nodo1->cantidadBloquesTotal);
+	printf("fd: %d\n", nodo1->fd);
+	printf("primerBloqueLibre: %d\n", nodo1->primerBloqueLibreBitmap);
+	printf("nombre: %s\n", nodo2->nombre);
+	printf("libres: %d\n", nodo2->cantidadBloquesLibres);
+	printf("total: %d\n", nodo2->cantidadBloquesTotal);
+	printf("fd: %d\n", nodo2->fd);
+	printf("primerBloqueLibre: %d\n", nodo2->primerBloqueLibreBitmap);
+}
+
 int bloquesOcupadosDeNodo(Tnodo * nodo){
 	return nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
 }
@@ -11,17 +53,55 @@ bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2){
 	return nodoA->cantidadBloquesLibres >= nodoB->cantidadBloquesLibres;
 }
 
-/*bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2){
-	Tnodo* nodoA = (Tnodo*)nodo1;
-	Tnodo* nodoB = (Tnodo*)nodo2;
-
-	double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
-		if(nodo->cantidadBloquesLibres == 0) return 1;
-		double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
-		return bloquesOcupados / nodo->cantidadBloquesTotal;
+void mostrarListaDeNodos(t_list * lista){
+	int i = 0;
+	int cantidadNodos = lista->elements_count;
+	Tnodo * nodo;
+	printf("La lista contiene la siguiente informacion:\n");
+	while(i != cantidadNodos){
+		nodo = (Tnodo *) list_get(lista, i);
+		printf("Nombre: %s\n", nodo->nombre);
+		printf("Cantidad De Bloques Total: %d\n", nodo->cantidadBloquesTotal);
+		printf("Cantidad De Bloques Libres: %d\n", nodo->cantidadBloquesLibres);
+		printf("File Descriptor: %d\n", nodo->fd);
+		printf("Primer Bloque Libre en Bitmap: %d\n", nodo->primerBloqueLibreBitmap);
+		printf("Bitmap: ");
+		mostrarBitmap(nodo->bitmap);
+		i++;
 	}
-	return obtenerProporcionDeDisponibilidad(nodoA) < obtenerProporcionDeDisponibilidad(nodoB);
-}*/
+}
+
+int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo){
+	int cantidad = listaDeNodos->elements_count;
+	int i = 0;
+	Tnodo * nodo;
+	int sumador = 0;
+	while(i != cantidad){
+		nodo = (Tnodo*)list_get(listaDeNodos, i);
+		if(nodo != maximo){
+			sumador += nodo->cantidadBloquesLibres;
+		}
+		i++;
+	}
+	return sumador;
+}
+
+Tnodo * obtenerNodoPorTamanioMaximo(){
+	int cantidad = listaDeNodos->elements_count;
+	Tnodo * nodo = NULL;
+	Tnodo * nodoMaximo = NULL;
+	int maximo = 0;
+	int i = 0;
+	while(i != cantidad){
+		nodo = (Tnodo * )list_get(listaDeNodos,i);
+		if(nodo->cantidadBloquesLibres > maximo){
+			nodoMaximo = nodo;
+			maximo = nodo->cantidadBloquesLibres;
+		}
+		i++;
+	}
+	return nodoMaximo;
+}
 
 int sumarListasPorTamanioDatabin(){
 	int cantidadDeElementos = listaDeNodos->elements_count;

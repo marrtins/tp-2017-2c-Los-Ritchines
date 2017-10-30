@@ -26,18 +26,19 @@ void conexionesDatanode(void * estructura);
 //Tablas
 void persistirTablaDeDirectorios();
 void levantarTablasDirectorios();
-void levantarTablaArchivo(Tarchivo * tablaArchivos);
+void levantarTablaArchivo(Tarchivo * tablaArchivos, char * ruta);
 void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
+void mostrarTablaArchivo(Tarchivo* tablaArchivo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
-char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento);
-char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre);
+void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, char * nombreElemento);
+void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento);
 void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
-char * generarArrayParaArchivoConfig(char * dato1, char * dato2);
+void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 
 
@@ -46,6 +47,10 @@ bool ordenarListaPorMayor(void * directorio1, void * directorio2);
 int sumarListasPorTamanioDatabin();
 void* buscarNodoDesconectadoPorFD(int fd);
 bool ordenarSegunBloquesDisponibles(void * nodo1, void * nodo2);
+Tnodo * obtenerNodoPorTamanioMaximo();
+int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
+void mostrarListaDeNodos(t_list * lista);
+void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -61,9 +66,16 @@ int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
 int crearDirectorio(char * ruta);
 int esDirectorio(char * ruta);
+int esArchivo(char* ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
+void listarArchivos(char * ruta);
 void removerDirectorios(char * ruta);
+int verificarRutaArchivo(char * rutaYamafs);
+int existeArchivo(int indiceDirectorio , char * rutaYamafs);
+char * obtenerRutaSinArchivo(char * ruta);
+char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
+int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
@@ -74,9 +86,13 @@ char * generarStringDeBloqueNBytes(int numeroDeBloque);
 bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
 
+//Obtener Archivo
+void pedirBloques(Tarchivo * archivo);
+void copiarArchivo(char ** palabras);
+
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
-Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor);
+Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo);
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);
@@ -95,5 +111,9 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 void liberarEstructuraBuffer(Tbuffer * buffer);
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
+
+//YAMA
+char * recvRutaArchivo(int socket);
+Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo);
 
 #endif

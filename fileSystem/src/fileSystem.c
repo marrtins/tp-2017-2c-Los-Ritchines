@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
 
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
+	char * rutaArchivo;
+	Tbuffer * buffer;
 
 	if(argc != 1){
 		puts("Error en la cantidad de parametros.");
@@ -31,10 +33,10 @@ int main(int argc, char* argv[]) {
 	listaDeNodosDesconectados = list_create();
 	listaTablaDirectorios = list_create();
 
-	inicializarTablaDirectorios();
+
+	//inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
-
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -65,37 +67,54 @@ int main(int argc, char* argv[]) {
 			log_trace(logger, mensaje);
 			break;
 		}
-		switch(head->tipo_de_proceso){
-			case YAMA:
-				puts("Es YAMA");
+		if(head->tipo_de_proceso == YAMA){
+		switch(head->tipo_de_mensaje){
+			case INICIO_YAMA:
+				puts("Es yama");
 				if (cantNodosPorConectar == 0) {
 					puts("Filesystem estable");
+				}
+			break;
 
+			case INFO_ARCHIVO:
+				puts("Es yama y quiere informacion sobre un archivo");
+				char * ruta;
+				Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
-					puts("Recibimos de YAMA");
-					estado = recv(socketYama, head, sizeof(Theader), 0);
+				head->tipo_de_proceso = FILESYSTEM;
+				head->tipo_de_mensaje = INFO_ARCHIVO;
 
-					if (estado == -1) {
-						log_trace(logger, "Error al recibir información de Yama.");
-					} else if (estado == 0) {
-						sprintf(mensaje, "Se desconecto el cliente de fd: %d.", socketYama);
-						log_trace(logger, mensaje);
-						close(socketYama);
-					}
-					printf("Recibi %d bytes\n", estado);
-					printf("el proceso es %d\n", head->tipo_de_proceso);
-					printf("el mensaje es %d\n", head->tipo_de_mensaje);
-					}
-					break;
+				rutaArchivo = recvRutaArchivo(socketYama);
 
-						//NO está manejada la conexion con worker
-					case WORKER:
-						puts("Es worker");
-						break;
+				//verifico que la ruta que me manda yama sea valida
+				if(verificarRutaArchivo(rutaArchivo)){
+					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
+					levantarTablaArchivo(archivo,ruta);
+					buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
 
-					default:
-						break;
-					}
+					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+							 logAndExit("Fallo al enviar la informacion de un archivo");
+						 }
+				}else {
+					//si no es valida se manda cant de bloques en cero
+					buffer = empaquetarInt(head,0);
+					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+						 logAndExit("Fallo al enviar la informacion de un archivo");
+						}
+				}
+
+			break;
+			default:
+			break;
+				}
+		}
+		if(head->tipo_de_proceso == WORKER){
+			switch(head->tipo_de_mensaje){
+			default:
+				break;
+			}
+			//NO está manejada la conexion con worker
+		}
 
 	}
 

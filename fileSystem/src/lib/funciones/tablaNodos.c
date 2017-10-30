@@ -22,7 +22,7 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", nuevoNodo->cantidadBloquesLibres, sumaDeDosNumerosInt);
 
 	//NODOS
-	agregarNodoAArrayDeNodos(tablaDeNodos, "NODOS", nuevoNodo->nombre);
+	agregarElementoAArrayArchivoConfig(tablaDeNodos, "NODOS", nuevoNodo->nombre);
 
 	//agregar Nodos Dinamicamente
 	char * nodoTotalAString = string_new();
@@ -50,14 +50,14 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 
 	//NODONTOTAL
 	char * nodoTotalAString = string_new();
+	puts("holi voy a appendear con format a nodototalastring");
 	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
+	puts("holi voy a obtener el get int value de la tabla de nodos con nodoTotalAString");
+	puts(nodoTotalAString);
 	int nodoTotal = config_get_int_value(tablaDeNodos, nodoTotalAString);
 
 	//TAMANIO
-	int tamanio = config_get_int_value(tablaDeNodos, "TAMANIO");
-	tamanio -= nodoTotal;
-	char * tamanioString = string_itoa(tamanio);
-	config_set_value(tablaDeNodos, "TAMANIO", tamanioString);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "TAMANIO", nodoTotal, restaDeDosNumerosInt);
 
 	//NODONLIBRE
 	char * nodoLibreAString = string_new();
@@ -65,10 +65,7 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 	int nodoLibre = config_get_int_value(tablaDeNodos, nodoLibreAString);
 
 	//LIBRE
-	int libre = config_get_int_value(tablaDeNodos, "LIBRE");
-	libre -= nodoLibre;
-	char * libreString = string_itoa(libre);
-	config_set_value(tablaDeNodos, "LIBRE", libreString);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", nodoLibre, restaDeDosNumerosInt);
 
 	//SETEAR NODONTOTAL
 	config_set_value(tablaDeNodos, nodoTotalAString, "");
@@ -77,20 +74,13 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 	config_set_value(tablaDeNodos, nodoLibreAString, "");
 
 	//NODOS
-	char ** nodos = config_get_array_value(tablaDeNodos, "NODOS");
-	char * nodosConNodoEliminado = eliminarNodoDelArrayDeNodos(nodos, nuevoNodo->nombre);
-	config_set_value(tablaDeNodos, "NODOS", nodosConNodoEliminado);
+	eliminarElementoDeArrayArchivosConfig(tablaDeNodos, "NODOS", nuevoNodo->nombre);
 
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
 
 	free(nodoTotalAString);
 	free(nodoLibreAString);
-	free(libreString);
-	free(tamanioString);
-	liberarPunteroDePunterosAChar(nodos);
-	free(nodos);
-	free(nodosConNodoEliminado);
 }
 
 void levantarTablaNodos(Tnodos * tablaNodos){
@@ -134,31 +124,13 @@ void levantarTablaNodos(Tnodos * tablaNodos){
 	config_destroy(archivoNodos);
 }
 
-char * eliminarNodoDelArrayDeNodos(char ** nodos, char * nombre){
-	char * nuevoString = string_new();
-	char * definitivo = string_new();
-	int i = 0;
-	string_append(&nuevoString, "[");
-	while(nodos[i] != NULL){
-		if(strcmp(nodos[i], nombre)){
-			string_append(&nuevoString, nodos[i]);
-			string_append(&nuevoString, ",");
-		}
-		i++;
-	}
-	definitivo = string_substring(nuevoString, 0, strlen(nuevoString)-1);
-	string_append(&definitivo, "]");
-	free(nuevoString);
-	return definitivo;
-}
-
-char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nombreElemento){
-	char ** nodos = config_get_array_value(tablaDeNodos, key);
+void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, char * nombreElemento){
+	char ** elementos = config_get_array_value(tablaDeNodos, key);
 	char * nuevoString = string_new();
 	int i = 0;
 	string_append(&nuevoString, "[");
-	while(nodos[i] != NULL){
-		string_append(&nuevoString, nodos[i]);
+	while(elementos[i] != NULL){
+		string_append(&nuevoString, elementos[i]);
 		string_append(&nuevoString, ",");
 		i++;
 	}
@@ -166,7 +138,6 @@ char * agregarNodoAArrayDeNodos(t_config * tablaDeNodos, char * key, char * nomb
 	string_append(&nuevoString, "]");
 	config_set_value(tablaDeNodos, key, nuevoString);
 	free(nuevoString);
-	liberarPunteroDePunterosAChar(nodos);
-	free(nodos);
-	return nuevoString;
+	liberarPunteroDePunterosAChar(elementos);
+	free(elementos);
 }
