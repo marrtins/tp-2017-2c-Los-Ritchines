@@ -82,11 +82,9 @@ void procesarInput(char* linea) {
 				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 				levantarTablaArchivo(tablaArchivo, rutaLocal);
 				mostrarTablaArchivo(tablaArchivo);
-				puts("antes de liberar");
 				liberarTablaDeArchivo(tablaArchivo);
-				puts("rompi liberando");
 				free(rutaLocal);
-			}
+		}
 			else{
 				puts("No existe el directorio o falta la referencia a yamafs");
 			}

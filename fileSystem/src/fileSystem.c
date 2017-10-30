@@ -2,6 +2,7 @@
 
 
 int main(int argc, char* argv[]) {
+
 	int estado,
 		socketDeEscuchaYama,
 		socketYama,
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 
 
-	//inicializarTablaDirectorios();
+	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
