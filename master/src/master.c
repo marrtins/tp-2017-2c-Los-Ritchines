@@ -217,11 +217,11 @@ TreduccionLocal *recibirInfoReduccionLocal(int sockYama){
 //			infoReduccion->ipNodo,infoReduccion->puertoNodo,infoReduccion->tempRed);
 //	printf("list size %d\n",infoReduccion->listaSize);
 
-	int i;
-	for(i=0;i<list_size(infoReduccion->listaTemporalesTransformacion);i++){
-		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporalesTransformacion,i);
-	//	printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
-	}
+//	int i;
+//	for(i=0;i<list_size(infoReduccion->listaTemporalesTransformacion);i++){
+//		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+//	//	printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
+//	}
 
 	return infoReduccion;
 }

@@ -139,6 +139,10 @@ void hiloWorkerReduccionLocal(void *info){
 
 		switch (headRcv.tipo_de_mensaje) {
 
+		case(FIN_REDUCCIONLOCALOK):
+			finCorrecto = true;
+			close(sockWorker);
+			break;
 		default:
 			break;
 		}
@@ -146,16 +150,16 @@ void hiloWorkerReduccionLocal(void *info){
 
 	}
 	if(finCorrecto){
-		puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
+		puts("Termina la conexion con worker.. La reduccion local salio OK. Le avisamos a yama ");
 		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALOK;
+		headASerializar.tipo_de_mensaje=FIN_REDUCCIONLOCALOK;
 		enviarHeaderYValor(headASerializar,idTarea,sockYama);
 
 
 	}else{
-		puts("termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
+		puts("termino la conexion con worker de manera inesperada. reduccion local fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALFAIL;
+		headASerializar.tipo_de_mensaje=FIN_REDUCCIONLOCALFAIL;
 		enviarHeaderYValor(headASerializar,idTarea,sockYama);
 
 	}
