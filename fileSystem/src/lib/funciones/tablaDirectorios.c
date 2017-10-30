@@ -370,6 +370,7 @@ void listarArchivos(char* ruta){
 				puts(nombreArchivoConExtension);
 				i++;
 
+				free(nombreArchivoConExtension);
 			}
 			liberarPunteroDePunterosAChar(archivos);
 			liberarPunteroDePunterosAChar(divisionRuta);
@@ -472,6 +473,9 @@ int validarQueLaRutaTengaElNombreDelArchivo(char * ruta){
 
 	valor = (int) string_contains(archivo, ".");
 
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	free(archivo);
 	return valor;
 
 }

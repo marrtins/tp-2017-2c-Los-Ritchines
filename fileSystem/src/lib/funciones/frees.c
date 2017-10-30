@@ -13,13 +13,12 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 
 	int i = 0;
-	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaDeArchivos->tamanioTotal)-1;
+	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaDeArchivos->tamanioTotal);
 	free(tablaDeArchivos->extensionArchivo);
-	free(tablaDeArchivos->nombreArchivoSinExtension);
 
 	for(; i != cantBloques; i++){
-		free(tablaDeArchivos->bloques[cantBloques].copiaCero.nombreDeNodo);
-		free(tablaDeArchivos->bloques[cantBloques].copiaUno.nombreDeNodo);
+		free(tablaDeArchivos->bloques[i].copiaCero.nombreDeNodo);
+		free(tablaDeArchivos->bloques[i].copiaUno.nombreDeNodo);
 	}
 	free(tablaDeArchivos->bloques);
 	free(tablaDeArchivos);
