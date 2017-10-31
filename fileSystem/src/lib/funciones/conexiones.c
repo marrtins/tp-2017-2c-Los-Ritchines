@@ -110,18 +110,29 @@ void conexionesDatanode(void * estructura){
 								char * bloque;
 
 								if ((estado = recv(fileDescriptor, &nroBloque, sizeof(int), 0)) == -1) {
-										logAndExit("Error al recibir el ip del nodo");
+										logAndExit("Error al recibir el nroBloque");
 										}
 
 								if ((estado = recv(fileDescriptor, &tamanio, sizeof(int), 0)) == -1) {
-										logAndExit("Error al recibir el ip del nodo");
+										logAndExit("Error al recibir el tamanio do bloque");
 										}
 								bloque = malloc(tamanio);
-
 								if ((estado = recv(fileDescriptor, bloque, sizeof(int), 0)) == -1) {
-										logAndExit("Error al recibir el ip del nodo");
+										logAndExit("Error al recibir el contenido do bloque");
 										}
 
+								break;
+							case OBTENER_BLOQUE:
+								puts("Es datanode y nos mando un bloque");
+								bloqueACopiar = malloc(sizeof(Tbuffer));
+								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
+										logAndExit("Error al recibir el tamanio do bloque");
+										}
+								bloqueACopiar->buffer = malloc(bloqueACopiar->tamanio);
+								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
+									logAndExit("Error al recibir el contenido do bloque");
+								}
+								//hacer true la condicion pthread para que el otro hilo haga lo suyo;
 								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
