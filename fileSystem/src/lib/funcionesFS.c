@@ -456,12 +456,12 @@ int copiarBloque(Tbuffer* buffer, Tbuffer* bloque){
 
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
 	Theader* head = malloc(sizeof(Theader));
-	Tnodo* nodo = buscarNodoPorNombre(nombreNodo);
-	char* buffer = malloc(sizeof(Tbuffer));
+	Tnodo* nodo = buscarNodoPorNombre(listaDeNodos,nombreNodo);
+	Tbuffer* buffer;
 	head->tipo_de_proceso = FILESYSTEM;
 	head->tipo_de_mensaje = ALMACENAR_BLOQUE;
 	buffer = empaquetarBloque(head, bloque, nodo);
-	if(send(nodo->fd,buffer,bloque->tamanio,0) == -1){
+	if(send(nodo->fd,buffer->buffer,buffer->tamanio,0) == -1){
 		return -1;
 	}
 	return 1;
