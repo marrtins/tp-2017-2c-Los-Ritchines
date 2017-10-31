@@ -645,3 +645,11 @@ int getMD5(char* ruta){
 	free(rutaArchivo);
 	return 0;
 }
+
+void removerDirectorio(char* ruta){
+	int index = obtenerIndexDeUnaRuta(ruta);
+	char* rutaDirectorio = malloc(200);
+	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/", index);
+	rmdir(rutaDirectorio);
+	free(rutaDirectorio);
+}

@@ -30,8 +30,15 @@ void procesarInput(char* linea) {
 			puts("El archivo no existe en la ruta especificada");
 			}
 		}
-	} else if (string_equals_ignore_case(*palabras, "rm -d")) {
-		printf("ya pude remover el archivo\n");
+	} else if (string_equals_ignore_case(*palabras, "rm-d")) {
+		if (cantidad==1){
+			if(existeDirectorio(palabras[1])){
+			removerDirectorio(palabras[1]);
+			puts("Ya pude remover el directorio");
+		} else{
+			puts("No pude remover el directorio");
+		}
+		}
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
 		if(cantidad == 2){
 			if(verificarRutaArchivo(palabras[1])){
