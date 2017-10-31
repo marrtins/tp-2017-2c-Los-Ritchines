@@ -14,7 +14,7 @@ void generarListaBloquesHardcode(t_list *listaBloques);
 void generarListaComposicionArchivoHardcode(t_list * listaInfo);
 void generarListaInfoNodos();
 
-void agregarAListaEnProceso(int jobActual,int idTarea, int etapa, TpackInfoBloque *bloque);
+
 
 //Funciones Planificacion
 int posicionarClock(t_list * listaWorkers);
@@ -47,8 +47,8 @@ char * getPuertoNodo(char * nombreNodo);
 bool sePuedeComenzarReduccionLocal(int idTareaFinalizada);
 int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster);
 
-void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion);
-
+void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char * bloquesReducidos);
+void agregarTransformacionAListaEnProceso(int jobActual, int idTarea, TpackInfoBloque *bloque);
 
 
 char *serializeInfoReduccionLocal2(Theader head, TreduccionLocal * infoReduccion, int *pack_size);

@@ -2,7 +2,7 @@
 #include <commons/config.h>
 
 extern Tworker *worker;
-
+extern int cantApareosGlobal;
 int cont=0;
 
 TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker2(char *bytes_serial){
@@ -159,7 +159,7 @@ int realizarTransformacion(int client_sock){
 				string_append(&rutaResultadoTransformacion,datosTransf->nombreTemporal);
 				string_append(&lineaDeEjecucionTransformacion,rutaResultadoTransformacion);
 
-				//printf("linea de eecucion %s\n",lineaDeEjecucionTransformacion);
+				printf("linea de eecucion %s\n",lineaDeEjecucionTransformacion);
 	//			printf("Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
 
 
@@ -193,7 +193,11 @@ int realizarReduccionLocal(int client_sock){
 	char * nombreScriptReductor;
 	char * rutaScriptReductor;
 	char  *rutaResultadoReduccion;
+	char  *rutaTemporalesApareados;
+	char * nombreArchivoTemporalApareado;
 	char * lineaDeEjecucionReduccion;
+	char * lineaDeEjecucionApareo;
+
 	int stat;
 	pid_t pidRed;
 	Theader *headEnvio  = malloc(sizeof headEnvio);
@@ -215,11 +219,30 @@ int realizarReduccionLocal(int client_sock){
 	printf("Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
 
 	int i;
+
 	printf("LIST SIZE %d\n",infoReduccion->listaSize);
+	lineaDeEjecucionApareo=string_new();
+	string_append(&lineaDeEjecucionApareo,"sort -m");
+
 	for(i=0;i<infoReduccion->listaSize;i++){
 		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporales,i);
 		printf("Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
+		string_append(&lineaDeEjecucionApareo," /home/utnso/");
+		string_append(&lineaDeEjecucionApareo,infoAux->nombreTemporal);
+
 	}
+	rutaTemporalesApareados=string_new();
+	//nombreArchivoTemporalApareado=string_new();
+	string_append(&rutaTemporalesApareados,"/home/utnso/tmp/apareoLocal");
+	string_append(&rutaTemporalesApareados,worker->nombre_nodo);
+	string_append(&rutaTemporalesApareados,"nro");
+	string_append(&rutaTemporalesApareados,string_itoa(cantApareosGlobal++));
+
+	string_append(&lineaDeEjecucionApareo," > ");
+	string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
+
+	printf("linea de ejec apareo %s \n",lineaDeEjecucionApareo);
+	system(lineaDeEjecucionApareo);
 	puts("Ahora recibo el script reductor");
 
 
@@ -237,7 +260,10 @@ int realizarReduccionLocal(int client_sock){
 	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
 
 
-	//ACA HAY Q HACER EL APAREO DE TODOS LOS TEMPORALES.
+
+
+
+
 
 
 	puts("Forkeo");
@@ -253,10 +279,12 @@ int realizarReduccionLocal(int client_sock){
 
 
 
-		//todo: reemplazar cat wban.csv por el bloque de codigo que nos interesa trasnformar.
-		string_append(&lineaDeEjecucionReduccion,"cat WBAN.csv | ./");
+
+		string_append(&lineaDeEjecucionReduccion,"cat ");
+		string_append(&lineaDeEjecucionReduccion,rutaTemporalesApareados);
+		string_append(&lineaDeEjecucionReduccion," | ./");
 		string_append(&lineaDeEjecucionReduccion,nombreScriptReductor);
-		string_append(&lineaDeEjecucionReduccion, " > /home/utnso/ ");
+		string_append(&lineaDeEjecucionReduccion, " > /home/utnso/");
 		string_append(&rutaResultadoReduccion,infoReduccion->nombreTempReduccion);
 		string_append(&lineaDeEjecucionReduccion,rutaResultadoReduccion);
 

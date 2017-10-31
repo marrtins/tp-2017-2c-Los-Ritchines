@@ -419,7 +419,7 @@ char *serializeInfoReduccionLocal(Theader head, TreduccionLocal * infoReduccion,
 	int i;
 	int espacioPackSize = sizeof(int);
 	int espacioEnteros = sizeof(int) * 7;
-	int espacioLista;
+	int espacioLista=0;
 
 	int sizeLista = list_size(infoReduccion->listaTemporalesTransformacion);
 	for(i=0;i< sizeLista;i++){
