@@ -140,7 +140,7 @@ void enviarBloqueAFS(int nroBloque, int socketFS){
 	free(head);
 }
 
-void enviarBloque(int nroBloque, int socketFS){
+void enviarBloque(int nroBloque, unsigned long long int tamanio, int socketFS){
 	Tbuffer * buffer;
 	Theader * head = malloc(sizeof(Theader));
 
@@ -148,8 +148,7 @@ void enviarBloque(int nroBloque, int socketFS){
 	head->tipo_de_mensaje = OBTENER_BLOQUE;
 	char * bloque = getBloque(nroBloque);
 	puts("voy a empaquetar el bloque");
-	buffer = empaquetarBytes(head,bloque);
-	printf("es igual a null: %d",buffer->buffer==NULL);
+	buffer = empaquetarBloqueConNBytes(head, tamanio, bloque, nroBloque);
 	if (send(socketFS, buffer->buffer, buffer->tamanio, 0) <= 0){
 		logAndExit("Fallo al enviar a FS el bloque que pidio");
 	}

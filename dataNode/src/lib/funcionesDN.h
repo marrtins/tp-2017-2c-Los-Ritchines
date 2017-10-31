@@ -14,7 +14,7 @@ char * getBloque(int posicion);
 //Envios
 int enviarInfoNodo(int socketFS, TdataNode * dataNode);
 void enviarBloqueAFS(int nroBloque, int socketFS);
-void enviarBloque(int nroBloque, int socketFS);
+void enviarBloque(int nroBloque,unsigned long long int tamanio, int socketFS);
 
 //Recv
 Tbloque * recvBloque(int socketFS);

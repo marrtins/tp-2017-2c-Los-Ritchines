@@ -83,10 +83,14 @@ int main(int argc, char* argv[]) {
 			case OBTENER_BLOQUE:
 				puts("ES fileSystem y quiere un bloque");
 				int nroBloque_;
+				unsigned long long int tamanioBloque_;
 				if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
 					logAndExit("Error al recibir el numero do bloque");
 				}
-				enviarBloque(nroBloque_, socketFS);
+				if (recv(socketFS, &tamanioBloque_, sizeof(unsigned long long int),0) == -1){
+					logAndExit("Error al recibir el tamanio del bloque");
+				}
+				enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
 				break;
 			default:
 				break;
