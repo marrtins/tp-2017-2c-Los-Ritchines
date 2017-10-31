@@ -131,12 +131,23 @@ void procesarInput(char* linea) {
 
 void procesarCpblock(char ** palabras){
 	if(verificarRutaArchivo(palabras[1])){
-		if(tieneBloque(palabras[1], palabras[2])){
+		char * rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
+
+		if(tieneBloque(rutaLocalArchivo, palabras[2])){
 			if((buscarNodoPorNombre(listaDeNodos, palabras[3]))->nombre != NULL){
+				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+				int nroBloque = atoi(palabras[2]);
+				char* bloque;
+				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
+				if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
+					puts("No se encontraron los nodos con las copias del bloque");
+					return;
+				}
+				bloque = obtenerBloque(tablaArchivo, nroBloque);
 
 			}
 			else {
-				puts("El nodo no existe o no esta conectado.");
+				puts("El nodo destino no existe o no esta conectado.");
 			}
 		}
 		else{

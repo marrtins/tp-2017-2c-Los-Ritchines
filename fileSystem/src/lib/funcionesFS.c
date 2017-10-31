@@ -417,6 +417,43 @@ void copiarArchivo(char ** palabras){
 
 }
 
-int tieneBloque(char * rutaYamafs, char * nroBloque){
+int tieneBloque(char * ruta, char * nroBloque){
 	return 0;
+}
+
+char* obtenerBloque(Tarchivo* tablaArchivo, int nroBloque){
+	char * nombreNodo = tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo;
+	int nroBloqueASolicitar;
+	Theader* header = malloc(sizeof(Theader));
+	Tbuffer * buffer;
+	header->tipo_de_proceso = FILESYSTEM;
+	header->tipo_de_mensaje = OBTENER_BLOQUE;
+	Tnodo* nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+	if(nodo != NULL){
+		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo;
+	}
+	else {
+		nombreNodo = tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo;
+		nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
+	}
+	buffer = empaquetarInt(header, nroBloqueASolicitar);
+	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+		return NULL;
+	}
+	//sincro;
+	return NULL;
+}
+
+int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque){
+	char * nombreNodo = tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo;
+	Tnodo* nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+	if(nodo == NULL){
+		nombreNodo = tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo;
+		nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+		if(nodo == NULL){
+			return 0;
+		}
+	}
+	return 1;
 }

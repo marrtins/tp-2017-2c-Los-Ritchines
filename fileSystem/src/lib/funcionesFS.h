@@ -104,6 +104,7 @@ void* buscarNodoPorFD(int fd);
 void borrarNodoDesconectadoPorFD(int fd);
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
+int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 
 //md5
 int getMD5(char**palabras);
@@ -112,7 +113,8 @@ int getMD5(char**palabras);
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
-int tieneBloque(char * rutaYamafs, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
+int tieneBloque(char * ruta, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
+char* obtenerBloque(Tarchivo* tablaArchivo,int nroBloque);
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);
