@@ -9,7 +9,6 @@ char * rutaTransformador, * rutaReductor;
 
 
 
-
 int main(int argc, char* argv[]) {
 
 	int sockYama,
@@ -112,6 +111,7 @@ int main(int argc, char* argv[]) {
 
 		TpackInfoBloque *infoBloque;
 		TreduccionLocal *infoReduccionLocal;
+		TreduccionGlobal *infoReduccionGlobal;
 
 		switch (headRcv.tipo_de_mensaje) {
 
@@ -162,6 +162,14 @@ int main(int argc, char* argv[]) {
 				}
 
 			stat = conectarseAWorkerParaReduccionLocal(infoReduccionLocal,sockYama);
+		break;
+		case(INFOREDUCCIONGLOBAL):
+				if((infoReduccionGlobal=recibirInfoReduccionGlobal(sockYama))==NULL){
+					puts("Error no pudimos recibir la info de la reduccion global. se cierra");
+					return FALLO_CONEXION;
+				}
+
+			//stat = conectarseAWorkerParaReduccionGlobal(infoReduccionLocal,sockYama);
 		break;
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);
@@ -227,3 +235,32 @@ TreduccionLocal *recibirInfoReduccionLocal(int sockYama){
 }
 
 
+TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama){
+	char * buffer;
+	TreduccionGlobal *infoReduccionGlobal;
+	if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
+		puts("Fallo recepcion de INFOBLOQUE");
+		return NULL;
+	}
+
+	if ((infoReduccionGlobal = deserializeInfoReduccionGlobal(buffer)) == NULL){
+		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
+		return NULL;
+	}
+	printf("llego la info apra la reduccion global\n");
+	printf("job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
+
+	printf("list size %d\n",infoReduccionGlobal->listaNodosSize);
+
+	int i;
+	for(i=0;i<list_size(infoReduccionGlobal->listaNodos);i++){
+		TinfoNodoReduccionGlobal *infoNodo = list_get(infoReduccionGlobal->listaNodos,i);
+		printf(" nombre nodo: %s \n",infoNodo->nombreNodo);
+		printf(" ip nodo: %s \n",infoNodo->ipNodo);
+		printf(" peurto: %s \n",infoNodo->puertoNodo);
+		printf(" temp red loc: %s \n",infoNodo->temporalReduccion);
+		printf(" encargado: %d \n",infoNodo->nodoEncargado);
+	}
+
+	return infoReduccionGlobal;
+}

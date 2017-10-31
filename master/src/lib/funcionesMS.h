@@ -14,13 +14,14 @@ int enviarScript(char * rutaScript,int sockDestino);
 TreduccionLocal *recibirInfoReduccionLocal(int sockYama);
 
 
-
 //-----Funciones Hilo Worker Transf//
 int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama);
 int conectarseAWorkerParaReplanificarTransformacion(TpackInfoBloque *infoBloque,int sockYama);
 void hiloWorkerTransformacion(void *info);
+
 int conectarseAWorkerParaReduccionLocal(TreduccionLocal *infoReduccion,int sockYama);
+int conectarseAWorkerParaReduccionGlobal(TreduccionLocal *infoReduccion,int sockYama);
 
-
+TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama);
 
 #endif

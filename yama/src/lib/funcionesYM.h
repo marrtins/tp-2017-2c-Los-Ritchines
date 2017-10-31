@@ -16,6 +16,7 @@ void generarListaInfoNodos();
 
 
 
+
 //Funciones Planificacion
 int posicionarClock(t_list * listaWorkers);
 TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *listaWorkersPlanificacion);
@@ -38,6 +39,7 @@ void mostrarTablaDeEstados();
 
 char * generarNombreTemporal();
 char *  generarNombreReductorTemporal(char * nombreNodo);
+char *  generarNombreReduccionGlobalTemporal();
 TpackTablaEstados * getTareaPorId(int idTarea);
 bool sePuedeReplanificar(int idTarea,t_list * listaComposicionArchivo);
 int replanificar(int idTarea,int fdMaster,t_list * listaComposicionArchivo);
@@ -52,7 +54,7 @@ void agregarTransformacionAListaEnProceso(int jobActual, int idTarea, TpackInfoB
 
 
 bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada);
+bool esNodoEncargado(char * nombreNodo);
 
-char *serializeInfoReduccionLocal2(Theader head, TreduccionLocal * infoReduccion, int *pack_size);
 #endif
 
