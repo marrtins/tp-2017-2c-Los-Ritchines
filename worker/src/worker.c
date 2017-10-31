@@ -1,6 +1,7 @@
 #include "lib/funcionesWK.h"
 
 Tworker *worker;
+int cantApareosGlobal;
 int main(int argc, char* argv[]){
 
 
@@ -11,7 +12,7 @@ int main(int argc, char* argv[]){
 		clientSize;
 	struct sockaddr_in client;
 
-
+	cantApareosGlobal=0;
 
 
 	clientSize = sizeof client;

@@ -57,8 +57,9 @@ typedef struct {
 	int bloqueDelArchivo;
 	int etapa;
 	char * nombreArchTemporal;
+	//t_list * listaTemporales;
 	bool fueReplanificada;
-
+	char  * bloquesReducidos;
 }TpackTablaEstados;
 
 typedef struct{

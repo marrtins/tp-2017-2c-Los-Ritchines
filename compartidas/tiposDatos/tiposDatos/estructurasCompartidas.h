@@ -49,7 +49,8 @@ typedef enum {
 	INFO_ARCHIVO= 36,
 	INFO_BLOQUE = 37,
 	FORMATEAR_NODO = 38,
-	OBTENER_BLOQUE = 39
+	OBTENER_BLOQUE = 39,
+	INFOREDUCCIONGLOBAL=40
 
 } Tmensaje;
 
@@ -194,11 +195,37 @@ typedef struct{
 }TreduccionLocal;
 
 
+
+
+
 typedef struct {
 	int nombreTemporalLen;
 	char * nombreTemporal;
 }TreduccionLista;
 
+
+typedef struct{
+	int job;
+	int idTarea;
+	int tempRedGlobalLen;
+	char * tempRedGlobal;
+	int listaNodosSize;
+	t_list * listaNodos;
+}TreduccionGlobal;
+
+
+
+typedef struct{
+	int nombreNodoLen;
+	char * nombreNodo;
+	int ipNodoLen;
+	char * ipNodo;
+	int puertoNodoLen;
+	char * puertoNodo;
+	int temporalReduccionLen;
+	char * temporalReduccion;
+	int nodoEncargado;
+}TinfoNodoReduccionGlobal;
 
 
 typedef struct {

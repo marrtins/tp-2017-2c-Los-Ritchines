@@ -344,3 +344,5 @@
 [ERROR] 16:31:51:474 FileSystem.log/(6000:6002): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 17:14:10:61 FileSystem.log/(7412:7414): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
 [ERROR] 17:14:33:994 FileSystem.log/(7416:7418): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 19:37:59:210 FileSystem.log/(10431:10433): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.
+[ERROR] 19:53:36:764 FileSystem.log/(10547:10549): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.

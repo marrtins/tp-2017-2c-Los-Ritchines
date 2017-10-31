@@ -32,5 +32,8 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial);
 char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalReduccionLen,char * nombreTemporalReduccion,t_list * listaTemporales, int *pack_size);
 TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char *bytes_serial);
 
+char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccionGlobal, int *pack_size);
+TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial);
+
 
 #endif

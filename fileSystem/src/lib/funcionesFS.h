@@ -44,6 +44,11 @@ void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * 
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 void renombrarArchivoODirectorio(char * ruta, char * nombre);
 void formatearFS();
+void leerArchivoComoTextoPlano(char * rutaLocal);
+char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal);
+void mostrarCsv(char * rutaLocal);
+void mostrarBinario(char * rutaLocal);
+
 
 
 //Listas
@@ -82,6 +87,7 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs);
 char * obtenerRutaSinArchivo(char * ruta);
 char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
+void removerArchivo(char* ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
