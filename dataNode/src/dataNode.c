@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 
 				break;
 			case OBTENER_BLOQUE_Y_NRO:
-				puts("Es fileSystem y quiere un bloque");
+				puts("Es fileSystem y quiere un bloque con su nro");
 				int nroBloque;
 
 				if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
@@ -80,8 +80,14 @@ int main(int argc, char* argv[]) {
 				printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
 				enviarBloqueAFS(nroBloque, socketFS);
 				break;
-
-
+			case OBTENER_BLOQUE:
+				puts("ES fileSystem y quiere un bloque");
+				int nroBloque_;
+				if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
+					logAndExit("Error al recibir el numero do bloque");
+				}
+				enviarBloque(nroBloque_, socketFS);
+				break;
 			default:
 				break;
 			}
