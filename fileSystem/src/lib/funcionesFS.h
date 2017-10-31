@@ -120,7 +120,9 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 int tieneBloque(char * ruta, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
-char* obtenerBloque(Tarchivo* tablaArchivo,int nroBloque);
+int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
+int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
+int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);

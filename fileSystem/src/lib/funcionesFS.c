@@ -421,7 +421,7 @@ int tieneBloque(char * ruta, char * nroBloque){
 	return 0;
 }
 
-char* obtenerBloque(Tarchivo* tablaArchivo, int nroBloque){
+int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	char * nombreNodo = tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo;
 	int nroBloqueASolicitar;
 	Theader* header = malloc(sizeof(Theader));
@@ -439,10 +439,32 @@ char* obtenerBloque(Tarchivo* tablaArchivo, int nroBloque){
 	}
 	buffer = empaquetarInt(header, nroBloqueASolicitar);
 	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
-		return NULL;
+		return -1;
 	}
-	//sincro;
-	return NULL;
+	return 1;
+}
+
+int copiarBloque(Tbuffer* buffer, Tbuffer* bloque){
+	if(buffer->buffer == NULL){
+		return -1;
+	}
+	bloque->buffer = malloc(buffer->tamanio);
+	memcpy(&bloque->tamanio,&buffer->tamanio,sizeof(unsigned long long));
+	memcpy(bloque->buffer,buffer->buffer,buffer->tamanio);
+	return 1;
+}
+
+int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
+	Theader* head = malloc(sizeof(Theader));
+	Tnodo* nodo = buscarNodoPorNombre(nombreNodo);
+	char* buffer = malloc(sizeof(Tbuffer));
+	head->tipo_de_proceso = FILESYSTEM;
+	head->tipo_de_mensaje = ALMACENAR_BLOQUE;
+	buffer = empaquetarBloque(head, bloque, nodo);
+	if(send(nodo->fd,buffer,bloque->tamanio,0) == -1){
+		return -1;
+	}
+	return 1;
 }
 
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque){

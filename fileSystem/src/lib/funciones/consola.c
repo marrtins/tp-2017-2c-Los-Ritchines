@@ -157,14 +157,29 @@ void procesarCpblock(char ** palabras){
 			if((buscarNodoPorNombre(listaDeNodos, palabras[3]))->nombre != NULL){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				int nroBloque = atoi(palabras[2]);
-				char* bloque;
+				Tbuffer* bloque = malloc(sizeof(Tbuffer));
+				TbloqueAEnviar* bloqueAEnviar;
 				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
 				if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
 					puts("No se encontraron los nodos con las copias del bloque");
 					return;
 				}
-				bloque = obtenerBloque(tablaArchivo, nroBloque);
-
+				if(pedirBloque(tablaArchivo, nroBloque) == -1){
+					puts("Error al solicitar bloque");
+					return;
+				}
+				//aca hago un wait pthread_cond;
+				if(copiarBloque(bloqueACopiar, bloque) == -1){
+					puts("Error al copiar bloque recibido");
+					return;
+				}
+				bloqueAEnviar->contenido = bloque->buffer;
+				bloqueAEnviar->tamanio = bloque->tamanio;
+				bloqueAEnviar->numeroDeBloque = nroBloque;
+				if(enviarBloqueA(bloqueAEnviar, palabras[3])){
+					puts("Error no se pudo enviar el bloque");
+					return;
+				}
 			}
 			else {
 				puts("El nodo destino no existe o no esta conectado.");
