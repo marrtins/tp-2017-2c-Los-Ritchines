@@ -24,9 +24,7 @@ void levantarTablasDirectorios(){
 		printf("%d \t %s \t %d \n", directorio->index, directorio->nombre, directorio->padre);
 		list_add(listaTablaDirectorios, directorio);
 	}
-
 	fclose(archivoDirectorios);
-
 }
 
 void mostrarDirectorios(){

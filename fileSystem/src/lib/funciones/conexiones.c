@@ -128,10 +128,12 @@ void conexionesDatanode(void * estructura){
 								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
 										logAndExit("Error al recibir el tamanio do bloque");
 										}
+								puts("voy a copiar el bloque");
 								bloqueACopiar->buffer = malloc(bloqueACopiar->tamanio);
 								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
 									logAndExit("Error al recibir el contenido do bloque");
 								}
+								puts("voy a hacer el signal");
 								pthread_cond_signal(&bloqueCond);
 								pthread_mutex_unlock(&bloqueMutex);
 								break;

@@ -173,6 +173,7 @@ void procesarCpblock(char ** palabras){
 
 				pthread_mutex_lock(&bloqueMutex);
 				pthread_cond_wait(&bloqueCond, &bloqueMutex);
+				pthread_mutex_unlock(&bloqueMutex);
 				if(copiarBloque(bloqueACopiar, bloque) == -1){
 					puts("Error al copiar bloque recibido");
 					return;
