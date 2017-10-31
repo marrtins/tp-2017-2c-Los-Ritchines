@@ -633,3 +633,21 @@ void removerArchivo(char* ruta){
 	}
 
 
+int getMD5(char* ruta){
+	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+	char* comando = string_duplicate("md5sum ");
+	string_append(&comando, rutaArchivo);
+	system(comando);
+	printf("Obtuve el MD5 del archivo");
+	free(comando);
+	free(rutaArchivo);
+	return 0;
+}
+
+void removerDirectorio(char* ruta){
+	int index = obtenerIndexDeUnaRuta(ruta);
+	char* rutaDirectorio = malloc(200);
+	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/", index);
+	rmdir(rutaDirectorio);
+	free(rutaDirectorio);
+}

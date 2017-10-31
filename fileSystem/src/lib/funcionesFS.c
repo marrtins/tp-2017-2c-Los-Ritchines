@@ -338,30 +338,7 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	 return infoBloque;
 }
 
-int getMD5(char**palabras){
-	/*Tdirectorio * directorio;
-	char ** splitDeRuta = string_split(palabras[1], "/");
-	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
-	printf("El archivo del que queremos su MD5 es: %s\n", nombreArchivoConExtension);
 
-	Tarchivo * archivo = malloc(sizeof(Tarchivo));
-	archivo->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
-	archivo->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
-
-	char* ruta_temporal = string_duplicate("/tmp/");
-		string_append(&ruta_temporal, archivo->nombreArchivoSinExtension);
-		string_append(&ruta_temporal, ".");
-		string_append(&ruta_temporal, archivo->extensionArchivo);
-		copiar_archivo_mdfs_a_local(palabras[1], ruta_temporal); //FALTA ESTO
-
-		char* comando = string_duplicate("md5sum ");
-		string_append(&comando, ruta_temporal);
-		system(comando);
-
-		free(comando);
-		free(ruta_temporal);*/
-		return 0;
-}
 
 void pedirBloques(Tarchivo * tablaArchivo){
 	int cantBloques, nroBloque=0;

@@ -766,7 +766,7 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 	t_list * listaRet = list_create();
 	for(i=0;i<datosReduccion->listaSize;i++){
 
-		TreduccionLista *aux = malloc(sizeof aux);
+		TreduccionLista *aux = malloc(sizeof (TreduccionLista));
 		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
@@ -855,7 +855,7 @@ char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccio
 	int espacioEnteros = sizeof(int) * 4;
 	int espacioLista=0;
 
-	int sizeLista = list_size(infoReduccionGlobal->listaNodos);
+	int sizeLista = infoReduccionGlobal->listaNodosSize;
 	for(i=0;i< sizeLista;i++){
 		TinfoNodoReduccionGlobal * infoAux = list_get(infoReduccionGlobal->listaNodos,i);
 		espacioLista += sizeof(int)*5;
@@ -960,17 +960,20 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccionGlobal->tempRedGlobalLen);
 		return NULL;
 	}
+	memcpy(infoReduccionGlobal->tempRedGlobal, bytes_serial + off, infoReduccionGlobal->tempRedGlobalLen);
+	off += infoReduccionGlobal->tempRedGlobalLen;
 
 
 	memcpy(&infoReduccionGlobal->listaNodosSize, bytes_serial + off, sizeof (int));
 	off += sizeof (int);
 
+	infoReduccionGlobal->listaNodos=list_create();
 
 	int i;
 	t_list *listaInfoNodos = list_create();
 	for(i=0;i<infoReduccionGlobal->listaNodosSize;i++){
 
-		TinfoNodoReduccionGlobal *infoAux = malloc(sizeof infoAux);
+		TinfoNodoReduccionGlobal *infoAux = malloc(sizeof (TinfoNodoReduccionGlobal));
 
 		memcpy(&infoAux->nombreNodoLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
@@ -1028,8 +1031,10 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 		list_add(listaInfoNodos,infoAux);
 	}
 
+
 	infoReduccionGlobal->listaNodos=listaInfoNodos;
 
 
 	return infoReduccionGlobal;
 }
+

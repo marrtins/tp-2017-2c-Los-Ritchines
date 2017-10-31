@@ -232,22 +232,23 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	int i,packSize,stat;
 	char * buffer;
 	int jobAReducir = tareaFinalizada->job;
-	MUX_LOCK(&mux_jobIdGlobal);
-	int nuevoJob=idJobGlobal++;
-	MUX_UNLOCK(&mux_jobIdGlobal);
 
 	MUX_LOCK(&mux_idTareaGlobal);
 	int idTareaActual = idTareaGlobal++;
 	MUX_UNLOCK(&mux_idTareaGlobal);
 
-	TreduccionGlobal *nuevaReduccion = malloc(sizeof nuevaReduccion);
+	TreduccionGlobal *nuevaReduccion = malloc(sizeof (nuevaReduccion));
 	nuevaReduccion->idTarea=idTareaActual;
-	nuevaReduccion->job=nuevoJob;
+	nuevaReduccion->job=jobAReducir;
+	nuevaReduccion->tempRedGlobal=malloc(TAMANIO_NOMBRE_TEMPORAL);
+	nuevaReduccion->tempRedGlobal="tmppiola";
+	nuevaReduccion->tempRedGlobalLen=strlen(nuevaReduccion->tempRedGlobal)+1;
+	nuevaReduccion->listaNodos=list_create();
 
 	t_list * listaInformacionNodos = list_create();
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 			TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
-			if(tareaOk->job==jobAReducir){
+			if(tareaOk->job==jobAReducir && tareaOk->etapa==REDUCCIONLOCAL){
 				TinfoNodoReduccionGlobal * infoNodoAux=  malloc(sizeof infoNodoAux);
 				infoNodoAux->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 				infoNodoAux->nombreNodo=tareaOk->nodo;
@@ -256,12 +257,12 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 				infoNodoAux->ipNodo=getIpNodo(infoNodoAux->nombreNodo);
 				infoNodoAux->ipNodoLen=strlen(infoNodoAux->ipNodo)+1;
 				infoNodoAux->puertoNodo=malloc(MAXIMA_LONGITUD_PUERTO);
-				infoNodoAux->puertoNodo=getPuertoNodo(infoNodoAux->puertoNodo);
+				infoNodoAux->puertoNodo=getPuertoNodo(infoNodoAux->nombreNodo);
 				infoNodoAux->puertoNodoLen=strlen(infoNodoAux->puertoNodo)+1;
 				infoNodoAux->temporalReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL);
 				infoNodoAux->temporalReduccion=tareaOk->nombreArchTemporal;
 				infoNodoAux->temporalReduccionLen=strlen(infoNodoAux->temporalReduccion)+1;
-				infoNodoAux->nodoEncargado=esNodoEncargado(infoNodoAux->nombreNodo);
+				infoNodoAux->nodoEncargado=1;
 
 				list_add(listaInformacionNodos,infoNodoAux);
 
@@ -271,8 +272,6 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
 			}
 		}
-
-
 
 	nuevaReduccion->listaNodosSize=list_size(listaInformacionNodos);
 	nuevaReduccion->listaNodos=listaInformacionNodos;
@@ -293,6 +292,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
 	return 0;
 }
+
 bool esNodoEncargado(char * nombreNodo){
 	return false;
 }
@@ -315,10 +315,8 @@ bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada){
 	TpackTablaEstados *tareaAuxiliar;
 	for(i=0;i<list_size(listaEstadoEnProceso);i++){
 		tareaAuxiliar=list_get(listaEstadoEnProceso,i);
-		if(tareaFinalizada->job == tareaAuxiliar->job){
-			if(tareaAuxiliar->etapa == REDUCCIONLOCAL){
-				return false;
-			}
+		if(tareaFinalizada->job==tareaAuxiliar->job){
+			return false;
 		}
 	}
 
@@ -335,9 +333,6 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	int packSize,stat;
 
 	int jobAReducir = tareaFinalizada->job;
-	MUX_LOCK(&mux_jobIdGlobal);
-	int nuevoJob = idJobGlobal;
-	MUX_UNLOCK(&mux_jobIdGlobal);
 	MUX_LOCK(&mux_idTareaGlobal);
 	int idTareaActual = idTareaGlobal++;
 	MUX_UNLOCK(&mux_idTareaGlobal);
@@ -358,14 +353,15 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	infoReduccion->tempRed=malloc(TAMANIO_NOMBRE_TEMPORAL);
 	infoReduccion->tempRed=generarNombreReductorTemporal(nodoReductor);
 	infoReduccion->tempRedLen=strlen(infoReduccion->tempRed)+1;
-	infoReduccion->job=nuevoJob;
+	infoReduccion->job=jobAReducir;
 	infoReduccion->idTarea=idTareaActual;
+	infoReduccion->listaTemporalesTransformacion=list_create();
 
 	t_list *listaTemporales= list_create();
 	t_list * bloques = list_create();
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 		TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
-		if(tareaOk->job==jobAReducir && tareaOk->nodo==nodoReductor){
+		if(tareaOk->job==jobAReducir && tareaOk->nodo==nodoReductor &&tareaOk->etapa==TRANSFORMACION){
 			TreduccionLista * reduccionAux=  malloc(sizeof reduccionAux);
 			reduccionAux->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
 			reduccionAux->nombreTemporal=tareaOk->nombreArchTemporal;
@@ -504,6 +500,20 @@ char *  generarNombreReductorTemporal(char * nombreNodo){
 	string_append(&temp,string_itoa(idPropio));
 	string_append(&temp,"-");
 	string_append(&temp,nombreNodo);
+
+
+	return temp;
+}
+
+
+char *  generarNombreReduccionGlobalTemporal(){
+
+	char *temp = string_new();
+
+	string_append(&temp,"tmp/Master");
+	string_append(&temp,string_itoa(idPropio));
+	string_append(&temp,"-final");
+
 
 
 	return temp;
@@ -1044,10 +1054,10 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 				bloqueRet->nombreNodo=bloqueAux->nombreNodoC2;
 
 				bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
-				bloqueRet->puertoWorker="5004";//completar
+				bloqueRet->puertoWorker=getPuertoNodo(bloqueRet->nombreNodo);
 
 				bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
-				bloqueRet->ipWorker="127.0.0.1";//completar
+				bloqueRet->ipWorker=getIpNodo(bloqueRet->nombreNodo);
 
 
 			}else{
@@ -1058,10 +1068,10 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 				bloqueRet->nombreNodo=bloqueAux->nombreNodoC1;
 
 				bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
-				bloqueRet->puertoWorker="5004";//completar
+				bloqueRet->puertoWorker=getPuertoNodo(bloqueRet->nombreNodo);
 
 				bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
-				bloqueRet->ipWorker="127.0.0.1";//completar  todo
+				bloqueRet->ipWorker=getIpNodo(bloqueRet->nombreNodo);
 			}
 
 			bloqueRet->bloqueDelArchivo=tareaAReplanificar->bloqueDelArchivo;
@@ -1071,7 +1081,7 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 			MUX_UNLOCK(&mux_idTareaGlobal);
 			bloqueRet->nombreTemporal=malloc(strlen(tareaAReplanificar->nombreArchTemporal)+1);
 			tareaAReplanificar->fueReplanificada=true;
-			aumentarHistoricoEn(bloqueRet->nombreNodo,1);
+			aumentarHistoricoEn(bloqueRet->nombreNodo,1);//todo aumentar cargas etc
 
 			Theader head;
 			head.tipo_de_proceso=YAMA;
