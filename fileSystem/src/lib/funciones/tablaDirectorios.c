@@ -133,9 +133,42 @@ void mostrarNCaracteresDeUnMMap(char * archivoMapeado, unsigned long long tamani
 	puts("");
 }
 
+unsigned long long mostrarlineaDeUnMMap(char * archivoMapeado, unsigned long long tamanio, unsigned long long desde, int cantidadLineas){
+	unsigned long long incrementador = desde;
+	unsigned long long leido = 0;
+	while(incrementador < tamanio && cantidadLineas > 0){
+		printf("%c", archivoMapeado[incrementador]);
+		if(archivoMapeado[incrementador] == '\n'){
+			cantidadLineas--;
+		}
+		incrementador++;
+		leido++;
+	}
+	return leido;
+}
+
 //no se si funciona, verificar
 void mostrarCsv(char * rutaLocal){
-
+	FILE * archivo = fopen(rutaLocal, "rb");
+	unsigned long long tamanio = tamanioArchivo(archivo);
+	char * archivoMapeado;
+	int fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		puts("No se pudo abrir el archivo especificado.");
+		return;
+	}
+	fclose(archivo);
+	char entrada = 's';
+	int tamanioLineas = 5;
+	unsigned long long leido = 0;
+	while(leido <= tamanio && entrada == 's'){
+		leido += mostrarlineaDeUnMMap(archivoMapeado, tamanio, leido, tamanioLineas);
+		printf("Desea Seguir? (s/n) ");
+		scanf(" %c", &entrada);
+	}
+	puts("Finalizado, archivo leído.");
+	close(fd);
 }
 
 void mostrarBinario(char * rutaLocal){

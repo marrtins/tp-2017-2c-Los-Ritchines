@@ -29,7 +29,7 @@ void procesarInput(char* linea) {
 			} else{
 				puts("El archivo no existe en la ruta especificada");
 			}
-
+		}
 	} else if (string_equals_ignore_case(*palabras, "rm -d")) {
 		printf("ya pude remover el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
@@ -166,4 +166,4 @@ void procesarCpblock(char ** palabras){
 	else{
 		puts("Ruta de archivo incorrecta.");
 	}
-	}
+}
