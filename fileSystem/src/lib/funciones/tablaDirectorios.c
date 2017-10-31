@@ -147,7 +147,6 @@ unsigned long long mostrarlineaDeUnMMap(char * archivoMapeado, unsigned long lon
 	return leido;
 }
 
-//no se si funciona, verificar
 void mostrarCsv(char * rutaLocal){
 	FILE * archivo = fopen(rutaLocal, "rb");
 	unsigned long long tamanio = tamanioArchivo(archivo);
@@ -162,7 +161,7 @@ void mostrarCsv(char * rutaLocal){
 	char entrada = 's';
 	int tamanioLineas = 5;
 	unsigned long long leido = 0;
-	while(leido <= tamanio && entrada == 's'){
+	while(leido < tamanio && entrada == 's'){
 		leido += mostrarlineaDeUnMMap(archivoMapeado, tamanio, leido, tamanioLineas);
 		printf("Desea Seguir? (s/n) ");
 		scanf(" %c", &entrada);
