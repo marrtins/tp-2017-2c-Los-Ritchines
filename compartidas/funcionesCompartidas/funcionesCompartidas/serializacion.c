@@ -840,3 +840,196 @@ Tbuffer * empaquetarInt(Theader * head, int numero){
 
 	return buffer;
 }
+
+
+
+
+
+
+
+
+char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccionGlobal, int *pack_size){
+	char *bytes_serial;
+	int i;
+	int espacioPackSize = sizeof(int);
+	int espacioEnteros = sizeof(int) * 4;
+	int espacioLista=0;
+
+	int sizeLista = list_size(infoReduccionGlobal->listaNodos);
+	for(i=0;i< sizeLista;i++){
+		TinfoNodoReduccionGlobal * infoAux = list_get(infoReduccionGlobal->listaNodos,i);
+		espacioLista += sizeof(int)*5;
+		espacioLista+=infoAux->ipNodoLen;
+		espacioLista+=infoAux->puertoNodoLen;
+		espacioLista+=infoAux->nombreNodoLen;
+		espacioLista+=infoAux->temporalReduccionLen;
+	}
+
+
+
+	int espaciosVariables = infoReduccionGlobal->tempRedGlobalLen;
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espacioLista+espaciosVariables;
+	printf("Espacio a mallocar %d \n",espacioAMallocar);
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoReduccionGlobal->job, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoReduccionGlobal->idTarea, sizeof(int));
+	*pack_size += sizeof(int);
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccionGlobal->tempRedGlobalLen, sizeof(int));
+	*pack_size += sizeof(int);
+	memcpy(bytes_serial + *pack_size, infoReduccionGlobal->tempRedGlobal, infoReduccionGlobal->tempRedGlobalLen);
+	*pack_size += infoReduccionGlobal->tempRedGlobalLen;
+
+
+	memcpy(bytes_serial + *pack_size, &infoReduccionGlobal->listaNodosSize, sizeof(int));
+	*pack_size += sizeof(int);
+
+	for(i=0;i<sizeLista;i++){
+		TinfoNodoReduccionGlobal * infoAux = list_get(infoReduccionGlobal->listaNodos,i);
+
+		memcpy(bytes_serial + *pack_size, &infoAux->nombreNodoLen, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, infoAux->nombreNodo, infoAux->nombreNodoLen);
+		*pack_size += infoAux->nombreNodoLen;
+
+		memcpy(bytes_serial + *pack_size, &infoAux->ipNodoLen, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, infoAux->ipNodo, infoAux->ipNodoLen);
+		*pack_size += infoAux->ipNodoLen;
+
+		memcpy(bytes_serial + *pack_size, &infoAux->puertoNodoLen, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, infoAux->puertoNodo, infoAux->puertoNodoLen);
+		*pack_size += infoAux->puertoNodoLen;
+
+
+		memcpy(bytes_serial + *pack_size, &infoAux->temporalReduccionLen , sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, infoAux->temporalReduccion, infoAux->temporalReduccionLen);
+		*pack_size += infoAux->temporalReduccionLen;
+
+		memcpy(bytes_serial + *pack_size, &infoAux->nodoEncargado , sizeof(int));
+		*pack_size += sizeof(int);
+
+	}
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	printf("Serializados %d bytes \n",*pack_size);
+
+	return bytes_serial;
+}
+
+TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
+
+	int off;
+	TreduccionGlobal *infoReduccionGlobal;
+
+	if ((infoReduccionGlobal = malloc(sizeof *infoReduccionGlobal)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+
+	memcpy(&infoReduccionGlobal->job, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	memcpy(&infoReduccionGlobal->idTarea, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	memcpy(&infoReduccionGlobal->tempRedGlobalLen, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+	if ((infoReduccionGlobal->tempRedGlobal = malloc(infoReduccionGlobal->tempRedGlobalLen)) == NULL){
+		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccionGlobal->tempRedGlobalLen);
+		return NULL;
+	}
+
+
+	memcpy(&infoReduccionGlobal->listaNodosSize, bytes_serial + off, sizeof (int));
+	off += sizeof (int);
+
+
+	int i;
+	t_list *listaInfoNodos = list_create();
+	for(i=0;i<infoReduccionGlobal->listaNodosSize;i++){
+
+		TinfoNodoReduccionGlobal *infoAux = malloc(sizeof infoAux);
+
+		memcpy(&infoAux->nombreNodoLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+		if ((infoAux->nombreNodo = malloc(infoAux->nombreNodoLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->nombreNodoLen);
+			return NULL;
+		}
+		memcpy(infoAux->nombreNodo, bytes_serial + off, infoAux->nombreNodoLen);
+		off += infoAux->nombreNodoLen;
+
+
+
+
+
+		memcpy(&infoAux->ipNodoLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+		if ((infoAux->ipNodo = malloc(infoAux->ipNodoLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->ipNodoLen);
+			return NULL;
+		}
+		memcpy(infoAux->ipNodo, bytes_serial + off, infoAux->ipNodoLen);
+		off += infoAux->ipNodoLen;
+
+
+
+		memcpy(&infoAux->puertoNodoLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+		if ((infoAux->puertoNodo = malloc(infoAux->puertoNodoLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->puertoNodoLen);
+			return NULL;
+		}
+		memcpy(infoAux->puertoNodo, bytes_serial + off, infoAux->puertoNodoLen);
+		off += infoAux->puertoNodoLen;
+
+
+
+
+		memcpy(&infoAux->temporalReduccionLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+		if ((infoAux->temporalReduccion = malloc(infoAux->temporalReduccionLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->temporalReduccionLen);
+			return NULL;
+		}
+		memcpy(infoAux->temporalReduccion, bytes_serial + off, infoAux->temporalReduccionLen);
+		off += infoAux->temporalReduccionLen;
+
+
+
+
+		memcpy(&infoAux->nodoEncargado, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+
+
+		list_add(listaInfoNodos,infoAux);
+	}
+
+	infoReduccionGlobal->listaNodos=listaInfoNodos;
+
+
+	return infoReduccionGlobal;
+}

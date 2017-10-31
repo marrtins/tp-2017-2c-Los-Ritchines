@@ -51,6 +51,8 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char *
 void agregarTransformacionAListaEnProceso(int jobActual, int idTarea, TpackInfoBloque *bloque);
 
 
+bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada);
+
 char *serializeInfoReduccionLocal2(Theader head, TreduccionLocal * infoReduccion, int *pack_size);
 #endif
 

@@ -193,12 +193,28 @@ void masterHandler(void *atributos){
 			printf("REDUCCION LOCAL OK de la tarea %d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaFinalizadosOK(idTareaFinalizada);
+
+			if(sePuedeComenzarReduccionGlobal(idTareaFinalizada)){
+				comenzarReduccionGlobal(idTareaFinalizada,sockMaster);
+			}
+
 			break;
 		case FIN_REDUCCIONLOCALFAIL:
 			idTareaFinalizada = recibirValor(sockMaster);
 			printf("FIN REDUCCION LOCAL FAIL de la tarea%d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaError(idTareaFinalizada);
+			printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+			puts("Se da x terminado el job");
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+			enviarHeader(sockMaster,headEnvio);
+			TjobFinalizado *job = malloc(sizeof job);
+			TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+			job->nroJob = tareaFinalizada->job;
+			job->finCorrecto=false;
+			list_add(listaJobFinalizados,job);
+
 			break;
 		default:
 			break;
@@ -208,6 +224,109 @@ void masterHandler(void *atributos){
 	}
 	freeAndNULL((void **) &buffer);
 }
+
+
+int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
+
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+	int i,packSize,stat;
+	char * buffer;
+	int jobAReducir = tareaFinalizada->job;
+	MUX_LOCK(&mux_jobIdGlobal);
+	int nuevoJob=idJobGlobal++;
+	MUX_UNLOCK(&mux_jobIdGlobal);
+
+	MUX_LOCK(&mux_idTareaGlobal);
+	int idTareaActual = idTareaGlobal++;
+	MUX_UNLOCK(&mux_idTareaGlobal);
+
+	TreduccionGlobal *nuevaReduccion = malloc(sizeof nuevaReduccion);
+	nuevaReduccion->idTarea=idTareaActual;
+	nuevaReduccion->job=nuevoJob;
+
+	t_list * listaInformacionNodos = list_create();
+	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+			TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
+			if(tareaOk->job==jobAReducir){
+				TinfoNodoReduccionGlobal * infoNodoAux=  malloc(sizeof infoNodoAux);
+				infoNodoAux->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
+				infoNodoAux->nombreNodo=tareaOk->nodo;
+				infoNodoAux->nombreNodoLen=strlen(infoNodoAux->nombreNodo)+1;
+				infoNodoAux->ipNodo=malloc(MAXIMA_LONGITUD_IP);
+				infoNodoAux->ipNodo=getIpNodo(infoNodoAux->nombreNodo);
+				infoNodoAux->ipNodoLen=strlen(infoNodoAux->ipNodo)+1;
+				infoNodoAux->puertoNodo=malloc(MAXIMA_LONGITUD_PUERTO);
+				infoNodoAux->puertoNodo=getPuertoNodo(infoNodoAux->puertoNodo);
+				infoNodoAux->puertoNodoLen=strlen(infoNodoAux->puertoNodo)+1;
+				infoNodoAux->temporalReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL);
+				infoNodoAux->temporalReduccion=tareaOk->nombreArchTemporal;
+				infoNodoAux->temporalReduccionLen=strlen(infoNodoAux->temporalReduccion)+1;
+				infoNodoAux->nodoEncargado=esNodoEncargado(infoNodoAux->nombreNodo);
+
+				list_add(listaInformacionNodos,infoNodoAux);
+
+
+				//todo://int bloqueAux = tareaOk->bloqueDelArchivo;
+				//list_add(bloques,string_itoa(bloqueAux));
+
+			}
+		}
+
+
+
+	nuevaReduccion->listaNodosSize=list_size(listaInformacionNodos);
+	nuevaReduccion->listaNodos=listaInformacionNodos;
+
+	Theader head;
+	head.tipo_de_proceso=YAMA;
+	head.tipo_de_mensaje=INFOREDUCCIONGLOBAL;
+
+
+	packSize=0;
+	buffer=serializeInfoReduccionGlobal(head,nuevaReduccion,&packSize);
+	printf("Info de la reduccion global serializado, total %d bytes\n",packSize);
+	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
+		puts("no se pudo enviar info de la reduccion global. ");
+		return  FALLO_SEND;
+	}
+	printf("se enviaron %d bytes de la info de la reduccion global\n",stat);
+
+	return 0;
+}
+bool esNodoEncargado(char * nombreNodo){
+	return false;
+}
+
+bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada){
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+
+	//1-Verifico q el job no se haya terminado x error de replanificacion .
+	int i;
+	for(i=0;i<list_size(listaJobFinalizados);i++){
+		TjobFinalizado *jobAux = list_get(listaJobFinalizados,i);
+		if(jobAux->nroJob == tareaFinalizada->job){
+			return false;
+		}
+	}
+
+	//2-Verifico si ya se terminaron todas las reducciones locales relacionadas con este archivo
+
+
+	TpackTablaEstados *tareaAuxiliar;
+	for(i=0;i<list_size(listaEstadoEnProceso);i++){
+		tareaAuxiliar=list_get(listaEstadoEnProceso,i);
+		if(tareaFinalizada->job == tareaAuxiliar->job){
+			if(tareaAuxiliar->etapa == REDUCCIONLOCAL){
+				return false;
+			}
+		}
+	}
+
+
+		return true;
+
+}
+
 
 int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 
@@ -270,10 +389,10 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	buffer=serializeInfoReduccionLocal(head,infoReduccion,&packSize);
 	printf("Info de la reduccion local serializado, total %d bytes\n",packSize);
 	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
-		puts("no se pudo enviar info del bloque. ");
+		puts("no se pudo enviar info dede la reduccion local ");
 		return  FALLO_SEND;
 	}
-	printf("se enviaron %d bytes de la info del bloque\n",stat);
+	printf("se enviaron %d bytes de la info de la reduccion local\n",stat);
 
 	char * bloquesReducidos = string_new();
 	string_append(&bloquesReducidos,"[");
