@@ -596,4 +596,10 @@ int verificarRutaArchivo(char * rutaYamafs){
 
 }
 
+void removerArchivo(char* ruta){
+	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+	remove(rutaArchivo);
+	puts("Ya pude remover el archivo");
+	}
+
 

@@ -104,8 +104,8 @@ void conexionesDatanode(void * estructura){
 								cantNodosPorConectar--;
 								break;
 
-							case OBTENER_BLOQUE:
-								puts("Es datanode y nos manda un bloque");
+							case OBTENER_BLOQUE_Y_NRO:
+								puts("Es datanode y nos manda un bloque con su numero");
 								int tamanio,nroBloque;
 								char * bloque;
 

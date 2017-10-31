@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 				free(bloque);
 
 				break;
-			case OBTENER_BLOQUE:
+			case OBTENER_BLOQUE_Y_NRO:
 				puts("Es fileSystem y quiere un bloque");
 				int nroBloque;
 
