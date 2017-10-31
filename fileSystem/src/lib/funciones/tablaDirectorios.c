@@ -640,7 +640,7 @@ int getMD5(char* ruta){
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaArchivo);
 	system(comando);
-
+	printf("Obtuve el MD5 del archivo");
 	free(comando);
 	free(rutaArchivo);
 	return 0;
