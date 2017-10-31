@@ -13,6 +13,11 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	char* bloqueCopia1;
 	char* bloqueBytes;
 
+	char ** split = string_split(ruta, "/");
+	char * nombreEntero = obtenerUltimoElementoDeUnSplit(split);
+	char * nombreSinExtension = obtenerNombreDeArchivoSinExtension(nombreEntero);
+	strcpy(tablaArchivo->nombreArchivoSinExtension, nombreSinExtension);
+
 	tablaArchivo->tamanioTotal = config_get_int_value(archivo, "TAMANIO");
 	strcpy(tablaArchivo->extensionArchivo, config_get_string_value(archivo, "TIPO"));
 
@@ -51,6 +56,10 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 		free(bloqueCopia1);
 		free(bloqueBytes);
 	}
+	liberarPunteroDePunterosAChar(split);
+	free(split);
+	free(nombreEntero);
+	free(nombreSinExtension);
 
 	config_destroy(archivo);
 }

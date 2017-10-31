@@ -55,4 +55,7 @@ t_list * listaDeNodos;
 t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;
 
+//Se usa en el cpblock;
+char * bloqueACopiar;
+
 #endif

@@ -15,13 +15,15 @@ TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 
 //Consola
-void procesarInput(char * palabras);
+void procesarCpblock(char ** palabras);
+void procesarInput(char * linea);
 void consolaFS(void);
 
 //Conexiones
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);
+void formatearNodos();
 
 //Tablas
 void persistirTablaDeDirectorios();
@@ -40,6 +42,13 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaArchivos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
+void renombrarArchivoODirectorio(char * ruta, char * nombre);
+void formatearFS();
+void leerArchivoComoTextoPlano(char * rutaLocal);
+char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal);
+void mostrarCsv(char * rutaLocal);
+void mostrarBinario(char * rutaLocal);
+
 
 
 //Listas
@@ -51,6 +60,8 @@ Tnodo * obtenerNodoPorTamanioMaximo();
 int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
 void mostrarListaDeNodos(t_list * lista);
 void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2);
+Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
+void liberarNodosDeLista(void * nodo);
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -76,6 +87,7 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs);
 char * obtenerRutaSinArchivo(char * ruta);
 char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
+void removerArchivo(char* ruta);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
@@ -106,6 +118,7 @@ int getMD5(char**palabras);
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
+int tieneBloque(char * rutaYamafs, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);

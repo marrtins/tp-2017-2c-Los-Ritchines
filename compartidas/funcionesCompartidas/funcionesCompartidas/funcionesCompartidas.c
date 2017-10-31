@@ -63,7 +63,7 @@ int cantidadParametros(char ** palabras){
 	return i-1;
 }
 
-int tamanioArchivo(FILE * archivo){
+unsigned long long tamanioArchivo(FILE * archivo){
 	int tamanio;
 	fseek(archivo, 0L, SEEK_END);
 	tamanio = ftell(archivo);

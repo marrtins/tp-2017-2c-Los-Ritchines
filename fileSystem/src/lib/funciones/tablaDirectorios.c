@@ -107,6 +107,107 @@ void inicializarTablaDirectorios(){
 		free(ruta);
 }
 
+void formatearFS(){
+	inicializarTablaDirectorios();
+	inicializarTablaDeNodos();
+	formatearNodos();
+}
+
+char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
+	char * archivoConExtension;
+	char ** split = string_split(rutaLocal, "/");
+	archivoConExtension = obtenerUltimoElementoDeUnSplit(split);
+	liberarPunteroDePunterosAChar(split);
+	free(split);
+	return archivoConExtension;
+
+}
+
+//no se si funciona, verificar
+void mostrarNCaracteresDeUnMMap(char * archivoMapeado, unsigned long long tamanio, unsigned long long desde, unsigned long long hasta){
+	unsigned long long incrementador = desde;
+	while(incrementador < tamanio && incrementador <= hasta){
+		printf("%c", archivoMapeado[incrementador]);
+		incrementador++;
+	}
+	puts("");
+}
+
+unsigned long long mostrarlineaDeUnMMap(char * archivoMapeado, unsigned long long tamanio, unsigned long long desde, int cantidadLineas){
+	unsigned long long incrementador = desde;
+	unsigned long long leido = 0;
+	while(incrementador < tamanio && cantidadLineas > 0){
+		printf("%c", archivoMapeado[incrementador]);
+		if(archivoMapeado[incrementador] == '\n'){
+			cantidadLineas--;
+		}
+		incrementador++;
+		leido++;
+	}
+	return leido;
+}
+
+void mostrarCsv(char * rutaLocal){
+	FILE * archivo = fopen(rutaLocal, "rb");
+	unsigned long long tamanio = tamanioArchivo(archivo);
+	char * archivoMapeado;
+	int fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		puts("No se pudo abrir el archivo especificado.");
+		return;
+	}
+	fclose(archivo);
+	char entrada = 's';
+	int tamanioLineas = 5;
+	unsigned long long leido = 0;
+	while(leido < tamanio && entrada == 's'){
+		leido += mostrarlineaDeUnMMap(archivoMapeado, tamanio, leido, tamanioLineas);
+		printf("Desea Seguir? (s/n) ");
+		scanf(" %c", &entrada);
+	}
+	puts("Finalizado, archivo leído.");
+	close(fd);
+}
+
+void mostrarBinario(char * rutaLocal){
+	FILE * archivo = fopen(rutaLocal, "rb");
+	unsigned long long tamanio = tamanioArchivo(archivo);
+	char * archivoMapeado;
+	int fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		puts("No se pudo abrir el archivo especificado.");
+		return;
+	}
+	fclose(archivo);
+	char entrada = 's';
+	unsigned long long contador = 0;
+	int sumador = 150;
+	while(contador < tamanio && entrada == 's'){
+		mostrarNCaracteresDeUnMMap(archivoMapeado, tamanio, contador, contador+sumador);
+		contador += sumador + 1;
+		if(contador+sumador >= tamanio){
+			sumador = tamanio - contador - 1;
+		}
+		printf("Desea Seguir? (s/n) ");
+		scanf(" %c", &entrada);
+	}
+	puts("Finalizado, archivo leído.");
+	close(fd);
+}
+
+void leerArchivoComoTextoPlano(char * rutaLocal){
+	char * nombreArchivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
+	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
+	if(strcmp(extension, "csv") == 0){
+		mostrarCsv(rutaLocal);
+	}else{
+		mostrarBinario(rutaLocal);
+	}
+
+}
+
 int directorioNoExistente(char ** carpetas) {
 	int cant, indicePadre = 0, i = 0;
 	char * yamafs = malloc(10);
@@ -201,6 +302,32 @@ int existeDirectorio(char * directorio){
 
 }
 
+char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
+	char ** nuevoSplit = malloc(1);
+	int i = 0;
+	while(desde <= hasta){
+		nuevoSplit = realloc(nuevoSplit, i+1);
+		nuevoSplit[i] = strdup(split[desde]);
+		i++;
+		desde++;
+	}
+
+	return nuevoSplit;
+}
+
+void renombrarArchivoODirectorio(char * ruta, char * nombre){
+	char * nuevaRuta = obtenerRutaSinArchivo(ruta);
+	string_append(&nuevaRuta, "/");
+	string_append(&nuevaRuta, nombre);
+	if(rename(ruta, nuevaRuta) == 0){
+		puts("Se ha renombrado el archivo");
+	}
+	else{
+		puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
+	}
+	free(nuevaRuta);
+}
+
 int esDirectorio(char * ruta){
 	struct stat estado;
 	int i;
@@ -277,7 +404,6 @@ char** buscarArchivos(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
-
 	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
@@ -501,5 +627,11 @@ int verificarRutaArchivo(char * rutaYamafs){
 	return 0;
 
 }
+
+void removerArchivo(char* ruta){
+	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+	remove(rutaArchivo);
+	puts("Ya pude remover el archivo");
+	}
 
 
