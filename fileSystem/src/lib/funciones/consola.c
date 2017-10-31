@@ -23,11 +23,11 @@ void procesarInput(char* linea) {
 		}
 
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
-		if(cantidad ==1){
+		if (cantidad == 1){
 			if(verificarRutaArchivo(palabras[1])){
 				removerArchivo(palabras[1]);
 			} else{
-				puts("El archivo no existe en la ruta especificada");
+			puts("El archivo no existe en la ruta especificada");
 			}
 		}
 	} else if (string_equals_ignore_case(*palabras, "rm -d")) {
@@ -101,7 +101,7 @@ void procesarInput(char* linea) {
 		procesarCpblock(palabras);
 	} else if (string_equals_ignore_case(*palabras, "md5")) {
 			if (cantidad ==1){
-				//getMD5(palabras);
+				getMD5(palabras[1]);
 				printf("ya pude solicitar el md5 de un archivo del file system\n");
 			}
 			else {

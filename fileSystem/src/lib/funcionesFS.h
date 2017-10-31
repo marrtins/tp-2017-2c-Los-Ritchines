@@ -89,6 +89,7 @@ char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 
+
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar);
@@ -112,8 +113,7 @@ int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 
-//md5
-int getMD5(char**palabras);
+
 
 //Archivos
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
@@ -123,6 +123,7 @@ int tieneBloque(char * ruta, char * nroBloque); // recibe el numero en char* por
 int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
 int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
+int getMD5(char* ruta);
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);

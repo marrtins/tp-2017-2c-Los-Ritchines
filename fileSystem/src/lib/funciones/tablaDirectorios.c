@@ -635,3 +635,13 @@ void removerArchivo(char* ruta){
 	}
 
 
+int getMD5(char* ruta){
+	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+	char* comando = string_duplicate("md5sum ");
+	string_append(&comando, rutaArchivo);
+	system(comando);
+
+	free(comando);
+	free(rutaArchivo);
+	return 0;
+}
