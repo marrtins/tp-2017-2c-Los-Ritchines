@@ -113,6 +113,69 @@ void formatearFS(){
 	formatearNodos();
 }
 
+char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
+	char * archivoConExtension;
+	char ** split = string_split(rutaLocal, "/");
+	archivoConExtension = obtenerUltimoElementoDeUnSplit(split);
+	liberarPunteroDePunterosAChar(split);
+	free(split);
+	return archivoConExtension;
+
+}
+
+//no se si funciona, verificar
+void mostrarNCaracteresDeUnMMap(char * archivoMapeado, unsigned long long tamanio, unsigned long long desde, unsigned long long hasta){
+	unsigned long long incrementador = desde;
+	while(incrementador < tamanio && incrementador <= hasta){
+		printf("%c", archivoMapeado[incrementador]);
+		incrementador++;
+	}
+	puts("");
+}
+
+//no se si funciona, verificar
+void mostrarCsv(char * rutaLocal){
+
+}
+
+void mostrarBinario(char * rutaLocal){
+	FILE * archivo = fopen(rutaLocal, "rb");
+	unsigned long long tamanio = tamanioArchivo(archivo);
+	char * archivoMapeado;
+	int fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		puts("No se pudo abrir el archivo especificado.");
+		return;
+	}
+	fclose(archivo);
+	char entrada = 's';
+	unsigned long long contador = 0;
+	int sumador = 150;
+	while(contador < tamanio && entrada == 's'){
+		mostrarNCaracteresDeUnMMap(archivoMapeado, tamanio, contador, contador+sumador);
+		contador += sumador + 1;
+		if(contador+sumador >= tamanio){
+			sumador = tamanio - contador - 1;
+		}
+		printf("Desea Seguir? (s/n) ");
+		scanf(" %c", &entrada);
+	}
+	puts("Finalizado, archivo leído.");
+	close(fd);
+}
+
+void leerArchivoComoTextoPlano(char * rutaLocal){
+	char * nombreArchivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
+	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
+	if(strcmp(extension, "csv") == 0){
+		mostrarCsv(rutaLocal);
+	}else{
+		mostrarBinario(rutaLocal);
+	}
+
+}
+
 int directorioNoExistente(char ** carpetas) {
 	int cant, indicePadre = 0, i = 0;
 	char * yamafs = malloc(10);

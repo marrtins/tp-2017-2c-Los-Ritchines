@@ -44,7 +44,19 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "mv")) {
 		printf("ya pude mover el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "cat")) {
-		printf("ya pude leer el archivo\n");
+		if(cantidad == 1){
+			if(verificarRutaArchivo(palabras[1])){
+				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+				leerArchivoComoTextoPlano(rutaLocal);
+				puts("pase");
+			}
+			else{
+				puts("No existe el directorio o falta la referencia a yamafs:");
+			}
+		}
+		else{
+			puts("Error en la cantidad de parametros");
+		}
 	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
 		if(cantidad == 1){
 			if(existeDirectorio(palabras[1])){
