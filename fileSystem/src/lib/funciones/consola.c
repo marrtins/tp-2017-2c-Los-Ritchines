@@ -158,7 +158,7 @@ void procesarCpblock(char ** palabras){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				int nroBloque = atoi(palabras[2]);
 				Tbuffer* bloque = malloc(sizeof(Tbuffer));
-				TbloqueAEnviar* bloqueAEnviar;
+				TbloqueAEnviar* bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
 				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
 				if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
 					puts("No se encontraron los nodos con las copias del bloque");
@@ -168,7 +168,11 @@ void procesarCpblock(char ** palabras){
 					puts("Error al solicitar bloque");
 					return;
 				}
-				//aca hago un wait pthread_cond;
+				pthread_cond_init(&bloqueCond, NULL);
+				pthread_mutex_init(&bloqueMutex,NULL);
+
+				pthread_mutex_lock(&bloqueMutex);
+				pthread_cond_wait(&bloqueCond, &bloqueMutex);
 				if(copiarBloque(bloqueACopiar, bloque) == -1){
 					puts("Error al copiar bloque recibido");
 					return;

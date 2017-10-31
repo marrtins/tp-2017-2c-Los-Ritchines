@@ -132,7 +132,8 @@ void conexionesDatanode(void * estructura){
 								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
 									logAndExit("Error al recibir el contenido do bloque");
 								}
-								//hacer true la condicion pthread para que el otro hilo haga lo suyo;
+								pthread_cond_signal(&bloqueCond);
+								pthread_mutex_unlock(&bloqueMutex);
 								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
