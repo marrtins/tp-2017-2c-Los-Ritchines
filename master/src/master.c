@@ -12,18 +12,14 @@ char * rutaTransformador, * rutaReductor;
 int main(int argc, char* argv[]) {
 
 	int sockYama,
-
-	//sockWorker,
 		cantidadBytesEnviados,
-	//	puertoWorker,
-	//	ipWorker,
 		packSize,
 		stat;
-	//	cantBytes;
+
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
 	Theader headTmp;
-	//char * chorroDeBytes;
+
 	t_list *bloquesTransformacion = list_create();
 
 
@@ -169,7 +165,7 @@ int main(int argc, char* argv[]) {
 					return FALLO_CONEXION;
 				}
 
-			//stat = conectarseAWorkerParaReduccionGlobal(infoReduccionLocal,sockYama);
+			stat = conectarseAWorkerParaReduccionGlobal(infoReduccionGlobal,sockYama);
 		break;
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);

@@ -766,7 +766,7 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 	t_list * listaRet = list_create();
 	for(i=0;i<datosReduccion->listaSize;i++){
 
-		TreduccionLista *aux = malloc(sizeof (TreduccionLista));
+		TreduccionLista *aux = malloc(sizeof aux);
 		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
@@ -923,7 +923,7 @@ char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccio
 	*pack_size += infoReduccionGlobal->tempRedGlobalLen;
 
 
-	memcpy(bytes_serial + *pack_size, &infoReduccionGlobal->listaNodosSize, sizeof(int));
+	memcpy(bytes_serial + *pack_size, &sizeLista, sizeof(int));
 	*pack_size += sizeof(int);
 
 	for(i=0;i<sizeLista;i++){

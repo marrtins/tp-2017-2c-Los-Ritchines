@@ -447,9 +447,11 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	buffer = empaquetarPeticionBloque(header, nroBloqueASolicitar, tablaArchivo->bloques[nroBloque].bytes);
 	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 		free(header);
+		liberarEstructuraBuffer(buffer);
 		return -1;
 	}
 	free(header);
+	liberarEstructuraBuffer(buffer);
 	return 1;
 }
 
@@ -472,9 +474,11 @@ int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
 	buffer = empaquetarBloque(head, bloque, nodo);
 	if(send(nodo->fd,buffer->buffer,buffer->tamanio,0) == -1){
 		free(head);
+		liberarEstructuraBuffer(buffer);
 		return -1;
 	}
 	free(head);
+	liberarEstructuraBuffer(buffer);
 	return 1;
 }
 

@@ -26,4 +26,9 @@ typedef struct{
 	int sockYama;
 }TatributosHiloReduccionLocal;
 
+typedef struct{
+	TreduccionGlobal infoReduccionGlobal;
+	int sockYama;
+}TatributosHiloReduccionGlobal;
+
 #endif

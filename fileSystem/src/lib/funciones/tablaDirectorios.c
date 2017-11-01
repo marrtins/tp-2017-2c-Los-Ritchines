@@ -38,7 +38,7 @@ int crearDirectorio(char * ruta) {
 	char* directorio = malloc(100);
 	strcpy(directorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	char * indice;
-	Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
+	Tdirectorio * tDirectorio;
 
 	if(list_size(listaTablaDirectorios)>=100){
 		puts("Ya hay 100 directorios creados, no se puede crear el directorio");
@@ -71,7 +71,7 @@ int crearDirectorio(char * ruta) {
 			mkdir(directorio,0777);
 
 			printf("Directorio /%s creado\n", carpetas[nroDirectorio]);
-
+			tDirectorio = malloc(sizeof(Tdirectorio));
 			tDirectorio->index = index;
 			strcpy(tDirectorio->nombre,carpetas[nroDirectorio]);
 			tDirectorio->padre = indicePadre;
@@ -80,6 +80,7 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
+			free(tDirectorio);
 			return 0;
 		}
 			puts("No se puede crear directorio dentro de un directorio que no existe");
@@ -634,16 +635,7 @@ void removerArchivo(char* ruta){
 	}
 
 
-int getMD5(char* ruta){
-	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
-	char* comando = string_duplicate("md5sum ");
-	string_append(&comando, rutaArchivo);
-	system(comando);
-	printf("Obtuve el MD5 del archivo");
-	free(comando);
-	free(rutaArchivo);
-	return 0;
-}
+
 
 void removerDirectorio(char* ruta){
 
@@ -651,24 +643,23 @@ void removerDirectorio(char* ruta){
 	char** palabras = string_split(ruta, "/");
 	char* nombreDirectorio = obtenerUltimoElementoDeUnSplit(palabras);
 	char* rutaDirectorio = malloc(200);
-	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/", index);
+	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
 	rmdir(rutaDirectorio);
-
 	removerDirectorioDeTabla(nombreDirectorio);
-
 	free(rutaDirectorio);
 }
 
 void removerDirectorioDeTabla(char* nombreDirectorio){
 	int tamanio, i=0;
-	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
-		tamanio = list_size(listaTablaDirectorios);
-		Tdirectorio * directorio;
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r+");
+	tamanio = list_size(listaTablaDirectorios);
+	Tdirectorio * directorio;
 
 	while(tamanio != i){
 		directorio = list_get(listaTablaDirectorios, i);
 		if(string_equals_ignore_case(nombreDirectorio, directorio->nombre)){
 			list_remove(listaTablaDirectorios, i);
+			break;
 		}
 		i++;
 	}
@@ -676,33 +667,7 @@ void removerDirectorioDeTabla(char* nombreDirectorio){
 	persistirTablaDeDirectorios();
 
 }
-void evaluarParametrosRM (char** palabras, int cantidadParametros){
-	if (cantidadParametros == 1){
 
-		if(verificarRutaArchivo(palabras[1])){
-			removerArchivo(palabras[1]);
-		} else{
-			puts("El archivo no existe en la ruta especificada");
-		}
-	} else if (cantidadParametros ==2){
-		if (string_equals_ignore_case(palabras[1], "-d")){
-
-			if(existeDirectorio(palabras[2])){
-				if(esDirectorioVacio(palabras[2])){
-				removerDirectorio(palabras[2]);
-				puts("Ya pude remover el directorio");
-				} else{
-				puts("EL directorio no esta vacio. No se puede remover");
-				}
-			} else{
-				puts("No existe el directorio");
-			}
-		} else if (string_equals_ignore_case(palabras[1], "-b")){
-			puts("Voy a eliminar un nodo");
-			//removerNodo
-		}
-		}
-}
 
 
 int esDirectorioVacio (char*ruta){
@@ -716,6 +681,24 @@ int esDirectorioVacio (char*ruta){
 	archivos = buscarArchivos(rutaLocalDirectorio);
 
 
-	return (archivos[i] == NULL);
+	return ((archivos[i] == NULL) && (!esDirectorioPadre(ruta)));
 	free(rutaLocalDirectorio);
 }
+
+int esDirectorioPadre (char* ruta){
+	int index = obtenerIndexDeUnaRuta(ruta);
+	int tamanio, i=0;
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
+	tamanio = list_size(listaTablaDirectorios);
+	Tdirectorio * directorio;
+
+	while(tamanio != i){
+			directorio = list_get(listaTablaDirectorios, i);
+			if(index == directorio->padre){
+				return 1;
+			}
+			i++;
+	}
+			return 0;
+}
+

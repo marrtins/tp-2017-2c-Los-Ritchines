@@ -50,7 +50,9 @@ typedef enum {
 	INFO_BLOQUE = 37,
 	FORMATEAR_NODO = 38,
 	OBTENER_BLOQUE = 39,
-	INFOREDUCCIONGLOBAL=40
+	INFOREDUCCIONGLOBAL=40,
+	GIVE_TMPREDUCCIONLOCAL=41,
+	TAKE_TMPREDUCCIONLOCAL=42
 
 } Tmensaje;
 
@@ -234,6 +236,13 @@ typedef struct {
 	int listaSize;
 	t_list * listaTemporales;
 }TinfoReduccionLocalMasterWorker;
+
+typedef struct{
+	int nombreTempReduccionLen;
+	char * nombreTempReduccion;
+	int listaNodosSize;
+	t_list * listaNodos;
+}TinfoReduccionGlobalMasterWorker;
 
 t_log* logger;
 
