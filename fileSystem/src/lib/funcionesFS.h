@@ -18,6 +18,15 @@ void mostrarConfiguracion(TfileSystem *fileSystem);
 void procesarCpblock(char ** palabras);
 void procesarInput(char * linea);
 void consolaFS(void);
+void hacerRM(char** palabras, int cantidadParametros);
+void hacerRename(char**palabras, int cantidadParametros);
+void hacerCat(char**palabras, int cantidadParametros);
+void hacerMkdir(char**palabras, int cantidadParametros);
+void hacerCpfrom(char**palabras, int cantidadParametros);
+void obtenerMD5(char**palabras, int cantidadParametros);
+void hacerLs(char**palabras, int cantidadParametros);
+void hacerInfo(char**palabras, int cantidadParametros);
+
 
 //Conexiones
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
@@ -92,7 +101,6 @@ int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
 void removerDirectorioDeTabla(char* directorio);
-void evaluarParametrosRM(char** palabras, int cantidadParametros);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);

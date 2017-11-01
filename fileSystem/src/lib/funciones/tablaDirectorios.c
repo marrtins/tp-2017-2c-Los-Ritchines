@@ -634,16 +634,7 @@ void removerArchivo(char* ruta){
 	}
 
 
-int getMD5(char* ruta){
-	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
-	char* comando = string_duplicate("md5sum ");
-	string_append(&comando, rutaArchivo);
-	system(comando);
-	printf("Obtuve el MD5 del archivo");
-	free(comando);
-	free(rutaArchivo);
-	return 0;
-}
+
 
 void removerDirectorio(char* ruta){
 
@@ -675,33 +666,7 @@ void removerDirectorioDeTabla(char* nombreDirectorio){
 	persistirTablaDeDirectorios();
 
 }
-void evaluarParametrosRM (char** palabras, int cantidadParametros){
-	if (cantidadParametros == 1){
 
-		if(verificarRutaArchivo(palabras[1])){
-			removerArchivo(palabras[1]);
-		} else{
-			puts("El archivo no existe en la ruta especificada");
-		}
-	} else if (cantidadParametros ==2){
-		if (string_equals_ignore_case(palabras[1], "-d")){
-
-			if(existeDirectorio(palabras[2])){
-				if(esDirectorioVacio(palabras[2])){
-				removerDirectorio(palabras[2]);
-				puts("Ya pude remover el directorio");
-				} else{
-				puts("EL directorio no esta vacio. No se puede remover");
-				}
-			} else{
-				puts("No existe el directorio");
-			}
-		} else if (string_equals_ignore_case(palabras[1], "-b")){
-			puts("Voy a eliminar un nodo");
-			//removerNodo
-		}
-		}
-}
 
 
 int esDirectorioVacio (char*ruta){
@@ -735,3 +700,4 @@ int esDirectorioPadre (char* ruta){
 	}
 			return 0;
 }
+

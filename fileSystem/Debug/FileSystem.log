@@ -384,3 +384,5 @@
 >>>>>>> a646229a7751b172f83d04b90c595dbbd554b7b8
 >>>>>>> ac422915b399a2a0c6bfabbced9bb250b65c16ad
 [ERROR] 15:54:20:279 FileSystem.log/(16952:16952): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 16:01:22:90 FileSystem.log/(17182:17182): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 16:33:47:751 FileSystem.log/(18519:18519): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
