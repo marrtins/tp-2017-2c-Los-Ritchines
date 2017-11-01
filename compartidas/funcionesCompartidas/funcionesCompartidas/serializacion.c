@@ -841,9 +841,37 @@ Tbuffer * empaquetarInt(Theader * head, int numero){
 	return buffer;
 }
 
+Tbuffer * empaquetarPeticionBloque(Theader* head, int nroBloque, unsigned long long tamanioBloque){
+	Tbuffer* buffer = malloc(sizeof(Tbuffer));
+	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long));
+	buffer->buffer = malloc(buffer->tamanio);
 
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &nroBloque, sizeof(int));
+	p += sizeof(int);
+	memcpy(p, &tamanioBloque, sizeof(unsigned long long));
 
+	return buffer;
+}
 
+Tbuffer * empaquetarBloqueConNBytes(Theader* head, unsigned long long int tamanio, char* bloque, int nroBloque){
+	Tbuffer* buffer = malloc(sizeof(Tbuffer));
+	buffer->tamanio = (HEAD_SIZE + sizeof(unsigned long long int) + tamanio + sizeof(int));
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &tamanio, sizeof(unsigned long long int));
+	p += sizeof(unsigned long long int);
+	memcpy(p, bloque, tamanio);
+	p += tamanio;
+	memcpy(p, &nroBloque, sizeof(int));
+
+	return buffer;
+}
 
 
 

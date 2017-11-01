@@ -338,99 +338,72 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 	 return infoBloque;
 }
 
-int getMD5(char**palabras){
-	/*Tdirectorio * directorio;
-	char ** splitDeRuta = string_split(palabras[1], "/");
-	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
-	printf("El archivo del que queremos su MD5 es: %s\n", nombreArchivoConExtension);
 
-	Tarchivo * archivo = malloc(sizeof(Tarchivo));
-	archivo->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
-	archivo->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 
-	char* ruta_temporal = string_duplicate("/tmp/");
-		string_append(&ruta_temporal, archivo->nombreArchivoSinExtension);
-		string_append(&ruta_temporal, ".");
-		string_append(&ruta_temporal, archivo->extensionArchivo);
-		copiar_archivo_mdfs_a_local(palabras[1], ruta_temporal); //FALTA ESTO
-
-		char* comando = string_duplicate("md5sum ");
-		string_append(&comando, ruta_temporal);
-		system(comando);
-
-		free(comando);
-		free(ruta_temporal);*/
-		return 0;
-}
-
-void pedirBloques(Tarchivo * tablaArchivo){
+void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	int cantBloques, nroBloque=0;
-	Tbuffer * buffer;
-	Tnodo * nodo;
-	Theader * head = malloc(sizeof(Theader));
-	int bloqueAEnviar;
+	Tbuffer* bloque = malloc(sizeof(Tbuffer));
+	int fd;
+	char * archivoMapeado;
 
-	head->tipo_de_proceso = FILESYSTEM;
-	head->tipo_de_mensaje = OBTENER_BLOQUE_Y_NRO;
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 
+	FILE * archivo = fopen(ruta, "w+");
+	fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_READ|PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
+		logAndExit("Error al hacer mmap");
+	}
+	fclose(archivo);
+	close(fd);
+
+	char * p = archivoMapeado;
 	while(nroBloque != cantBloques){
+		pthread_cond_init(&bloqueCond, NULL);
+		pthread_mutex_init(&bloqueMutex,NULL);
 
-		if((nodo = buscarNodoPorNombre(listaDeNodos, tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo)) != NULL){
-			bloqueAEnviar = tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo;
-		}
-		else if((nodo = buscarNodoPorNombre(listaDeNodos, tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo)) != NULL){
-			bloqueAEnviar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
-		}
-		else{
-			log_trace(logger, "Los nodos que contienen el bloque, no estan conectados.");
-			puts("Los nodos que contienen el bloque, no estan conectados.");
-			return;
-		}
+		puts("Voy a pedir un bloque");
+		pedirBloque(tablaArchivo, nroBloque);
 
-		buffer = empaquetarInt(head, bloqueAEnviar);
+		pthread_mutex_lock(&bloqueMutex);
+		pthread_cond_wait(&bloqueCond, &bloqueMutex);
+		pthread_mutex_unlock(&bloqueMutex);
 
-		if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
-			logAndExit("Fallo al enviar al DATANODE el nro de bloque");
+		if(copiarBloque(bloqueACopiar, bloque) == -1){
+			puts("Error al copiar bloque recibido");
 		}
-
+		p += nroBloque *bloque->tamanio ;
+		memcpy(p,bloque->buffer,bloque->tamanio);
 		nroBloque++;
 	}
 
-	free(head);
-	liberarEstructuraBuffer(buffer);
+
+
+
 
 }
 
 void copiarArchivo(char ** palabras){
 	//palabras[1] --> ruta archivo yamafs
 	//palabras[2] --> directorio
-	char * ruta;
+	char * rutaTablaArchivo;
+	char * nombreArchivo;
+	char * rutaDirectorio = malloc(100);
 	Tarchivo * archivo = malloc(sizeof(Tarchivo));
-	ruta = obtenerRutaLocalDeArchivo(palabras[1]);
+	rutaTablaArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 
-	levantarTablaArchivo(archivo,ruta);
+	levantarTablaArchivo(archivo,rutaTablaArchivo);
 
-	pedirBloques(archivo);
+	nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(palabras[1]);
+	strcpy(rutaDirectorio,palabras[2]);
+	string_append(&rutaDirectorio,"/");
+	string_append(&rutaDirectorio,nombreArchivo);
+
+	levantarArchivo(archivo,rutaDirectorio);
+
 	liberarTablaDeArchivo(archivo);
-	free(ruta);
-
-}
-
-int tieneBloque(char * ruta, char * nroBloque){
-	FILE* archivo;
-	int bloqueNro = atoi(nroBloque);
-	if(string_equals_ignore_case(obtenerExtensionDeUnArchivo(ruta),"bin")){
-		archivo = fopen(ruta,"rb");
-	}
-	else {
-		archivo = fopen(ruta, "r");
-	}
-	int tamanioEnMB = cantidadDeBloquesDeUnArchivo(tamanioArchivo(archivo));
-	if(bloqueNro < tamanioEnMB){
-		return 1;
-	}
-	else return 0;
+	free(rutaTablaArchivo);
+	free(nombreArchivo);
+	free(rutaDirectorio);
 }
 
 int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
@@ -447,12 +420,22 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	else {
 		nombreNodo = tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo;
 		nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+		if(nodo != NULL){
 		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
+		}
+		else{
+			free(header);
+			return -1;
+		}
 	}
-	buffer = empaquetarInt(header, nroBloqueASolicitar);
+	buffer = empaquetarPeticionBloque(header, nroBloqueASolicitar, tablaArchivo->bloques[nroBloque].bytes);
 	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+		free(header);
+		liberarEstructuraBuffer(buffer);
 		return -1;
 	}
+	free(header);
+	liberarEstructuraBuffer(buffer);
 	return 1;
 }
 
@@ -474,8 +457,12 @@ int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
 	head->tipo_de_mensaje = ALMACENAR_BLOQUE;
 	buffer = empaquetarBloque(head, bloque, nodo);
 	if(send(nodo->fd,buffer->buffer,buffer->tamanio,0) == -1){
+		free(head);
+		liberarEstructuraBuffer(buffer);
 		return -1;
 	}
+	free(head);
+	liberarEstructuraBuffer(buffer);
 	return 1;
 }
 

@@ -18,6 +18,16 @@ void mostrarConfiguracion(TfileSystem *fileSystem);
 void procesarCpblock(char ** palabras);
 void procesarInput(char * linea);
 void consolaFS(void);
+void hacerFormat(char**palabras, int cantidadParametros);
+void hacerRM(char** palabras, int cantidadParametros);
+void hacerRename(char**palabras, int cantidadParametros);
+void hacerCat(char**palabras, int cantidadParametros);
+void hacerMkdir(char**palabras, int cantidadParametros);
+void hacerCpfrom(char**palabras, int cantidadParametros);
+void obtenerMD5(char**palabras, int cantidadParametros);
+void hacerLs(char**palabras, int cantidadParametros);
+void hacerInfo(char**palabras, int cantidadParametros);
+
 
 //Conexiones
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
@@ -77,6 +87,8 @@ int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
 int crearDirectorio(char * ruta);
 int esDirectorio(char * ruta);
+int esDirectorioPadre(char * ruta);
+int esDirectorioVacio(char* ruta);
 int esArchivo(char* ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
@@ -88,6 +100,8 @@ char * obtenerRutaSinArchivo(char * ruta);
 char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
+void removerDirectorio(char*ruta);
+void removerDirectorioDeTabla(char* directorio);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
@@ -99,7 +113,7 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
 
 //Obtener Archivo
-void pedirBloques(Tarchivo * archivo);
+void levantarArchivo(Tarchivo * archivo, char * ruta);
 void copiarArchivo(char ** palabras);
 
 //Nodos
@@ -112,17 +126,16 @@ int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 
-//md5
-int getMD5(char**palabras);
+
 
 //Archivos
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
-int tieneBloque(char * ruta, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
 int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
 int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
+int getMD5(char* ruta);
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);

@@ -125,13 +125,19 @@ void conexionesDatanode(void * estructura){
 							case OBTENER_BLOQUE:
 								puts("Es datanode y nos mando un bloque");
 								bloqueACopiar = malloc(sizeof(Tbuffer));
+								int nroBloqueRecibido;
 								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
 										logAndExit("Error al recibir el tamanio do bloque");
 										}
+								puts("voy a copiar el bloque");
 								bloqueACopiar->buffer = malloc(bloqueACopiar->tamanio);
 								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
 									logAndExit("Error al recibir el contenido do bloque");
 								}
+								if(recv(fileDescriptor, &nroBloqueRecibido,sizeof(int),0) == -1){
+									logAndExit("Error al recibir el numero de bloque");
+								}
+								puts("voy a hacer el signal");
 								pthread_cond_signal(&bloqueCond);
 								pthread_mutex_unlock(&bloqueMutex);
 								break;

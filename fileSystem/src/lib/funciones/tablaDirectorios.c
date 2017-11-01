@@ -24,9 +24,7 @@ void levantarTablasDirectorios(){
 		printf("%d \t %s \t %d \n", directorio->index, directorio->nombre, directorio->padre);
 		list_add(listaTablaDirectorios, directorio);
 	}
-
 	fclose(archivoDirectorios);
-
 }
 
 void mostrarDirectorios(){
@@ -40,7 +38,7 @@ int crearDirectorio(char * ruta) {
 	char* directorio = malloc(100);
 	strcpy(directorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	char * indice;
-	Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
+	Tdirectorio * tDirectorio;
 
 	if(list_size(listaTablaDirectorios)>=100){
 		puts("Ya hay 100 directorios creados, no se puede crear el directorio");
@@ -73,7 +71,7 @@ int crearDirectorio(char * ruta) {
 			mkdir(directorio,0777);
 
 			printf("Directorio /%s creado\n", carpetas[nroDirectorio]);
-
+			tDirectorio = malloc(sizeof(Tdirectorio));
 			tDirectorio->index = index;
 			strcpy(tDirectorio->nombre,carpetas[nroDirectorio]);
 			tDirectorio->padre = indicePadre;
@@ -82,6 +80,7 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
+			free(tDirectorio);
 			return 0;
 		}
 			puts("No se puede crear directorio dentro de un directorio que no existe");
@@ -488,8 +487,8 @@ void listarArchivos(char* ruta){
 	sprintf(rutaArchivosDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
 	archivos = buscarArchivos(rutaArchivosDirectorio);
 
-	if(archivos[i] != NULL){
-		while(archivos[i] != NULL){
+		if(archivos[i] != NULL){
+			while(archivos[i] != NULL){
 
 				divisionRuta = string_split(archivos[i], "/");
 				nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(divisionRuta);
@@ -509,8 +508,9 @@ void listarArchivos(char* ruta){
 		log_trace(logger,"El directorio no tiene archivos");
 		free(archivos);
 		free(rutaArchivosDirectorio);
-	}
-	}
+		}
+}
+
 
 
 char * obtenerRutaSinArchivo(char * ruta){
@@ -634,4 +634,71 @@ void removerArchivo(char* ruta){
 	puts("Ya pude remover el archivo");
 	}
 
+
+
+
+void removerDirectorio(char* ruta){
+
+	int index = obtenerIndexDeUnaRuta(ruta);
+	char** palabras = string_split(ruta, "/");
+	char* nombreDirectorio = obtenerUltimoElementoDeUnSplit(palabras);
+	char* rutaDirectorio = malloc(200);
+	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	rmdir(rutaDirectorio);
+	removerDirectorioDeTabla(nombreDirectorio);
+	free(rutaDirectorio);
+}
+
+void removerDirectorioDeTabla(char* nombreDirectorio){
+	int tamanio, i=0;
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r+");
+	tamanio = list_size(listaTablaDirectorios);
+	Tdirectorio * directorio;
+
+	while(tamanio != i){
+		directorio = list_get(listaTablaDirectorios, i);
+		if(string_equals_ignore_case(nombreDirectorio, directorio->nombre)){
+			list_remove(listaTablaDirectorios, i);
+			break;
+		}
+		i++;
+	}
+	fclose(archivoDirectorios);
+	persistirTablaDeDirectorios();
+
+}
+
+
+
+int esDirectorioVacio (char*ruta){
+	int index = obtenerIndexDeUnaRuta(ruta);
+	int i = 0;
+	char* rutaLocalDirectorio = malloc (200);
+	sprintf(rutaLocalDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	char** archivos;
+
+
+	archivos = buscarArchivos(rutaLocalDirectorio);
+
+
+	return ((archivos[i] == NULL) && (!esDirectorioPadre(ruta)));
+	free(rutaLocalDirectorio);
+}
+
+int esDirectorioPadre (char* ruta){
+	int index = obtenerIndexDeUnaRuta(ruta);
+	int tamanio, i=0;
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
+	tamanio = list_size(listaTablaDirectorios);
+	Tdirectorio * directorio;
+
+	while(tamanio != i){
+			directorio = list_get(listaTablaDirectorios, i);
+			if(index == directorio->padre){
+				return 1;
+			}
+			i++;
+	}
+			return 0;
+}
 

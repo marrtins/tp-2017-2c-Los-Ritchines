@@ -34,16 +34,14 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 
 
-	//inicializarTablaDirectorios();
+	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
-
 	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
-
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
 		log_trace(logger,"Fallo al escuchar el socket servidor de file system.");
