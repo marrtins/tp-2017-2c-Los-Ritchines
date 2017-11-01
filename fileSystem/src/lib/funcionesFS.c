@@ -394,22 +394,6 @@ void copiarArchivo(char ** palabras){
 
 }
 
-int tieneBloque(char * ruta, char * nroBloque){
-	FILE* archivo;
-	int bloqueNro = atoi(nroBloque);
-	if(string_equals_ignore_case(obtenerExtensionDeUnArchivo(ruta),"bin")){
-		archivo = fopen(ruta,"rb");
-	}
-	else {
-		archivo = fopen(ruta, "r");
-	}
-	int tamanioEnMB = cantidadDeBloquesDeUnArchivo(tamanioArchivo(archivo));
-	if(bloqueNro < tamanioEnMB){
-		return 1;
-	}
-	else return 0;
-}
-
 int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	char * nombreNodo = tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo;
 	int nroBloqueASolicitar;
