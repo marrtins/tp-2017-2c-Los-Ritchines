@@ -14,17 +14,9 @@ void procesarInput(char* linea) {
 	char **palabras = string_split(linea, " ");
 	cantidad = cantidadParametros(palabras);
 	if (string_equals_ignore_case(*palabras, "format")) {
-		if(cantidad == 0){
-			formatearFS();
-			puts("FileSystem formateado.");
-		}
-		else{
-			puts("Error en la cantidad de parametros.");
-		}
-
+		hacerFormat(palabras, cantidad);
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
 		hacerRM(palabras,cantidad);
-
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
 		hacerRename(palabras,cantidad);
 		printf("ya pude renombrar el archivo\n");
@@ -36,7 +28,6 @@ void procesarInput(char* linea) {
 		hacerMkdir(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
 		hacerCpfrom(palabras,cantidad);
-
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
 		if(verificarRutaArchivo(palabras[1])){
 		copiarArchivo(palabras);
@@ -128,6 +119,15 @@ void procesarCpblock(char ** palabras){
 	}
 }
 
+void hacerFormat(char**palabras, int cantidad){
+	if(cantidad == 0){
+				formatearFS();
+				puts("FileSystem formateado.");
+			}
+	else{
+				puts("Error en la cantidad de parametros.");
+		}
+}
 void hacerRename(char** palabras, int cantidad){
 	if(cantidad == 2){
 			if(verificarRutaArchivo(palabras[1])){

@@ -18,6 +18,7 @@ void mostrarConfiguracion(TfileSystem *fileSystem);
 void procesarCpblock(char ** palabras);
 void procesarInput(char * linea);
 void consolaFS(void);
+void hacerFormat(char**palabras, int cantidadParametros);
 void hacerRM(char** palabras, int cantidadParametros);
 void hacerRename(char**palabras, int cantidadParametros);
 void hacerCat(char**palabras, int cantidadParametros);
