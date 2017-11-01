@@ -101,14 +101,13 @@ void procesarCpblock(char ** palabras){
 			bloqueAEnviar->contenido = bloque->buffer;
 			bloqueAEnviar->tamanio = bloque->tamanio;
 			bloqueAEnviar->numeroDeBloque = nroBloque;
-			liberarEstructuraBuffer(bloque);
 			if(enviarBloqueA(bloqueAEnviar, palabras[3]) == -1){
 				puts("Error no se pudo enviar el bloque");
-				liberarEstructuraBuffer(bloqueAEnviar);
+				liberarEstructuraBuffer(bloque);
 				return;
 				}
-
-			liberarEstructuraBloquesAEnviar(bloqueAEnviar);
+			liberarEstructuraBuffer(bloque);
+			puts("Perfeeecto, el bloque se copio lo mas bien");
 		}
 		else {
 			puts("El nodo destino no existe o no esta conectado.");
