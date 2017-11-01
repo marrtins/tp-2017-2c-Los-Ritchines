@@ -340,15 +340,43 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 
 
-void pedirBloques(Tarchivo * tablaArchivo){
+void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	int cantBloques, nroBloque=0;
+	Tbuffer* bloque = malloc(sizeof(Tbuffer));
+	int fd;
+	char * archivoMapeado;
 
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 
+	FILE * archivo = fopen(ruta, "w+");
+	fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_READ|PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
+		logAndExit("Error al hacer mmap");
+	}
+	fclose(archivo);
+	close(fd);
+
+	char * p = archivoMapeado;
 	while(nroBloque != cantBloques){
+		pthread_cond_init(&bloqueCond, NULL);
+		pthread_mutex_init(&bloqueMutex,NULL);
+
+		puts("Voy a pedir un bloque");
 		pedirBloque(tablaArchivo, nroBloque);
+
+		pthread_mutex_lock(&bloqueMutex);
+		pthread_cond_wait(&bloqueCond, &bloqueMutex);
+		pthread_mutex_unlock(&bloqueMutex);
+
+		if(copiarBloque(bloqueACopiar, bloque) == -1){
+			puts("Error al copiar bloque recibido");
+		}
+		p += nroBloque *bloque->tamanio ;
+		memcpy(p,bloque->buffer,bloque->tamanio);
 		nroBloque++;
 	}
+
+
 
 
 
@@ -357,16 +385,25 @@ void pedirBloques(Tarchivo * tablaArchivo){
 void copiarArchivo(char ** palabras){
 	//palabras[1] --> ruta archivo yamafs
 	//palabras[2] --> directorio
-	char * ruta;
+	char * rutaTablaArchivo;
+	char * nombreArchivo;
+	char * rutaDirectorio = malloc(100);
 	Tarchivo * archivo = malloc(sizeof(Tarchivo));
-	ruta = obtenerRutaLocalDeArchivo(palabras[1]);
+	rutaTablaArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 
-	levantarTablaArchivo(archivo,ruta);
+	levantarTablaArchivo(archivo,rutaTablaArchivo);
 
-	pedirBloques(archivo);
+	nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(palabras[1]);
+	strcpy(rutaDirectorio,palabras[2]);
+	string_append(&rutaDirectorio,"/");
+	string_append(&rutaDirectorio,nombreArchivo);
+
+	levantarArchivo(archivo,rutaDirectorio);
+
 	liberarTablaDeArchivo(archivo);
-	free(ruta);
-
+	free(rutaTablaArchivo);
+	free(nombreArchivo);
+	free(rutaDirectorio);
 }
 
 int tieneBloque(char * ruta, char * nroBloque){

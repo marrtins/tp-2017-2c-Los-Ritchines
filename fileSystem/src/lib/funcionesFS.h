@@ -101,7 +101,7 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
 
 //Obtener Archivo
-void pedirBloques(Tarchivo * archivo);
+void levantarArchivo(Tarchivo * archivo, char * ruta);
 void copiarArchivo(char ** palabras);
 
 //Nodos

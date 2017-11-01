@@ -5,6 +5,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	t_config *archivo = config_create(ruta);
 
 	tablaArchivo->extensionArchivo = malloc(TAMANIO_EXTENSION_ARCHIVO);
+	tablaArchivo->nombreArchivoSinExtension = malloc(100);
 
 	int cantBloques, nroBloque = 0;
 	char **temporal1;
