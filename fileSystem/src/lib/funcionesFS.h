@@ -77,6 +77,7 @@ int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
 int crearDirectorio(char * ruta);
 int esDirectorio(char * ruta);
+int esDirectorioVacio(char* ruta);
 int esArchivo(char* ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
@@ -89,6 +90,7 @@ char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
+void removerDirectorioDeTabla(char* directorio);
 void evaluarParametrosRM(char** palabras, int cantidadParametros);
 
 //Almacenar Archivo
