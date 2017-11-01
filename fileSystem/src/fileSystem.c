@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
 	listaDeNodosDesconectados = list_create();
 	listaTablaDirectorios = list_create();
 
-	//inicializarTablaDirectorios();
+
+	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 

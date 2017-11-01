@@ -646,13 +646,36 @@ int getMD5(char* ruta){
 }
 
 void removerDirectorio(char* ruta){
+
 	int index = obtenerIndexDeUnaRuta(ruta);
+	char** palabras = string_split(ruta, "/");
+	char* nombreDirectorio = obtenerUltimoElementoDeUnSplit(palabras);
 	char* rutaDirectorio = malloc(200);
 	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/", index);
 	rmdir(rutaDirectorio);
+
+	removerDirectorioDeTabla(nombreDirectorio);
+
 	free(rutaDirectorio);
 }
 
+void removerDirectorioDeTabla(char* nombreDirectorio){
+	int tamanio, i=0;
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
+		tamanio = list_size(listaTablaDirectorios);
+		Tdirectorio * directorio;
+
+	while(tamanio != i){
+		directorio = list_get(listaTablaDirectorios, i);
+		if(string_equals_ignore_case(nombreDirectorio, directorio->nombre)){
+			list_remove(listaTablaDirectorios, i);
+		}
+		i++;
+	}
+	fclose(archivoDirectorios);
+	persistirTablaDeDirectorios();
+
+}
 void evaluarParametrosRM (char** palabras, int cantidadParametros){
 	if (cantidadParametros == 1){
 
@@ -665,8 +688,12 @@ void evaluarParametrosRM (char** palabras, int cantidadParametros){
 		if (string_equals_ignore_case(palabras[1], "-d")){
 
 			if(existeDirectorio(palabras[2])){
+				if(esDirectorioVacio(palabras[2])){
 				removerDirectorio(palabras[2]);
 				puts("Ya pude remover el directorio");
+				} else{
+				puts("EL directorio no esta vacio. No se puede remover");
+				}
 			} else{
 				puts("No existe el directorio");
 			}
@@ -674,5 +701,21 @@ void evaluarParametrosRM (char** palabras, int cantidadParametros){
 			puts("Voy a eliminar un nodo");
 			//removerNodo
 		}
-	}
+		}
+}
+
+
+int esDirectorioVacio (char*ruta){
+	int index = obtenerIndexDeUnaRuta(ruta);
+	int i = 0;
+	char* rutaLocalDirectorio = malloc (200);
+	sprintf(rutaLocalDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	char** archivos;
+
+
+	archivos = buscarArchivos(rutaLocalDirectorio);
+
+
+	return (archivos[i] == NULL);
+	free(rutaLocalDirectorio);
 }

@@ -159,46 +159,48 @@ void procesarInput(char* linea) {
 void procesarCpblock(char ** palabras){
 	if(verificarRutaArchivo(palabras[1])){
 		char * rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
+		if((buscarNodoPorNombre(listaDeNodos, palabras[3])) != NULL){
+			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+			int nroBloque = atoi(palabras[2]);
+			Tbuffer* bloque = malloc(sizeof(Tbuffer));
+			TbloqueAEnviar* bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
+			levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
+			if(nroBloque >= cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)){
+				puts("Numero de bloque incorrecto");
+				return;
 
-		if(tieneBloque(rutaLocalArchivo, palabras[2])){
-			if((buscarNodoPorNombre(listaDeNodos, palabras[3]))->nombre != NULL){
-				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
-				int nroBloque = atoi(palabras[2]);
-				Tbuffer* bloque = malloc(sizeof(Tbuffer));
-				TbloqueAEnviar* bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
-				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
-				if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
-					puts("No se encontraron los nodos con las copias del bloque");
-					return;
-				}
-				if(pedirBloque(tablaArchivo, nroBloque) == -1){
-					puts("Error al solicitar bloque");
-					return;
-				}
-				pthread_cond_init(&bloqueCond, NULL);
-				pthread_mutex_init(&bloqueMutex,NULL);
+			}
+			if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
+				puts("No se encontraron los nodos con las copias del bloque");
+				return;
+			}
+			pthread_cond_init(&bloqueCond, NULL);
+			pthread_mutex_init(&bloqueMutex,NULL);
+			if(pedirBloque(tablaArchivo, nroBloque) == -1){
+				puts("Error al solicitar bloque");
+				return;
+			}
 
-				pthread_mutex_lock(&bloqueMutex);
-				pthread_cond_wait(&bloqueCond, &bloqueMutex);
-				pthread_mutex_unlock(&bloqueMutex);
-				if(copiarBloque(bloqueACopiar, bloque) == -1){
-					puts("Error al copiar bloque recibido");
-					return;
-				}
-				bloqueAEnviar->contenido = bloque->buffer;
-				bloqueAEnviar->tamanio = bloque->tamanio;
-				bloqueAEnviar->numeroDeBloque = nroBloque;
-				if(enviarBloqueA(bloqueAEnviar, palabras[3])){
-					puts("Error no se pudo enviar el bloque");
-					return;
-				}
+			pthread_mutex_lock(&bloqueMutex);
+			pthread_cond_wait(&bloqueCond, &bloqueMutex);
+			pthread_mutex_unlock(&bloqueMutex);
+			if(copiarBloque(bloqueACopiar, bloque) == -1){
+				puts("Error al copiar bloque recibido");
+				return;
 			}
-			else {
-				puts("El nodo destino no existe o no esta conectado.");
-			}
+			liberarEstructuraBuffer(bloqueACopiar);
+			bloqueAEnviar->contenido = bloque->buffer;
+			bloqueAEnviar->tamanio = bloque->tamanio;
+			bloqueAEnviar->numeroDeBloque = nroBloque;
+			if(enviarBloqueA(bloqueAEnviar, palabras[3]) == -1){
+				puts("Error no se pudo enviar el bloque");
+				return;
+				}
+			liberarTablaDeArchivo(tablaArchivo);
+			liberarEstructuraBloquesAEnviar(bloqueAEnviar);
 		}
-		else{
-			puts("Numero de bloque incorrecto");
+		else {
+			puts("El nodo destino no existe o no esta conectado.");
 		}
 	}
 	else{

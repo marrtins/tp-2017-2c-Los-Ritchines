@@ -77,6 +77,7 @@ int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
 int crearDirectorio(char * ruta);
 int esDirectorio(char * ruta);
+int esDirectorioVacio(char* ruta);
 int esArchivo(char* ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
@@ -89,6 +90,7 @@ char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
+void removerDirectorioDeTabla(char* directorio);
 void evaluarParametrosRM(char** palabras, int cantidadParametros);
 
 //Almacenar Archivo
@@ -120,7 +122,6 @@ int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo);
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
 void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar * infoBloque);
-int tieneBloque(char * ruta, char * nroBloque); // recibe el numero en char* por ser parametro del readline;
 int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
 int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
