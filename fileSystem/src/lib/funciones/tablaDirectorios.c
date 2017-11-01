@@ -486,8 +486,8 @@ void listarArchivos(char* ruta){
 	sprintf(rutaArchivosDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
 	archivos = buscarArchivos(rutaArchivosDirectorio);
 
-	if(archivos[i] != NULL){
-		while(archivos[i] != NULL){
+		if(archivos[i] != NULL){
+			while(archivos[i] != NULL){
 
 				divisionRuta = string_split(archivos[i], "/");
 				nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(divisionRuta);
@@ -507,8 +507,9 @@ void listarArchivos(char* ruta){
 		log_trace(logger,"El directorio no tiene archivos");
 		free(archivos);
 		free(rutaArchivosDirectorio);
-	}
-	}
+		}
+}
+
 
 
 char * obtenerRutaSinArchivo(char * ruta){
@@ -650,4 +651,28 @@ void removerDirectorio(char* ruta){
 	sprintf(rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d/", index);
 	rmdir(rutaDirectorio);
 	free(rutaDirectorio);
+}
+
+void evaluarParametrosRM (char** palabras, int cantidadParametros){
+	if (cantidadParametros == 1){
+
+		if(verificarRutaArchivo(palabras[1])){
+			removerArchivo(palabras[1]);
+		} else{
+			puts("El archivo no existe en la ruta especificada");
+		}
+	} else if (cantidadParametros ==2){
+		if (string_equals_ignore_case(palabras[1], "-d")){
+
+			if(existeDirectorio(palabras[2])){
+				removerDirectorio(palabras[2]);
+				puts("Ya pude remover el directorio");
+			} else{
+				puts("No existe el directorio");
+			}
+		} else if (string_equals_ignore_case(palabras[1], "-b")){
+			puts("Voy a eliminar un nodo");
+			//removerNodo
+		}
+	}
 }
