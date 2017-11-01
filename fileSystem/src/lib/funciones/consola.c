@@ -147,7 +147,7 @@ void procesarCpblock(char ** palabras){
 		char * rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 
 		if(tieneBloque(rutaLocalArchivo, palabras[2])){
-			if((buscarNodoPorNombre(listaDeNodos, palabras[3]))->nombre != NULL){
+			if((buscarNodoPorNombre(listaDeNodos, palabras[3])) != NULL){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				int nroBloque = atoi(palabras[2]);
 				Tbuffer* bloque = malloc(sizeof(Tbuffer));
