@@ -399,7 +399,12 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	else {
 		nombreNodo = tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo;
 		nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+		if(nodo != NULL){
 		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
+		}
+		else{
+			return -1;
+		}
 	}
 	buffer = empaquetarPeticionBloque(header, nroBloqueASolicitar, tablaArchivo->bloques[nroBloque].bytes);
 	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
