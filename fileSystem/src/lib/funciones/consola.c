@@ -173,6 +173,7 @@ void procesarCpblock(char ** palabras){
 				puts("Error al copiar bloque recibido");
 				return;
 			}
+			liberarEstructuraBuffer(bloqueACopiar);
 			bloqueAEnviar->contenido = bloque->buffer;
 			bloqueAEnviar->tamanio = bloque->tamanio;
 			bloqueAEnviar->numeroDeBloque = nroBloque;
@@ -180,6 +181,8 @@ void procesarCpblock(char ** palabras){
 				puts("Error no se pudo enviar el bloque");
 				return;
 				}
+			liberarTablaDeArchivo(tablaArchivo);
+			liberarEstructuraBloquesAEnviar(bloqueAEnviar);
 		}
 		else {
 			puts("El nodo destino no existe o no esta conectado.");

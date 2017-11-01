@@ -387,13 +387,16 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
 		}
 		else{
+			free(header);
 			return -1;
 		}
 	}
 	buffer = empaquetarPeticionBloque(header, nroBloqueASolicitar, tablaArchivo->bloques[nroBloque].bytes);
 	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+		free(header);
 		return -1;
 	}
+	free(header);
 	return 1;
 }
 
@@ -415,8 +418,10 @@ int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
 	head->tipo_de_mensaje = ALMACENAR_BLOQUE;
 	buffer = empaquetarBloque(head, bloque, nodo);
 	if(send(nodo->fd,buffer->buffer,buffer->tamanio,0) == -1){
+		free(head);
 		return -1;
 	}
+	free(head);
 	return 1;
 }
 
