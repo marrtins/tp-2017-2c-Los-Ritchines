@@ -23,8 +23,22 @@ void procesarInput(char* linea) {
 		}
 
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
-		evaluarParametrosRM(palabras, cantidad);
-
+		if (cantidad == 1){
+			if(verificarRutaArchivo(palabras[1])){
+				removerArchivo(palabras[1]);
+			} else{
+			puts("El archivo no existe en la ruta especificada");
+			}
+		}
+	} else if (string_equals_ignore_case(*palabras, "rm-d")) {
+		if (cantidad==1){
+			if(existeDirectorio(palabras[1])){
+			removerDirectorio(palabras[1]);
+			puts("Ya pude remover el directorio");
+		} else{
+			puts("No pude remover el directorio");
+		}
+		}
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
 		if(cantidad == 2){
 			if(verificarRutaArchivo(palabras[1])){
@@ -154,6 +168,7 @@ void procesarCpblock(char ** palabras){
 			if(nroBloque >= cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)){
 				puts("Numero de bloque incorrecto");
 				return;
+
 			}
 			if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
 				puts("No se encontraron los nodos con las copias del bloque");
@@ -173,6 +188,7 @@ void procesarCpblock(char ** palabras){
 				puts("Error al copiar bloque recibido");
 				return;
 			}
+			liberarEstructuraBuffer(bloqueACopiar);
 			bloqueAEnviar->contenido = bloque->buffer;
 			bloqueAEnviar->tamanio = bloque->tamanio;
 			bloqueAEnviar->numeroDeBloque = nroBloque;
@@ -180,6 +196,8 @@ void procesarCpblock(char ** palabras){
 				puts("Error no se pudo enviar el bloque");
 				return;
 				}
+			liberarTablaDeArchivo(tablaArchivo);
+			liberarEstructuraBloquesAEnviar(bloqueAEnviar);
 		}
 		else {
 			puts("El nodo destino no existe o no esta conectado.");
