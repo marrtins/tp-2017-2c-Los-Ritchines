@@ -23,22 +23,7 @@ void procesarInput(char* linea) {
 		}
 
 	} else if (string_equals_ignore_case(*palabras, "rm")) {
-		if (cantidad == 1){
-			if(verificarRutaArchivo(palabras[1])){
-				removerArchivo(palabras[1]);
-			} else{
-			puts("El archivo no existe en la ruta especificada");
-			}
-		}
-	} else if (string_equals_ignore_case(*palabras, "rm-d")) {
-		if (cantidad==1){
-			if(existeDirectorio(palabras[1])){
-			removerDirectorio(palabras[1]);
-			puts("Ya pude remover el directorio");
-		} else{
-			puts("No pude remover el directorio");
-		}
-		}
+		evaluarParametrosRM(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "rename")) {
 		if(cantidad == 2){
 			if(verificarRutaArchivo(palabras[1])){
