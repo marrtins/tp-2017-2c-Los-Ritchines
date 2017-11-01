@@ -69,9 +69,9 @@ int crearDirectorio(char * ruta) {
 			free(indice);
 			//syscall(SYS_mkdir, directorio);
 			mkdir(directorio,0777);
-
-			printf("Directorio /%s creado\n", carpetas[nroDirectorio]);
 			tDirectorio = malloc(sizeof(Tdirectorio));
+			printf("Directorio /%s creado\n", carpetas[nroDirectorio]);
+
 			tDirectorio->index = index;
 			strcpy(tDirectorio->nombre,carpetas[nroDirectorio]);
 			tDirectorio->padre = indicePadre;
@@ -80,7 +80,6 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
-			free(tDirectorio);
 			return 0;
 		}
 			puts("No se puede crear directorio dentro de un directorio que no existe");
@@ -688,7 +687,6 @@ int esDirectorioVacio (char*ruta){
 int esDirectorioPadre (char* ruta){
 	int index = obtenerIndexDeUnaRuta(ruta);
 	int tamanio, i=0;
-	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
 	tamanio = list_size(listaTablaDirectorios);
 	Tdirectorio * directorio;
 

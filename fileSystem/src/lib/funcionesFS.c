@@ -345,7 +345,7 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	Tbuffer* bloque = malloc(sizeof(Tbuffer));
 	int fd;
 	char * archivoMapeado;
-	char * p = archivoMapeado;
+
 
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 
@@ -362,6 +362,7 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	fclose(archivo);
 	close(fd);
 
+	char * p = archivoMapeado;
 	while(nroBloque != cantBloques){
 		pthread_cond_init(&bloqueCond, NULL);
 		pthread_mutex_init(&bloqueMutex,NULL);
