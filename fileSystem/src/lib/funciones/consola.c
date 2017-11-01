@@ -87,7 +87,7 @@ void procesarInput(char* linea) {
 
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
 		if(verificarRutaArchivo(palabras[1])){
-		//copiarArchivo(palabras);
+		copiarArchivo(palabras);
 		}
 		printf("ya pude copiar un archivo local al file system\n");
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
