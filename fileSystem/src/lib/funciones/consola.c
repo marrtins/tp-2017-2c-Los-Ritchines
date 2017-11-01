@@ -21,7 +21,7 @@ void procesarInput(char* linea) {
 		hacerRename(palabras,cantidad);
 		printf("ya pude renombrar el archivo\n");
 	} else if (string_equals_ignore_case(*palabras, "mv")) {
-		printf("ya pude mover el archivo\n");
+		hacerMV(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "cat")) {
 		hacerCat(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
@@ -271,4 +271,16 @@ int getMD5(char* ruta){
 	free(comando);
 	free(rutaArchivo);
 	return 0;
+}
+
+void hacerMV(char** palabras, int cantidad){
+	if(cantidad==2){
+		if(verificarRutaArchivo(palabras[1])){
+			moverArchivo(palabras[1], palabras[2]);
+		} else{
+			puts("No se quiere mover un archivo");
+		}
+	}else{
+		puts("Error en la cantidad de parametros");
+	}
 }

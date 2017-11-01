@@ -26,6 +26,7 @@ void hacerMkdir(char**palabras, int cantidadParametros);
 void hacerCpfrom(char**palabras, int cantidadParametros);
 void obtenerMD5(char**palabras, int cantidadParametros);
 void hacerLs(char**palabras, int cantidadParametros);
+void hacerMV(char**palabras, int cantidadParametros);
 void hacerInfo(char**palabras, int cantidadParametros);
 
 
@@ -93,6 +94,7 @@ int esArchivo(char* ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
 void listarArchivos(char * ruta);
+void moverArchivo(char*ruta1, char*ruta2);
 void removerDirectorios(char * ruta);
 int verificarRutaArchivo(char * rutaYamafs);
 int existeArchivo(int indiceDirectorio , char * rutaYamafs);
