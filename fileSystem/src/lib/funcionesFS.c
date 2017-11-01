@@ -398,6 +398,7 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 }
 
+
 void copiarArchivo(char ** palabras){
 	//palabras[1] --> ruta archivo yamafs
 	//palabras[2] --> directorio
@@ -411,7 +412,10 @@ void copiarArchivo(char ** palabras){
 
 	nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(palabras[1]);
 	strcpy(rutaDirectorio,palabras[2]);
-	string_append(&rutaDirectorio,"/");
+
+	if(!string_ends_with(rutaDirectorio,"/")){
+		string_append(&rutaDirectorio,"/");
+	}
 	string_append(&rutaDirectorio,nombreArchivo);
 
 	levantarArchivo(archivo,rutaDirectorio);
