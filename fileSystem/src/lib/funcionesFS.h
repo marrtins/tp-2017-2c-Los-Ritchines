@@ -89,6 +89,7 @@ char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
+void evaluarParametrosRM(char** palabras, int cantidadParametros);
 
 //Almacenar Archivo
 void almacenarArchivo(char **palabras);
