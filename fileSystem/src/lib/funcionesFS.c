@@ -345,40 +345,56 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	Tbuffer* bloque = malloc(sizeof(Tbuffer));
 	int fd;
 	char * archivoMapeado;
+	char * p = archivoMapeado;
 
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 
 	FILE * archivo = fopen(ruta, "w+");
 	fd = fileno(archivo);
-	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_READ|PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
+	ftruncate(fd, tablaArchivo->tamanioTotal);
+
+	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
+		log_trace(logger,"Error al hacer mmap");
+		puts("Error al hacer mmap");
+		liberarEstructuraBuffer(bloque);
+		return;
 	}
 	fclose(archivo);
 	close(fd);
 
-	char * p = archivoMapeado;
 	while(nroBloque != cantBloques){
 		pthread_cond_init(&bloqueCond, NULL);
 		pthread_mutex_init(&bloqueMutex,NULL);
 
-		puts("Voy a pedir un bloque");
+		printf("Voy a pedir el bloque %d\n",nroBloque);
 		pedirBloque(tablaArchivo, nroBloque);
 
 		pthread_mutex_lock(&bloqueMutex);
 		pthread_cond_wait(&bloqueCond, &bloqueMutex);
 		pthread_mutex_unlock(&bloqueMutex);
 
+		puts("pase el mutex, voy a copiar un bloque");
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
-			puts("Error al copiar bloque recibido");
+			puts("Error al copiar bloque recibido. Intentelo de nuevo");
+			log_trace(logger,"Error al copiar bloque recibido");
+			liberarEstructuraBuffer(bloque);
+		//borrar archivo
+			return;
 		}
-		p += nroBloque *bloque->tamanio ;
+		puts("voy a hacer un memcpy");
 		memcpy(p,bloque->buffer,bloque->tamanio);
+		p += bloque->tamanio;
+		puts("hice el memcpy");
 		nroBloque++;
 	}
 
-
-
-
+	if (msync((void *)archivoMapeado, tablaArchivo->tamanioTotal, MS_SYNC) < 0) {
+					log_trace(logger,"Error al hacer msync");
+					puts("Error al hacer msync");
+		}
+	puts("Achivo copiado con éxito");
+	liberarEstructuraBuffer(bloque);
+	munmap(archivoMapeado,tablaArchivo->tamanioTotal);
 
 }
 

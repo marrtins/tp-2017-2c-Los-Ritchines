@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 
 
-	inicializarTablaDirectorios();
+	//inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 

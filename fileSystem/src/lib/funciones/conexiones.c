@@ -140,6 +140,7 @@ void conexionesDatanode(void * estructura){
 								puts("voy a hacer el signal");
 								pthread_cond_signal(&bloqueCond);
 								pthread_mutex_unlock(&bloqueMutex);
+								puts("Hice el signal y libere el mutex");
 								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");

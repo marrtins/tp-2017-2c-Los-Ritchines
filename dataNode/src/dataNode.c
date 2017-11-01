@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
 					logAndExit("Error al recibir el tamanio del bloque");
 				}
 				enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
+				puts("Envie el bloque a FS");
 				break;
 			default:
 				break;
