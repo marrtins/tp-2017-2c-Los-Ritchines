@@ -12,4 +12,5 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar);
 int realizarReduccionLocal(int client_sock);
 int realizarTransformacion(int client_sock);
 int realizarReduccionGlobal(int client_sock);
+int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar);
 #endif

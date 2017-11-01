@@ -3,63 +3,41 @@
 
 extern Tworker *worker;
 extern int cantApareosGlobal;
-int cont=0;
-
-TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker2(char *bytes_serial){
-
-	int off;
-	TinfoReduccionLocalMasterWorker *datosReduccion;
-
-	if ((datosReduccion = malloc(sizeof *datosReduccion)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete datos reduccion\n");
-		return NULL;
-	}
-
-	off = 0;
-	memcpy(&datosReduccion->nombreTempReduccionLen, bytes_serial + off, sizeof (int));
-	off += sizeof (int);
-
-	if ((datosReduccion->nombreTempReduccion = malloc(datosReduccion->nombreTempReduccionLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", datosReduccion->nombreTempReduccionLen);
-		return NULL;
-	}
-
-	memcpy(datosReduccion->nombreTempReduccion, bytes_serial + off, datosReduccion->nombreTempReduccionLen);
-	off += datosReduccion->nombreTempReduccionLen;
+extern int cont=0;
 
 
 
-	memcpy(&datosReduccion->listaSize, bytes_serial + off, sizeof (int));
-	off += sizeof (int);
+void manejarConexionWorker(Theader *head, int client_sock){
+
+	char * buffer;
+	TpackBytes *pathArchivoTemporal;
+	int stat;
+	if(head->tipo_de_mensaje==GIVE_TMPREDUCCIONLOCAL){
+
+		puts("Nos llega el path del archivo temporal que precisa");
 
 
-	int i;
-	t_list * listaRet = list_create();
-	for(i=0;i<datosReduccion->listaSize;i++){
-
-		TreduccionLista *aux = malloc(sizeof aux);
-		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
-
-
-		if ((aux->nombreTemporal = malloc(aux->nombreTemporalLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", aux->nombreTemporalLen);
-			return NULL;
+		if ((buffer = recvGeneric(client_sock)) == NULL){
+			puts("Fallo recepcion del path del archivo temporal");
+			return;
 		}
 
-		memcpy(aux->nombreTemporal, bytes_serial + off, aux->nombreTemporalLen);
-		off += aux->nombreTemporalLen;
-		list_add(listaRet,aux);
+		if ((pathArchivoTemporal =  deserializeBytes(buffer)) == NULL){
+			puts("Fallo deserializacion de Bytes del path arch a reducir");
+			return;
+		}
+
+		printf("Path archivo que vamos a enviarle: %s\n",pathArchivoTemporal->bytes);
+
+		stat = enviarArchivo(pathArchivoTemporal->bytes,client_sock);
+		if(stat<0){
+			puts("error al enviar archivo");
+		}
+
 	}
 
-	datosReduccion->listaTemporales=listaRet;
 
-
-
-	return datosReduccion;
 }
-
-
 
 void manejarConexionMaster(Theader *head, int client_sock){
 
@@ -92,7 +70,200 @@ void manejarConexionMaster(Theader *head, int client_sock){
 
 }
 int realizarReduccionGlobal(client_sock){
+
+	char * buffer;
+	char * nombreScriptReductor;
+	char * rutaScriptReductor;
+	int stat;
+	TreduccionGlobal *infoReduccionGlobal;
+	if ((buffer = recvGenericWFlags(client_sock,MSG_WAITALL)) == NULL){
+		puts("Fallo recepcion de INFOBLOQUE");
+		return FALLO_RECV;
+	}
+
+	if ((infoReduccionGlobal = deserializeInfoReduccionGlobal(buffer)) == NULL){
+		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
+		return FALLO_GRAL;
+	}
+	printf("llego la info apra la reduccion global\n");
+	printf("job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
+
+	printf("list size %d\n",infoReduccionGlobal->listaNodosSize);
+
+	int i;
+	for(i=0;i<list_size(infoReduccionGlobal->listaNodos);i++){
+		TinfoNodoReduccionGlobal *infoNodo = list_get(infoReduccionGlobal->listaNodos,i);
+		printf(" nombre nodo: %s \n",infoNodo->nombreNodo);
+		printf(" ip nodo: %s \n",infoNodo->ipNodo);
+		printf(" peurto: %s \n",infoNodo->puertoNodo);
+		printf(" temp red loc: %s \n",infoNodo->temporalReduccion);
+		printf(" encargado: %d \n",infoNodo->nodoEncargado);
+	}
+
+
+	puts("Ahora recibo el script reductor");
+
+
+	nombreScriptReductor=string_new();
+	rutaScriptReductor  = string_new();
+	string_append(&rutaScriptReductor,"/home/utnso/");
+	string_append(&nombreScriptReductor,"reductorGlobal");
+	cont++;
+	string_append(&nombreScriptReductor,string_itoa(cont));
+	string_append(&nombreScriptReductor,worker->nombre_nodo);
+	string_append(&nombreScriptReductor,".sh");
+	string_append(&rutaScriptReductor,nombreScriptReductor);
+
+
+	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
+
+
+	//le pido a todos los workers que me pasen sus reducciones locales.
+
+	int sockWorkerVecino,packSize2;
+	Theader headEnvio;
+	headEnvio.tipo_de_proceso=WORKER;
+	headEnvio.tipo_de_mensaje=GIVE_TMPREDUCCIONLOCAL;
+	char * buffer2;
+	char * nombreArchivoReduccionPedido;
+	char *rutaArchivoReduccionPedido;
+	char * temporalEnEsteNodo=string_new();
+	t_list * listaTemporales = list_create();
+	for(i=0;i<list_size(infoReduccionGlobal->listaNodos);i++){
+		TinfoNodoReduccionGlobal *infoNodo = list_get(infoReduccionGlobal->listaNodos,i);
+		if(infoNodo->nodoEncargado!=1){//no soy yo.(soy el unico encargado(==1)
+			printf("me conecto con y le pido su reduccion local del job %d\n",infoReduccionGlobal->job);
+			printf(" nombre nodo: %s \n",infoNodo->nombreNodo);
+			printf(" ip nodo: %s \n",infoNodo->ipNodo);
+			printf(" peurto: %s \n",infoNodo->puertoNodo);
+			printf(" temp red loc: %s \n",infoNodo->temporalReduccion);
+			printf(" encargado: %d \n",infoNodo->nodoEncargado);
+			sockWorkerVecino=conectarAServidor(infoNodo->ipNodo,infoNodo->puertoNodo);
+			buffer2=serializeBytes(headEnvio,infoNodo->temporalReduccion,infoNodo->temporalReduccionLen,&packSize2);
+			if ((stat = send(sockWorkerVecino, buffer2, packSize2, 0)) == -1){
+				puts("no se pudo enviar path del archivo temporal que necesitamos. ");
+				return  FALLO_SEND;
+			}
+			nombreArchivoReduccionPedido=string_new();
+			rutaArchivoReduccionPedido = string_new();
+			string_append(&rutaArchivoReduccionPedido,"tmp/");
+			string_append(&nombreArchivoReduccionPedido,"temporalRLPedidoA");
+			string_append(&nombreArchivoReduccionPedido,worker->nombre_nodo);
+			string_append(&nombreArchivoReduccionPedido,"-nro");
+			cont++;
+			string_append(&nombreArchivoReduccionPedido,string_itoa(cont));
+			string_append(&rutaArchivoReduccionPedido,nombreArchivoReduccionPedido);
+
+			stat = recibirYAlmacenarArchivo(sockWorkerVecino,rutaArchivoReduccionPedido);
+			list_add(listaTemporales,rutaArchivoReduccionPedido);
+			puts("recibi el temporal");
+			close(sockWorkerVecino);
+		}else{
+			string_append(&temporalEnEsteNodo,infoNodo->temporalReduccion);
+		}
+	}
+
+
+	puts("Ya tengo todos los reductores. apareo todos");
+	char * lineaDeEjecucionApareo;
+	char * rutaDeApareoGlobal;
+	lineaDeEjecucionApareo=string_new();
+	string_append(&lineaDeEjecucionApareo,"sort -m");
+
+	//agrego el temporal que esta en este nodo:
+	string_append(&lineaDeEjecucionApareo," /home/utnso/");
+	string_append(&lineaDeEjecucionApareo,temporalEnEsteNodo);
+
+	for(i=0;i<list_size(listaTemporales);i++){
+		char * ruta = list_get(listaTemporales,i);
+		printf("Nombre del archivo %d a reducir: %s\n",i,ruta);
+		string_append(&lineaDeEjecucionApareo," /home/utnso/");
+		string_append(&lineaDeEjecucionApareo,ruta);
+
+	}
+	rutaDeApareoGlobal=string_new();
+	//nombreArchivoTemporalApareado=string_new();
+	string_append(&rutaDeApareoGlobal,"/home/utnso");
+	string_append(&rutaDeApareoGlobal,"/tmp/ApareoGlobalnro");
+	cont ++;
+	string_append(&rutaDeApareoGlobal,string_itoa(cont));
+	string_append(&rutaDeApareoGlobal,worker->nombre_nodo);
+
+	string_append(&lineaDeEjecucionApareo," > ");
+	string_append(&lineaDeEjecucionApareo,rutaDeApareoGlobal);
+
+	printf("linea de ejec apareo global %s \n",lineaDeEjecucionApareo);
+	stat=system(lineaDeEjecucionApareo);
+
+	printf("Stat apareo global:%d\n",stat);
+
+	puts("hago reduccion global\n");
+
+
+
+
+
+
+
+	puts("Forkeo");
+	char * lineaDeEjecucionReduccionGlobal;
+	char * rutaResultadoReduccionGlobal;
+	pid_t pidRedGl;
+	if ( (pidRedGl=fork()) == 0 )
+	{ /* hijo */
+		//	printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
+		//	printf("%d\n",cont);
+
+
+		lineaDeEjecucionReduccionGlobal = string_new();
+		rutaResultadoReduccionGlobal=string_new();
+
+
+
+
+		string_append(&lineaDeEjecucionReduccionGlobal,"cat ");
+		string_append(&lineaDeEjecucionReduccionGlobal,rutaDeApareoGlobal);
+		string_append(&lineaDeEjecucionReduccionGlobal," | ./");
+		string_append(&lineaDeEjecucionReduccionGlobal,nombreScriptReductor);
+		string_append(&lineaDeEjecucionReduccionGlobal, " > /home/utnso");
+		string_append(&rutaResultadoReduccionGlobal,infoReduccionGlobal->tempRedGlobal);
+		string_append(&lineaDeEjecucionReduccionGlobal,rutaResultadoReduccionGlobal);
+
+		printf("linea de eecucion red global %s\n",lineaDeEjecucionReduccionGlobal);
+		printf("Ruta resutlado reduccion %s\n",rutaResultadoReduccionGlobal);
+
+
+
+		stat = system(lineaDeEjecucionReduccionGlobal);
+		printf("Stat lineaDeEjecucion :%d \n",stat);
+		Theader *head = malloc(sizeof head);
+		head->tipo_de_proceso = WORKER;
+		head->tipo_de_mensaje = FIN_REDUCCIONGLOBALOK;
+
+		puts("Envio header. fin reduccion global ok");
+		enviarHeader(client_sock,head);
+		//close(client_sock);
+		exit(0);
+
+	}
+	else
+	{ /* padre */
+		//	printf("Soy el padre (%d, hijo de %d)\n", getpid(),	getppid());
+		//	printf("%d\n",cont);
+		//waitpid(pid,pidStat,0);
+	}
 	return 0;
+
+
+
+
+
+
+
+
+
+
+
 }
 
 int realizarTransformacion(int client_sock){
@@ -194,7 +365,7 @@ int realizarReduccionLocal(int client_sock){
 	char * rutaScriptReductor;
 	char  *rutaResultadoReduccion;
 	char  *rutaTemporalesApareados;
-	char * nombreArchivoTemporalApareado;
+	//char * nombreArchivoTemporalApareado;
 	char * lineaDeEjecucionReduccion;
 	char * lineaDeEjecucionApareo;
 
@@ -209,7 +380,7 @@ int realizarReduccionLocal(int client_sock){
 		return FALLO_RECV;
 	}
 
-	if ((infoReduccion = deserializarInfoReduccionLocalMasterWorker2(bufferReduccion)) == NULL){
+	if ((infoReduccion = deserializarInfoReduccionLocalMasterWorker(bufferReduccion)) == NULL){
 		puts("Fallo deserializacion de Bytes de los datos de la reduccion local");
 		return FALLO_GRAL;
 	}
@@ -249,7 +420,7 @@ int realizarReduccionLocal(int client_sock){
 	nombreScriptReductor=string_new();
 	rutaScriptReductor  = string_new();
 	string_append(&rutaScriptReductor,"/home/utnso/");
-	string_append(&nombreScriptReductor,"reductor");
+	string_append(&nombreScriptReductor,"reductorLocal");
 	cont++;
 	string_append(&nombreScriptReductor,string_itoa(cont));
 	string_append(&nombreScriptReductor,worker->nombre_nodo);
@@ -364,6 +535,100 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 
 	return 0;
 
+}
+
+
+int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar){
+
+
+	char buffer[BUFSIZ];
+	int len;
+	int remain_data = 0;
+	int stat;
+	   char *ptr;
+
+	long file_size2;
+	//char file_size2[sizeof(int)];
+	FILE *scriptFile;
+
+
+	/*file size */
+	stat=recv(client_sock, buffer, sizeof(long)*2, 0);
+	printf("size rec stat %d\n",stat);
+	//file_size2 = strtol(buffer);
+	file_size2=strtol(buffer,&ptr,10);
+	fprintf(stdout, "\nFile size : %lu\n", file_size2);
+
+	scriptFile = fopen(rutaAAlmacenar, "w");
+	if (scriptFile == NULL){
+		fprintf(stderr, "Fallo open archivo file --> %s\n", strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	remain_data = file_size2;
+
+	while (remain_data > 0){//todo:cheq
+		len = recv(client_sock, buffer, 1024, 0);
+		fwrite(buffer, sizeof(char), len, scriptFile);
+		remain_data -= len;
+		fprintf(stdout, "Recibidos %d bytes y espero :- %d bytes\n", len, remain_data);
+		//if(len<0) break;
+	}
+	fclose(scriptFile);
+
+	puts("recibi archivo");
+	printf("Ruta archivo  %s\n",rutaAAlmacenar);
+
+
+
+
+	return 0;
+
+}
+
+int enviarArchivo(char * rutaArchivo,int sockDestino){
+
+	int fdScript;
+	int len,remain_data,sent_bytes;
+	off_t offset;
+	struct stat file_stat;
+	char file_size[20];
+	fdScript = open(rutaArchivo, O_RDONLY);
+	if (fdScript == -1){
+		fprintf(stderr, "Error abriendo archivo  --> %s", strerror(errno));
+		return FALLO_GRAL;
+	}
+
+	/* file stats */
+	if (fstat(fdScript, &file_stat) < 0){
+		fprintf(stderr, "Error fstat --> %s", strerror(errno));
+		return FALLO_GRAL;
+	}
+
+	fprintf(stdout, "File Size: \n %ld bytes\n",(long) file_stat.st_size);
+	sprintf(file_size, "%ld",(long) file_stat.st_size);
+
+
+	/* envio file size */
+	len = send(sockDestino, file_size, sizeof(long)*2, 0);
+	if (len < 0){
+		fprintf(stderr, "Error enviando filesize --> %s", strerror(errno));
+		return FALLO_GRAL;
+	}
+
+	fprintf(stdout, "Enviamos %d bytes del tamanio(%ld) del archivo \n", len,(long)file_stat.st_size);
+
+	offset = 0;
+	remain_data = file_stat.st_size;
+	/* envio script data */
+
+	while (((sent_bytes = sendfile(sockDestino, fdScript, &offset, 1024)) > 0) && (remain_data > 0)){
+		remain_data -= sent_bytes;
+		fprintf(stdout, "2.enviados %d bytes de data, offset : %ld and remain data = %d\n", sent_bytes,(long) offset, remain_data);
+	}
+
+	close(fdScript);
+	return 0;
 }
 
 Tworker *obtenerConfiguracionWorker(char* ruta){

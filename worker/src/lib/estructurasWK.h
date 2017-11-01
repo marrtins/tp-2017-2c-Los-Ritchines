@@ -15,4 +15,11 @@ typedef struct{
 	int   tipo_de_proceso;
 }Tworker;
 
+
+typedef struct{
+	char * nombreArchivoTemporal;
+	char * rutaArchivoTemporal;
+	int jobAsociado;
+
+}TinfoTemporalJobAsoc;
 #endif

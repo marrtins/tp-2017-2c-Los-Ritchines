@@ -241,11 +241,12 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	nuevaReduccion->idTarea=idTareaActual;
 	nuevaReduccion->job=jobAReducir;
 	nuevaReduccion->tempRedGlobal=malloc(TAMANIO_NOMBRE_TEMPORAL);
-	nuevaReduccion->tempRedGlobal="tmppiola";
+	nuevaReduccion->tempRedGlobal="/tmppiola";
 	nuevaReduccion->tempRedGlobalLen=strlen(nuevaReduccion->tempRedGlobal)+1;
 	nuevaReduccion->listaNodos=list_create();
 
 	t_list * listaInformacionNodos = list_create();
+	int hardcode=0;
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 			TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
 			if(tareaOk->job==jobAReducir && tareaOk->etapa==REDUCCIONLOCAL){
@@ -262,7 +263,12 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 				infoNodoAux->temporalReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL);
 				infoNodoAux->temporalReduccion=tareaOk->nombreArchTemporal;
 				infoNodoAux->temporalReduccionLen=strlen(infoNodoAux->temporalReduccion)+1;
-				infoNodoAux->nodoEncargado=1;
+				if(hardcode==0){
+					infoNodoAux->nodoEncargado=1;
+					hardcode++;
+				}else{
+					infoNodoAux->nodoEncargado=0;
+				}//hrdcoed
 
 				list_add(listaInformacionNodos,infoNodoAux);
 
@@ -1291,7 +1297,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque1->nombreNodoC1Len=strlen(bloque1->nombreNodoC1)+1;
 	bloque1->bloqueC1=10;
 	bloque1->nombreNodoC2=malloc(sizeof(maxNombreNodo));
-	bloque1->nombreNodoC2="Nodo1";
+	bloque1->nombreNodoC2="Nodo3";
 	bloque1->nombreNodoC2Len=strlen(bloque1->nombreNodoC2)+1;
 	bloque1->bloqueC2=7;
 	bloque1->finBloque=1048500;
@@ -1300,7 +1306,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	TpackageUbicacionBloques *bloque2 = malloc(sizeof(bloque2));
 	bloque2->bloque=2;
 	bloque2->nombreNodoC1=malloc(sizeof(maxNombreNodo));
-	bloque2->nombreNodoC1="Nodo2";
+	bloque2->nombreNodoC1="Nodo3";
 	bloque2->nombreNodoC1Len=strlen(bloque2->nombreNodoC1)+1;
 	bloque2->bloqueC1=12;
 	bloque2->nombreNodoC2=malloc(sizeof(maxNombreNodo));
@@ -1345,6 +1351,19 @@ void generarListaInfoNodos(){
 	nodo2->tamanioPuerto=strlen(nodo2->puertoWorker)+1;
 
 	list_add(listaNodos,nodo2);
+
+	TpackageInfoNodo *nodo3 = malloc(sizeof(nodo3));
+	nodo3->nombreNodo=malloc(nombreLen);
+	nodo3->nombreNodo="Nodo3";
+	nodo3->tamanioNombre=strlen(nodo3->nombreNodo)+1;
+	nodo3->ipNodo=malloc(ipLen);
+	nodo3->ipNodo="127.0.0.1";
+	nodo3->tamanioIp=strlen(nodo3->ipNodo)+1;
+	nodo3->puertoWorker=malloc(puertoLen);
+	nodo3->puertoWorker = "5034";
+	nodo3->tamanioPuerto=strlen(nodo3->puertoWorker)+1;
+
+	list_add(listaNodos,nodo3);
 
 
 }

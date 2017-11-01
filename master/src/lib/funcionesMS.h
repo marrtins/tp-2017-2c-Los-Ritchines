@@ -20,7 +20,7 @@ int conectarseAWorkerParaReplanificarTransformacion(TpackInfoBloque *infoBloque,
 void hiloWorkerTransformacion(void *info);
 
 int conectarseAWorkerParaReduccionLocal(TreduccionLocal *infoReduccion,int sockYama);
-int conectarseAWorkerParaReduccionGlobal(TreduccionLocal *infoReduccion,int sockYama);
+int conectarseAWorkerParaReduccionGlobal(TreduccionGlobal *infoReduccion,int sockYama);
 
 TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama);
 
