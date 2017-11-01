@@ -38,7 +38,7 @@ int crearDirectorio(char * ruta) {
 	char* directorio = malloc(100);
 	strcpy(directorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	char * indice;
-	Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
+	Tdirectorio * tDirectorio;
 
 	if(list_size(listaTablaDirectorios)>=100){
 		puts("Ya hay 100 directorios creados, no se puede crear el directorio");
@@ -71,7 +71,7 @@ int crearDirectorio(char * ruta) {
 			mkdir(directorio,0777);
 
 			printf("Directorio /%s creado\n", carpetas[nroDirectorio]);
-
+			tDirectorio = malloc(sizeof(Tdirectorio));
 			tDirectorio->index = index;
 			strcpy(tDirectorio->nombre,carpetas[nroDirectorio]);
 			tDirectorio->padre = indicePadre;
@@ -80,6 +80,7 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
+			free(tDirectorio);
 			return 0;
 		}
 			puts("No se puede crear directorio dentro de un directorio que no existe");
