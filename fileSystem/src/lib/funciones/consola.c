@@ -188,7 +188,7 @@ void procesarCpblock(char ** palabras){
 				bloqueAEnviar->contenido = bloque->buffer;
 				bloqueAEnviar->tamanio = bloque->tamanio;
 				bloqueAEnviar->numeroDeBloque = nroBloque;
-				if(enviarBloqueA(bloqueAEnviar, palabras[3])){
+				if(enviarBloqueA(bloqueAEnviar, palabras[3]) == -1){
 					puts("Error no se pudo enviar el bloque");
 					return;
 				}
