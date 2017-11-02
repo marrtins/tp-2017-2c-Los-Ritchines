@@ -97,7 +97,7 @@ void inicializarTablaDirectorios(){
 
 		strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 
-		list_clean(listaTablaDirectorios);
+		vaciarLista();
 		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
 		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
 		fclose(archivoDirectorios);
@@ -323,6 +323,7 @@ void renombrarArchivoODirectorio(char * ruta, char * nombre){
 		nuevaRuta = obtenerRutaSinArchivo(ruta);
 		string_append(&nuevaRuta, "/");
 		string_append(&nuevaRuta, nombre);
+		//verificar extension de archivo sea la misma
 	}
 	else{
 		//es un directorio, hay que actualizar la tabla de directorios

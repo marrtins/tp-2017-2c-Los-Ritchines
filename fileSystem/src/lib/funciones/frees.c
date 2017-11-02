@@ -31,3 +31,7 @@ void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque){
 	free(bloque->puertoNodo);
 	free(bloque);
 }
+
+void liberarTablaDirectorios(void * directorio){
+	free(directorio);
+}

@@ -74,6 +74,7 @@ void mostrarListaDeNodos(t_list * lista);
 void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2);
 Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
+void vaciarLista();
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -144,6 +145,7 @@ int getMD5(char* ruta);
 void liberarEstructuraBuffer(Tbuffer * buffer);
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
+void liberarTablaDirectorios(void* directorio);
 
 //YAMA
 char * recvRutaArchivo(int socket);

@@ -197,3 +197,12 @@ void* buscarPorNombreDeDirectorio(char * directorio){
 	return list_find(listaTablaDirectorios, buscarPorNombreDeDirectorioParaLista);
 }
 
+void vaciarLista(){
+	int tam, i=0;
+	tam = list_size(listaTablaDirectorios);
+
+	while(i != tam){
+	list_remove_and_destroy_element(listaTablaDirectorios,i,liberarTablaDirectorios);
+	i++;
+	}
+}
