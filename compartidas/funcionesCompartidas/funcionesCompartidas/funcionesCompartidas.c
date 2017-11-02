@@ -220,6 +220,7 @@ int obtenerBloqueDisponible(Tnodo * nodo){
 		if(bitarray_test_bit(nodo->bitmap, i) == 0){
 			return i;
 		}
+		i++;
 	}
 	return -1;
 }
