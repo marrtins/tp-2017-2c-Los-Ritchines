@@ -372,15 +372,21 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 	char * p = archivoMapeado;
 	while(nroBloque != cantBloques){
-		pthread_cond_init(&bloqueCond, NULL);
-		pthread_mutex_init(&bloqueMutex,NULL);
 
+		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
+			puts("No se encontraron los nodos con las copias del bloque");
+			return;
+			}
+
+		//pthread_cond_init(&bloqueCond, NULL);
+		pthread_mutex_init(&bloqueMutex,NULL);
+		pthread_mutex_lock(&bloqueMutex);
 		printf("Voy a pedir el bloque %d\n",nroBloque);
 		pedirBloque(tablaArchivo, nroBloque);
 
 		pthread_mutex_lock(&bloqueMutex);
-		pthread_cond_wait(&bloqueCond, &bloqueMutex);
-		pthread_mutex_unlock(&bloqueMutex);
+		//pthread_cond_wait(&bloqueCond, &bloqueMutex);
+		//pthread_mutex_unlock(&bloqueMutex);
 
 		puts("pase el mutex, voy a copiar un bloque");
 		if(copiarBloque(bloqueACopiar, bloque) == -1){

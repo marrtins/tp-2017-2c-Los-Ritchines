@@ -67,45 +67,41 @@ void procesarCpblock(char ** palabras){
 				TbloqueAEnviar* bloqueAEnviar;
 				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
 				free(rutaLocalArchivo);
-				if(nroBloque >= cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)){
+				if (nroBloque>=cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)) {
 					puts("Numero de bloque incorrecto");
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
-
 				}
-				if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
+				if (nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0) {
 					puts("No se encontraron los nodos con las copias del bloque");
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
 				}
-				pthread_cond_init(&bloqueCond, NULL);
-				pthread_mutex_init(&bloqueMutex,NULL);
-				if(pedirBloque(tablaArchivo, nroBloque) == -1){
+				pthread_mutex_init(&bloqueMutex, NULL);
+				if (pedirBloque(tablaArchivo, nroBloque) == -1) {
 					puts("Error al solicitar bloque");
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
 				}
 				liberarTablaDeArchivo(tablaArchivo);
 				pthread_mutex_lock(&bloqueMutex);
-				pthread_cond_wait(&bloqueCond, &bloqueMutex);
-				pthread_mutex_unlock(&bloqueMutex);
+				pthread_mutex_lock(&bloqueMutex);
+
 				bloque = malloc(sizeof(Tbuffer));
-				if(copiarBloque(bloqueACopiar, bloque) == -1){
+				if (copiarBloque(bloqueACopiar, bloque) == -1) {
 					puts("Error al copiar bloque recibido");
-					liberarEstructuraBuffer(bloqueACopiar);
-					liberarEstructuraBuffer(bloque);
-					return;
+
 				}
 				liberarEstructuraBuffer(bloqueACopiar);
 				bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
 				bloqueAEnviar->contenido = bloque->buffer;
 				bloqueAEnviar->tamanio = bloque->tamanio;
 				bloqueAEnviar->numeroDeBloque = nroBloque;
-				if(enviarBloqueA(bloqueAEnviar, palabras[3]) == -1){
+				if (enviarBloqueA(bloqueAEnviar, palabras[3]) == -1) {
 					puts("Error no se pudo enviar el bloque");
 					liberarEstructuraBuffer(bloque);
 					return;
-					}
+				}
 				liberarEstructuraBuffer(bloque);
 				puts("Perfeeecto, el bloque se copio lo mas bien");
 			}
@@ -131,108 +127,113 @@ void consolaFormat(char**palabras, int cantidad){
 		puts("Error en la cantidad de parametros.");
 	}
 }
-void consolaRename(char** palabras, int cantidad){
-	if(cantidad == 2){
-			if(verificarRutaArchivo(palabras[1])){
-					//falta corroborar que el archivo y los directorios existen
-				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-				puts(rutaLocal);
-				renombrarArchivoODirectorio(rutaLocal, palabras[2]);
-				free(rutaLocal);
-				} else{
-					puts("No existe el directorio o falta la referencia a yamafs:");
-				}
-	} else {
+void consolaRename(char** palabras, int cantidad) {
+	if (cantidad == 2) {
+		if (verificarRutaArchivo(palabras[1]) || 1) {
+			//falta corroborar que el archivo y los directorios existen
+			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+			renombrarArchivoODirectorio(rutaLocal, palabras[2]);
+			free(rutaLocal);
+		}
+		else{
+			puts("No existe el directorio o falta la referencia a yamafs:");
+		}
+	}
+	else{
 		puts("Error en la cantidad de parametros");
 	}
 }
 
-void consolaCat(char**palabras, int cantidad){
-	if(cantidad == 1){
-				if(verificarRutaArchivo(palabras[1])){
-					char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-					leerArchivoComoTextoPlano(rutaLocal);
-					puts("pase");
-				}
-				else{
-					puts("No existe el directorio o falta la referencia a yamafs:");
-				}
-			}
-	else{
-				puts("Error en la cantidad de parametros");
-			}
+void consolaCat(char**palabras, int cantidad) {
+	if (cantidad == 1) {
+		if (verificarRutaArchivo(palabras[1])) {
+			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+			leerArchivoComoTextoPlano(rutaLocal);
+			puts("pase");
+		}
+		else {
+			puts("No existe el directorio o falta la referencia a yamafs:");
+		}
+	}
+	else {
+		puts("Error en la cantidad de parametros");
+	}
 }
 
 void consolaMkdir(char**palabras, int cantidad){
 	if(cantidad == 1){
-				if(existeDirectorio(palabras[1])){
-					puts("Existe el directorio");
-				}else {
-					puts("No existe el directorio");
-					if(crearDirectorio(palabras[1])>=0){
-						persistirTablaDeDirectorios();
-					}
-				}
+		if(existeDirectorio(palabras[1])){
+			puts("Existe el directorio");
+		}
+		else{
+			puts("No existe el directorio");
+			if(crearDirectorio(palabras[1])>=0){
+				persistirTablaDeDirectorios();
 			}
+		}
+	}
 	else{
-				puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros");
 	}
 }
 
 void consolaCpfrom(char** palabras, int cantidad){
 	if(cantidad == 2){
-				if(existeDirectorio(palabras[2])){
-				puts("Existe el directorio");
-				almacenarArchivo(palabras);
-				}else {
-					puts("No existe el directorio");
-				}
-			}
+		if(existeDirectorio(palabras[2])){
+			puts("Existe el directorio");
+			almacenarArchivo(palabras);
+		}
+		else {
+			puts("No existe el directorio");
+		}
+	}
 	else {
-				puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros");
 	}
 }
 
 void consolaMd5(char** palabras, int cantidad){
-	if (cantidad ==1){
-					getMD5(palabras[1]);
-					printf("ya pude solicitar el md5 de un archivo del file system\n");
-				}
-				else {
-					puts("Error en la cantidad de parametros.");
-				}
+	if (cantidad == 1){
+		getMD5(palabras[1]);
+		printf("ya pude solicitar el md5 de un archivo del file system\n");
+	}
+	else {
+		puts("Error en la cantidad de parametros.");
+	}
 }
 
 void consolaLs(char**palabras, int cantidad){
 	if(cantidad == 1){
-			if(existeDirectorio(palabras[1])){
-						puts("Existe el directorio");
-						listarArchivos(palabras[1]);
-						}else {
-						puts("No existe el directorio");
-				}
-	} else{
-			puts("Error en la cantidad de parametros");
+		if(existeDirectorio(palabras[1])){
+			puts("Existe el directorio");
+			listarArchivos(palabras[1]);
+		}
+		else{
+			puts("No existe el directorio");
+		}
+	}
+	else{
+		puts("Error en la cantidad de parametros");
 	}
 }
 
 void consolaInfo(char**palabras, int cantidad){
 	if (cantidad == 1){
-				if(verificarRutaArchivo(palabras[1])){
-					Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
-					char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-					levantarTablaArchivo(tablaArchivo, rutaLocal);
-					mostrarTablaArchivo(tablaArchivo);
-					liberarTablaDeArchivo(tablaArchivo);
-					free(rutaLocal);
-				}
-				else{
-					puts("No existe el directorio o falta la referencia a yamafs:");
-				}
-			}
-			else{
-				puts("Error en la cantidad de parametros");
-			}
+		if(verificarRutaArchivo(palabras[1])){
+			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+			levantarTablaArchivo(tablaArchivo, rutaLocal);
+			mostrarTablaArchivo(tablaArchivo);
+			liberarTablaDeArchivo(tablaArchivo);
+			free(rutaLocal);
+		}
+		else{
+			puts("No existe el directorio o falta la referencia a yamafs:");
+		}
+	}
+	else{
+		puts("Error en la cantidad de parametros");
+	}
 }
 
 void consolaRemove (char** palabras, int cantidad){

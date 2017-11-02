@@ -106,6 +106,7 @@ void inicializarTablaDirectorios(){
 }
 
 void formatearFS(){
+	//eliminarArchivosMetadata();
 	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	formatearNodos(listaDeNodos);
@@ -315,9 +316,20 @@ char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
 }
 
 void renombrarArchivoODirectorio(char * ruta, char * nombre){
-	char * nuevaRuta = obtenerRutaSinArchivo(ruta);
-	string_append(&nuevaRuta, "/");
-	string_append(&nuevaRuta, nombre);
+	char ** split = string_split(ruta, "/");
+	char * ultimoElemento = obtenerUltimoElementoDeUnSplit(split);
+	char * nuevaRuta;
+	if((int) string_contains(ultimoElemento, ".") == 1){
+		nuevaRuta = obtenerRutaSinArchivo(ruta);
+		string_append(&nuevaRuta, "/");
+		string_append(&nuevaRuta, nombre);
+	}
+	else{
+		//es un directorio, hay que actualizar la tabla de directorios
+		nuevaRuta = ruta;
+
+	}
+	printf("ruta a renombrar: %s", nuevaRuta);
 	if(rename(ruta, nuevaRuta) == 0){
 		puts("Se ha renombrado el archivo");
 	}
@@ -325,6 +337,8 @@ void renombrarArchivoODirectorio(char * ruta, char * nombre){
 		puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
 	}
 	free(nuevaRuta);
+	liberarPunteroDePunterosAChar(split);
+	free(split);
 }
 
 int esDirectorio(char * ruta){

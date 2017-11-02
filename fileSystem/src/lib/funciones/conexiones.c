@@ -138,7 +138,6 @@ void conexionesDatanode(void * estructura){
 									logAndExit("Error al recibir el numero de bloque");
 								}
 								puts("voy a hacer el signal");
-								pthread_cond_signal(&bloqueCond);
 								pthread_mutex_unlock(&bloqueMutex);
 								puts("Hice el signal y libere el mutex");
 								break;
