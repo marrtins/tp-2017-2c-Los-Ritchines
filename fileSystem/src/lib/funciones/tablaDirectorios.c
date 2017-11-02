@@ -108,7 +108,8 @@ void inicializarTablaDirectorios(){
 void formatearFS(){
 	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
-	formatearNodos();
+	formatearNodos(listaDeNodos);
+	formatearNodos(listaDeNodosDesconectados);
 }
 
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){

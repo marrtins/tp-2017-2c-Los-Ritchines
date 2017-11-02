@@ -186,26 +186,14 @@ void clearAndClose(int fileDescriptor, fd_set* masterFD){
 	close(fileDescriptor);
 }
 
-void formatearNodos(){
-	int i = 0;
-	int cantidadDeElementos = list_size(listaDeNodos);
+void formatearNodos(t_list * lista){
+	int cantidadElementos = list_size(lista);
 	Tnodo * nodo;
-	Theader * header = malloc(sizeof(Theader));
-	header->tipo_de_proceso = FILESYSTEM;
-	header->tipo_de_mensaje = FORMATEAR_NODO;
-	while(i != cantidadDeElementos){
-		nodo = (Tnodo *)list_get(listaDeNodos, i);
-		if ((send(nodo->fd, header , sizeof(Theader), 0)) == -1){
-			log_trace(logger, "Fallo el send de envío de formateo.");
-			puts("Fallo el formateo de los nodos");
-			return;
-		}
+	int i = 0;
+	while(i < cantidadElementos){
+		nodo = (Tnodo *)list_get(lista, i);
+		inicializarBitmap(nodo->bitmap);
+		nodo->cantidadBloquesLibres = nodo->cantidadBloquesTotal;
 		i++;
 	}
-	if(list_size(listaDeNodosDesconectados) == 0){
-		log_trace(logger, "Fallo al formatear los nodos desconectados.");
-		puts("Warning: Se formatearon los nodos, pero hay nodos desconectados que no lo hicieron.");
-		puts("Puede Intentarlo nuevamente cuando se reconecten al sistema.");
-	}
-	free(header);
 }
