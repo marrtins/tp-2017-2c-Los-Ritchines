@@ -58,54 +58,60 @@ void procesarInput(char* linea) {
 void procesarCpblock(char ** palabras){
 	if(verificarRutaArchivo(palabras[1])){
 		char * rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
-		if((buscarNodoPorNombre(listaDeNodos, palabras[3])) != NULL){
-			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
-			int nroBloque = atoi(palabras[2]);
-			Tbuffer* bloque;
-			TbloqueAEnviar* bloqueAEnviar;
-			levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
-			free(rutaLocalArchivo);
-			if(nroBloque >= cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)){
-				puts("Numero de bloque incorrecto");
-				liberarTablaDeArchivo(tablaArchivo);
-				return;
+		Tnodo *nodo = buscarNodoPorNombre(listaDeNodos, palabras[3]);
+		if(nodo != NULL){
+			if(buscarBloqueDisponible(nodo->bitmap) == -1){
+				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+				int nroBloque = atoi(palabras[2]);
+				Tbuffer* bloque;
+				TbloqueAEnviar* bloqueAEnviar;
+				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
+				free(rutaLocalArchivo);
+				if(nroBloque >= cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)){
+					puts("Numero de bloque incorrecto");
+					liberarTablaDeArchivo(tablaArchivo);
+					return;
 
-			}
-			if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
-				puts("No se encontraron los nodos con las copias del bloque");
-				liberarTablaDeArchivo(tablaArchivo);
-				return;
-			}
-			pthread_cond_init(&bloqueCond, NULL);
-			pthread_mutex_init(&bloqueMutex,NULL);
-			if(pedirBloque(tablaArchivo, nroBloque) == -1){
-				puts("Error al solicitar bloque");
-				liberarTablaDeArchivo(tablaArchivo);
-				return;
-			}
-			liberarTablaDeArchivo(tablaArchivo);
-			pthread_mutex_lock(&bloqueMutex);
-			pthread_cond_wait(&bloqueCond, &bloqueMutex);
-			pthread_mutex_unlock(&bloqueMutex);
-			bloque = malloc(sizeof(Tbuffer));
-			if(copiarBloque(bloqueACopiar, bloque) == -1){
-				puts("Error al copiar bloque recibido");
-				liberarEstructuraBuffer(bloqueACopiar);
-				liberarEstructuraBuffer(bloque);
-				return;
-			}
-			liberarEstructuraBuffer(bloqueACopiar);
-			bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
-			bloqueAEnviar->contenido = bloque->buffer;
-			bloqueAEnviar->tamanio = bloque->tamanio;
-			bloqueAEnviar->numeroDeBloque = nroBloque;
-			if(enviarBloqueA(bloqueAEnviar, palabras[3]) == -1){
-				puts("Error no se pudo enviar el bloque");
-				liberarEstructuraBuffer(bloque);
-				return;
 				}
-			liberarEstructuraBuffer(bloque);
-			puts("Perfeeecto, el bloque se copio lo mas bien");
+				if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
+					puts("No se encontraron los nodos con las copias del bloque");
+					liberarTablaDeArchivo(tablaArchivo);
+					return;
+				}
+				pthread_cond_init(&bloqueCond, NULL);
+				pthread_mutex_init(&bloqueMutex,NULL);
+				if(pedirBloque(tablaArchivo, nroBloque) == -1){
+					puts("Error al solicitar bloque");
+					liberarTablaDeArchivo(tablaArchivo);
+					return;
+				}
+				liberarTablaDeArchivo(tablaArchivo);
+				pthread_mutex_lock(&bloqueMutex);
+				pthread_cond_wait(&bloqueCond, &bloqueMutex);
+				pthread_mutex_unlock(&bloqueMutex);
+				bloque = malloc(sizeof(Tbuffer));
+				if(copiarBloque(bloqueACopiar, bloque) == -1){
+					puts("Error al copiar bloque recibido");
+					liberarEstructuraBuffer(bloqueACopiar);
+					liberarEstructuraBuffer(bloque);
+					return;
+				}
+				liberarEstructuraBuffer(bloqueACopiar);
+				bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
+				bloqueAEnviar->contenido = bloque->buffer;
+				bloqueAEnviar->tamanio = bloque->tamanio;
+				bloqueAEnviar->numeroDeBloque = nroBloque;
+				if(enviarBloqueA(bloqueAEnviar, palabras[3]) == -1){
+					puts("Error no se pudo enviar el bloque");
+					liberarEstructuraBuffer(bloque);
+					return;
+					}
+				liberarEstructuraBuffer(bloque);
+				puts("Perfeeecto, el bloque se copio lo mas bien");
+			}
+			else{
+				puts("El nodo destino esta lleno.");
+			}
 		}
 		else {
 			puts("El nodo destino no existe o no esta conectado.");
