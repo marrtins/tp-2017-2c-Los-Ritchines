@@ -108,7 +108,8 @@ void inicializarTablaDirectorios(){
 void formatearFS(){
 	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
-	formatearNodos();
+	formatearNodos(listaDeNodos);
+	formatearNodos(listaDeNodosDesconectados);
 }
 
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
@@ -634,7 +635,23 @@ void removerArchivo(char* ruta){
 	}
 
 
+void moverArchivo(char* ruta1, char* ruta2){
+	char* rutaLocalArchivo = obtenerRutaLocalDeArchivo(ruta1);
+	char** palabras = string_split(rutaLocalArchivo, "/");
+	char* nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(palabras);
+	remove(rutaLocalArchivo);
+	int index = obtenerIndexDeUnaRuta(ruta2);
+	char* rutaLocalDirectorio = malloc(200);
+	sprintf(rutaLocalDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	string_append(&rutaLocalDirectorio,"/");
+	string_append(&rutaLocalDirectorio, nombreArchivoConExtension);
+	FILE * archivo = fopen(rutaLocalDirectorio, "w+");
+	fclose(archivo);
+	free(rutaLocalDirectorio);
 
+
+	puts("Movi el archivo");
+}
 
 void removerDirectorio(char* ruta){
 

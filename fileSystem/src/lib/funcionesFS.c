@@ -5,24 +5,33 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = nodo1->primerBloqueLibreBitmap;
-	ocuparProximoBloque(nodo1);
+	int bloqueAOcupar = obtenerBloqueDisponible(nodo1->bitmap);
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = bloqueAOcupar;
+	ocuparBloque(nodo1, bloqueAOcupar);
 	mostrarBitmap(nodo1->bitmap);
 
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
 
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = nodo2->primerBloqueLibreBitmap;
-	ocuparProximoBloque(nodo2);
+	bloqueAOcupar = obtenerBloqueDisponible(nodo2->bitmap);
+	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = bloqueAOcupar;
+	ocuparBloque(nodo2, bloqueAOcupar);
 	mostrarBitmap(nodo2->bitmap);
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
 	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 }
 
-void ocuparProximoBloque(Tnodo * nodo){
-	bitarray_set_bit(nodo->bitmap, nodo->primerBloqueLibreBitmap);
-	nodo->primerBloqueLibreBitmap++;
+void inicializarBitmap(t_bitarray * bitmap){
+	int i = 0;
+	while(i < bitarray_get_max_bit(bitmap)){
+		bitarray_clean_bit(bitmap, i);
+		i++;
+	}
+}
+
+void ocuparBloque(Tnodo * nodo, int bloqueAOcupar){
+	bitarray_set_bit(nodo->bitmap, bloqueAOcupar);
 	nodo->cantidadBloquesLibres--;
 	ocuparBloqueEnTablaArchivos(nodo->nombre);
 }
@@ -267,7 +276,6 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->fd = fileDescriptor;
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
-	nuevoNodo->primerBloqueLibreBitmap = 0;
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
 	return nuevoNodo;

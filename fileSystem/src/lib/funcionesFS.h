@@ -18,15 +18,17 @@ void mostrarConfiguracion(TfileSystem *fileSystem);
 void procesarCpblock(char ** palabras);
 void procesarInput(char * linea);
 void consolaFS(void);
-void hacerFormat(char**palabras, int cantidadParametros);
-void hacerRM(char** palabras, int cantidadParametros);
-void hacerRename(char**palabras, int cantidadParametros);
-void hacerCat(char**palabras, int cantidadParametros);
-void hacerMkdir(char**palabras, int cantidadParametros);
-void hacerCpfrom(char**palabras, int cantidadParametros);
-void obtenerMD5(char**palabras, int cantidadParametros);
-void hacerLs(char**palabras, int cantidadParametros);
-void hacerInfo(char**palabras, int cantidadParametros);
+void consolaFormat(char**palabras, int cantidadParametros);
+void consolaRemove(char** palabras, int cantidadParametros);
+void consolaRename(char**palabras, int cantidadParametros);
+void consolaCat(char**palabras, int cantidadParametros);
+void consolaMkdir(char**palabras, int cantidadParametros);
+void consolaCpfrom(char**palabras, int cantidadParametros);
+void consolaMd5(char**palabras, int cantidadParametros);
+void consolaLs(char**palabras, int cantidadParametros);
+void consolaMove(char**palabras, int cantidadParametros);
+void consolaInfo(char**palabras, int cantidadParametros);
+void inicializarBitmap(t_bitarray * bitmap);
 
 
 //Conexiones
@@ -76,7 +78,7 @@ void liberarNodosDeLista(void * nodo);
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
-void ocuparProximoBloque(Tnodo * nodo);
+void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
 
 //Directorios
 int existeDirectorio(char * directorio);
@@ -93,6 +95,7 @@ int esArchivo(char* ruta);
 char** buscarDirectorios(char * ruta);
 char** buscarArchivos(char * ruta);
 void listarArchivos(char * ruta);
+void moverArchivo(char*ruta1, char*ruta2);
 void removerDirectorios(char * ruta);
 int verificarRutaArchivo(char * rutaYamafs);
 int existeArchivo(int indiceDirectorio , char * rutaYamafs);
