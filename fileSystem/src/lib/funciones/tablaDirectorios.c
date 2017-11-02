@@ -106,9 +106,11 @@ void inicializarTablaDirectorios(){
 }
 
 void formatearFS(){
+	//eliminarArchivosMetadata();
 	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
-	formatearNodos();
+	formatearNodos(listaDeNodos);
+	formatearNodos(listaDeNodosDesconectados);
 }
 
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
@@ -314,9 +316,20 @@ char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
 }
 
 void renombrarArchivoODirectorio(char * ruta, char * nombre){
-	char * nuevaRuta = obtenerRutaSinArchivo(ruta);
-	string_append(&nuevaRuta, "/");
-	string_append(&nuevaRuta, nombre);
+	char ** split = string_split(ruta, "/");
+	char * ultimoElemento = obtenerUltimoElementoDeUnSplit(split);
+	char * nuevaRuta;
+	if((int) string_contains(ultimoElemento, ".") == 1){
+		nuevaRuta = obtenerRutaSinArchivo(ruta);
+		string_append(&nuevaRuta, "/");
+		string_append(&nuevaRuta, nombre);
+	}
+	else{
+		//es un directorio, hay que actualizar la tabla de directorios
+		nuevaRuta = ruta;
+
+	}
+	printf("ruta a renombrar: %s", nuevaRuta);
 	if(rename(ruta, nuevaRuta) == 0){
 		puts("Se ha renombrado el archivo");
 	}
@@ -324,6 +337,8 @@ void renombrarArchivoODirectorio(char * ruta, char * nombre){
 		puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
 	}
 	free(nuevaRuta);
+	liberarPunteroDePunterosAChar(split);
+	free(split);
 }
 
 int esDirectorio(char * ruta){
@@ -634,7 +649,23 @@ void removerArchivo(char* ruta){
 	}
 
 
+void moverArchivo(char* ruta1, char* ruta2){
+	char* rutaLocalArchivo = obtenerRutaLocalDeArchivo(ruta1);
+	char** palabras = string_split(rutaLocalArchivo, "/");
+	char* nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(palabras);
+	remove(rutaLocalArchivo);
+	int index = obtenerIndexDeUnaRuta(ruta2);
+	char* rutaLocalDirectorio = malloc(200);
+	sprintf(rutaLocalDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
+	string_append(&rutaLocalDirectorio,"/");
+	string_append(&rutaLocalDirectorio, nombreArchivoConExtension);
+	FILE * archivo = fopen(rutaLocalDirectorio, "w+");
+	fclose(archivo);
+	free(rutaLocalDirectorio);
 
+
+	puts("Movi el archivo");
+}
 
 void removerDirectorio(char* ruta){
 

@@ -34,12 +34,10 @@ void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo 
 	printf("libres: %d\n", nodo1->cantidadBloquesLibres);
 	printf("total: %d\n", nodo1->cantidadBloquesTotal);
 	printf("fd: %d\n", nodo1->fd);
-	printf("primerBloqueLibre: %d\n", nodo1->primerBloqueLibreBitmap);
 	printf("nombre: %s\n", nodo2->nombre);
 	printf("libres: %d\n", nodo2->cantidadBloquesLibres);
 	printf("total: %d\n", nodo2->cantidadBloquesTotal);
 	printf("fd: %d\n", nodo2->fd);
-	printf("primerBloqueLibre: %d\n", nodo2->primerBloqueLibreBitmap);
 }
 
 int bloquesOcupadosDeNodo(Tnodo * nodo){
@@ -64,7 +62,6 @@ void mostrarListaDeNodos(t_list * lista){
 		printf("Cantidad De Bloques Total: %d\n", nodo->cantidadBloquesTotal);
 		printf("Cantidad De Bloques Libres: %d\n", nodo->cantidadBloquesLibres);
 		printf("File Descriptor: %d\n", nodo->fd);
-		printf("Primer Bloque Libre en Bitmap: %d\n", nodo->primerBloqueLibreBitmap);
 		printf("Bitmap: ");
 		mostrarBitmap(nodo->bitmap);
 		i++;
