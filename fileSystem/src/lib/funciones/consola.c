@@ -78,7 +78,6 @@ void procesarCpblock(char ** palabras){
 				liberarTablaDeArchivo(tablaArchivo);
 				return;
 			}
-			pthread_cond_init(&bloqueCond, NULL);
 			pthread_mutex_init(&bloqueMutex,NULL);
 			if(pedirBloque(tablaArchivo, nroBloque) == -1){
 				puts("Error al solicitar bloque");
@@ -87,7 +86,7 @@ void procesarCpblock(char ** palabras){
 			}
 			liberarTablaDeArchivo(tablaArchivo);
 			pthread_mutex_lock(&bloqueMutex);
-			pthread_cond_wait(&bloqueCond, &bloqueMutex);
+			//pthread_cond_wait(&bloqueCond, &bloqueMutex);
 			pthread_mutex_unlock(&bloqueMutex);
 			bloque = malloc(sizeof(Tbuffer));
 			if(copiarBloque(bloqueACopiar, bloque) == -1){

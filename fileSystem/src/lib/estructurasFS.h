@@ -58,7 +58,7 @@ t_list * listaTablaDirectorios;
 //Se usa en el cpblock;
 Tbuffer* bloqueACopiar;
 
-pthread_cond_t bloqueCond;
 pthread_mutex_t bloqueMutex;
+
 
 #endif
