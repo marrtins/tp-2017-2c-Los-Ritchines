@@ -200,11 +200,24 @@ void mostrarBinario(char * rutaLocal){
 void leerArchivoComoTextoPlano(char * rutaLocal){
 	char * nombreArchivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
 	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
+	char * rutaTmp = string_new();
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+
+	levantarTablaArchivo(archivo,rutaLocal);
+
+	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
+	string_append(&rutaTmp, nombreArchivoConExtension);
+	levantarArchivo(archivo,rutaTmp);
 	if(strcmp(extension, "csv") == 0){
-		mostrarCsv(rutaLocal);
+		mostrarCsv(rutaTmp);
 	}else{
-		mostrarBinario(rutaLocal);
+		mostrarBinario(rutaTmp);
 	}
+
+	liberarTablaDeArchivo(archivo);
+	free(nombreArchivoConExtension);
+	free(extension);
+	free(rutaTmp);
 
 }
 
