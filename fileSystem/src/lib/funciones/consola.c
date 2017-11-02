@@ -60,7 +60,7 @@ void procesarCpblock(char ** palabras){
 		char * rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 		Tnodo *nodo = buscarNodoPorNombre(listaDeNodos, palabras[3]);
 		if(nodo != NULL){
-			if(obtenerBloqueDisponible(nodo) == -1){
+			if(obtenerBloqueDisponible(nodo) != -1){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				int nroBloque = atoi(palabras[2]);
 				Tbuffer* bloque;
