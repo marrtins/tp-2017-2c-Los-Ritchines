@@ -28,7 +28,7 @@ void consolaMd5(char**palabras, int cantidadParametros);
 void consolaLs(char**palabras, int cantidadParametros);
 void consolaMove(char**palabras, int cantidadParametros);
 void consolaInfo(char**palabras, int cantidadParametros);
-void inicializarBitmap(t_bitarray * bitmap);
+void inicializarBitmap(Tnodo* bitmap);
 
 
 //Conexiones

@@ -191,7 +191,7 @@ void formatearNodos(t_list * lista){
 	int i = 0;
 	while(i < cantidadElementos){
 		nodo = (Tnodo *)list_get(lista, i);
-		inicializarBitmap(nodo->bitmap);
+		inicializarBitmap(nodo);
 		nodo->cantidadBloquesLibres = nodo->cantidadBloquesTotal;
 		i++;
 	}

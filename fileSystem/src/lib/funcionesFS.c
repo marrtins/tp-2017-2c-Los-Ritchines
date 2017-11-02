@@ -5,7 +5,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
 
-	int bloqueAOcupar = obtenerBloqueDisponible(nodo1->bitmap);
+	int bloqueAOcupar = obtenerBloqueDisponible(nodo1);
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = bloqueAOcupar;
 	ocuparBloque(nodo1, bloqueAOcupar);
 	mostrarBitmap(nodo1->bitmap);
@@ -14,7 +14,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
 	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
 
-	bloqueAOcupar = obtenerBloqueDisponible(nodo2->bitmap);
+	bloqueAOcupar = obtenerBloqueDisponible(nodo2);
 	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = bloqueAOcupar;
 	ocuparBloque(nodo2, bloqueAOcupar);
 	mostrarBitmap(nodo2->bitmap);
@@ -22,10 +22,10 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
 }
 
-void inicializarBitmap(t_bitarray * bitmap){
+void inicializarBitmap(Tnodo* nodo){
 	int i = 0;
-	while(i < bitarray_get_max_bit(bitmap)){
-		bitarray_clean_bit(bitmap, i);
+	while(i < nodo->cantidadBloquesTotal){
+		bitarray_clean_bit(nodo->bitmap, i);
 		i++;
 	}
 }
