@@ -211,7 +211,7 @@ void leerArchivoComoTextoPlano(char * rutaLocal){
 	Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
 	levantarTablaArchivo(archivo,rutaLocal);
-
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/", 0777);
 	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
 	string_append(&rutaTmp, nombreArchivoConExtension);
 	levantarArchivo(archivo,rutaTmp);
@@ -220,7 +220,7 @@ void leerArchivoComoTextoPlano(char * rutaLocal){
 	}else{
 		mostrarBinario(rutaTmp);
 	}
-
+	remove(rutaTmp);
 	liberarTablaDeArchivo(archivo);
 	free(nombreArchivoConExtension);
 	free(extension);
