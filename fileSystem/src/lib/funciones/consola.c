@@ -163,7 +163,11 @@ void consolaRename(char** palabras, int cantidad) {
 
 void consolaCat(char ** palabras, int cantidad) {
 	if (cantidad == 1) {
-		if (verificarRutaArchivo(palabras[1])) {
+		char** carpetas = string_split(palabras[1], "/");
+
+		if(string_equals_ignore_case(carpetas[0], "yamafs:")){
+			puts("Falta la referencia a yamafs");
+		} else if (verificarRutaArchivo(palabras[1])) {
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 			leerArchivoComoTextoPlano(rutaLocal);
 			puts("pase");
@@ -179,7 +183,10 @@ void consolaCat(char ** palabras, int cantidad) {
 
 void consolaMkdir(char**palabras, int cantidad){
 	if(cantidad == 1){
-		if(existeDirectorio(palabras[1])){
+		char** carpetas = string_split(palabras[1], "/");
+		if(!string_equals_ignore_case(carpetas[0], "yamafs:")){
+			puts("Falta la referencia a yamafs");
+		} else if(existeDirectorio(palabras[1])){
 			puts("Existe el directorio");
 		}
 		else{
@@ -211,8 +218,12 @@ void consolaCpfrom(char** palabras, int cantidad){
 
 void consolaMd5(char** palabras, int cantidad){
 	if (cantidad == 1){
-		getMD5(palabras[1]);
-
+		char** carpetas = string_split(palabras[1], "/");
+		if(!string_equals_ignore_case(carpetas[0], "yamafs:")){
+			puts("Falta la referencia a yamafs");
+		} else{
+			getMD5(palabras[1]);
+		}
 	}
 	else {
 		puts("Error en la cantidad de parametros.");
@@ -221,7 +232,10 @@ void consolaMd5(char** palabras, int cantidad){
 
 void consolaLs(char**palabras, int cantidad){
 	if(cantidad == 1){
-		if(existeDirectorio(palabras[1])){
+		char** carpetas = string_split(palabras[1], "/");
+		if(!string_equals_ignore_case(carpetas[0], "yamafs:")){
+			puts("Falta la referencia a yamafs");
+		} else if(existeDirectorio(palabras[1])){
 			puts("Existe el directorio");
 			listarArchivos(palabras[1]);
 		}
@@ -236,7 +250,10 @@ void consolaLs(char**palabras, int cantidad){
 
 void consolaInfo(char**palabras, int cantidad){
 	if (cantidad == 1){
-		if(verificarRutaArchivo(palabras[1])){
+		char** divisionRuta = string_split(palabras[1], "/");
+		if(!string_equals_ignore_case(divisionRuta[0], "yamafs:")){
+				puts("Falta la referencia a yamafs");
+		} else if(verificarRutaArchivo(palabras[1])){
 			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 			levantarTablaArchivo(tablaArchivo, rutaLocal);
@@ -255,34 +272,40 @@ void consolaInfo(char**palabras, int cantidad){
 
 void consolaRemove (char** palabras, int cantidad){
 	if (cantidad == 1){
-
-		if(verificarRutaArchivo(palabras[1])){
+		char** divisionRuta = string_split(palabras[1], "/");
+		if (!string_equals_ignore_case(divisionRuta[0], "yamafs:")){
+				puts("Falta la referencia a yamafs");
+		} else if(verificarRutaArchivo(palabras[1])){
 			removerArchivo(palabras[1]);
 		} else{
 			puts("El archivo no existe en la ruta especificada");
 		}
 	} else if (cantidad ==2){
 		if (string_equals_ignore_case(palabras[1], "-d")){
-
-			if(existeDirectorio(palabras[2])){
+			char** carpetas = string_split(palabras[2], "/");
+			if(!string_equals_ignore_case(carpetas[0], "yamafs:")){
+				puts("Falta la referencia a yamafs");
+			} else if(existeDirectorio(palabras[2])){
 				if(esDirectorioRaiz(palabras[2])){
-					puts("No se puede remover el directorio raíz");
-				} else if(esDirectorioVacio(palabras[2])){
+				puts("No se puede remover el directorio raíz");
+			} else if(esDirectorioVacio(palabras[2])){
 				removerDirectorio(palabras[2]);
 				puts("Ya pude remover el directorio");
-				} else{
+			} else{
 				puts("El directorio no esta vacío. No se puede remover");
-				}
+			}
 			} else{
 				puts("No existe el directorio");
 			}
 		} else if (string_equals_ignore_case(palabras[1], "-b")){
-			puts("Voy a eliminar un nodo");
+				puts("Voy a eliminar un nodo");
 			//removerNodo
 		}
+
 		} else{
 			puts("Error en la cantidad de parámetros");
 		}
+
 }
 
 int getMD5(char* rutaYamafs){
@@ -290,14 +313,12 @@ int getMD5(char* rutaYamafs){
 	char * nombreArchivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
 	char * rutaTmp = string_new();
 	Tarchivo * archivo = malloc(sizeof(Tarchivo));
-printf("obtuve ruta local %s", rutaLocal);
 	levantarTablaArchivo(archivo,rutaLocal);
-	puts("rompe aca");
+
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/", 0777);
 	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
 	string_append(&rutaTmp, nombreArchivoConExtension);
 	levantarArchivo(archivo,rutaTmp);
-	puts("rompe aca 2");
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaTmp);
 	system(comando);
@@ -312,7 +333,11 @@ printf("obtuve ruta local %s", rutaLocal);
 
 void consolaMove(char ** palabras, int cantidad){
 	if(cantidad==2){
-		if(verificarRutaArchivo(palabras[1])){
+		char** carpetas1 = string_split(palabras[1], "/");
+		char** carpetas2 = string_split(palabras[2], "/");
+		if(!string_equals_ignore_case(carpetas1[0], "yamafs:") || !string_equals_ignore_case(carpetas2[0], "yamafs:")){
+			puts("Falta la referencia a yamafs en alguna de las rutas");
+		} else if(verificarRutaArchivo(palabras[1])){
 			moverArchivo(palabras[1], palabras[2]);
 		} else{
 			puts("No se quiere mover un archivo");
