@@ -541,7 +541,7 @@ void listarArchivos(char* ruta){
 	char ** archivos;
 	int i = 0, index;
 	char * rutaArchivosDirectorio = malloc(200);
-	char ** divisionRuta;
+	char ** carpetas;
 	char * nombreArchivoConExtension;
 	index = obtenerIndexDeUnaRuta(ruta);
 	sprintf(rutaArchivosDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
@@ -550,16 +550,16 @@ void listarArchivos(char* ruta){
 		if(archivos[i] != NULL){
 			while(archivos[i] != NULL){
 
-				divisionRuta = string_split(archivos[i], "/");
-				nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(divisionRuta);
+				carpetas = string_split(archivos[i], "/");
+				nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(carpetas);
 				puts(nombreArchivoConExtension);
 				i++;
 
 				free(nombreArchivoConExtension);
 			}
 			liberarPunteroDePunterosAChar(archivos);
-			liberarPunteroDePunterosAChar(divisionRuta);
-			free(divisionRuta);
+			liberarPunteroDePunterosAChar(carpetas);
+			free(carpetas);
 			free(archivos);
 			free(rutaArchivosDirectorio);
 		}else {
