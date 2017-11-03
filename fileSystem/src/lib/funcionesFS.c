@@ -263,8 +263,6 @@ int almacenarArchivo(char **palabras){
 	Tarchivo * archivoAAlmacenar = malloc(sizeof(Tarchivo));
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
-	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
-	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
 	if(procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]) == -1){
 		liberarPunteroDePunterosAChar(splitDeRuta);
