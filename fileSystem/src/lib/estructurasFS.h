@@ -60,5 +60,7 @@ Tbuffer* bloqueACopiar;
 
 pthread_mutex_t bloqueMutex;
 
+//bool
+int estable;
 
 #endif

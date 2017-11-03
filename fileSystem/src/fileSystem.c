@@ -8,8 +8,8 @@ int main(int argc, char* argv[]) {
 		socketYama,
 		cantNodosPorConectar;
 
+	estable = 0;
 	TfileSystem * fileSystem;
-
 	pthread_t consolaThread, datanodesThread;
 
 	fd_set readFD, masterFD;

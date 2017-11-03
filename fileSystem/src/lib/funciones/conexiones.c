@@ -85,6 +85,7 @@ void conexionesDatanode(void * estructura){
 										nuevoNodo = malloc(sizeof(Tnodo));
 										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										list_add(listaDeNodos, nuevoNodo);
+										cantNodosPorConectar--;
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -101,7 +102,6 @@ void conexionesDatanode(void * estructura){
 									puts("Un nodo ya conectado, se esta volviendo a conectar");
 									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
-								cantNodosPorConectar--;
 								break;
 
 							case OBTENER_BLOQUE_Y_NRO:
