@@ -29,7 +29,14 @@ void procesarInput(char* linea) {
 		consolaCpfrom(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
 		if(verificarRutaArchivo(palabras[1])){
-		copiarArchivo(palabras);
+			if(copiarArchivo(palabras) != -1){
+				puts("Se copio el archivo, bro.");
+				return;
+			}
+			else
+			{
+				puts("No se pudo copiar el archivo, bro.");
+			}
 		}
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
 		procesarCpblock(palabras);
@@ -205,7 +212,7 @@ void consolaCpfrom(char** palabras, int cantidad){
 void consolaMd5(char** palabras, int cantidad){
 	if (cantidad == 1){
 		getMD5(palabras[1]);
-		printf("ya pude solicitar el md5 de un archivo del file system\n");
+
 	}
 	else {
 		puts("Error en la cantidad de parametros.");
@@ -276,14 +283,28 @@ void consolaRemove (char** palabras, int cantidad){
 		}
 }
 
-int getMD5(char* ruta){
-	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+int getMD5(char* rutaYamafs){
+	char* rutaLocal = obtenerRutaLocalDeArchivo(rutaYamafs);
+	char * nombreArchivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
+	char * rutaTmp = string_new();
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+printf("obtuve ruta local %s", rutaLocal);
+	levantarTablaArchivo(archivo,rutaLocal);
+	puts("rompe aca");
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/", 0777);
+	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
+	string_append(&rutaTmp, nombreArchivoConExtension);
+	levantarArchivo(archivo,rutaTmp);
+	puts("rompe aca 2");
 	char* comando = string_duplicate("md5sum ");
-	string_append(&comando, rutaArchivo);
+	string_append(&comando, rutaTmp);
 	system(comando);
 	printf("Obtuve el MD5 del archivo");
+	remove(rutaTmp);
 	free(comando);
-	free(rutaArchivo);
+	free(rutaTmp);
+	free(rutaLocal);
+
 	return 0;
 }
 
