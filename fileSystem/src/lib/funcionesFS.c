@@ -225,6 +225,11 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		return -1;
 	}
 
+	if(list_size(listaDeNodos) <= 1){
+		puts("No hay nodos conectados, hermano");
+		return -1;
+	}
+
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_trace(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
@@ -241,10 +246,10 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	}
 
 	liberarEstructuraBloquesAEnviar(infoBloque);
-	return 0;
+	return 1;
 }
 
-void almacenarArchivo(char **palabras){
+int almacenarArchivo(char **palabras){
 	//palabras[1] --> ruta archivo a almacenar
 	//palabras[2] --> ruta de nuestro directorio
 	char ** splitDeRuta = string_split(palabras[1], "/");
@@ -262,7 +267,7 @@ void almacenarArchivo(char **palabras){
 		free(splitDeRuta);
 		free(nombreArchivoConExtension);
 		liberarTablaDeArchivo(archivoAAlmacenar);
-		return;
+		return -1;
 	}
 
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
@@ -270,6 +275,7 @@ void almacenarArchivo(char **palabras){
 	free(splitDeRuta);
 	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
+	return 1;
 }
 
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo){
@@ -348,7 +354,7 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 
 
-void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
+int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	int cantBloques, nroBloque=0;
 	Tbuffer* bloque = malloc(sizeof(Tbuffer));
 	int fd;
@@ -365,7 +371,7 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		log_trace(logger,"Error al hacer mmap");
 		puts("Error al hacer mmap");
 		liberarEstructuraBuffer(bloque);
-		return;
+		return -1;
 	}
 	fclose(archivo);
 	close(fd);
@@ -375,7 +381,7 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
 			puts("No se encontraron los nodos con las copias del bloque");
-			return;
+			return -1;
 			}
 
 		//pthread_cond_init(&bloqueCond, NULL);
@@ -394,7 +400,7 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 			log_trace(logger,"Error al copiar bloque recibido");
 			liberarEstructuraBuffer(bloque);
 		//borrar archivo
-			return;
+			return -1;
 		}
 		puts("voy a hacer un memcpy");
 		memcpy(p,bloque->buffer,bloque->tamanio);
@@ -404,17 +410,18 @@ void levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	}
 
 	if (msync((void *)archivoMapeado, tablaArchivo->tamanioTotal, MS_SYNC) < 0) {
-					log_trace(logger,"Error al hacer msync");
-					puts("Error al hacer msync");
-		}
+		log_trace(logger,"Error al hacer msync");
+		puts("Error al hacer msync");
+		return -1;
+	}
 	puts("Achivo copiado con éxito");
 	liberarEstructuraBuffer(bloque);
 	munmap(archivoMapeado,tablaArchivo->tamanioTotal);
-
+	return 1;
 }
 
 
-void copiarArchivo(char ** palabras){
+int copiarArchivo(char ** palabras){
 	//palabras[1] --> ruta archivo yamafs
 	//palabras[2] --> directorio
 	char * rutaTablaArchivo;
@@ -439,6 +446,7 @@ void copiarArchivo(char ** palabras){
 	free(rutaTablaArchivo);
 	free(nombreArchivo);
 	free(rutaDirectorio);
+	return 1;
 }
 
 int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){

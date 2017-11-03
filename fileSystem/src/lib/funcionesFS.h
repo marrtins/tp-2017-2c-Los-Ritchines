@@ -109,7 +109,7 @@ void removerDirectorio(char*ruta);
 void removerDirectorioDeTabla(char* directorio);
 
 //Almacenar Archivo
-void almacenarArchivo(char **palabras);
+int almacenarArchivo(char **palabras);
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar);
 void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo);
 char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia);
@@ -118,8 +118,8 @@ bool ordenarSegunBloquesDisponibles(void* nodo1, void* nodo2);
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * archivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque);
 
 //Obtener Archivo
-void levantarArchivo(Tarchivo * archivo, char * ruta);
-void copiarArchivo(char ** palabras);
+int levantarArchivo(Tarchivo * archivo, char * ruta);
+int copiarArchivo(char ** palabras);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
