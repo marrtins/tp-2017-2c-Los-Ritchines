@@ -29,7 +29,14 @@ void procesarInput(char* linea) {
 		consolaCpfrom(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
 		if(verificarRutaArchivo(palabras[1])){
-		copiarArchivo(palabras);
+			if(copiarArchivo(palabras) != -1){
+				puts("Se copio el archivo, bro.");
+				return;
+			}
+			else
+			{
+				puts("No se pudo copiar el archivo, bro.");
+			}
 		}
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
 		procesarCpblock(palabras);
