@@ -266,7 +266,10 @@ int almacenarArchivo(char **palabras){
 		liberarPunteroDePunterosAChar(splitDeRuta);
 		free(splitDeRuta);
 		free(nombreArchivoConExtension);
-		liberarTablaDeArchivo(archivoAAlmacenar);
+		free(archivoAAlmacenar->nombreArchivoSinExtension);
+		free(archivoAAlmacenar->extensionArchivo);
+		free(archivoAAlmacenar->bloques);
+		free(archivoAAlmacenar);
 		return -1;
 	}
 
