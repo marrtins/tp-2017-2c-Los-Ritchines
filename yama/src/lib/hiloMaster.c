@@ -10,9 +10,9 @@ int idTempName,idPropio;
 
 extern int idMasterGlobal,idJobGlobal,idTareaGlobal;
 
-t_list *listaNodos;
+t_list *listaNodosDelJob;
 extern t_list *listaJobFinalizados, * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
-extern pthread_mutex_t mux_idTareaGlobal,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
+extern pthread_mutex_t mux_listaJobFinalizados, mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 
 TpackBytes *pathResultado;
 
@@ -26,7 +26,7 @@ void masterHandler(void *atributos){
 	int idTareaFinalizada;
 	idTempName=0;
 
-	listaNodos=list_create();
+	listaNodosDelJob=list_create();
 
 
 	pthread_mutex_lock(&mux_idGlobal);
@@ -167,6 +167,7 @@ void masterHandler(void *atributos){
 					headEnvio->tipo_de_proceso=YAMA;
 					headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 					enviarHeader(sockMaster,headEnvio);
+					MUX_LOCK(&mux_listaJobFinalizados);
 					if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
 						TjobFinalizado *job = malloc(sizeof job);
 						TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
@@ -174,6 +175,7 @@ void masterHandler(void *atributos){
 						job->finCorrecto=false;
 						list_add(listaJobFinalizados,job);
 					}
+					MUX_UNLOCK(&mux_listaJobFinalizados);
 				}
 			}else{
 
@@ -183,6 +185,7 @@ void masterHandler(void *atributos){
 				headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 				enviarHeader(sockMaster,headEnvio);
 				liberarCargaNodos(idTareaFinalizada);
+				MUX_LOCK(&mux_listaJobFinalizados);
 				if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
 					TjobFinalizado *job = malloc(sizeof job);
 					TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
@@ -190,6 +193,7 @@ void masterHandler(void *atributos){
 					job->finCorrecto=false;
 					list_add(listaJobFinalizados,job);
 				}
+				MUX_UNLOCK(&mux_listaJobFinalizados);
 			}
 
 			break;
@@ -215,6 +219,7 @@ void masterHandler(void *atributos){
 			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 			enviarHeader(sockMaster,headEnvio);
 			liberarCargaNodos(idTareaFinalizada);
+			MUX_LOCK(&mux_listaJobFinalizados);
 			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
 				TjobFinalizado *jobFinRL = malloc(sizeof jobFinRL);
 				TpackTablaEstados *tareaFinalizadaRL=getTareaPorId(idTareaFinalizada);
@@ -222,6 +227,7 @@ void masterHandler(void *atributos){
 				jobFinRL->finCorrecto=false;
 				list_add(listaJobFinalizados,jobFinRL);
 			}
+			MUX_UNLOCK(&mux_listaJobFinalizados);
 			break;
 		case FIN_REDUCCIONGLOBALOK:
 			idTareaFinalizada = recibirValor(sockMaster);
@@ -243,6 +249,7 @@ void masterHandler(void *atributos){
 			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 			enviarHeader(sockMaster,headEnvio);
 			liberarCargaNodos(idTareaFinalizada);
+			MUX_LOCK(&mux_listaJobFinalizados);
 			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
 				TjobFinalizado *jobFinRG = malloc(sizeof jobFinRG);
 				TpackTablaEstados *tareaFinalizadaRG=getTareaPorId(idTareaFinalizada);
@@ -250,6 +257,7 @@ void masterHandler(void *atributos){
 				jobFinRG->finCorrecto=false;
 				list_add(listaJobFinalizados,jobFinRG);
 			}
+			MUX_UNLOCK(&mux_listaJobFinalizados);
 			break;
 		case FIN_ALMACENAMIENTOFINALOK:
 			idTareaFinalizada = recibirValor(sockMaster);
@@ -270,6 +278,7 @@ void masterHandler(void *atributos){
 			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 			enviarHeader(sockMaster,headEnvio);
 			liberarCargaNodos(idTareaFinalizada);
+			MUX_LOCK(&mux_listaJobFinalizados);
 			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
 				TjobFinalizado *jobFinAF = malloc(sizeof jobFinAF);
 				TpackTablaEstados *tareaFinalizadaAF=getTareaPorId(idTareaFinalizada);
@@ -277,6 +286,7 @@ void masterHandler(void *atributos){
 				jobFinAF->finCorrecto=false;
 				list_add(listaJobFinalizados,jobFinAF);
 			}
+			MUX_UNLOCK(&mux_listaJobFinalizados);
 			break;
 		default:
 			break;
@@ -395,8 +405,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 				list_add(listaInformacionNodos,infoNodoAux);
 
 
-				//todo://int bloqueAux = tareaOk->bloqueDelArchivo;
-				//list_add(bloques,string_itoa(bloqueAux));
+
 
 			}
 		}
@@ -419,10 +428,10 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	printf("se enviaron %d bytes de la info de la reduccion global\n",stat);
 	agregarReduccionGlobalAListaEnProceso(nuevaReduccion);
 
-	int cargaWorker = divideYRedondea(list_size(listaNodos),2);
+	int cargaWorker = divideYRedondea(list_size(listaNodosDelJob),2);
 
-	actualizarCargaWorkerEn(getNodoElegido(listaNodos),cargaWorker);
-	aumentarHistoricoEn(getNodoElegido(listaNodos),cargaWorker);
+	actualizarCargaWorkerEn(getNodoElegido(listaNodosDelJob),cargaWorker);
+	aumentarHistoricoEn(getNodoElegido(listaNodosDelJob),cargaWorker);
 	return 0;
 }
 
@@ -535,14 +544,10 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 
 bool sePuedeComenzarReduccionLocal(int idTareaFinalizada){
 	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
-
-//1-Verifico q el job no se haya terminado x error de replanificacion .
 	int i;
-	for(i=0;i<list_size(listaJobFinalizados);i++){
-		TjobFinalizado *jobAux = list_get(listaJobFinalizados,i);
-		if(jobAux->nroJob == tareaFinalizada->job){
-			return false;
-		}
+//1-Verifico q el job no se haya terminado x error de replanificacion .
+	if(yaFueFinalizadoPorErrorDeReplanificacion(tareaFinalizada->job)){
+		return false;
 	}
 
 //2-Verifico si ya se terminaron todas las transformaciones relacionadas con este archivo
@@ -994,7 +999,7 @@ void generarListaInfoNodos(){
 	nodo1->puertoWorker=malloc(puertoLen);
 	nodo1->puertoWorker = "5013";
 	nodo1->tamanioPuerto=strlen(nodo1->puertoWorker)+1;
-	list_add(listaNodos,nodo1);
+	list_add(listaNodosDelJob,nodo1);
 
 	TpackageInfoNodo *nodo2 = malloc(sizeof(nodo2));
 	nodo2->nombreNodo=malloc(nombreLen);
@@ -1007,7 +1012,7 @@ void generarListaInfoNodos(){
 	nodo2->puertoWorker = "5014";
 	nodo2->tamanioPuerto=strlen(nodo2->puertoWorker)+1;
 
-	list_add(listaNodos,nodo2);
+	list_add(listaNodosDelJob,nodo2);
 
 	TpackageInfoNodo *nodo3 = malloc(sizeof(nodo3));
 	nodo3->nombreNodo=malloc(nombreLen);
@@ -1020,7 +1025,7 @@ void generarListaInfoNodos(){
 	nodo3->puertoWorker = "5034";
 	nodo3->tamanioPuerto=strlen(nodo3->puertoWorker)+1;
 
-	list_add(listaNodos,nodo3);
+	list_add(listaNodosDelJob,nodo3);
 
 
 }
@@ -1157,13 +1162,17 @@ char * getNodoElegido(t_list * listaNodos){
 }
 
 bool yaFueFinalizadoPorErrorDeReplanificacion(int job){
+	MUX_LOCK(&mux_listaJobFinalizados);
 	int i;
 	for(i=0;i<list_size(listaJobFinalizados);i++){
 		TjobFinalizado *jobAux = list_get(listaJobFinalizados,i);
 		if(jobAux->nroJob == job){
+
+			MUX_UNLOCK(&mux_listaJobFinalizados);
 			return true;
 		}
 	}
+	MUX_UNLOCK(&mux_listaJobFinalizados);
 
 	return false;
 }
@@ -1336,8 +1345,8 @@ char * getNombreEtapa(int etapaEnum){
 char * getIpNodo(char * nombreNodo){
 	TpackageInfoNodo *nodoAux;
 	int i;
-	for(i=0;i<list_size(listaNodos);i++){
-		nodoAux=list_get(listaNodos,i);
+	for(i=0;i<list_size(listaNodosDelJob);i++){
+		nodoAux=list_get(listaNodosDelJob,i);
 		if(nodoAux->nombreNodo == nombreNodo){
 			return nodoAux->ipNodo;
 		}
@@ -1348,8 +1357,8 @@ char * getIpNodo(char * nombreNodo){
 char * getPuertoNodo(char * nombreNodo){
 	TpackageInfoNodo *nodoAux;
 	int i;
-	for(i=0;i<list_size(listaNodos);i++){
-		nodoAux=list_get(listaNodos,i);
+	for(i=0;i<list_size(listaNodosDelJob);i++){
+		nodoAux=list_get(listaNodosDelJob,i);
 		if(nodoAux->nombreNodo == nombreNodo){
 			return nodoAux->puertoWorker;
 		}
@@ -1370,8 +1379,8 @@ t_list * planificar(t_list * listaComposicionArchivo){
 	TpackageInfoNodo *aux;
 	//lleno la lista con los workers asociados a esta transfo.
 	int i;
-	for(i=0;i<list_size(listaNodos);i++){
-		aux = list_get(listaNodos,i);
+	for(i=0;i<list_size(listaNodosDelJob);i++){
+		aux = list_get(listaNodosDelJob,i);
 		Tplanificacion * nodo = malloc(sizeof nodo);
 		nodo->infoNodo.nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 		nodo->infoNodo.nombreNodo=aux->nombreNodo;
@@ -1629,15 +1638,15 @@ int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
 
 int getHistorico(Tplanificacion *infoWorker){
 	int i;
-
+	MUX_LOCK(&mux_listaHistorica);
 	for(i=0;i<list_size(listaHistoricaTareas);i++){
 		ThistorialTareas *aux = list_get(listaHistoricaTareas,i);
 		if(infoWorker->infoNodo.nombreNodo==aux->nombreNodo){
-
+			MUX_UNLOCK(&mux_listaHistorica);
 			return aux->tareasRealizadas;
 		}
-	}//todo mutex
-
+	}
+	MUX_UNLOCK(&mux_listaHistorica);
 	return 0;
 }
 
