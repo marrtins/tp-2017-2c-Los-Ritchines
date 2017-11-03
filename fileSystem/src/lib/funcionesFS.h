@@ -82,6 +82,7 @@ void mostrarBitmap(t_bitarray* bitmap);
 void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
 
 //Directorios
+void crearRoot();
 int existeDirectorio(char * directorio);
 int obtenerIndexDeUnaRuta(char * rutaDestino);
 int buscarIndexPorNombreDeDirectorio(char * directorio);

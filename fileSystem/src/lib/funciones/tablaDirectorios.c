@@ -90,18 +90,25 @@ int crearDirectorio(char * ruta) {
 			return -1;
 	}
 }
+void crearRoot(){
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/0/",0777);
+}
 
 void inicializarTablaDirectorios(){
 		char * ruta = malloc(100);
+
 		FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 
 		strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 
 		vaciarLista();
 		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
+
 		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
+
 		fclose(archivoDirectorios);
 		removerDirectorios(ruta);
+		crearRoot();
 		free(ruta);
 }
 
