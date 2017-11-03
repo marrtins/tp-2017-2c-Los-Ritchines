@@ -60,6 +60,7 @@ void leerArchivoComoTextoPlano(char * rutaLocal);
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal);
 void mostrarCsv(char * rutaLocal);
 void mostrarBinario(char * rutaLocal);
+char * generarStringBloqueNCopias(int nroBloque);
 
 
 
@@ -75,6 +76,7 @@ void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo 
 Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
+
 
 //Bitmap
 t_bitarray* crearBitmap(int tamanioBitmap);
@@ -148,6 +150,7 @@ void liberarEstructuraBuffer(Tbuffer * buffer);
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 void liberarTablaDirectorios(void* directorio);
+void liberarCopia(void * copia);
 
 //YAMA
 char * recvRutaArchivo(int socket);

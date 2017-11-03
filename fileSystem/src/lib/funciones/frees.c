@@ -10,6 +10,12 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 	free(infoBloque);
 }
 
+void liberarCopia(void * copia){
+
+	TcopiaNodo * copiaNodo = (TcopiaNodo*) copia;
+	free(copiaNodo->nombreDeNodo);
+}
+
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 
 	int i = 0;
@@ -17,10 +23,10 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){
 	free(tablaDeArchivos->extensionArchivo);
 	free(tablaDeArchivos->nombreArchivoSinExtension);
 
-	for(; i != cantBloques; i++){
-		free(tablaDeArchivos->bloques[i].copiaCero.nombreDeNodo);
-		free(tablaDeArchivos->bloques[i].copiaUno.nombreDeNodo);
+	for(; i < cantBloques; i++){
+		list_destroy_and_destroy_elements(tablaDeArchivos->bloques[i].copia,liberarCopia);
 	}
+
 	free(tablaDeArchivos->bloques);
 	free(tablaDeArchivos);
 }

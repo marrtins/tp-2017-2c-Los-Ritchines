@@ -8,12 +8,12 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	tablaArchivo->nombreArchivoSinExtension = malloc(100);
 
 	int cantBloques, nroBloque = 0;
-	char **temporal1;
-	char **temporal2;
-	char* bloqueCopia0;
-	char* bloqueCopia1;
+	int i = 0;
+	int cantidadDeCopias;
+	char **temporal;
+	char* bloqueCopiaN;
 	char* bloqueBytes;
-
+	char * bloqueNCopias;
 	char ** split = string_split(ruta, "/");
 	char * nombreEntero = obtenerUltimoElementoDeUnSplit(split);
 	char * nombreSinExtension = obtenerNombreDeArchivoSinExtension(nombreEntero);
@@ -26,35 +26,33 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	tablaArchivo->bloques = malloc(sizeof(Tbloques)*cantBloques);
 
 	while(nroBloque != cantBloques){
-
-		tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-		//tablaArchivos->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = malloc(sizeof(char)*4);
-		tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-		//tablaArchivos->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = malloc(sizeof(char)*4);
-
-		bloqueCopia0 = generarStringDeBloqueNCopiaN(nroBloque,0);
-		bloqueCopia1 = generarStringDeBloqueNCopiaN(nroBloque,1);
+		bloqueNCopias = generarStringBloqueNCopias(nroBloque);
+		cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
+		tablaArchivo->bloques[nroBloque].copia = list_create();
 		bloqueBytes = generarStringDeBloqueNBytes(nroBloque);
-
-		temporal1 = config_get_array_value(archivo, bloqueCopia0);
-		temporal2 = config_get_array_value(archivo, bloqueCopia1);
 		tablaArchivo->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueBytes);
 
-		strcpy(tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo,temporal1[0]);
-		tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo = atoi(temporal1[1]);
+		while(i < cantidadDeCopias){
+			TcopiaNodo * copiaNodo = malloc(sizeof(TcopiaNodo));
+			copiaNodo->nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 
-		strcpy(tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo,temporal2[0]);
-		tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo = atoi(temporal2[1]);
+			bloqueCopiaN = generarStringDeBloqueNCopiaN(nroBloque,i);
+
+			temporal = config_get_array_value(archivo, bloqueCopiaN);
+
+			strcpy(copiaNodo->nombreDeNodo,temporal[0]);
+			copiaNodo->numeroBloqueDeNodo = atoi(temporal[1]);
+			list_add(tablaArchivo->bloques[nroBloque].copia, copiaNodo);
+
+			i++;
+		}
 
 		nroBloque++;
 
-		liberarPunteroDePunterosAChar(temporal1);
-		free(temporal1);
-		liberarPunteroDePunterosAChar(temporal2);
-		free(temporal2);
-
-		free(bloqueCopia0);
-		free(bloqueCopia1);
+		liberarPunteroDePunterosAChar(temporal);
+		free(temporal);
+		free(bloqueNCopias);
+		free(bloqueCopiaN);
 		free(bloqueBytes);
 	}
 	liberarPunteroDePunterosAChar(split);
@@ -87,6 +85,12 @@ char * generarStringDeBloqueNCopiaN(int numeroDeBloque, int numeroDeCopia){
 	return stringGenerado;
 }
 
+char * generarStringBloqueNCopias(int nroBloque){
+	char * stringGenerado = malloc(TAMANIO_BLOQUE_N_COPIA_N);
+	sprintf(stringGenerado, "BLOQUE%dCOPIAS", nroBloque);
+	return stringGenerado;
+}
+
 char * generarStringDeBloqueNBytes(int numeroDeBloque){
 	char * stringGenerado = malloc(TAMANIO_BLOQUE_N_COPIA_N);
 	sprintf(stringGenerado, "BLOQUE%dBYTES", numeroDeBloque);
@@ -96,14 +100,16 @@ char * generarStringDeBloqueNBytes(int numeroDeBloque){
 void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * rutaArchivo){
 	t_config * archivoConfig = config_create(rutaArchivo);
 	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(archivoAAlmacenar->tamanioTotal);
-	char * bloque0CopiaN;
-	char * bloque1CopiaN;
+	char * bloqueNCopiaM;
 	char * bloqueNBytes;
 	char * numeroBloqueEnString;
-	char * numeroBloqueEnString2;
 	char * tamanioTotal;
 	char * bytes;
 	int i = 0;
+	int j = 0;
+	int cantidadDeCopias;
+	TcopiaNodo * copia;
+	t_list * lista;
 
 	tamanioTotal = string_itoa(archivoAAlmacenar->tamanioTotal);
 	config_set_value(archivoConfig, "TAMANIO", tamanioTotal);
@@ -111,30 +117,29 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 
 	free(tamanioTotal);
 
-	while(cantidadDeBloques != 0){
+	while(i < cantidadDeBloques){
+		cantidadDeCopias = list_size(archivoAAlmacenar->bloques[i].copia);
+		lista = archivoAAlmacenar->bloques[i].copia;
+		while(j < cantidadDeCopias){
+			copia = (TcopiaNodo *) list_get(lista,j);
 
-		bloque0CopiaN = generarStringDeBloqueNCopiaN(i,0);
-		numeroBloqueEnString = string_itoa(archivoAAlmacenar->bloques[i].copiaCero.numeroBloqueDeNodo);
-		generarArrayParaArchivoConfig(archivoConfig, bloque0CopiaN, archivoAAlmacenar->bloques[i].copiaCero.nombreDeNodo, numeroBloqueEnString);
-
-		bloque1CopiaN = generarStringDeBloqueNCopiaN(i,1);
-		numeroBloqueEnString2 = string_itoa(archivoAAlmacenar->bloques[i].copiaUno.numeroBloqueDeNodo);
-		generarArrayParaArchivoConfig(archivoConfig, bloque1CopiaN, archivoAAlmacenar->bloques[i].copiaUno.nombreDeNodo, numeroBloqueEnString2);
-
+			bloqueNCopiaM = generarStringDeBloqueNCopiaN(i, copia->nroDeCopia);
+			numeroBloqueEnString = string_itoa(copia->numeroBloqueDeNodo);
+			agregarElementoAArrayArchivoConfig(archivoConfig, bloqueNCopiaM, copia->nombreDeNodo);
+			agregarElementoAArrayArchivoConfig(archivoConfig, bloqueNCopiaM, numeroBloqueEnString);
+			j++;
+		}
 		//aca hace el tamanio
 		bloqueNBytes = generarStringDeBloqueNBytes(i);
-		//hay que pasar un long a string
+		//hay que pasar un long a string TODO
 		bytes = string_itoa(archivoAAlmacenar->bloques[i].bytes);
 		config_set_value(archivoConfig, bloqueNBytes, bytes);
 
-		cantidadDeBloques--;
 		i++;
 
 		free(bytes);
 		free(numeroBloqueEnString);
-		free(numeroBloqueEnString2);
-		free(bloque0CopiaN);
-		free(bloque1CopiaN);
+		free(bloqueNCopiaM);
 		free(bloqueNBytes);
 	}
 

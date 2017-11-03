@@ -24,11 +24,11 @@ typedef struct{
 typedef struct{
 	char * nombreDeNodo;
 	int numeroBloqueDeNodo;
+	int nroDeCopia;
 }TcopiaNodo;
 
 typedef struct{
-	TcopiaNodo copiaCero;
-	TcopiaNodo copiaUno;
+	t_list * copia;
 	unsigned long long bytes;
 }Tbloques;
 

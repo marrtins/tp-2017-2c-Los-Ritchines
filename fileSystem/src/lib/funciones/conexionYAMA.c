@@ -33,13 +33,13 @@ Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo){
 	tamanioFijo = sizeof(int) * 5 * cantBloques;
 	buffer->tamanio = (HEAD_SIZE + sizeof(int) + tamanioFijo);
 	buffer->buffer = malloc(buffer->tamanio);
-
+	//TODO Esto
 	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
 	memcpy(p, &cantBloques, sizeof(int));
 	p += sizeof(int);
-
+	/*
 	while(nroBloque != cantBloques){
 		memcpy(p, &nroBloque, sizeof(int));
 		p += sizeof(int);
@@ -71,7 +71,7 @@ Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo){
 		p += sizeof(int);
 
 		nroBloque++;
-	}
+	}*/
 
 	return buffer;
 }
