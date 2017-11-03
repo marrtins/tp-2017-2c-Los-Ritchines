@@ -136,27 +136,32 @@ void consolaFormat(char**palabras, int cantidad){
 }
 void consolaRename(char** palabras, int cantidad) {
 	if (cantidad == 2) {
-		if ( existeDirectorio(palabras[1]) || verificarRutaArchivo(palabras[1])) {
+		char ** carpetas = string_split(palabras[1], "/");
+		char * yamafs = malloc(10);
+		strcpy(yamafs, "yamafs:");
+		int cant = contarPunteroDePunteros(carpetas);
 
-			renombrarArchivoODirectorio(palabras[1], palabras[2]);
-		}
-		else{
-			char ** carpetas = string_split(palabras[1], "/");
-			char * yamafs = malloc(10);
-			strcpy(yamafs,"yamafs:");
-			if (!string_equals_ignore_case(carpetas[0], yamafs)) {
-				puts("Falta la referencia a 'yamafs:'");
+		if (string_equals_ignore_case(carpetas[0], yamafs)) {
+			puts("Falta la referencia a 'yamafs:'");
+		} else {
+			if (cant == 1) {
+				puts("No se puede renombrar el root");
+			} else {
+				if (existeDirectorio(palabras[1]) || verificarRutaArchivo(palabras[1])) {
+
+					renombrarArchivoODirectorio(palabras[1], palabras[2]);
+				}
 			}
-			puts("No se pudo renombrar el archivo o directorio");
-			free(yamafs);
 		}
-	}
-	else{
+		puts("No se pudo renombrar el archivo o directorio");
+		free(yamafs);
+
+	} else {
 		puts("Error en la cantidad de parametros");
 	}
 }
 
-void consolaCat(char**palabras, int cantidad) {
+void consolaCat(char ** palabras, int cantidad) {
 	if (cantidad == 1) {
 		if (verificarRutaArchivo(palabras[1])) {
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
@@ -305,7 +310,7 @@ printf("obtuve ruta local %s", rutaLocal);
 	return 0;
 }
 
-void consolaMove(char** palabras, int cantidad){
+void consolaMove(char ** palabras, int cantidad){
 	if(cantidad==2){
 		if(verificarRutaArchivo(palabras[1])){
 			moverArchivo(palabras[1], palabras[2]);

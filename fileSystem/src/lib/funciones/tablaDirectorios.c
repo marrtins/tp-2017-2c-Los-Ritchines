@@ -95,21 +95,18 @@ void crearRoot(){
 }
 
 void inicializarTablaDirectorios(){
-		char * ruta = malloc(100);
+	char * ruta = malloc(100);
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 
-		FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
+	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	vaciarLista();
+	fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
 
-		strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
-
-		vaciarLista();
-		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
-
-		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
-
-		fclose(archivoDirectorios);
-		removerDirectorios(ruta);
-		crearRoot();
-		free(ruta);
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
+	fclose(archivoDirectorios);
+	removerDirectorios(ruta);
+	crearRoot();
+	free(ruta);
 }
 
 void formatearFS(){
@@ -118,6 +115,7 @@ void formatearFS(){
 	inicializarTablaDeNodos();
 	formatearNodos(listaDeNodos);
 	formatearNodos(listaDeNodosDesconectados);
+	levantarTablasDirectorios();
 }
 
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
@@ -263,10 +261,15 @@ int directorioNoExistente(char ** carpetas) {
 int obtenerIndexDeUnaRuta(char * rutaDestino){
 	int indice;
 	char ** palabras = string_split(rutaDestino, "/");
+	int cant = contarPunteroDePunteros(palabras);
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
+	if(cant == 1){
+		indice = 0;
+	}else{
 	indice = buscarIndexPorNombreDeDirectorio(directorio);
+	}
 	free(directorio);
 	return indice;
 }
@@ -691,23 +694,67 @@ void removerArchivo(char* ruta){
 	puts("Ya pude remover el archivo");
 	}
 
+void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio){
+	puts("entre2");
+	memcpy(archivoMapeado, archivoAMoverMapeado, tamanio);
+}
 
 void moverArchivo(char* ruta1, char* ruta2){
 	char* rutaLocalArchivo = obtenerRutaLocalDeArchivo(ruta1);
 	char** palabras = string_split(rutaLocalArchivo, "/");
 	char* nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(palabras);
-	remove(rutaLocalArchivo);
+	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
+	char * archivoMapeado;
+	char * archivoAMoverMapeado;
 	int index = obtenerIndexDeUnaRuta(ruta2);
 	char* rutaLocalDirectorio = malloc(200);
+	FILE * archivo;
+	if(strcmp(extension, "csv") == 0){
+		archivo = fopen(rutaLocalArchivo, "r");
+	}
+	else{
+		archivo = fopen(rutaLocalArchivo, "rb");
+	}
+	unsigned long long tamanio = tamanioArchivo(archivo);
+	int fdAMover = fileno(archivo);
+
+	if ((archivoAMoverMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED, fdAMover, 0)) == MAP_FAILED) {
+		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		puts("No se pudo abrir el archivo especificado.");
+		return;
+	}
+
 	sprintf(rutaLocalDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
 	string_append(&rutaLocalDirectorio,"/");
 	string_append(&rutaLocalDirectorio, nombreArchivoConExtension);
-	FILE * archivo = fopen(rutaLocalDirectorio, "w+");
+
+	FILE * archivoMovido = fopen(rutaLocalDirectorio, "w+");
+	int fd = fileno(archivoMovido);
+	ftruncate(fd, tamanio);
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		puts("No se pudo abrir el archivo especificado.");
+		return;
+	}
+
+	pasarInfoDeUnArchivoAOtro(archivoAMoverMapeado, archivoMapeado, tamanio);
+
+	remove(rutaLocalArchivo);
+
 	fclose(archivo);
+	fclose(archivoMovido);
+	close(fd);
+	close(fdAMover);
+
 	free(rutaLocalDirectorio);
+	free(rutaLocalArchivo);
+	liberarPunteroDePunterosAChar(palabras);
+	free(palabras);
+	free(nombreArchivoConExtension);
+	free(extension);
 
-
-	puts("Movi el archivo");
+	remove(rutaLocalArchivo);
+	puts("Se movio el archivo correctamente.");
 }
 
 void removerDirectorio(char* ruta){
