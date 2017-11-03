@@ -91,6 +91,7 @@ int buscarIndexMayor();
 int directorioNoExistente(char ** carpetas);
 int crearDirectorio(char * ruta);
 int esDirectorio(char * ruta);
+int esDirectorioRaiz(char*ruta);
 int esDirectorioPadre(char * ruta);
 int esDirectorioVacio(char* ruta);
 int esArchivo(char* ruta);

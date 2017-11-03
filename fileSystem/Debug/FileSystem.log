@@ -437,3 +437,5 @@
 >>>>>>> 32e01c2f694e0aac5df9ad723153034704cc527d
 [ERROR] 14:08:30:83 FileSystem.log/(11207:11207): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 14:16:33:739 FileSystem.log/(11571:11571): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 15:41:30:215 FileSystem.log/(12715:12715): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 15:42:47:294 FileSystem.log/(13031:13031): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4

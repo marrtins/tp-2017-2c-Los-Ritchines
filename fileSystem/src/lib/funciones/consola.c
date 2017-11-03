@@ -260,11 +260,13 @@ void consolaRemove (char** palabras, int cantidad){
 		if (string_equals_ignore_case(palabras[1], "-d")){
 
 			if(existeDirectorio(palabras[2])){
-				if(esDirectorioVacio(palabras[2])){
+				if(esDirectorioRaiz(palabras[2])){
+					puts("No se puede remover el directorio raíz");
+				} else if(esDirectorioVacio(palabras[2])){
 				removerDirectorio(palabras[2]);
 				puts("Ya pude remover el directorio");
 				} else{
-				puts("EL directorio no esta vacio. No se puede remover");
+				puts("El directorio no esta vacío. No se puede remover");
 				}
 			} else{
 				puts("No existe el directorio");
@@ -274,7 +276,7 @@ void consolaRemove (char** palabras, int cantidad){
 			//removerNodo
 		}
 		} else{
-			puts("Error en la cantidad de parametros");
+			puts("Error en la cantidad de parámetros");
 		}
 }
 

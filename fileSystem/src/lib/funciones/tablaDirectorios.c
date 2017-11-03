@@ -774,3 +774,13 @@ int esDirectorioPadre (char* ruta){
 			return 0;
 }
 
+int esDirectorioRaiz (char*ruta){
+	char ** palabras = string_split(ruta, "/");
+	int tamanioRuta = contarPunteroDePunteros(palabras);
+
+	if (tamanioRuta == 1){
+		return 1;
+
+	}
+	return 0;
+}
