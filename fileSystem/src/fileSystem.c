@@ -19,23 +19,34 @@ int main(int argc, char* argv[]) {
 	char * rutaArchivo;
 	Tbuffer * buffer;
 
-	if(argc != 1){
+	listaDeNodos = list_create();
+	listaDeNodosDesconectados = list_create();
+	listaTablaDirectorios = list_create();
+
+	/*if(argc != 1){
 		puts("Error en la cantidad de parametros.");
 		return EXIT_FAILURE;
 	}
+	*/
+	if(argc == 2){
+		char * flag = malloc(10);
+		strcpy(flag,"--clean");
+		if(string_equals_ignore_case(argv[1],flag)){
+			inicializarTablaDirectorios();
+			inicializarTablaDeNodos();
+		}else{
+			puts("La flag ingresada no es válida");
+			return EXIT_FAILURE;
+		}
+		free(flag);
+	}
+
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
-	listaDeNodos = list_create();
-	listaDeNodosDesconectados = list_create();
-	listaTablaDirectorios = list_create();
-
-
-	inicializarTablaDirectorios();
-	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
 	FD_ZERO(&masterFD);

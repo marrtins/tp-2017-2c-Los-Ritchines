@@ -7,7 +7,7 @@ void persistirTablaDeDirectorios(){
 	Tdirectorio * directorio;
 
 	while(tamanio != i){
-		directorio = list_get(listaTablaDirectorios, i);
+		directorio = (Tdirectorio*) list_get(listaTablaDirectorios, i);
 		fprintf(archivoDirectorios, "%d %s %d\n", directorio->index, directorio->nombre, directorio->padre);
 		i++;
 	}
@@ -16,15 +16,38 @@ void persistirTablaDeDirectorios(){
 }
 
 void levantarTablasDirectorios(){
+	int i;
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "r");
+	int tam = tamanioArchivo(archivoDirectorios);
+	int fd = fileno(archivoDirectorios);
+	char * archivoMapeado;
+	char ** directorios;
 
-	while(!feof(archivoDirectorios)){
-		Tdirectorio * directorio = malloc(sizeof(Tdirectorio));
-		fscanf(archivoDirectorios, "%d %s %d", &directorio->index, directorio->nombre, &directorio->padre);
-		printf("%d \t %s \t %d \n", directorio->index, directorio->nombre, directorio->padre);
-		list_add(listaTablaDirectorios, directorio);
+	if ((archivoMapeado = mmap(NULL,tam, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		puts("Error al hacer mmap");
+		logAndExit("Error al hacer mmap");
 	}
 	fclose(archivoDirectorios);
+	close(fd);
+
+	directorios = string_split(archivoMapeado,"\n");
+	int cant = contarPunteroDePunteros(directorios);
+
+	for(i=0; i<cant;i++){
+		Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
+		char ** directorio = string_split(directorios[i]," ");
+		tDirectorio->index = atoi(directorio[0]);
+		strcpy(tDirectorio->nombre, directorio[1]);
+		tDirectorio->padre = atoi(directorio[2]);
+		printf("%d \t %s \t %d\n",tDirectorio->index,tDirectorio->nombre,tDirectorio->padre);
+		list_add(listaTablaDirectorios, tDirectorio);
+		liberarPunteroDePunterosAChar(directorio);
+		free(directorio);
+	}
+
+	liberarPunteroDePunterosAChar(directorios);
+	free(directorios);
+	munmap(archivoMapeado,tam);
 }
 
 void mostrarDirectorios(){

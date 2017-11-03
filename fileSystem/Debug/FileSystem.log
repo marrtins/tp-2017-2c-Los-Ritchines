@@ -473,3 +473,18 @@
 >>>>>>> f2e7030aeb354114714dc79c4cb93a2dfdc1a1ae
 >>>>>>> f3b600553f95762940d3eb8f43cc7ce49076c7dd
 >>>>>>> ffd797baef585cf733f30ee93b9add0432f3a40d
+[ERROR] 17:14:14:851 FileSystem.log/(12581:12581): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:20:02:180 FileSystem.log/(12898:12898): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 17:20:46:577 FileSystem.log/(12941:12941): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:20:58:102 FileSystem.log/(12985:12985): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 17:49:37:825 FileSystem.log/(13523:13523): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:51:10:536 FileSystem.log/(13761:13761): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:51:35:967 FileSystem.log/(13887:13887): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:53:33:417 FileSystem.log/(13995:13995): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:55:29:100 FileSystem.log/(14095:14095): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:07:51:49 FileSystem.log/(14451:14451): Fallo al reservar el puerto 5002. Es posible que el puerto este ocupado.
+[ERROR] 18:08:34:838 FileSystem.log/(14504:14504): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:10:24:691 FileSystem.log/(14602:14602): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:19:47:579 FileSystem.log/(14719:14719): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:23:41:751 FileSystem.log/(14846:14846): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:24:37:538 FileSystem.log/(15004:15004): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
