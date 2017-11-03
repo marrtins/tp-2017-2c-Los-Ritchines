@@ -263,9 +263,8 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 				infoNodoAux->temporalReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL);
 				infoNodoAux->temporalReduccion=tareaOk->nombreArchTemporal;
 				infoNodoAux->temporalReduccionLen=strlen(infoNodoAux->temporalReduccion)+1;
-				if(hardcode==0){
+				if(infoNodoAux->nombreNodo=="Nodo3"){
 					infoNodoAux->nodoEncargado=1;
-					hardcode++;
 				}else{
 					infoNodoAux->nodoEncargado=0;
 				}//hrdcoed

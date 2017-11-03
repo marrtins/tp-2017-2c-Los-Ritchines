@@ -20,6 +20,11 @@ typedef struct{
 	char * nombreArchivoTemporal;
 	char * rutaArchivoTemporal;
 	int jobAsociado;
-
 }TinfoTemporalJobAsoc;
+typedef struct{
+	int fdWorker;
+	bool eofTemporal;
+	bool encargado;
+}TinfoApareoGlobal;
+
 #endif

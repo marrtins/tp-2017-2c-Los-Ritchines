@@ -13,3 +13,4 @@
 [ERROR] 11:26:33:883 worker.log/(21976:21976): Fallo al reservar el puerto 5014. Es posible que el puerto este ocupado.
 [ERROR] 11:29:56:757 worker.log/(22169:22169): Fallo al reservar el puerto 5014. Es posible que el puerto este ocupado.
 [ERROR] 18:16:34:33 worker.log/(22357:22357): Fallo al reservar el puerto 5014. Es posible que el puerto este ocupado.
+[ERROR] 18:14:30:552 worker.log/(12813:12813): Fallo al reservar el puerto 5034. Es posible que el puerto este ocupado.

@@ -54,6 +54,7 @@ int main(int argc, char* argv[]){
 		case MASTER:
 			puts("Es master");
 			manejarConexionMaster(head,client_sock);
+
 			break;
 		case WORKER:
 			puts("es worker");
@@ -73,7 +74,7 @@ int main(int argc, char* argv[]){
 
 
 
-	free(head);
+	//free(head);
 
 	return 0;
 }
