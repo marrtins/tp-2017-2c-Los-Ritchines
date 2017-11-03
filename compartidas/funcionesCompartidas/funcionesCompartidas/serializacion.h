@@ -35,5 +35,10 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccionGlobal, int *pack_size);
 TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial);
 
+char *serializeInfoAlmacenadoFinal(Theader head, TinfoAlmacenadoFinal * infoAlmacenado, int *pack_size);
+TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial);
+
+char *serializeInfoAlmacenadoFinalMasterWorker(Theader head, TinfoAlmacenadoMasterWorker * infoAlmacenado, int *pack_size);
+TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_serial);
 
 #endif

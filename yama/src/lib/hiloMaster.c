@@ -12,9 +12,9 @@ extern int idMasterGlobal,idJobGlobal,idTareaGlobal;
 
 t_list *listaNodos;
 extern t_list *listaJobFinalizados, * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
-extern pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
+extern pthread_mutex_t mux_idTareaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 
-
+TpackBytes *pathResultado;
 
 void masterHandler(void *atributos){
 
@@ -37,7 +37,7 @@ void masterHandler(void *atributos){
 	Theader *headEnvio = malloc(sizeof(headEnvio));
 
 	TpackBytes *pathArchivoAReducir;
-	TpackBytes *pathResultado;
+
 
 	char* buffer;
 	Tbuffer * buffer1;
@@ -56,7 +56,6 @@ void masterHandler(void *atributos){
 		case PATH_FILE_TOREDUCE:
 
 			puts("Nos llega el path del archivo a reducir");
-
 
 			if ((buffer = recvGeneric(sockMaster)) == NULL){
 				puts("Fallo recepcion de PATH_FILE_TOREDUCE");
@@ -216,6 +215,53 @@ void masterHandler(void *atributos){
 			list_add(listaJobFinalizados,job);
 
 			break;
+		case FIN_REDUCCIONGLOBALOK:
+			idTareaFinalizada = recibirValor(sockMaster);
+			printf("REDUCCION GLOBAL OK de la tarea %d\n",idTareaFinalizada);
+			puts("actuializo tbala de estados");
+			moverAListaFinalizadosOK(idTareaFinalizada);
+
+			comenzarAlmacenadoFinal(idTareaFinalizada,sockMaster);
+
+			break;
+		case FIN_REDUCCIONGLOBALFAIL:
+			idTareaFinalizada = recibirValor(sockMaster);
+			puts("fin reduccion global fail");
+			puts("actuializo tbala de estados");
+			moverAListaError(idTareaFinalizada);
+			printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+			puts("Se da x terminado el job");
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+			enviarHeader(sockMaster,headEnvio);
+			TjobFinalizado *job = malloc(sizeof job);
+			TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+			job->nroJob = tareaFinalizada->job;
+			job->finCorrecto=false;
+			list_add(listaJobFinalizados,job);
+			break;
+		case FIN_ALMACENAMIENTOFINALOK:
+			idTareaFinalizada = recibirValor(sockMaster);
+			printf("Almacenamiento final de la tarea %d\n",idTareaFinalizada);
+			puts("actuializo tbala de estados");
+			moverAListaFinalizadosOK(idTareaFinalizada);
+			break;
+		case FIN_ALMACENAMIENTOFINALFAIL:
+			idTareaFinalizada = recibirValor(sockMaster);
+			puts("fin almacenamiento local fail");
+			puts("actuializo tbala de estados");
+			moverAListaError(idTareaFinalizada);
+			printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+			puts("Se da x terminado el job");
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+			enviarHeader(sockMaster,headEnvio);
+			TjobFinalizado *job = malloc(sizeof job);
+			TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+			job->nroJob = tareaFinalizada->job;
+			job->finCorrecto=false;
+			list_add(listaJobFinalizados,job);
+			break;
 		default:
 			break;
 
@@ -225,6 +271,66 @@ void masterHandler(void *atributos){
 	freeAndNULL((void **) &buffer);
 }
 
+int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster){
+
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+
+	MUX_LOCK(&mux_idTareaGlobal);
+	int idTareaActual = idTareaGlobal++;
+	MUX_UNLOCK(&mux_idTareaGlobal);
+
+	TinfoAlmacenadoFinal *infoAlmacenado = malloc(sizeof(infoAlmacenado));
+	infoAlmacenado->idTarea=idTareaActual;
+	infoAlmacenado->job=tareaFinalizada->job;
+	infoAlmacenado->ipNodo=malloc(MAXIMA_LONGITUD_IP);
+	infoAlmacenado->ipNodo=getIpNodo(tareaFinalizada->nodo);
+	infoAlmacenado->ipNodoLen=strlen(infoAlmacenado->ipNodo)+1;
+
+	infoAlmacenado->puertoNodo=malloc(MAXIMA_LONGITUD_IP);
+	infoAlmacenado->puertoNodo=getPuertoNodo(tareaFinalizada->nodo);
+	infoAlmacenado->puertoNodoLen=strlen(infoAlmacenado->puertoNodo)+1;
+
+	infoAlmacenado->nombreTempReduccion=malloc(MAXIMA_LONGITUD_IP);
+	infoAlmacenado->nombreTempReduccion=tareaFinalizada->nombreArchTemporal;
+	infoAlmacenado->nombreTempReduccionLen=strlen(infoAlmacenado->nombreTempReduccion)+1;
+
+	Theader head;
+	head.tipo_de_proceso=YAMA;
+	head.tipo_de_mensaje=INFOALMACENADOFINAL;
+
+	int packSize;
+	char * buffer;
+	int stat;
+	packSize=0;
+	buffer=serializeInfoAlmacenadoFinal(head,infoAlmacenado,&packSize);
+	printf("Info del almacenado final serializado, total %d bytes\n",packSize);
+	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
+		puts("no se pudo enviar info del almacenado final. ");
+		return  FALLO_SEND;
+	}
+	printf("se enviaron %d bytes de la info del almacenado final\n",stat);
+	agregarAlmacenadoFinalAListaEnProceso(infoAlmacenado,tareaFinalizada->nodo);
+
+
+	return 0;
+}
+void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo){
+		MUX_LOCK(&mux_listaEnProceso);
+		TpackTablaEstados * estado = malloc(sizeof estado);
+		estado->idTarea=infoAlmacenado->idTarea;
+		estado->job=infoAlmacenado->job;
+		estado->master=idPropio;
+		estado->bloqueDelArchivo=999;//todo
+		estado->nodo=malloc(TAMANIO_NOMBRE_NODO);
+		estado->nodo=nombreNodo;
+		estado->etapa=ALMACENAMIENTOFINAL;
+		estado->nombreArchTemporal=pathResultado->bytes;
+//		estado->bloquesReducidos=malloc(TAMANIO_NOMBRE_TEMPORAL);//todo
+//		estado->bloquesReducidos=bloquesReducidos;
+		list_add(listaEstadoEnProceso,estado);
+		MUX_UNLOCK(&mux_listaEnProceso);
+		mostrarTablaDeEstados();
+}
 
 int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
@@ -246,7 +352,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	nuevaReduccion->listaNodos=list_create();
 
 	t_list * listaInformacionNodos = list_create();
-	int hardcode=0;
+
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 			TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
 			if(tareaOk->job==jobAReducir && tareaOk->etapa==REDUCCIONLOCAL){
@@ -294,12 +400,38 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 		return  FALLO_SEND;
 	}
 	printf("se enviaron %d bytes de la info de la reduccion global\n",stat);
-
+	agregarReduccionGlobalAListaEnProceso(nuevaReduccion);
 	return 0;
 }
-
+void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion){
+		MUX_LOCK(&mux_listaEnProceso);
+		TpackTablaEstados * estado = malloc(sizeof estado);
+		estado->idTarea=infoReduccion->idTarea;
+		estado->job=infoReduccion->job;
+		estado->master=idPropio;
+		estado->bloqueDelArchivo=999;//todo: chequear
+		estado->nodo=malloc(TAMANIO_NOMBRE_NODO);
+		estado->nodo=getNodoElegido(infoReduccion->listaNodos);
+		estado->etapa=REDUCCIONGLOBAL;
+		estado->nombreArchTemporal=infoReduccion->tempRedGlobal;
+		//estado->bloquesReducidos=malloc(TAMANIO_NOMBRE_TEMPORAL);//todo cambiar x tamanio cant bloques
+		//estado->bloquesReducidos=bloquesReducidos;
+		list_add(listaEstadoEnProceso,estado);
+		MUX_UNLOCK(&mux_listaEnProceso);
+		mostrarTablaDeEstados();
+}
 bool esNodoEncargado(char * nombreNodo){
 	return false;
+}
+char * getNodoElegido(t_list * listaNodos){
+	int i;
+	for(i=0;i<list_size(listaNodos);i++){
+		TinfoNodoReduccionGlobal *nodo =list_get(listaNodos,i);
+		if(nodo->nodoEncargado==1){
+			return nodo->nombreNodo;
+		}
+	}
+	return "null";
 }
 
 bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada){
@@ -690,6 +822,8 @@ char * getNombreEtapa(int etapaEnum){
 		string_append(&ret,"R Global");
 	}else if(etapaEnum==REDUCCIONLOCAL){
 		string_append(&ret,"R Local");
+	}else if(etapaEnum==ALMACENAMIENTOFINAL){
+			string_append(&ret,"A Final");
 	}else{
 		string_append(&ret,"");
 	}

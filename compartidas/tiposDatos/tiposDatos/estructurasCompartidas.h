@@ -55,7 +55,11 @@ typedef enum {
 	TAKE_TMPREDUCCIONLOCAL=42,
 	GIVE_NEXTLINE=43,
 	TAKE_NEXTLINE=44,
-	EOF_TEMPORAL=45
+	EOF_TEMPORAL=45,
+	INFOALMACENADOFINAL=46,
+	INICIARALMACENAMIENTOFINAL=47,
+	FIN_ALMACENAMIENTOFINALOK=48,
+	FIN_ALMACENAMIENTOFINALFAIL=49
 
 } Tmensaje;
 
@@ -245,6 +249,22 @@ typedef struct{
 	int listaNodosSize;
 	t_list * listaNodos;
 }TinfoReduccionGlobalMasterWorker;
+typedef struct{
+	int idTarea;
+	int job;
+	int ipNodoLen;
+	char * ipNodo;
+	int puertoNodoLen;
+	char * puertoNodo;
+	int nombreTempReduccionLen;
+	char * nombreTempReduccion;
+}TinfoAlmacenadoFinal;
+typedef struct{
+	int nombreTempReduccionLen;
+	char * nombreTempReduccion;
+	int nombreResultanteLen;
+	char * nombreResultante;
+}TinfoAlmacenadoMasterWorker;
 
 t_log* logger;
 

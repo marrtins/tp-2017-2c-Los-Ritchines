@@ -24,4 +24,9 @@ int conectarseAWorkerParaReduccionGlobal(TreduccionGlobal *infoReduccion,int soc
 
 TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama);
 
+TinfoAlmacenadoFinal *recibirInfoAlmacenadoFinal(int sockYama);
+
+int conectarseAWorkerParaAlmacenamientoFinal(TinfoAlmacenadoFinal *infoAlmacenamiento,int sockYama);
+void hiloWorkerAlmacenamientoFinal(void *info);
+
 #endif

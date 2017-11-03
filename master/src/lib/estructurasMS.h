@@ -31,4 +31,9 @@ typedef struct{
 	int sockYama;
 }TatributosHiloReduccionGlobal;
 
+typedef struct{
+	TinfoAlmacenadoFinal infoAlmacenamiento;
+	int sockYama;
+}TatributosHiloAlmacenamientoFinal;
+
 #endif

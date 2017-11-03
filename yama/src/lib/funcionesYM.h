@@ -51,10 +51,18 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster);
 
 void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char * bloquesReducidos);
 void agregarTransformacionAListaEnProceso(int jobActual, int idTarea, TpackInfoBloque *bloque);
-
+void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion);
+void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo);
 
 bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada);
+int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster);
 bool esNodoEncargado(char * nombreNodo);
+
+
+int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster);
+
+char * getNodoElegido(t_list * listaNodos);
+
 
 #endif
 

@@ -32,6 +32,10 @@ int manejarConexionMaster(Theader *head, int client_sock){
 		if((stat = realizarReduccionGlobal(client_sock))<0){
 			puts("Fallo en la reduccion global");
 		}
+	}else if(head->tipo_de_mensaje==INICIARALMACENAMIENTOFINAL){
+		if((stat = realizarAlmacenamientoFinal(client_sock))<0){
+			puts("Fallo en el almacenamiento final");
+		}
 	}
 
 	//free(headEnvio);

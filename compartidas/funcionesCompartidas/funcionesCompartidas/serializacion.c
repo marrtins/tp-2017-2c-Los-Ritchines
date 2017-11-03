@@ -731,7 +731,7 @@ char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalRe
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-	printf("Pack size: %d\n",*pack_size);
+	printf("Pack size:serializarInfoReduccionLocalMasterWorker2 %d\n",*pack_size);
 	return bytes_serial;
 }
 
@@ -1067,4 +1067,209 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 
 	return infoReduccionGlobal;
 }
+
+char *serializeInfoAlmacenadoFinal(Theader head, TinfoAlmacenadoFinal * infoAlmacenado, int *pack_size){
+
+	char *bytes_serial;
+
+	int espacioPackSize = sizeof(int);
+	int espacioEnteros = sizeof(int) * 5;
+	int espaciosVariables = infoAlmacenado->ipNodoLen+infoAlmacenado->nombreTempReduccionLen+infoAlmacenado->puertoNodoLen;
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
+
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->idTarea, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->job, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->ipNodoLen, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, infoAlmacenado->ipNodo, infoAlmacenado->ipNodoLen);
+	*pack_size += infoAlmacenado->ipNodoLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->puertoNodoLen, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, infoAlmacenado->puertoNodo, infoAlmacenado->puertoNodoLen);
+	*pack_size += infoAlmacenado->puertoNodoLen;
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->nombreTempReduccionLen, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, infoAlmacenado->nombreTempReduccion, infoAlmacenado->nombreTempReduccionLen);
+	*pack_size += infoAlmacenado->nombreTempReduccionLen;
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+
+TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial){
+
+	int off;
+	TinfoAlmacenadoFinal *infoAlmacenado;
+
+		if ((infoAlmacenado = malloc(sizeof *infoAlmacenado)) == NULL){
+			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+			return NULL;
+		}
+
+		off = 0;
+
+		memcpy(&infoAlmacenado->idTarea, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		memcpy(&infoAlmacenado->job, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		memcpy(&infoAlmacenado->ipNodoLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((infoAlmacenado->ipNodo = malloc(infoAlmacenado->ipNodoLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->ipNodoLen);
+			return NULL;
+		}
+
+		memcpy(infoAlmacenado->ipNodo, bytes_serial + off, infoAlmacenado->ipNodoLen);
+		off += infoAlmacenado->ipNodoLen;
+
+
+
+		memcpy(&infoAlmacenado->puertoNodoLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((infoAlmacenado->puertoNodo = malloc(infoAlmacenado->puertoNodoLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->puertoNodoLen);
+			return NULL;
+		}
+
+		memcpy(infoAlmacenado->puertoNodo, bytes_serial + off, infoAlmacenado->puertoNodoLen);
+		off += infoAlmacenado->puertoNodoLen;
+
+
+
+
+
+		memcpy(&infoAlmacenado->nombreTempReduccionLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((infoAlmacenado->nombreTempReduccion = malloc(infoAlmacenado->nombreTempReduccionLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->nombreTempReduccionLen);
+			return NULL;
+		}
+
+		memcpy(infoAlmacenado->nombreTempReduccion, bytes_serial + off, infoAlmacenado->nombreTempReduccionLen);
+		off += infoAlmacenado->nombreTempReduccionLen;
+
+
+
+
+
+
+		return infoAlmacenado;
+}
+
+char *serializeInfoAlmacenadoFinalMasterWorker(Theader head, TinfoAlmacenadoMasterWorker * infoAlmacenado, int *pack_size){
+
+	char *bytes_serial;
+
+	int espacioPackSize = sizeof(int);
+	int espacioEnteros = sizeof(int) * 2;
+	int espaciosVariables = infoAlmacenado->nombreTempReduccionLen+infoAlmacenado->nombreResultanteLen;
+	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
+
+	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->nombreTempReduccionLen, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, infoAlmacenado->nombreTempReduccion, infoAlmacenado->nombreTempReduccionLen);
+	*pack_size += infoAlmacenado->nombreTempReduccionLen;
+
+	memcpy(bytes_serial + *pack_size, &infoAlmacenado->nombreResultanteLen, sizeof(int));
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, infoAlmacenado->nombreResultante, infoAlmacenado->nombreResultanteLen);
+	*pack_size += infoAlmacenado->nombreResultanteLen;
+
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+	return bytes_serial;
+}
+
+
+TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_serial){
+
+	int off;
+	TinfoAlmacenadoMasterWorker *infoAlmacenado;
+
+		if ((infoAlmacenado = malloc(sizeof *infoAlmacenado)) == NULL){
+			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+			return NULL;
+		}
+
+		off = 0;
+
+
+		memcpy(&infoAlmacenado->nombreTempReduccionLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((infoAlmacenado->nombreTempReduccion = malloc(infoAlmacenado->nombreTempReduccionLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->nombreTempReduccionLen);
+			return NULL;
+		}
+
+		memcpy(infoAlmacenado->nombreTempReduccion, bytes_serial + off, infoAlmacenado->nombreTempReduccionLen);
+		off += infoAlmacenado->nombreTempReduccionLen;
+
+		memcpy(&infoAlmacenado->nombreResultanteLen, bytes_serial + off, sizeof (int));
+		off += sizeof (int);
+
+		if ((infoAlmacenado->nombreResultante = malloc(infoAlmacenado->nombreResultanteLen)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->nombreResultanteLen);
+			return NULL;
+		}
+
+		memcpy(infoAlmacenado->nombreResultante, bytes_serial + off, infoAlmacenado->nombreResultanteLen);
+		off += infoAlmacenado->nombreResultanteLen;
+
+
+
+		return infoAlmacenado;
+}
+
+
 
