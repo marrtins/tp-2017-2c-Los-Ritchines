@@ -440,7 +440,10 @@ int copiarArchivo(char ** palabras){
 	}
 	string_append(&rutaDirectorio,nombreArchivo);
 
-	levantarArchivo(archivo,rutaDirectorio);
+	if(levantarArchivo(archivo,rutaDirectorio) == -1){
+		puts("Error al levantar archivo");
+		return -1;
+	}
 
 	liberarTablaDeArchivo(archivo);
 	free(rutaTablaArchivo);
