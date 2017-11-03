@@ -1,2 +1,3 @@
-3 gero 0
-4 kevin 0
+1 gero 0
+0 root -1
+2 kevin 0

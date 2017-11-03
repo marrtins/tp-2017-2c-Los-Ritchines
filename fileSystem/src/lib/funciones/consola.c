@@ -282,7 +282,7 @@ int getMD5(char* ruta){
 	return 0;
 }
 
-void consolaMove(char** palabras, int cantidad){
+void consolaMove(char ** palabras, int cantidad){
 	if(cantidad==2){
 		if(verificarRutaArchivo(palabras[1])){
 			moverArchivo(palabras[1], palabras[2]);
