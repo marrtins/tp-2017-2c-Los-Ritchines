@@ -135,32 +135,36 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 }
 
 void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, TbloqueAEnviar* infoBloque){
-	char * punteroAuxiliar = archivoMapeado;
+	char * punteroInicioBloque = archivoMapeado;
 	unsigned long long bytesFaltantesPorEnviar = archivoAAlmacenar->tamanioTotal;
-	unsigned long long posicionUltimoBarraN = 0;
-	unsigned long long bytesCopiados = 0;
+	char * punteroFinalBloque = archivoMapeado;
+	unsigned long long bytesACopiar = 0;
 
 
 	while(bytesFaltantesPorEnviar > 0){
 		if(bytesFaltantesPorEnviar < BLOQUE_SIZE){
-			memcpy(infoBloque->contenido,punteroAuxiliar,bytesFaltantesPorEnviar);
+			memcpy(infoBloque->contenido,punteroInicioBloque,bytesFaltantesPorEnviar);
 			infoBloque->tamanio = bytesFaltantesPorEnviar;
 			bytesFaltantesPorEnviar = 0;
+			bytesACopiar = 0;
 		}
 		else {
-			posicionUltimoBarraN = posicionUltimoBarraN + BLOQUE_SIZE;
-			while(archivoMapeado[posicionUltimoBarraN] != '\n'){
-				posicionUltimoBarraN--;
+			punteroFinalBloque += BLOQUE_SIZE;
+			bytesACopiar = BLOQUE_SIZE;
+			while(*punteroFinalBloque != '\n'){
+
+				punteroFinalBloque--;
+				bytesACopiar--;
 			}
-			memcpy(infoBloque->contenido,punteroAuxiliar,posicionUltimoBarraN);
-			infoBloque->tamanio = posicionUltimoBarraN - bytesCopiados;
-			bytesCopiados = posicionUltimoBarraN;
+			memcpy(infoBloque->contenido,punteroInicioBloque,bytesACopiar);
+			infoBloque->tamanio = bytesACopiar;
 		}
-		bytesFaltantesPorEnviar-=bytesCopiados;
+		bytesFaltantesPorEnviar-=bytesACopiar;
 		//freir infoBloque->contenido en enviarBloque;
 		//los tamaños varian según la posición del \n;
+		printf("bloque a enviar %d\n",infoBloque->numeroDeBloque);
 		enviarBloque(infoBloque, archivoAAlmacenar);
-		punteroAuxiliar = archivoMapeado + posicionUltimoBarraN;
+		punteroInicioBloque+=bytesACopiar;
 		infoBloque->numeroDeBloque++;
 	}
 }
@@ -259,8 +263,6 @@ int almacenarArchivo(char **palabras){
 	Tarchivo * archivoAAlmacenar = malloc(sizeof(Tarchivo));
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
 	archivoAAlmacenar->extensionArchivo = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
-	printf("El nombre del archivo es: %s\n", archivoAAlmacenar->nombreArchivoSinExtension);
-	printf("La extensión es es: %s\n", archivoAAlmacenar->extensionArchivo);
 
 	if(procesarArchivoSegunExtension(archivoAAlmacenar, palabras[1]) == -1){
 		liberarPunteroDePunterosAChar(splitDeRuta);

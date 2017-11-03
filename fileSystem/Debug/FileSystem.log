@@ -473,6 +473,7 @@
 >>>>>>> f2e7030aeb354114714dc79c4cb93a2dfdc1a1ae
 >>>>>>> f3b600553f95762940d3eb8f43cc7ce49076c7dd
 >>>>>>> ffd797baef585cf733f30ee93b9add0432f3a40d
+<<<<<<< HEAD
 [ERROR] 17:14:14:851 FileSystem.log/(12581:12581): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 17:20:02:180 FileSystem.log/(12898:12898): Fallo la aceptacion del cliente, del FD servidor (fileSystem
 [ERROR] 17:20:46:577 FileSystem.log/(12941:12941): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
@@ -488,3 +489,14 @@
 [ERROR] 18:19:47:579 FileSystem.log/(14719:14719): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 18:23:41:751 FileSystem.log/(14846:14846): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
 [ERROR] 18:24:37:538 FileSystem.log/(15004:15004): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+=======
+<<<<<<< HEAD
+[ERROR] 18:28:34:449 FileSystem.log/(9750:9750): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+=======
+[ERROR] 17:50:11:125 FileSystem.log/(14916:14916): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:58:31:639 FileSystem.log/(15484:15484): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 17:59:28:144 FileSystem.log/(15786:15786): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:09:28:749 FileSystem.log/(16239:16239): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+[ERROR] 18:11:40:695 FileSystem.log/(16338:16338): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
+>>>>>>> 5d7825074b3522b8c0b48da57627bf8d0b63b5d7
+>>>>>>> 9dada0b345ff5920ad0618ed4e94e61110d57970
