@@ -198,15 +198,7 @@ Tdirectorio* buscarPorNombreDeDirectorio(char * directorio){
 }
 
 void vaciarLista(){
-	int tam, i=0;
-	tam = list_size(listaTablaDirectorios);
-	if(tam > 0){
-		Tdirectorio * directorio = (Tdirectorio*) list_get(listaTablaDirectorios,1);
-		puts(directorio->nombre);
-
-		while(i != tam -1){
-			list_remove_and_destroy_element(listaTablaDirectorios,i,liberarTablaDirectorios);
-			i++;
-		}
+	if(!list_is_empty(listaTablaDirectorios)){
+	list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
 	}
 }
