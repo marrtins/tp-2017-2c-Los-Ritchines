@@ -149,7 +149,7 @@ void consolaRename(char** palabras, int cantidad) {
 	}
 }
 
-void consolaCat(char**palabras, int cantidad) {
+void consolaCat(char ** palabras, int cantidad) {
 	if (cantidad == 1) {
 		if (verificarRutaArchivo(palabras[1])) {
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
