@@ -164,7 +164,7 @@ void mostrarCsv(char * rutaLocal){
 	}
 	fclose(archivo);
 	char entrada = 's';
-	int tamanioLineas = 5;
+	int tamanioLineas = 20;
 	unsigned long long leido = 0;
 	while(leido < tamanio && entrada == 's'){
 		leido += mostrarlineaDeUnMMap(archivoMapeado, tamanio, leido, tamanioLineas);
@@ -188,7 +188,7 @@ void mostrarBinario(char * rutaLocal){
 	fclose(archivo);
 	char entrada = 's';
 	unsigned long long contador = 0;
-	int sumador = 150;
+	int sumador = 500;
 	while(contador < tamanio && entrada == 's'){
 		mostrarNCaracteresDeUnMMap(archivoMapeado, tamanio, contador, contador+sumador);
 		contador += sumador + 1;

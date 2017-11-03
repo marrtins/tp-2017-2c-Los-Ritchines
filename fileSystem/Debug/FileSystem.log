@@ -473,3 +473,4 @@
 >>>>>>> f2e7030aeb354114714dc79c4cb93a2dfdc1a1ae
 >>>>>>> f3b600553f95762940d3eb8f43cc7ce49076c7dd
 >>>>>>> ffd797baef585cf733f30ee93b9add0432f3a40d
+[ERROR] 18:28:34:449 FileSystem.log/(9750:9750): Fallo la aceptacion del cliente, del FD servidor (fileSystem): 4
