@@ -205,13 +205,19 @@ void consolaMkdir(char**palabras, int cantidad){
 
 void consolaCpfrom(char** palabras, int cantidad){
 	if(cantidad == 2){
-		if(existeDirectorio(palabras[2])){
+		char** carpetas = string_split(palabras[2], "/");
+		if(!string_equals_ignore_case(carpetas[0], "yamafs:")){
+			puts("Falta la referencia a yamafs:/ en el segundo parametro");
+		} else if(existeDirectorio(palabras[2])){
 			puts("Existe el directorio");
 			almacenarArchivo(palabras);
 		}
 		else {
 			puts("No existe el directorio");
 		}
+
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
 	}
 	else {
 		puts("Error en la cantidad de parametros");
