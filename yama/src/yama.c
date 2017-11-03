@@ -2,7 +2,7 @@
 
 int idMasterGlobal,idJobGlobal,idTareaGlobal;
 t_list *listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
-pthread_mutex_t mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
+pthread_mutex_t mux_listaJobFinalizados,mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 int main(int argc, char* argv[]){
 	int estado,
 		socketMasters,
@@ -38,6 +38,7 @@ int main(int argc, char* argv[]){
 	pthread_mutex_init(&mux_listaError,   NULL);
 	pthread_mutex_init(&mux_listaFinalizado,   NULL);
 	pthread_mutex_init(&mux_idTareaGlobal,   NULL);
+	pthread_mutex_init(&mux_listaJobFinalizados,   NULL);
 
 
 	if(argc!=1){
