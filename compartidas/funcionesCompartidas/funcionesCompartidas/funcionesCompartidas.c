@@ -214,12 +214,13 @@ char *recvGeneric(int sock_in){
 	return recvGenericWFlags(sock_in, 0);
 }
 
-int obtenerBloqueDisponible(t_bitarray * bitmap){
+int obtenerBloqueDisponible(Tnodo * nodo){
 	unsigned int i = 0;
-	while(i < bitarray_get_max_bit(bitmap)){
-		if(bitarray_test_bit(bitmap, i) == 0){
+	while(i < nodo->cantidadBloquesTotal){
+		if(bitarray_test_bit(nodo->bitmap, i) == 0){
 			return i;
 		}
+		i++;
 	}
 	return -1;
 }

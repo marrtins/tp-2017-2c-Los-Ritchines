@@ -21,6 +21,6 @@ char * obtenerUltimoElementoDeUnSplit(char ** palabras);
 char* deUnsignedLongLongAString(int number);
 char * obtenerExtensionDeUnArchivo(char * nombreArchivoConExtension);
 char * obtenerNombreDeArchivoSinExtension(char * nombreDeArchivoConExtension);
-int obtenerBloqueDisponible(t_bitarray * bitmap);
+int obtenerBloqueDisponible(Tnodo* nodo);
 
 #endif

@@ -97,7 +97,7 @@ void inicializarTablaDirectorios(){
 
 		strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 
-		list_clean(listaTablaDirectorios);
+		vaciarLista();
 		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
 		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
 		fclose(archivoDirectorios);
@@ -106,6 +106,7 @@ void inicializarTablaDirectorios(){
 }
 
 void formatearFS(){
+	//eliminarArchivosMetadata();
 	inicializarTablaDirectorios();
 	inicializarTablaDeNodos();
 	formatearNodos(listaDeNodos);
@@ -199,11 +200,24 @@ void mostrarBinario(char * rutaLocal){
 void leerArchivoComoTextoPlano(char * rutaLocal){
 	char * nombreArchivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
 	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
+	char * rutaTmp = string_new();
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+
+	levantarTablaArchivo(archivo,rutaLocal);
+
+	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
+	string_append(&rutaTmp, nombreArchivoConExtension);
+	levantarArchivo(archivo,rutaTmp);
 	if(strcmp(extension, "csv") == 0){
-		mostrarCsv(rutaLocal);
+		mostrarCsv(rutaTmp);
 	}else{
-		mostrarBinario(rutaLocal);
+		mostrarBinario(rutaTmp);
 	}
+
+	liberarTablaDeArchivo(archivo);
+	free(nombreArchivoConExtension);
+	free(extension);
+	free(rutaTmp);
 
 }
 
@@ -315,9 +329,21 @@ char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
 }
 
 void renombrarArchivoODirectorio(char * ruta, char * nombre){
-	char * nuevaRuta = obtenerRutaSinArchivo(ruta);
-	string_append(&nuevaRuta, "/");
-	string_append(&nuevaRuta, nombre);
+	char ** split = string_split(ruta, "/");
+	char * ultimoElemento = obtenerUltimoElementoDeUnSplit(split);
+	char * nuevaRuta;
+	if((int) string_contains(ultimoElemento, ".") == 1){
+		nuevaRuta = obtenerRutaSinArchivo(ruta);
+		string_append(&nuevaRuta, "/");
+		string_append(&nuevaRuta, nombre);
+		//verificar extension de archivo sea la misma
+	}
+	else{
+		//es un directorio, hay que actualizar la tabla de directorios
+		nuevaRuta = ruta;
+
+	}
+	printf("ruta a renombrar: %s", nuevaRuta);
 	if(rename(ruta, nuevaRuta) == 0){
 		puts("Se ha renombrado el archivo");
 	}
@@ -325,6 +351,8 @@ void renombrarArchivoODirectorio(char * ruta, char * nombre){
 		puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
 	}
 	free(nuevaRuta);
+	liberarPunteroDePunterosAChar(split);
+	free(split);
 }
 
 int esDirectorio(char * ruta){

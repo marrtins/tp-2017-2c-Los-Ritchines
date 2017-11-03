@@ -138,7 +138,6 @@ void conexionesDatanode(void * estructura){
 									logAndExit("Error al recibir el numero de bloque");
 								}
 								puts("voy a hacer el signal");
-								pthread_cond_signal(&bloqueCond);
 								pthread_mutex_unlock(&bloqueMutex);
 								puts("Hice el signal y libere el mutex");
 								break;
@@ -192,7 +191,7 @@ void formatearNodos(t_list * lista){
 	int i = 0;
 	while(i < cantidadElementos){
 		nodo = (Tnodo *)list_get(lista, i);
-		inicializarBitmap(nodo->bitmap);
+		inicializarBitmap(nodo);
 		nodo->cantidadBloquesLibres = nodo->cantidadBloquesTotal;
 		i++;
 	}
