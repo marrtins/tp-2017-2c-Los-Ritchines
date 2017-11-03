@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 1 gero 0
 0 root -1
 2 kevin 0
+=======
+0 root -1
+1 user 0
+>>>>>>> f3b600553f95762940d3eb8f43cc7ce49076c7dd

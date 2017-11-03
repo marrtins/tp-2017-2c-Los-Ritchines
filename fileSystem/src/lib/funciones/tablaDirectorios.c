@@ -95,21 +95,18 @@ void crearRoot(){
 }
 
 void inicializarTablaDirectorios(){
-		char * ruta = malloc(100);
+	char * ruta = malloc(100);
+	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 
-		FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
+	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	vaciarLista();
+	fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
 
-		strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
-
-		vaciarLista();
-		fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
-
-		mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
-
-		fclose(archivoDirectorios);
-		removerDirectorios(ruta);
-		crearRoot();
-		free(ruta);
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
+	fclose(archivoDirectorios);
+	removerDirectorios(ruta);
+	crearRoot();
+	free(ruta);
 }
 
 void formatearFS(){
@@ -118,6 +115,7 @@ void formatearFS(){
 	inicializarTablaDeNodos();
 	formatearNodos(listaDeNodos);
 	formatearNodos(listaDeNodosDesconectados);
+	levantarTablasDirectorios();
 }
 
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
@@ -263,10 +261,15 @@ int directorioNoExistente(char ** carpetas) {
 int obtenerIndexDeUnaRuta(char * rutaDestino){
 	int indice;
 	char ** palabras = string_split(rutaDestino, "/");
+	int cant = contarPunteroDePunteros(palabras);
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
+	if(cant == 1){
+		indice = 0;
+	}else{
 	indice = buscarIndexPorNombreDeDirectorio(directorio);
+	}
 	free(directorio);
 	return indice;
 }
