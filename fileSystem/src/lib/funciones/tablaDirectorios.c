@@ -328,31 +328,53 @@ char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
 	return nuevoSplit;
 }
 
-void renombrarArchivoODirectorio(char * ruta, char * nombre){
-	char ** split = string_split(ruta, "/");
+void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
+	char ** split = string_split(rutaYamafs, "/");
 	char * ultimoElemento = obtenerUltimoElementoDeUnSplit(split);
-	char * nuevaRuta;
-	if((int) string_contains(ultimoElemento, ".") == 1){
-		nuevaRuta = obtenerRutaSinArchivo(ruta);
-		string_append(&nuevaRuta, "/");
-		string_append(&nuevaRuta, nombre);
-		//verificar extension de archivo sea la misma
-	}
-	else{
-		//es un directorio, hay que actualizar la tabla de directorios
-		nuevaRuta = ruta;
 
+	Tdirectorio * directorio;
+
+	if ((int) string_contains(ultimoElemento, ".") == 1) {
+		if ((int) string_contains(nombre, ".") == 1) {
+			char * extensionOriginal = obtenerExtensionDeUnArchivo(
+					ultimoElemento);
+			char * extensionNueva = obtenerExtensionDeUnArchivo(nombre);
+
+			if (string_equals_ignore_case(extensionOriginal, extensionNueva)) {
+
+				free(extensionNueva);
+				free(extensionOriginal);
+				char * rutaLocal = obtenerRutaLocalDeArchivo(rutaYamafs);
+				char *nuevaRuta = obtenerRutaSinArchivo(rutaLocal);
+				string_append(&nuevaRuta, "/");
+				string_append(&nuevaRuta, nombre);
+
+				if (rename(rutaLocal, nuevaRuta) == 0) {
+					puts("Se renombro el archivo");
+				} else {
+					puts(
+							"La ruta especificada no concuerda con la ruta del archivo a renombrar");
+				}
+				free(rutaLocal);
+				free(nuevaRuta);
+			} else {
+				puts(
+						"La extension tiene que ser la misma que la del archivo orginal");
+			}
+		} else {
+			puts(
+					"Tiene que ingresar el nuevo nombre con la extension del archivo original");
+		}
+	} else {
+		directorio = buscarPorNombreDeDirectorio(ultimoElemento);
+		strcpy(directorio->nombre, nombre);
+		persistirTablaDeDirectorios();
+		puts("Se renombro el directorio");
 	}
-	printf("ruta a renombrar: %s", nuevaRuta);
-	if(rename(ruta, nuevaRuta) == 0){
-		puts("Se ha renombrado el archivo");
-	}
-	else{
-		puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
-	}
-	free(nuevaRuta);
+
 	liberarPunteroDePunterosAChar(split);
 	free(split);
+	free(ultimoElemento);
 }
 
 int esDirectorio(char * ruta){

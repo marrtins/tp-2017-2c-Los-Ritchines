@@ -129,14 +129,19 @@ void consolaFormat(char**palabras, int cantidad){
 }
 void consolaRename(char** palabras, int cantidad) {
 	if (cantidad == 2) {
-		if (verificarRutaArchivo(palabras[1]) || 1) {
-			//falta corroborar que el archivo y los directorios existen
-			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-			renombrarArchivoODirectorio(rutaLocal, palabras[2]);
-			free(rutaLocal);
+		if ( existeDirectorio(palabras[1]) || verificarRutaArchivo(palabras[1])) {
+
+			renombrarArchivoODirectorio(palabras[1], palabras[2]);
 		}
 		else{
-			puts("No existe el directorio o falta la referencia a yamafs:");
+			char ** carpetas = string_split(palabras[1], "/");
+			char * yamafs = malloc(10);
+			strcpy(yamafs,"yamafs:");
+			if (!string_equals_ignore_case(carpetas[0], yamafs)) {
+				puts("Falta la referencia a 'yamafs:'");
+			}
+			puts("No se pudo renombrar el archivo o directorio");
+			free(yamafs);
 		}
 	}
 	else{

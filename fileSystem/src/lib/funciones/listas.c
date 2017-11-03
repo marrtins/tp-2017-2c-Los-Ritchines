@@ -187,14 +187,14 @@ int buscarIndexMayor(){
 	return directorio->index;
 }
 
-void* buscarPorNombreDeDirectorio(char * directorio){
+Tdirectorio* buscarPorNombreDeDirectorio(char * directorio){
 	bool buscarPorNombreDeDirectorioParaLista(void* elementoDeLista){
 		Tdirectorio* estructuraDirectorio = (Tdirectorio*) elementoDeLista;
 
 		return !strcmp(directorio, estructuraDirectorio->nombre);
 	}
 
-	return list_find(listaTablaDirectorios, buscarPorNombreDeDirectorioParaLista);
+	return (Tdirectorio*)list_find(listaTablaDirectorios, buscarPorNombreDeDirectorioParaLista);
 }
 
 void vaciarLista(){
