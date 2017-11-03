@@ -191,7 +191,7 @@ char *recvGenericWFlags(int sock_in, int flags){
 	}
 
 	pack_size -= (sizeof(Theader) + sizeof(int)); // ya se recibieron estas dos cantidades
-	printf("Paquete de size: %d\n", pack_size);
+	//printf("Paquete de size: %d\n", pack_size);
 
 	if ((p_serial = malloc(pack_size)) == NULL){
 		printf("No se pudieron mallocar %d bytes para paquete generico\n", pack_size);

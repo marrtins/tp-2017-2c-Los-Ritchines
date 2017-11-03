@@ -42,7 +42,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 		Theader headEnvio;
 
 		int stat;
-		Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
+		Theader headRcv = {.tipo_de_proceso = WORKER, .tipo_de_mensaje = 0};
 		while ((stat=recv(client_sock, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 			switch (headRcv.tipo_de_mensaje) {
@@ -70,6 +70,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			}
 		}
 	}
+	puts("fin conexion con worker encargado");
 	//free(lineaAux);
 	return 0;
 }

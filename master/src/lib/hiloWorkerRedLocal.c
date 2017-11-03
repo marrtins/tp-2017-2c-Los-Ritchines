@@ -8,62 +8,7 @@
 #include "funcionesMS.h"
 extern char * rutaReductor;
 
-char *serializarInfoReduccionLocalMasterWorker2(Theader head,int nombreTemporalReduccionLen,char * nombreTemporalReduccion,t_list * listaTemporales, int *pack_size){
 
-	char *bytes_serial;
-
-	int i;
-	int espacioPackSize = sizeof(int);
-	int espacioListSize = sizeof(int);
-	int espacioNombreTemporalLen = sizeof(int);
-	int sizeLista = list_size(listaTemporales);
-
-	int espaciosVariables=0;
-	for(i=0;i< sizeLista;i++){
-		TreduccionLista * aux = list_get(listaTemporales,i);
-		espaciosVariables += aux->nombreTemporalLen;
-	}
-	espaciosVariables += sizeof(int)*sizeLista;
-	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioListSize+espacioNombreTemporalLen+nombreTemporalReduccionLen+espaciosVariables;
-	printf("Espacio a mallocar: %d\n",espacioAMallocar);
-
-	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
-		return NULL;
-	}
-
-
-	*pack_size = 0;
-	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
-	*pack_size += HEAD_SIZE;
-
-	// hacemos lugar para el payload_size
-	*pack_size += sizeof(int);
-
-	memcpy(bytes_serial + *pack_size, &nombreTemporalReduccionLen, sizeof (int));
-	*pack_size += sizeof (int);
-	memcpy(bytes_serial + *pack_size, nombreTemporalReduccion, nombreTemporalReduccionLen);
-	*pack_size += nombreTemporalReduccionLen;
-
-
-	memcpy(bytes_serial + *pack_size, &sizeLista, sizeof (int));
-	*pack_size += sizeof (int);
-
-	printf("EN COMPARTIDAS; SIZE LISTA: %d\n",sizeLista);
-	for(i=0;i<sizeLista;i++){
-		TreduccionLista * aux = list_get(listaTemporales,i);
-		memcpy(bytes_serial + *pack_size, &aux->nombreTemporalLen, sizeof(int));
-		*pack_size += sizeof(int);
-		memcpy(bytes_serial + *pack_size, aux->nombreTemporal, aux->nombreTemporalLen);
-		*pack_size += aux->nombreTemporalLen;
-	}
-
-
-	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
-
-	printf("Pack size:serializarInfoReduccionLocalMasterWorker2 %d\n",*pack_size);
-	return bytes_serial;
-}
 void hiloWorkerReduccionLocal(void *info){
 	TatributosHiloReduccionLocal *atributos = (TatributosHiloReduccionLocal *)info;
 
@@ -117,7 +62,7 @@ void hiloWorkerReduccionLocal(void *info){
 	headASerializar.tipo_de_proceso=MASTER;
 	packSize=0;
 	printf("LIST SIZE: %d",list_size(atributos->infoReduccion.listaTemporalesTransformacion));
-	buffer = serializarInfoReduccionLocalMasterWorker2(headASerializar,atributos->infoReduccion.tempRedLen,atributos->infoReduccion.tempRed,atributos->infoReduccion.listaTemporalesTransformacion,&packSize);
+	buffer = serializarInfoReduccionLocalMasterWorker(headASerializar,atributos->infoReduccion.tempRedLen,atributos->infoReduccion.tempRed,atributos->infoReduccion.listaTemporalesTransformacion,&packSize);
 
 //	printf("Info de la reduccion local serializada, enviamos\n");
 	if ((stat = send(sockWorker, buffer, packSize, 0)) == -1){

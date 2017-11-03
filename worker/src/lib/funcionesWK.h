@@ -16,6 +16,6 @@ int realizarReduccionGlobal(int client_sock);
 int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal);
 int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar);
 int enviarArchivo(char * rutaArchivo,int sockDestino);
-
+int realizarAlmacenamientoFinal(int client_sock);
 int compararLineas(int cantArchivos,char arrayLineas[cantArchivos][MAXSIZELINEA]);
 #endif

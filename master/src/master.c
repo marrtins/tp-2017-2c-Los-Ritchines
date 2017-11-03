@@ -3,7 +3,7 @@
 #include <fcntl.h>
 
 
-char * rutaTransformador, * rutaReductor;
+char * rutaTransformador, * rutaReductor, *rutaResultado;
 
 
 
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 	rutaTransformador = string_new();
 	rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
-	char *rutaResultado = string_new();
+	rutaResultado = string_new();
 	char *buffer;
 
 	if(argc != 5){
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 		TpackInfoBloque *infoBloque;
 		TreduccionLocal *infoReduccionLocal;
 		TreduccionGlobal *infoReduccionGlobal;
-
+		TinfoAlmacenadoFinal *infoAlmacenado;
 		switch (headRcv.tipo_de_mensaje) {
 
 		case (INFOBLOQUE):
@@ -167,6 +167,14 @@ int main(int argc, char* argv[]) {
 
 			stat = conectarseAWorkerParaReduccionGlobal(infoReduccionGlobal,sockYama);
 		break;
+		case(INFOALMACENADOFINAL):
+			if((infoAlmacenado=recibirInfoAlmacenadoFinal(sockYama))==NULL){
+				puts("Error no pudimos recibir la info de la reduccion global. se cierra");
+				return FALLO_CONEXION;
+			}
+
+			stat = conectarseAWorkerParaAlmacenamientoFinal(infoAlmacenado,sockYama);
+			break;
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);
 			printf("Mensaje: %d \n", headTmp.tipo_de_mensaje);
@@ -259,4 +267,25 @@ TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama){
 	}
 
 	return infoReduccionGlobal;
+}
+
+
+
+TinfoAlmacenadoFinal *recibirInfoAlmacenadoFinal(int sockYama){
+	char * buffer;
+	TinfoAlmacenadoFinal *infoAlmacenado;
+	if ((buffer = recvGenericWFlags(sockYama,MSG_WAITALL)) == NULL){
+		puts("Fallo recepcion de INFOBLOQUE");
+		return NULL;
+	}
+
+	if ((infoAlmacenado = deserializeInfoAlmacenadoFinal(buffer)) == NULL){
+		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
+		return NULL;
+	}
+	printf("llego la info apra el almacenado final\n");
+	printf("job %d\n id %d\n tempred %s\n",infoAlmacenado->job,infoAlmacenado->idTarea,infoAlmacenado->nombreTempReduccion);
+	printf(" ip nodo: %s \n",infoAlmacenado->ipNodo);
+	printf(" peurto: %s \n",infoAlmacenado->puertoNodo);
+	return infoAlmacenado;
 }

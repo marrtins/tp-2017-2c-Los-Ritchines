@@ -82,8 +82,8 @@ int realizarReduccionGlobal(client_sock){
 
 
 	puts("Forkeo");
-	//char * lineaDeEjecucionReduccionGlobal;
-	//char * rutaResultadoReduccionGlobal;
+	char * lineaDeEjecucionReduccionGlobal;
+	char * rutaResultadoReduccionGlobal;
 	pid_t pidRedGl;
 	if ( (pidRedGl=fork()) == 0 )
 	{ /* hijo */
@@ -91,14 +91,14 @@ int realizarReduccionGlobal(client_sock){
 		//	printf("%d\n",cont);
 
 
-	/*	lineaDeEjecucionReduccionGlobal = string_new();
+		lineaDeEjecucionReduccionGlobal = string_new();
 		rutaResultadoReduccionGlobal=string_new();
 
 
 
 
 		string_append(&lineaDeEjecucionReduccionGlobal,"cat ");
-		string_append(&lineaDeEjecucionReduccionGlobal,rutaDeApareoGlobal);
+		string_append(&lineaDeEjecucionReduccionGlobal,rutaApareoFinal);
 		string_append(&lineaDeEjecucionReduccionGlobal," | ./");
 		string_append(&lineaDeEjecucionReduccionGlobal,nombreScriptReductor);
 		string_append(&lineaDeEjecucionReduccionGlobal, " > /home/utnso");
@@ -118,7 +118,7 @@ int realizarReduccionGlobal(client_sock){
 
 		puts("Envio header. fin reduccion global ok");
 		enviarHeader(client_sock,head);
-		//close(client_sock);*/
+		//close(client_sock);
 		exit(0);
 
 	}
@@ -282,8 +282,15 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 
 			}
 	}
+	puts("fin apareo global");
 	fclose(fdTempFilePropio);
 	fclose(fdArchivoResultado);
+	for(i=0;i<list_size(listaFds);i++){
+		TinfoApareoGlobal *infoWorker = list_get(listaFds,i);
+		if(infoWorker->encargado!=1){
+			close(infoWorker->fdWorker);
+		}
+	}
 	//free(head);
 	//free(lineaAux);
 	return 0;

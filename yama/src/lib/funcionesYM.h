@@ -7,6 +7,7 @@ Tyama *obtenerConfiguracionYama(char* ruta);
 void mostrarConfiguracion(Tyama *yama);
 void conectarAFS(Tyama *yama);
 void masterHandler(void *client_sock);
+int divideYRedondea(int x,int y);
 int responderSolicTransf(int sockMaster,t_list * listaBloques);
 
 
@@ -51,10 +52,20 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster);
 
 void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char * bloquesReducidos);
 void agregarTransformacionAListaEnProceso(int jobActual, int idTarea, TpackInfoBloque *bloque);
-
+void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion);
+void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo);
 
 bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada);
+int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster);
 bool esNodoEncargado(char * nombreNodo);
+bool yaFueFinalizadoPorErrorDeReplanificacion(int job);
+
+int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster);
+
+char * getNodoElegido(t_list * listaNodos);
+void liberarCargaNodos(int idTareaFinalizada);
+bool yaFueAgregadoAlistaJobFinalizados(int idTareaFinalizada);
+void liberarCargaEn(char * nombreNodo,int cantidad);
 
 #endif
 
