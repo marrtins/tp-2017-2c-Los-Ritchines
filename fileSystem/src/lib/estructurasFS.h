@@ -36,6 +36,7 @@ typedef struct{
 	char * nombreArchivoSinExtension;
 	unsigned long long tamanioTotal;
 	char * extensionArchivo;
+	int cantidadCopias;
 	Tbloques * bloques;
 }Tarchivo;
 
