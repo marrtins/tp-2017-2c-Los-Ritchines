@@ -33,7 +33,7 @@ void levantarTablasDirectorios(){
 	directorios = string_split(archivoMapeado,"\n");
 	int cant = contarPunteroDePunteros(directorios);
 
-	for(i=0; i<cant;i++){
+	for(i=0; i < cant; i++){
 		Tdirectorio * tDirectorio = malloc(sizeof(Tdirectorio));
 		char ** directorio = string_split(directorios[i]," ");
 		tDirectorio->index = atoi(directorio[0]);

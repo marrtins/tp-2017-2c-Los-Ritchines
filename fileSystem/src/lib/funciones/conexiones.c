@@ -82,8 +82,10 @@ void conexionesDatanode(void * estructura){
 									infoBloque = recvInfoNodo(fileDescriptor);
 									if((Tnodo*)buscarNodoDesconectadoPorFD(fileDescriptor) == NULL){
 										//nodo nuevo;
+										puts("voy a inicializar nodo");
 										nuevoNodo = malloc(sizeof(Tnodo));
 										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										puts("pude inicializar");
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
 									}
@@ -95,8 +97,10 @@ void conexionesDatanode(void * estructura){
 										borrarNodoDesconectadoPorFD(fileDescriptor);
 										log_trace(logger, "Nodo que se habia caído, se reconecto");
 									}
+									puts("voy a agregar a tabla de nodos");
 									agregarNodoATablaDeNodos(nuevoNodo);
 									liberarTPackInfoBloqueDN(infoBloque);
+									puts("agregue a tabla de nodos");
 								}
 								else {
 									puts("Un nodo ya conectado, se esta volviendo a conectar");

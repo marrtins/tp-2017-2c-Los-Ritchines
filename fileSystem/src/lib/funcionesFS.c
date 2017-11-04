@@ -1,25 +1,40 @@
 #include "funcionesFS.h"
 
 void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar, Tnodo * nodo1, Tnodo * nodo2, TbloqueAEnviar * bloque){
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo, nodo1->nombre);
-	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.nombreDeNodo);
+	Tbloques * tBloque = &estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque];
+	TcopiaNodo * copia0 = malloc(sizeof(TcopiaNodo));
+	TcopiaNodo * copia1 = malloc(sizeof(TcopiaNodo));
+
+	copia0->nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+	strcpy(copia0->nombreDeNodo, nodo1->nombre);
+	copia0->nroDeCopia = 0;
+	printf("El nombre de nodo es %s\n", copia0->nombreDeNodo);
+	
+
+	tBloque->copia = list_create();
 
 	int bloqueAOcupar = obtenerBloqueDisponible(nodo1);
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaCero.numeroBloqueDeNodo = bloqueAOcupar;
+	copia0->numeroBloqueDeNodo = bloqueAOcupar;
 	ocuparBloque(nodo1, bloqueAOcupar);
 	mostrarBitmap(nodo1->bitmap);
 
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-	strcpy(estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo, nodo2->nombre);
-	printf("El nombre de nodo es %s\n", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.nombreDeNodo);
+	list_add(tBloque->copia, copia0);
+
+	copia1->nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
+	strcpy(copia1->nombreDeNodo, nodo2->nombre);
+	copia1->nroDeCopia = 1;
+	printf("El nombre de nodo es %s\n", copia1->nombreDeNodo);
 
 	bloqueAOcupar = obtenerBloqueDisponible(nodo2);
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].copiaUno.numeroBloqueDeNodo = bloqueAOcupar;
+	copia1->numeroBloqueDeNodo = bloqueAOcupar;
 	ocuparBloque(nodo2, bloqueAOcupar);
 	mostrarBitmap(nodo2->bitmap);
-	estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes = bloque->tamanio;
-	printf("El tamaño del bloque en bytes es: %llu", estructuraArchivoAAlmacenar->bloques[bloque->numeroDeBloque].bytes);
+
+	tBloque->bytes = bloque->tamanio;
+	printf("El tamaño del bloque en bytes es: %llu", tBloque->bytes);
+
+	list_add(tBloque->copia, copia1);
+	tBloque->cantidadCopias = 2;
 }
 
 void inicializarBitmap(Tnodo* nodo){
@@ -348,13 +363,12 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	printf("Para el tamanio del databin recibi %d bytes\n", estado);
 
-	 infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+	infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+	free(nombreNodo);
+	free(ipNodo);
+	free(puertoNodo);
 
-	 free(nombreNodo);
-	 free(ipNodo);
-	 free(puertoNodo);
-
-	 return infoBloque;
+	return infoBloque;
 }
 
 
@@ -436,7 +450,7 @@ int copiarArchivo(char ** palabras){
 	rutaTablaArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 
 	levantarTablaArchivo(archivo,rutaTablaArchivo);
-
+	puts("levante la tabla");
 	nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(palabras[1]);
 	strcpy(rutaDirectorio,palabras[2]);
 
@@ -444,11 +458,12 @@ int copiarArchivo(char ** palabras){
 		string_append(&rutaDirectorio,"/");
 	}
 	string_append(&rutaDirectorio,nombreArchivo);
-
+	puts("vot a levantar archivo");
 	if(levantarArchivo(archivo,rutaDirectorio) == -1){
 		puts("Error al levantar archivo");
 		return -1;
 	}
+	puts("ya levante archivo");
 
 	liberarTablaDeArchivo(archivo);
 	free(rutaTablaArchivo);
@@ -458,36 +473,36 @@ int copiarArchivo(char ** palabras){
 }
 
 int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
-	char * nombreNodo = tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo;
-	int nroBloqueASolicitar;
+	Tbloques* tBloque = &tablaArchivo->bloques[nroBloque];
+	Tnodo * nodo;
+	int i = 0;
+	TcopiaNodo * copiaNodo;
 	Theader* header = malloc(sizeof(Theader));
 	Tbuffer * buffer;
 	header->tipo_de_proceso = FILESYSTEM;
 	header->tipo_de_mensaje = OBTENER_BLOQUE;
-	Tnodo* nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
-	if(nodo != NULL){
-		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo;
-	}
-	else {
-		nombreNodo = tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo;
-		nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
+	while(i < tBloque->cantidadCopias){
+		copiaNodo = (TcopiaNodo *)list_get(tBloque->copia,i);
+		nodo = buscarNodoPorNombre(listaDeNodos, copiaNodo->nombreDeNodo);
 		if(nodo != NULL){
-		nroBloqueASolicitar = tablaArchivo->bloques[nroBloque].copiaUno.numeroBloqueDeNodo;
-		}
-		else{
+			buffer = empaquetarPeticionBloque(header, nroBloque, tBloque->bytes);
+			if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
+				free(header);
+				liberarEstructuraBuffer(buffer);
+				return -1;
+			}
 			free(header);
-			return -1;
+			liberarEstructuraBuffer(buffer);
+			return 1;
+		}
+		else {
+			i++;
 		}
 	}
-	buffer = empaquetarPeticionBloque(header, nroBloqueASolicitar, tablaArchivo->bloques[nroBloque].bytes);
-	if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
-		free(header);
-		liberarEstructuraBuffer(buffer);
-		return -1;
-	}
+	puts("No se encontraron nodos donde realizar la petición");
 	free(header);
 	liberarEstructuraBuffer(buffer);
-	return 1;
+	return -1;
 }
 
 int copiarBloque(Tbuffer* buffer, Tbuffer* bloque){
@@ -518,14 +533,16 @@ int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
 }
 
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque){
-	char * nombreNodo = tablaArchivo->bloques[nroBloque].copiaCero.nombreDeNodo;
-	Tnodo* nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
-	if(nodo == NULL){
-		nombreNodo = tablaArchivo->bloques[nroBloque].copiaUno.nombreDeNodo;
-		nodo = (Tnodo*)buscarNodoPorNombre(listaDeNodos,nombreNodo);
-		if(nodo == NULL){
-			return 0;
+	int i = 0;
+	Tbloques * tBloque = &tablaArchivo->bloques[nroBloque];
+	Tnodo* nodo;
+	while(i < tBloque->cantidadCopias){
+		nodo = (Tnodo*)list_get(listaDeNodos,i);
+		if(nodo != NULL){
+			return 1;
 		}
+		i++;
 	}
-	return 1;
+
+	return 0;
 }

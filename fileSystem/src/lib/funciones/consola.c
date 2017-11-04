@@ -109,6 +109,7 @@ void procesarCpblock(char ** palabras){
 					liberarEstructuraBuffer(bloque);
 					return;
 				}
+				//TODO cuando envia el bloque, actualizar el metadata; y el bitmap;
 				liberarEstructuraBuffer(bloque);
 				puts("Perfeeecto, el bloque se copio lo mas bien");
 			}
