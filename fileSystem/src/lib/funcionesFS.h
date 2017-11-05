@@ -84,6 +84,7 @@ void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
 void inicializarBitmap(Tnodo* bitmap);
 void almacenarTodosLosBitmaps(t_list * lista);
 void almacenarBitmap(Tnodo * nodo);
+void levantarBitmapDeUnNodo(Tnodo * nodo);
 
 //Directorios
 void crearRoot();
