@@ -60,6 +60,7 @@ char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal);
 void mostrarCsv(char * rutaLocal);
 void mostrarBinario(char * rutaLocal);
 char * generarStringBloqueNCopias(int nroBloque);
+int esRutaYamafs(char * ruta);
 
 
 

@@ -1,5 +1,19 @@
 #include "../funcionesFS.h"
 
+int esRutaYamafs(char * ruta){
+	char ** carpetas = string_split(ruta, "/");
+	int retorno;
+	if(string_equals_ignore_case(carpetas[0], "yamafs:")){
+		retorno = 1;
+	}
+	else{
+		retorno = 0;
+	}
+	liberarPunteroDePunterosAChar(carpetas);
+	free(carpetas);
+	return retorno;
+}
+
 void persistirTablaDeDirectorios(){
 	int tamanio, i=0;
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
