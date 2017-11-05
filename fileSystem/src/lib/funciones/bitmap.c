@@ -15,3 +15,31 @@ void mostrarBitmap(t_bitarray* bitmap){
 	}
 	puts("");
 }
+void almacenarTodosLosBitmaps(t_list * lista){
+	int i = 0;
+	Tnodo * nodo;
+	while(i < list_size(lista)){
+		nodo = (Tnodo *) list_get(lista, i);
+		almacenarBitmap(nodo);
+		i++;
+	}
+}
+
+void almacenarBitmap(Tnodo * nodo){
+	char * rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
+	FILE * archivo = fopen(rutaArchivo, "w");
+	int i = 0;
+	int bit;
+	char * bitString;
+
+	while(i < nodo->cantidadBloquesTotal){
+		bit = bitarray_test_bit(nodo->bitmap, i);
+		bitString = string_itoa(bit);
+		fwrite(bitString, 1, strlen(bitString), archivo);
+		free(bitString);
+		i++;
+	}
+
+	fclose(archivo);
+	free(rutaArchivo);
+}

@@ -142,20 +142,21 @@ void consolaRename(char** palabras, int cantidad) {
 		strcpy(yamafs, "yamafs:");
 		int cant = contarPunteroDePunteros(carpetas);
 
-		if (string_equals_ignore_case(carpetas[0], yamafs)) {
+		if (!string_equals_ignore_case(carpetas[0], yamafs)) {
 			puts("Falta la referencia a yamafs:/");
 		} else {
 			if (cant == 1) {
 				puts("No se puede renombrar el root");
 			} else {
 				if (existeDirectorio(palabras[1]) || verificarRutaArchivo(palabras[1])) {
-
 					renombrarArchivoODirectorio(palabras[1], palabras[2]);
 				}
 			}
 		}
-		puts("No se pudo renombrar el archivo o directorio");
 		free(yamafs);
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
+		puts("No se pudo renombrar el archivo o directorio");
 
 	} else {
 		puts("Error en la cantidad de parametros");
@@ -166,15 +167,18 @@ void consolaCat(char ** palabras, int cantidad) {
 	if (cantidad == 1) {
 		char** carpetas = string_split(palabras[1], "/");
 
-		if(string_equals_ignore_case(carpetas[0], "yamafs:")){
+		if(!string_equals_ignore_case(carpetas[0], "yamafs:")){
 			puts("Falta la referencia a yamafs:/");
 		} else if (verificarRutaArchivo(palabras[1])) {
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 			leerArchivoComoTextoPlano(rutaLocal);
+			free(rutaLocal);
 		}
 		else {
 			puts("No existe el directorio o falta la referencia a yamafs");
 		}
+		liberarPunteroDePunterosAChar(carpetas);
+		free(carpetas);
 	}
 	else {
 		puts("Error en la cantidad de parametros");
@@ -272,6 +276,7 @@ void consolaInfo(char**palabras, int cantidad){
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 			levantarTablaArchivo(tablaArchivo, rutaLocal);
 			mostrarTablaArchivo(tablaArchivo);
+
 			liberarTablaDeArchivo(tablaArchivo);
 			free(rutaLocal);
 		}

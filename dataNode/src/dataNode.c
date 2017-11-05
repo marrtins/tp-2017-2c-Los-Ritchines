@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
 
 	fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, dataNode->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-					logAndExit("Error al hacer mmap");
-			}
+		logAndExit("Error al hacer mmap");
+	}
 	fclose(archivo);
 	close(fd);
 

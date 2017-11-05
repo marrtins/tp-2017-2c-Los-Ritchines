@@ -28,7 +28,6 @@ void consolaMd5(char**palabras, int cantidadParametros);
 void consolaLs(char**palabras, int cantidadParametros);
 void consolaMove(char**palabras, int cantidadParametros);
 void consolaInfo(char**palabras, int cantidadParametros);
-void inicializarBitmap(Tnodo* bitmap);
 
 
 //Conexiones
@@ -82,6 +81,9 @@ void vaciarLista();
 t_bitarray* crearBitmap(int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
 void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
+void inicializarBitmap(Tnodo* bitmap);
+void almacenarTodosLosBitmaps(t_list * lista);
+void almacenarBitmap(Tnodo * nodo);
 
 //Directorios
 void crearRoot();

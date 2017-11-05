@@ -289,8 +289,8 @@ int almacenarArchivo(char **palabras){
 		free(archivoAAlmacenar);
 		return -1;
 	}
-
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
+	almacenarTodosLosBitmaps(listaDeNodos);
 	liberarPunteroDePunterosAChar(splitDeRuta);
 	free(splitDeRuta);
 	free(nombreArchivoConExtension);
