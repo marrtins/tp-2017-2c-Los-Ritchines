@@ -274,3 +274,33 @@ void mostrarTablaArchivo(Tarchivo* tablaArchivo){
 	}
 
 }
+
+void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque){
+	char * bloqueNCopias;
+	char * bloqueNCopiaM;
+	int cantidadDeCopias;
+
+	puts(rutaLocalArchivo);
+	t_config *archivo = config_create(rutaLocalArchivo);
+	puts("Voy a agregar copia a tabla archivo");
+
+	bloqueNCopias = generarStringBloqueNCopias(nroBloque);
+	puts(bloqueNCopias);
+	puts("paso generar string bloqueNCopias");
+	cantidadDeCopias = config_get_int_value(archivo,bloqueNCopias);
+	printf("cant de copias obtenidas antes de setear %d\n",cantidadDeCopias);
+	setearAtributoDeArchivoConfigConInts(archivo,bloqueNCopias,1,sumaDeDosNumerosInt);
+	puts("seteado el atributo bloqueNCOPIAS");
+
+	char * bloqueDN = string_itoa(bloqueDatabin);
+puts("Aca no rompe");
+	bloqueNCopiaM = generarStringDeBloqueNCopiaN(nroBloque,cantidadDeCopias);
+	puts("genero bloqeNcopiaM");
+	generarArrayParaArchivoConfig(archivo,bloqueNCopiaM,nodo,bloqueDN);
+	puts("ya esta hecho");
+	config_save(archivo);
+	config_destroy(archivo);
+	free(bloqueNCopias);
+	free(bloqueNCopiaM);
+	free(bloqueDN);
+}

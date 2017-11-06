@@ -63,17 +63,18 @@ void procesarInput(char* linea) {
 }
 
 void procesarCpblock(char ** palabras){
+	int bloqueDN;
 	if(verificarRutaArchivo(palabras[1])){
 		char * rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 		Tnodo *nodo = buscarNodoPorNombre(listaDeNodos, palabras[3]);
 		if(nodo != NULL){
-			if(obtenerBloqueDisponible(nodo) != -1){
+			if((bloqueDN = obtenerBloqueDisponible(nodo)) != -1){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				int nroBloque = atoi(palabras[2]);
 				Tbuffer* bloque;
 				TbloqueAEnviar* bloqueAEnviar;
 				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
-				free(rutaLocalArchivo);
+
 				if (nroBloque>=cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)) {
 					puts("Numero de bloque incorrecto");
 					liberarTablaDeArchivo(tablaArchivo);
@@ -85,6 +86,7 @@ void procesarCpblock(char ** palabras){
 					return;
 				}
 				pthread_mutex_init(&bloqueMutex, NULL);
+				puts("Voy a pedir bloque");
 				if (pedirBloque(tablaArchivo, nroBloque) == -1) {
 					puts("Error al solicitar bloque");
 					liberarTablaDeArchivo(tablaArchivo);
@@ -93,7 +95,7 @@ void procesarCpblock(char ** palabras){
 				liberarTablaDeArchivo(tablaArchivo);
 				pthread_mutex_lock(&bloqueMutex);
 				pthread_mutex_lock(&bloqueMutex);
-
+				puts("voy a copiar bloque");
 				bloque = malloc(sizeof(Tbuffer));
 				if (copiarBloque(bloqueACopiar, bloque) == -1) {
 					puts("Error al copiar bloque recibido");
@@ -103,13 +105,15 @@ void procesarCpblock(char ** palabras){
 				bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
 				bloqueAEnviar->contenido = bloque->buffer;
 				bloqueAEnviar->tamanio = bloque->tamanio;
-				bloqueAEnviar->numeroDeBloque = nroBloque;
+				bloqueAEnviar->numeroDeBloque = bloqueDN;
 				if (enviarBloqueA(bloqueAEnviar, palabras[3]) == -1) {
 					puts("Error no se pudo enviar el bloque");
 					liberarEstructuraBuffer(bloque);
 					return;
 				}
 				//TODO cuando envia el bloque, actualizar el metadata; y el bitmap;
+				agregarCopiaAtablaArchivo(rutaLocalArchivo,palabras[3],bloqueDN,nroBloque);
+				free(rutaLocalArchivo);
 				liberarEstructuraBuffer(bloque);
 				puts("Perfeeecto, el bloque se copio lo mas bien");
 			}

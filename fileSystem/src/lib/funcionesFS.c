@@ -378,6 +378,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	Tbuffer* bloque = malloc(sizeof(Tbuffer));
 	int fd;
 	char * archivoMapeado;
+	int bloqueDN;
 
 
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);

@@ -67,6 +67,7 @@ int esRutaYamafs(char * ruta);
 void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia);
 int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque);
 void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia);
+void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque);
 
 
 
