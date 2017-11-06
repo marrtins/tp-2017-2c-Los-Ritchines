@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
-	int socketFS, fd, estado;
+	int socketFS, fd, estado, bloqueAEliminar;
 	char *bufferHead = malloc(sizeof(Theader));
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
@@ -58,46 +58,52 @@ int main(int argc, char* argv[]) {
 
 		if (head->tipo_de_proceso == FILESYSTEM) {
 			switch (head->tipo_de_mensaje) {
-			case ALMACENAR_BLOQUE:
-				puts("Es FileSystem y quiere almacenar un bloque");
+				case ALMACENAR_BLOQUE:
+					puts("Es FileSystem y quiere almacenar un bloque");
 
-				bloque = recvBloque(socketFS);
-				puts("voy a almacenar el bloque");
-				setBloque(bloque->nroBloque, bloque);
-				puts("Bloque almacenado");
+					bloque = recvBloque(socketFS);
+					puts("voy a almacenar el bloque");
+					setBloque(bloque->nroBloque, bloque);
+					puts("Bloque almacenado");
 
-				free(bloque->contenido);
-				free(bloque);
+					free(bloque->contenido);
+					free(bloque);
 
-				break;
-			case OBTENER_BLOQUE_Y_NRO:
-				puts("Es fileSystem y quiere un bloque con su nro");
-				int nroBloque;
+					break;
+				case OBTENER_BLOQUE_Y_NRO:
+					puts("Es fileSystem y quiere un bloque con su nro");
+					int nroBloque;
 
-				if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
-						logAndExit("Error al recibir el numero de bloque");
+					if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
+							logAndExit("Error al recibir el numero de bloque");
+						}
+					printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
+					enviarBloqueAFS(nroBloque, socketFS);
+					break;
+				case OBTENER_BLOQUE:
+					puts("ES fileSystem y quiere un bloque");
+					int nroBloque_;
+					unsigned long long int tamanioBloque_;
+					if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
+						logAndExit("Error al recibir el numero do bloque");
 					}
-				printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
-				enviarBloqueAFS(nroBloque, socketFS);
-				break;
-			case OBTENER_BLOQUE:
-				puts("ES fileSystem y quiere un bloque");
-				int nroBloque_;
-				unsigned long long int tamanioBloque_;
-				if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
-					logAndExit("Error al recibir el numero do bloque");
+					if (recv(socketFS, &tamanioBloque_, sizeof(unsigned long long int),0) == -1){
+						logAndExit("Error al recibir el tamanio del bloque");
+					}
+					enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
+					puts("Envie el bloque a FS");
+					break;
+				case ELIMINAR_BLOQUE:
+					puts("Eliminando bloque");
+					if (recv(socketFS, &bloqueAEliminar, sizeof(bloqueAEliminar),0) == -1){
+						logAndExit("Error al recibir el tamanio del bloque");
+					}
+					printf("recibi el bloque a eliminar: %d\n", bloqueAEliminar);
+					break;
+				default:
+					break;
 				}
-				if (recv(socketFS, &tamanioBloque_, sizeof(unsigned long long int),0) == -1){
-					logAndExit("Error al recibir el tamanio del bloque");
-				}
-				enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
-				puts("Envie el bloque a FS");
-				break;
-			default:
-				break;
 			}
-
-		}
 	}
 
 
