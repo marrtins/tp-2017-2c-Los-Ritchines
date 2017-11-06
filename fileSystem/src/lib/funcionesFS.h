@@ -53,7 +53,7 @@ void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key,
 void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
-void ocuparBloqueEnTablaArchivos(char * nombreNodo);
+void ocuparBloqueEnTablaNodos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre);
@@ -124,6 +124,7 @@ void almacenarBitmap(Tnodo * nodo);
 void levantarBitmapDeUnNodo(Tnodo * nodo);
 void inicializarBitmaps();
 void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque);
+void desocuparBloqueEnTablaDeNodos(char * nombreNodo);
 
 //Almacenar Archivo
 int almacenarArchivo(char **palabras);

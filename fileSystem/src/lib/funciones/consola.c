@@ -99,7 +99,6 @@ void procesarCpblock(char ** palabras){
 				bloque = malloc(sizeof(Tbuffer));
 				if (copiarBloque(bloqueACopiar, bloque) == -1) {
 					puts("Error al copiar bloque recibido");
-
 				}
 				liberarEstructuraBuffer(bloqueACopiar);
 				bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
@@ -113,6 +112,8 @@ void procesarCpblock(char ** palabras){
 				}
 				//TODO cuando envia el bloque, actualizar el metadata; y el bitmap;
 				agregarCopiaAtablaArchivo(rutaLocalArchivo,palabras[3],bloqueDN,nroBloque);
+				ocuparBloque(nodo, bloqueDN);
+				almacenarBitmap(nodo);
 				free(rutaLocalArchivo);
 				liberarEstructuraBuffer(bloque);
 				puts("Perfeeecto, el bloque se copio lo mas bien");

@@ -48,7 +48,7 @@ void inicializarBitmap(Tnodo* nodo){
 void ocuparBloque(Tnodo * nodo, int bloqueAOcupar){
 	bitarray_set_bit(nodo->bitmap, bloqueAOcupar);
 	nodo->cantidadBloquesLibres--;
-	ocuparBloqueEnTablaArchivos(nodo->nombre);
+	ocuparBloqueEnTablaNodos(nodo->nombre);
 }
 
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){

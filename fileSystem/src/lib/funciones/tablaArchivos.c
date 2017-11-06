@@ -157,7 +157,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 }
 
-void ocuparBloqueEnTablaArchivos(char * nombreNodo){
+void ocuparBloqueEnTablaNodos(char * nombreNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
 	//LIBRE
@@ -172,7 +172,7 @@ void ocuparBloqueEnTablaArchivos(char * nombreNodo){
 	free(nodoLibreAString);
 }
 
-void desocuparBloqueEnTablaDeArchivo(char * nombreNodo){
+void desocuparBloqueEnTablaDeNodos(char * nombreNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
 	//LIBRE
