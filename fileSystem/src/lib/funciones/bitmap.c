@@ -60,3 +60,8 @@ void almacenarBitmap(Tnodo * nodo){
 	fclose(archivo);
 	free(rutaArchivo);
 }
+
+void inicializarBitmaps(){
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/",0777);
+	removerArchivos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps");
+}

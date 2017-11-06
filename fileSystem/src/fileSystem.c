@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
 		strcpy(flag,"--clean");
 		if(string_equals_ignore_case(argv[1],flag)){
 			inicializarTablaDirectorios();
+			inicializarBitmaps();
 		}else{
 			puts("La flag ingresada no es válida");
 			return EXIT_FAILURE;
