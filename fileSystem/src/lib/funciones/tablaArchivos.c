@@ -110,20 +110,16 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 		config_destroy(archivo);
 		return;
 	}
-	puts("Verifique que sea un bloque valido");
 
 	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
 	cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
 	free(bloqueNCopias);
-	puts("Captura la cantidad de copias de ese bloque");
 
 	if(cantidadDeCopias > 1){
-		puts("esa cantidad de copias es mayor a 1");
 		bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
 		array = config_get_array_value(archivo, bloqueNCopiaN);
 		free(bloqueNCopiaN);
 		nodo = buscarNodoPorNombre(listaDeNodos, array[0]);
-		puts("obtuve el nodo y el array del bloque");
 
 		if(nodo == NULL){
 			liberarPunteroDePunterosAChar(array);
@@ -134,18 +130,17 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 		}
 		numeroDeBloqueEnNodo = atoi(array[1]);
 
-		puts("A punto de eliminar el bloque del nodo");
-		if(!eliminarBloqueDeNodo(nodo, numeroDeBloqueEnNodo)){
+		/*if(!eliminarBloqueDeNodo(nodo, numeroDeBloqueEnNodo)){
 			config_destroy(archivo);
 			liberarPunteroDePunterosAChar(array);
 			free(array);
 			return;
-		}
-		puts("pude eliminar el bloque del nodo");
+		}*/
 
-		puts("actualizando la tabla");
+		desocuparBloqueEnBitmap(nodo, numeroDeBloque);
+		mostrarBitmap(nodo->bitmap);
+
 		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
-		puts("tabla actualizada");
 
 		config_save(archivo);
 		config_destroy(archivo);

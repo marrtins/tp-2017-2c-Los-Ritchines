@@ -60,3 +60,8 @@ void almacenarBitmap(Tnodo * nodo){
 	fclose(archivo);
 	free(rutaArchivo);
 }
+
+void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque){
+	bitarray_clean_bit(nodo->bitmap, numeroDeBloque);
+	almacenarBitmap(nodo);
+}

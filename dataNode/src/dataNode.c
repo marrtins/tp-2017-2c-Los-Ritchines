@@ -93,13 +93,6 @@ int main(int argc, char* argv[]) {
 					enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
 					puts("Envie el bloque a FS");
 					break;
-				case ELIMINAR_BLOQUE:
-					puts("Eliminando bloque");
-					if (recv(socketFS, &bloqueAEliminar, sizeof(bloqueAEliminar),0) == -1){
-						logAndExit("Error al recibir el tamanio del bloque");
-					}
-					printf("recibi el bloque a eliminar: %d\n", bloqueAEliminar);
-					break;
 				default:
 					break;
 				}
