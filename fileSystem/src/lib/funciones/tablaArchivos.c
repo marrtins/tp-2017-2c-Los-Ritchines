@@ -163,9 +163,23 @@ void ocuparBloqueEnTablaArchivos(char * nombreNodo){
 	//LIBRE
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", 1, restaDeDosNumerosInt);
 
-	char * nodoLibreAString = string_new();
-	string_append_with_format(&nodoLibreAString,"%sLibre", nombreNodo);
+	char * nodoLibreAString = generarStringNodoNLibre(nombreNodo);
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1, restaDeDosNumerosInt);
+
+	config_save(tablaDeNodos);
+	config_destroy(tablaDeNodos);
+
+	free(nodoLibreAString);
+}
+
+void desocuparBloqueEnTablaDeArchivo(char * nombreNodo){
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+
+	//LIBRE
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", 1, sumaDeDosNumerosInt);
+
+	char * nodoLibreAString = generarStringNodoNLibre(nombreNodo);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1,	restaDeDosNumerosInt);
 
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);

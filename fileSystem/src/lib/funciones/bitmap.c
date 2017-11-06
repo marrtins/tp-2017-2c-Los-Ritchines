@@ -2,7 +2,10 @@
 
 t_bitarray* crearBitmap(int tamanioDatabin){
 	int tamanioEnBits = ceil(tamanioDatabin/8.0);
-	char * bitarray = calloc(tamanioEnBits,1);
+	printf("tamanioEnBits %d", tamanioEnBits);
+	puts("voy a romper");
+	char * bitarray = calloc(tamanioEnBits,sizeof(char));
+	puts("no pase");
 	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBits,LSB_FIRST);
 	return bitmap;
 }
@@ -19,12 +22,15 @@ void mostrarBitmap(t_bitarray* bitmap){
 void levantarBitmapDeUnNodo(Tnodo * nodo){
 	char * rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
 	FILE * archivo = fopen(rutaArchivo, "r");
+	puts("pude abrir");
 	int i = 0;
 	char bitChar;
 	int bit;
 	while(!feof(archivo)){
 		fread(bitChar, 1, sizeof(char), archivo);
+		printf("el bitchar %c", bitChar);
 		bit = bitChar;
+		printf("el bit", bit);
 		if(bit == 1){
 			bitarray_set_bit(nodo->bitmap, i);
 		}
@@ -65,6 +71,7 @@ void almacenarBitmap(Tnodo * nodo){
 void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque){
 	bitarray_clean_bit(nodo->bitmap, numeroDeBloque);
 	almacenarBitmap(nodo);
+	desocuparBloqueEnTablaDeArchivo(nodo->nombre);
 }
 void inicializarBitmaps(){
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/",0777);

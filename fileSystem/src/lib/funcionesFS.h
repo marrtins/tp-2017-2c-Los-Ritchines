@@ -68,8 +68,9 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque);
 void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia);
 void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque);
-
-
+char * generarStringNodoNLibre(char * nombre);
+char * generarStringNodoNTotal(char * nombre);
+void inicializarListaDeNodosAConectar(t_list * desconectados);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);

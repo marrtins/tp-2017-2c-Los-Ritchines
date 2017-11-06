@@ -39,7 +39,10 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 		free(flag);
+	}else {
+		//inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
 	}
+
 
 
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
