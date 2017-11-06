@@ -71,6 +71,7 @@ void almacenarBitmap(Tnodo * nodo){
 void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque){
 	bitarray_clean_bit(nodo->bitmap, numeroDeBloque);
 	almacenarBitmap(nodo);
+	desocuparBloqueEnTablaDeArchivo(nodo->nombre);
 }
 void inicializarBitmaps(){
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/",0777);
