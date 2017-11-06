@@ -305,11 +305,36 @@ void consolaRemove (char** palabras, int cantidad){
 				}
 			}
 		}
-		else if (string_equals_ignore_case(palabras[1], "-b")){
-			puts("Voy a eliminar un nodo");
-			//removerNodo
+		else{
+			puts("Error, utilice el prefijo -d para borrar un directorio");
 		}
 	}
+	else if(cantidad == 4){
+		if (string_equals_ignore_case(palabras[1], "-b")){
+			if(esRutaYamafs(palabras[2])){
+				if(verificarRutaArchivo(palabras[2])){
+					if(isdigit(*palabras[3]) && isdigit(*palabras[4])){
+						char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[2]);
+						eliminarBloqueDeUnArchivo(rutaLocal, atoi(palabras[3]), atoi(palabras[4]));
+						free(rutaLocal);
+					}
+					else{
+						puts("Ingrese numero de copias y bloques validos.");
+					}
+				}
+				else{
+					puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
+				}
+			}
+			else{
+				puts("Falta la referencia a yamafs");
+			}
+		}
+		else{
+			puts("Error, utilice el prefijo -b para borrar un bloque");
+		}
+	}
+
 	else{
 		puts("Error en la cantidad de parámetros");
 	}

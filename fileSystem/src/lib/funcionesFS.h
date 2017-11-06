@@ -3,6 +3,9 @@
 
 #include "estructurasFS.h"
 
+//serializacion
+void empaquetarBloqueAEliminar(Tbuffer * buffer, Theader * head, int numeroDeBloque);
+
 //Operaciones
 long sumaDeDosNumerosLong(long valor1, long valor2);
 long restaDeDosNumerosLong(long valor1, long valor2);
@@ -61,6 +64,9 @@ void mostrarCsv(char * rutaLocal);
 void mostrarBinario(char * rutaLocal);
 char * generarStringBloqueNCopias(int nroBloque);
 int esRutaYamafs(char * ruta);
+void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia);
+int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque);
+void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia);
 
 
 

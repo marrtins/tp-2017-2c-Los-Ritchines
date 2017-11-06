@@ -63,6 +63,105 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	config_destroy(archivo);
 }
 
+void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia){
+	char * bloqueNCopiaN;
+	char * bloqueNCopias;
+	bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
+	puts(bloqueNCopiaN);
+	config_set_value(archivo, bloqueNCopiaN, "[]");
+	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
+	setearAtributoDeArchivoConfigConInts(archivo, bloqueNCopias, 1, restaDeDosNumerosInt);
+	free(bloqueNCopiaN);
+	free(bloqueNCopias);
+}
+
+int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+	Theader * head = malloc(sizeof(Theader));
+	head->tipo_de_proceso = FILESYSTEM;
+	head->tipo_de_mensaje = ELIMINAR_BLOQUE;
+
+	empaquetarBloqueAEliminar(buffer, head, numeroDeBloque);
+
+	if ((send(nodo->fd, buffer->buffer, buffer->tamanio, 0)) == -1) {
+		puts("No se pudo comunicar con datanode, para que elimine el nodo.");
+		free(head);
+		liberarEstructuraBuffer(buffer);
+		return 0;
+	}
+
+	puts("Bloque eliminado");
+	return 1;
+}
+
+void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia){
+	t_config * archivo = config_create(rutaLocal);
+	unsigned long long tamanio = config_get_int_value(archivo, "TAMANIO");
+	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(tamanio);
+	char ** array;
+	Tnodo * nodo;
+	char * bloqueNCopiaN;
+	char * bloqueNCopias;
+	int cantidadDeCopias;
+	int numeroDeBloqueEnNodo;
+
+	if(numeroDeBloque > cantidadDeBloques-1){
+		puts("El bloque que quiere eliminar, no existe en el archivo");
+		config_destroy(archivo);
+		return;
+	}
+	puts("Verifique que sea un bloque valido");
+
+	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
+	cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
+	free(bloqueNCopias);
+	puts("Captura la cantidad de copias de ese bloque");
+
+	if(cantidadDeCopias > 1){
+		puts("esa cantidad de copias es mayor a 1");
+		bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
+		array = config_get_array_value(archivo, bloqueNCopiaN);
+		free(bloqueNCopiaN);
+		nodo = buscarNodoPorNombre(listaDeNodos, array[0]);
+		puts("obtuve el nodo y el array del bloque");
+
+		if(nodo == NULL){
+			liberarPunteroDePunterosAChar(array);
+			free(array);
+			puts("El nodo aun no esta conectado, intentelo mas tarde.");
+			config_destroy(archivo);
+			return;
+		}
+		numeroDeBloqueEnNodo = atoi(array[1]);
+
+		puts("A punto de eliminar el bloque del nodo");
+		if(!eliminarBloqueDeNodo(nodo, numeroDeBloqueEnNodo)){
+			config_destroy(archivo);
+			liberarPunteroDePunterosAChar(array);
+			free(array);
+			return;
+		}
+		puts("pude eliminar el bloque del nodo");
+
+		puts("actualizando la tabla");
+		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
+		puts("tabla actualizada");
+
+		config_save(archivo);
+		config_destroy(archivo);
+
+		liberarPunteroDePunterosAChar(array);
+		free(array);
+
+	}
+	else{
+		config_destroy(archivo);
+		puts("Existe solo una copia del bloque especificado y por lo tanto no se puede eliminar");
+	}
+
+
+}
+
 void ocuparBloqueEnTablaArchivos(char * nombreNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
@@ -180,4 +279,3 @@ void mostrarTablaArchivo(Tarchivo* tablaArchivo){
 	}
 
 }
-
