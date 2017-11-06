@@ -12,8 +12,8 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	int cantidadDeCopias;
 	char **temporal;
 	char * bloqueNCopias;
-	char* bloqueCopiaN;
-	char* bloqueBytes;
+	char* bloqueNCopiaM;
+	char* bloqueNBytes;
 	char ** split = string_split(ruta, "/");
 	char * nombreEntero = obtenerUltimoElementoDeUnSplit(split);
 	char * nombreSinExtension = obtenerNombreDeArchivoSinExtension(nombreEntero);
@@ -26,25 +26,27 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	tablaArchivo->bloques = malloc(sizeof(Tbloques)*cantBloques);
 
 	while(nroBloque < cantBloques){
+		tablaArchivo->bloques[nroBloque].copia = list_create();
 		bloqueNCopias = generarStringBloqueNCopias(nroBloque);
 		cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
-		tablaArchivo->bloques[nroBloque].copia = list_create();
-		bloqueBytes = generarStringDeBloqueNBytes(nroBloque);
-		tablaArchivo->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueBytes);
+		bloqueNBytes = generarStringDeBloqueNBytes(nroBloque);
+		tablaArchivo->bloques[nroBloque].bytes = config_get_int_value(archivo, bloqueNBytes);
 		tablaArchivo->bloques[nroBloque].cantidadCopias = cantidadDeCopias;
 		i = 0;
 		while(i < cantidadDeCopias){
 			TcopiaNodo * copiaNodo = malloc(sizeof(TcopiaNodo));
 			copiaNodo->nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
-			bloqueCopiaN = generarStringDeBloqueNCopiaN(nroBloque,i);
+			bloqueNCopiaM = generarStringDeBloqueNCopiaN(nroBloque,i);
 
-			temporal = config_get_array_value(archivo, bloqueCopiaN);
+			temporal = config_get_array_value(archivo, bloqueNCopiaM);
+			//probando
+			copiaNodo->nroDeCopia = i;
 
 			strcpy(copiaNodo->nombreDeNodo,temporal[0]);
 			copiaNodo->numeroBloqueDeNodo = atoi(temporal[1]);
 			list_add(tablaArchivo->bloques[nroBloque].copia, copiaNodo);
 
-			free(bloqueCopiaN);
+			free(bloqueNCopiaM);
 			i++;
 		}
 
@@ -52,7 +54,7 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 		liberarPunteroDePunterosAChar(temporal);
 		free(temporal);
 		free(bloqueNCopias);
-		free(bloqueBytes);
+		free(bloqueNBytes);
 	}
 	liberarPunteroDePunterosAChar(split);
 	free(split);
@@ -167,10 +169,11 @@ void mostrarTablaArchivo(Tarchivo* tablaArchivo){
 
 	while(i < cantBloques){
 		cantCopias = tablaArchivo->bloques[i].cantidadCopias;
+		j=0;
 		while(j < cantCopias){
 			copia = list_get(tablaArchivo->bloques[i].copia,j);
 			printf("BLOQUE%dCOPIA%d = [%s, %d]\n", i, copia->nroDeCopia, copia->nombreDeNodo,copia->numeroBloqueDeNodo);
-
+			j++;
 		}
 		printf("BLOQUE%dBYTES = %llu\n",i, tablaArchivo->bloques[i].bytes);
 		i++;
