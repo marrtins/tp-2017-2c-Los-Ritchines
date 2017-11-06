@@ -11,6 +11,47 @@ void inicializarTablaDeNodos(){
 	config_destroy(archivoNodos);
 }
 
+char * generarStringNodoNLibre(char * nombre){
+	return string_from_format("%sLibre", nombre);
+}
+
+char * generarStringNodoNTotal(char * nombre){
+	return string_from_format("%sTotal", nombre);
+}
+
+void inicializarListaDeNodosAConectar(t_list * desconectados){
+	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	char ** nodos = config_get_array_value(archivo, "NODOS");
+	int i = 0;
+	char * nodoNTotal;
+	char * nodoNLibres;
+	Tnodo * nodo;
+	while(nodos[i] != NULL){
+		puts(nodos[i]);
+		nodo = malloc(sizeof(Tnodo));
+		strcpy(nodo->nombre, nodos[i]);
+		nodoNLibres = generarStringNodoNLibre(nodos[i]);
+		nodo->cantidadBloquesLibres = config_get_int_value(archivo, nodoNLibres);
+		nodoNTotal = generarStringNodoNTotal(nodos[i]);
+		nodo->cantidadBloquesTotal = config_get_int_value(archivo, nodoNTotal);
+		puts("creando bitmap");
+		printf("%d", nodo->cantidadBloquesTotal);
+		nodo->bitmap = crearBitmap(nodo->cantidadBloquesTotal);
+		puts("levantando bitmap");
+		levantarBitmapDeUnNodo(nodo);
+		puts("bitmap");
+		nodo->fd = -1;
+		list_add(desconectados, nodo);
+		free(nodoNLibres);
+		free(nodoNTotal);
+		i++;
+	}
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
+	config_destroy(archivo);
+	mostrarListaDeNodos(desconectados);
+}
+
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 

@@ -67,6 +67,9 @@ int esRutaYamafs(char * ruta);
 void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia);
 int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque);
 void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia);
+char * generarStringNodoNLibre(char * nombre);
+char * generarStringNodoNTotal(char * nombre);
+void inicializarListaDeNodosAConectar(t_list * desconectados);
 
 
 
