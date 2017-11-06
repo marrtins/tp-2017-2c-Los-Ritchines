@@ -83,17 +83,6 @@ Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
 
-
-//Bitmap
-t_bitarray* crearBitmap(int tamanioBitmap);
-void mostrarBitmap(t_bitarray* bitmap);
-void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
-void inicializarBitmap(Tnodo* bitmap);
-void almacenarTodosLosBitmaps(t_list * lista);
-void almacenarBitmap(Tnodo * nodo);
-void levantarBitmapDeUnNodo(Tnodo * nodo);
-void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque);
-
 //Directorios
 void crearRoot();
 int existeDirectorio(char * directorio);
@@ -121,6 +110,18 @@ int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
 void removerDirectorioDeTabla(char* directorio);
+
+
+//Bitmap
+t_bitarray* crearBitmap(int tamanioBitmap);
+void mostrarBitmap(t_bitarray* bitmap);
+void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
+void inicializarBitmap(Tnodo* bitmap);
+void almacenarTodosLosBitmaps(t_list * lista);
+void almacenarBitmap(Tnodo * nodo);
+void levantarBitmapDeUnNodo(Tnodo * nodo);
+void inicializarBitmaps();
+void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque);
 
 //Almacenar Archivo
 int almacenarArchivo(char **palabras);
