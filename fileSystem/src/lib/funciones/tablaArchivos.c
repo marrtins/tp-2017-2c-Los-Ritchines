@@ -130,7 +130,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 		}
 		numeroDeBloqueEnNodo = atoi(array[1]);
 
-		desocuparBloque(nodo, numeroDeBloque);
+		desocuparBloque(nodo, numeroDeBloqueEnNodo);
 
 		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
 

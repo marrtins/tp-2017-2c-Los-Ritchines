@@ -463,7 +463,7 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	int i = 0;
 	TcopiaNodo * copiaNodo;
 	Theader* header = malloc(sizeof(Theader));
-	Tbuffer * buffer;
+	Tbuffer * buffer = NULL;
 	header->tipo_de_proceso = FILESYSTEM;
 	header->tipo_de_mensaje = OBTENER_BLOQUE;
 	while(i < tBloque->cantidadCopias){

@@ -1,5 +1,45 @@
 #include "../funcionesFS.h"
 
+void eliminarKeyDeArchivo(char * rutaArchivo, char * key){
+	FILE * archivo = fopen(rutaArchivo, "r+");
+	char * buffer = malloc(100);
+	int contiene;
+	int fd = fileno(archivo);
+	unsigned long long i = 0, indiceParaArchivoFinal = 0, indicePasadorDeInfo = 0;
+	unsigned long long tamanio = tamanioArchivo(archivo);
+	char * archivoMapeado = mmap(NULL, tamanio, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	while(i < tamanio){
+		indiceParaArchivoFinal = 0;
+		while(archivoMapeado[i] != '\n'){
+			buffer[indiceParaArchivoFinal] = archivoMapeado[i];
+			i++;
+			indiceParaArchivoFinal++;
+		}
+		buffer[indiceParaArchivoFinal] = '\0';
+		if((int)string_contains(buffer, key)){
+			break;
+		}
+		i++;
+	}
+	indiceParaArchivoFinal=0;
+	i -= strlen(buffer);
+	truncate("/home/utnso/holi.txt", tamanio - strlen(buffer) - 1);
+	FILE * archivo2 = fopen("/home/utnso/holi.txt", "r+");
+	int fd2 = fileno(archivo2);
+	char * archivoFinal = mmap(NULL, tamanio - strlen(buffer) + 1 , PROT_WRITE, MAP_SHARED, fd2, 0);
+	while(indicePasadorDeInfo < tamanio){
+		if(indicePasadorDeInfo < i || indicePasadorDeInfo > i + strlen(buffer)){
+			archivoFinal[indiceParaArchivoFinal] = archivoMapeado[indicePasadorDeInfo];
+			indiceParaArchivoFinal++;
+		}
+		indicePasadorDeInfo++;
+	}
+
+	fclose(archivo);
+	fclose(archivo2);
+	free(buffer);
+}
+
 void generarArrayParaArchivoConfig(t_config * archivoConf, char * key, char * dato1, char * dato2){
 	char * concatenacionLoca = string_new();
 	string_append(&concatenacionLoca, "[");

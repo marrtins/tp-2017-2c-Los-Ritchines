@@ -1,10 +1,20 @@
 #include "../funcionesFS.h"
 
+void setearACeroMalloc(char * memoria, int tamanioMemoria){
+	int i = 0;
+	while(i < tamanioMemoria){
+		memoria[i] = '0';
+		i++;
+	}
+}
+
 t_bitarray* crearBitmap(int tamanioDatabin){
 	int tamanioEnBits = ceil(tamanioDatabin/8.0);
 	printf("tamanioEnBits %d", tamanioEnBits);
 	puts("voy a romper");
 	char * bitarray = calloc(tamanioEnBits,sizeof(char));
+	//char * bitarray = malloc(tamanioEnBits);
+	//setearACeroMalloc(bitarray, tamanioEnBits);
 	puts("no pase");
 	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBits,LSB_FIRST);
 	return bitmap;
@@ -69,11 +79,12 @@ void almacenarBitmap(Tnodo * nodo){
 
 void almacenarBitEnBitmap(Tnodo * nodo, int numeroDeBloque){
 	char * rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
-	FILE * archivo = fopen(rutaArchivo, "w+");
-	char bitChar = (char)bitarray_test_bit(nodo->bitmap, numeroDeBloque);
+	FILE * archivo = fopen(rutaArchivo, "r+");
+	char * bitChar = string_itoa(bitarray_test_bit(nodo->bitmap, numeroDeBloque));
 	fseek(archivo, numeroDeBloque, SEEK_SET);
-	fwrite(&bitChar, 1, sizeof(char), archivo);
+	fwrite(bitChar, 1, sizeof(char), archivo);
 	fclose(archivo);
+	free(bitChar);
 }
 
 

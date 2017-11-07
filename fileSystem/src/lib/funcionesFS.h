@@ -72,6 +72,7 @@ char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
 void inicializarListaDeNodosAConectar(t_list * desconectados);
 void removerArchivos(char * ruta);
+void eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -126,6 +127,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo);
 void inicializarBitmaps();
 void desocuparBloque(Tnodo * nodo, int numeroDeBloque);
 void desocuparBloqueEnTablaDeNodos(char * nombreNodo);
+void setearACeroMalloc(char * memoria, int tamanioMemoria);
 
 //Almacenar Archivo
 int almacenarArchivo(char **palabras);
