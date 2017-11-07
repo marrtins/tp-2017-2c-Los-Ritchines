@@ -24,7 +24,7 @@ void hiloWorkerTransformacion(void *info){
 //	char file_size[sizeof(int)];
 	char *buffer;
 	int packSize;
-	Theader *headEnvio = malloc(sizeof(headEnvio));
+
 	bool finCorrecto = false;
 
 	bloqueDelArchivo=atributos->infoBloque.bloqueDelArchivo;
@@ -107,7 +107,7 @@ void hiloWorkerTransformacion(void *info){
 
 int conectarseAWorkerParaReplanificarTransformacion(TpackInfoBloque *infoBloque,int sockYama){
 	pthread_t workerThread;
-	TatributosHilo * atributos = malloc(sizeof atributos);
+	TatributosHilo * atributos = malloc(sizeof (TatributosHilo));
 	atributos->infoBloque.idTarea=infoBloque->idTarea;
 	atributos->infoBloque.bloqueDelDatabin = infoBloque->bloqueDelDatabin;
 	atributos->infoBloque.bloqueDelArchivo=infoBloque->bloqueDelArchivo;
@@ -144,7 +144,7 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama
 	for(i=0;i< cantConexiones;i++){
 
 		TpackInfoBloque *infoBloque=list_get(bloquesTransformacion,i);
-		TatributosHilo * atributos = malloc(sizeof atributos);
+		TatributosHilo * atributos = malloc(sizeof (TatributosHilo));
 		atributos->infoBloque.idTarea=infoBloque->idTarea;
 		atributos->infoBloque.bloqueDelDatabin = infoBloque->bloqueDelDatabin;
 		atributos->infoBloque.bloqueDelArchivo=infoBloque->bloqueDelArchivo;

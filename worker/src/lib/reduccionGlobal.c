@@ -112,7 +112,7 @@ int realizarReduccionGlobal(client_sock){
 
 		stat = system(lineaDeEjecucionReduccionGlobal);
 		printf("Stat lineaDeEjecucion :%d \n",stat);
-		Theader *head = malloc(sizeof head);
+		Theader *head = malloc(sizeof (Theader));
 		head->tipo_de_proceso = WORKER;
 		head->tipo_de_mensaje = FIN_REDUCCIONGLOBALOK;
 
@@ -160,7 +160,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 				puts("no se pudo enviar path del archivo temporal que necesitamos. ");
 				return  FALLO_SEND;
 			}
-			TinfoApareoGlobal *infoWorker = malloc(sizeof *infoWorker);
+			TinfoApareoGlobal *infoWorker = malloc(sizeof (TinfoApareoGlobal));
 			infoWorker->fdWorker=fdWorker;
 			infoWorker->eofTemporal=false;
 			infoWorker->encargado=false;
@@ -169,7 +169,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 
 
 			string_append(&rutaMiTemporal,infoNodo->temporalReduccion);
-			TinfoApareoGlobal *infoWorker = malloc(sizeof *infoWorker);
+			TinfoApareoGlobal *infoWorker = malloc(sizeof (TinfoApareoGlobal));
 			infoWorker->fdWorker=-1;
 			infoWorker->eofTemporal=false;
 			infoWorker->encargado=true;
@@ -184,7 +184,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	int eofTotal = list_size(listaFds);
 	int cantEofRecibidos =0;
 
-	Theader *head = malloc(sizeof head);
+	Theader *head = malloc(sizeof (Theader));
 	head->tipo_de_proceso=WORKER;
 	head->tipo_de_mensaje=GIVE_NEXTLINE;
 	TpackBytes *siguienteLinea;

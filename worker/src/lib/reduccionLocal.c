@@ -25,7 +25,7 @@ int realizarReduccionLocal(int client_sock){
 
 	int stat;
 	pid_t pidRed;
-	Theader *headEnvio  = malloc(sizeof headEnvio);
+	Theader *headEnvio  = malloc(sizeof (Theader));
 	puts("Llego solicitud de inicio para reduccion local");
 
 

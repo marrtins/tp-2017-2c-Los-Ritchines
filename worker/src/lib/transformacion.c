@@ -22,7 +22,7 @@ int realizarTransformacion(int client_sock){
 	char * rutaResultadoTransformacion;
 	char * nombreScriptTransformador;
 	char * rutaScriptTransformador ;
-	Theader *headEnvio  = malloc(sizeof headEnvio);
+	Theader *headEnvio  = malloc(sizeof (Theader));
 	int stat;
 	pid_t pid;
 

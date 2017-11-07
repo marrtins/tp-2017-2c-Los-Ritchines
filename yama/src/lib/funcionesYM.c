@@ -1,7 +1,7 @@
 
 #include "funcionesYM.h"
 
-
+extern int retardoPlanificacion;
 
 
 
@@ -26,7 +26,11 @@ Tyama *obtenerConfiguracionYama(char* ruta){
 
 	yama->retardo_planificacion = config_get_int_value(yamaConfig, "RETARDO_PLANIFICACION");
 	yama->algoritmo_balanceo =          config_get_int_value(yamaConfig, "ALGORITMO_BALANCEO");
+	yama->disponibilidadBase =          config_get_int_value(yamaConfig, "DISPONIBILIDAD_BASE");
 	yama->tipo_de_proceso = YAMA;
+
+	retardoPlanificacion=yama->retardo_planificacion;
+	setRetardoPlanificacion();
 
 	config_destroy(yamaConfig);
 	return yama;
@@ -39,8 +43,21 @@ void mostrarConfiguracion(Tyama *yama){
 	printf("Puerto Master: %s\n",       yama->puerto_master);
 	printf("Puerto Filesystem: %s\n", yama->puerto_filesystem);
 	printf("Retardo Planificacion: %d\n",   yama->retardo_planificacion);
-	printf("Algoritmo Balanceo: %d\n", yama->algoritmo_balanceo);
+	printf("Algoritmo Balanceo: %s\n",getAlgoritmoBalanceo(yama->algoritmo_balanceo));
+	printf("Retardo: %d\n",yama->retardo_planificacion);
+	printf("Disponibilidad: %d\n",yama->disponibilidadBase);
 	printf("Tipo de proceso: %d\n", yama->tipo_de_proceso);
+}
+char * getAlgoritmoBalanceo(int algoritmo){
+	char * ret = string_new();
+	if(algoritmo==CLOCK){
+		string_append(&ret,"CLOCK");
+	}else if(algoritmo==WCLOCK){
+		string_append(&ret,"WCLOCK");
+	}else{
+		string_append(&ret,"VALOR INVALIDO");
+	}
+	return ret;
 }
 
 void conectarAFS(Tyama *yama){

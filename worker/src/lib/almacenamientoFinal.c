@@ -36,7 +36,7 @@ int realizarAlmacenamientoFinal(client_sock){
 	sleep(1);
 
 
-	Theader *headEnvio=malloc(sizeof(headEnvio));
+	Theader *headEnvio=malloc(sizeof(Theader));
 
 	headEnvio->tipo_de_proceso=WORKER;
 	headEnvio->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;

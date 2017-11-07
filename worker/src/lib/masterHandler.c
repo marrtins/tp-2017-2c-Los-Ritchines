@@ -13,7 +13,7 @@ int manejarConexionMaster(Theader *head, int client_sock){
 
 
 	int stat;
-	Theader *headEnvio  = malloc(sizeof headEnvio);
+
 
 
 	if(head->tipo_de_mensaje==NUEVATRANSFORMACION){

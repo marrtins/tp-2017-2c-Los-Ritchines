@@ -9,11 +9,12 @@ int idTempName,idPropio;
 
 
 extern int idMasterGlobal,idJobGlobal,idTareaGlobal;
+extern float retardoPlanificacionSegs;
 
 t_list *listaNodosDelJob;
 extern t_list *listaJobFinalizados, * listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 extern pthread_mutex_t mux_listaJobFinalizados, mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
-
+extern Tyama *yama;
 TpackBytes *pathResultado;
 
 void masterHandler(void *atributos){
@@ -30,6 +31,7 @@ void masterHandler(void *atributos){
 
 
 	pthread_mutex_lock(&mux_idGlobal);
+
 	idPropio=idMasterGlobal++;
 	pthread_mutex_unlock(&mux_idGlobal);
 
@@ -40,7 +42,7 @@ void masterHandler(void *atributos){
 
 
 	char* buffer;
-	Tbuffer * buffer1;
+	//Tbuffer * buffer1;
 
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
@@ -52,6 +54,7 @@ void masterHandler(void *atributos){
 			puts("Master quiere iniciar un nuevo JOB. esperamos a recibir la info");
 
 			break;
+
 
 		case PATH_FILE_TOREDUCE:
 
@@ -69,7 +72,7 @@ void masterHandler(void *atributos){
 
 			printf("Path archivo a reducir: : %s\n",pathArchivoAReducir->bytes);
 
-		break;
+			break;
 
 		case PATH_RES_FILE:
 			puts("Nos llega el path del resultado");
@@ -86,17 +89,17 @@ void masterHandler(void *atributos){
 
 			puts("Pido info a filesystem sobre el archivo a transformar");
 
-//			head.tipo_de_proceso=YAMA;
-//			head.tipo_de_mensaje=INFO_ARCHIVO;
-//
-//			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
-//			buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
-//			puts("Path del archivo a reducir serializado; lo enviamos");
-//			if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
-//				puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
-//				return;
-//			}
-//			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
+			//			head.tipo_de_proceso=YAMA;
+			//			head.tipo_de_mensaje=INFO_ARCHIVO;
+			//
+			//			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
+			//			buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
+			//			puts("Path del archivo a reducir serializado; lo enviamos");
+			//			if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
+			//				puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
+			//				return;
+			//			}
+			//			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
 
 
 			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
@@ -104,11 +107,10 @@ void masterHandler(void *atributos){
 			//FS envia: cant de bloques del archivo (si es cero la ruta no es valida) para saber cuantos recv va a tener que hacer sobre
 			//info de un bloque: nro de bloque + tamanioNombreNodo +copiacero nombrenodo+ copiacero nrobloquedatabin + tamanioNombreNodo +copiauno nombrenodo+ copiauno nrobloquedatabin
 			/*while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
-				if(head->tipo_char  *nombre =malloc(MAXSIZETEMPNAME)de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
-					//recibimos la lista de bloques y demases que componen al archivo a reducir
-				}
-
-			}
+						if(head->tipo_char  *nombre =malloc(MAXSIZETEMPNAME)de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
+							//recibimos la lista de bloques y demases que componen al archivo a reducir
+						}
+					}
 			 */
 			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
 			//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
@@ -125,6 +127,7 @@ void masterHandler(void *atributos){
 			generarListaInfoNodos();
 
 
+			sleep(retardoPlanificacionSegs);
 
 			t_list *listaBloquesPlanificados=planificar(listaComposicionArchivo);
 
@@ -137,7 +140,9 @@ void masterHandler(void *atributos){
 			}
 			break;
 		case FINTRANSFORMACIONLOCALOK:
+
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			printf("FINTRANSFORMACIONLOCAL OK de la tarea%d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaFinalizadosOK(idTareaFinalizada);
@@ -151,6 +156,7 @@ void masterHandler(void *atributos){
 			break;
 		case FINTRANSFORMACIONLOCALFAIL:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			printf("FINTRANSFORMACIONLOCAL FAIL de la tarea%d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 
@@ -169,7 +175,7 @@ void masterHandler(void *atributos){
 					enviarHeader(sockMaster,headEnvio);
 					MUX_LOCK(&mux_listaJobFinalizados);
 					if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-						TjobFinalizado *job = malloc(sizeof job);
+						TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
 						TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 						job->nroJob = tareaFinalizada->job;
 						job->finCorrecto=false;
@@ -187,7 +193,7 @@ void masterHandler(void *atributos){
 				liberarCargaNodos(idTareaFinalizada);
 				MUX_LOCK(&mux_listaJobFinalizados);
 				if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-					TjobFinalizado *job = malloc(sizeof job);
+					TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
 					TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 					job->nroJob = tareaFinalizada->job;
 					job->finCorrecto=false;
@@ -199,6 +205,7 @@ void masterHandler(void *atributos){
 			break;
 		case FIN_REDUCCIONLOCALOK:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			printf("REDUCCION LOCAL OK de la tarea %d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaFinalizadosOK(idTareaFinalizada);
@@ -210,6 +217,7 @@ void masterHandler(void *atributos){
 			break;
 		case FIN_REDUCCIONLOCALFAIL:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			printf("FIN REDUCCION LOCAL FAIL de la tarea%d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaError(idTareaFinalizada);
@@ -221,7 +229,7 @@ void masterHandler(void *atributos){
 			liberarCargaNodos(idTareaFinalizada);
 			MUX_LOCK(&mux_listaJobFinalizados);
 			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-				TjobFinalizado *jobFinRL = malloc(sizeof jobFinRL);
+				TjobFinalizado *jobFinRL = malloc(sizeof (TjobFinalizado));
 				TpackTablaEstados *tareaFinalizadaRL=getTareaPorId(idTareaFinalizada);
 				jobFinRL->nroJob = tareaFinalizadaRL->job;
 				jobFinRL->finCorrecto=false;
@@ -231,6 +239,7 @@ void masterHandler(void *atributos){
 			break;
 		case FIN_REDUCCIONGLOBALOK:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			printf("REDUCCION GLOBAL OK de la tarea %d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaFinalizadosOK(idTareaFinalizada);
@@ -240,6 +249,7 @@ void masterHandler(void *atributos){
 			break;
 		case FIN_REDUCCIONGLOBALFAIL:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			puts("fin reduccion global fail");
 			puts("actuializo tbala de estados");
 			moverAListaError(idTareaFinalizada);
@@ -251,7 +261,7 @@ void masterHandler(void *atributos){
 			liberarCargaNodos(idTareaFinalizada);
 			MUX_LOCK(&mux_listaJobFinalizados);
 			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-				TjobFinalizado *jobFinRG = malloc(sizeof jobFinRG);
+				TjobFinalizado *jobFinRG = malloc(sizeof (TjobFinalizado));
 				TpackTablaEstados *tareaFinalizadaRG=getTareaPorId(idTareaFinalizada);
 				jobFinRG->nroJob = tareaFinalizadaRG->job;
 				jobFinRG->finCorrecto=false;
@@ -261,6 +271,7 @@ void masterHandler(void *atributos){
 			break;
 		case FIN_ALMACENAMIENTOFINALOK:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			printf("Almacenamiento final de la tarea %d\n",idTareaFinalizada);
 			puts("actuializo tbala de estados");
 			moverAListaFinalizadosOK(idTareaFinalizada);
@@ -269,6 +280,7 @@ void masterHandler(void *atributos){
 			break;
 		case FIN_ALMACENAMIENTOFINALFAIL:
 			idTareaFinalizada = recibirValor(sockMaster);
+			sleep(retardoPlanificacionSegs);
 			puts("fin almacenamiento local fail");
 			puts("actuializo tbala de estados");
 			moverAListaError(idTareaFinalizada);
@@ -280,7 +292,7 @@ void masterHandler(void *atributos){
 			liberarCargaNodos(idTareaFinalizada);
 			MUX_LOCK(&mux_listaJobFinalizados);
 			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-				TjobFinalizado *jobFinAF = malloc(sizeof jobFinAF);
+				TjobFinalizado *jobFinAF = malloc(sizeof (TjobFinalizado));
 				TpackTablaEstados *tareaFinalizadaAF=getTareaPorId(idTareaFinalizada);
 				jobFinAF->nroJob = tareaFinalizadaAF->job;
 				jobFinAF->finCorrecto=false;
@@ -306,7 +318,7 @@ int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster){
 	int idTareaActual = idTareaGlobal++;
 	MUX_UNLOCK(&mux_idTareaGlobal);
 
-	TinfoAlmacenadoFinal *infoAlmacenado = malloc(sizeof(infoAlmacenado));
+	TinfoAlmacenadoFinal *infoAlmacenado = malloc(sizeof(TinfoAlmacenadoFinal));
 	infoAlmacenado->idTarea=idTareaActual;
 	infoAlmacenado->job=tareaFinalizada->job;
 	infoAlmacenado->ipNodo=malloc(MAXIMA_LONGITUD_IP);
@@ -336,24 +348,29 @@ int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster){
 		return  FALLO_SEND;
 	}
 	printf("se enviaron %d bytes de la info del almacenado final\n",stat);
-	agregarAlmacenadoFinalAListaEnProceso(infoAlmacenado,tareaFinalizada->nodo);
+
+
+
+
+
+	agregarAlmacenadoFinalAListaEnProceso(infoAlmacenado,tareaFinalizada->nodo,tareaFinalizada->bloquesReducidos);
 
 
 	return 0;
 }
-void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo){
+void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo,char * bloquesReducidos){
 		MUX_LOCK(&mux_listaEnProceso);
-		TpackTablaEstados * estado = malloc(sizeof estado);
+		TpackTablaEstados * estado = malloc(sizeof (TpackTablaEstados));
 		estado->idTarea=infoAlmacenado->idTarea;
 		estado->job=infoAlmacenado->job;
 		estado->master=idPropio;
-		estado->bloqueDelArchivo=999;//todo
+		estado->bloqueDelArchivo=-1;
 		estado->nodo=malloc(TAMANIO_NOMBRE_NODO);
 		estado->nodo=nombreNodo;
 		estado->etapa=ALMACENAMIENTOFINAL;
 		estado->nombreArchTemporal=pathResultado->bytes;
-//		estado->bloquesReducidos=malloc(TAMANIO_NOMBRE_TEMPORAL);//todo
-//		estado->bloquesReducidos=bloquesReducidos;
+		estado->bloquesReducidos=malloc(strlen(bloquesReducidos)+1);
+		estado->bloquesReducidos=bloquesReducidos;
 		list_add(listaEstadoEnProceso,estado);
 		MUX_UNLOCK(&mux_listaEnProceso);
 		mostrarTablaDeEstados();
@@ -370,20 +387,22 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	int idTareaActual = idTareaGlobal++;
 	MUX_UNLOCK(&mux_idTareaGlobal);
 
-	TreduccionGlobal *nuevaReduccion = malloc(sizeof (nuevaReduccion));
+	TreduccionGlobal *nuevaReduccion = malloc(sizeof (TreduccionGlobal));
 	nuevaReduccion->idTarea=idTareaActual;
 	nuevaReduccion->job=jobAReducir;
 	nuevaReduccion->tempRedGlobal=malloc(TAMANIO_NOMBRE_TEMPORAL);
-	nuevaReduccion->tempRedGlobal="/tmppiola";
+	nuevaReduccion->tempRedGlobal=generarNombreReduccionGlobalTemporal();
 	nuevaReduccion->tempRedGlobalLen=strlen(nuevaReduccion->tempRedGlobal)+1;
 	nuevaReduccion->listaNodos=list_create();
 
-	t_list * listaInformacionNodos = list_create();
 
+
+	t_list * listaInformacionNodos = list_create();
+	t_list * bloques = list_create();
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 			TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
 			if(tareaOk->job==jobAReducir && tareaOk->etapa==REDUCCIONLOCAL){
-				TinfoNodoReduccionGlobal * infoNodoAux=  malloc(sizeof infoNodoAux);
+				TinfoNodoReduccionGlobal * infoNodoAux=  malloc(sizeof (TinfoNodoReduccionGlobal));
 				infoNodoAux->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 				infoNodoAux->nombreNodo=tareaOk->nodo;
 				infoNodoAux->nombreNodoLen=strlen(infoNodoAux->nombreNodo)+1;
@@ -396,19 +415,15 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 				infoNodoAux->temporalReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL);
 				infoNodoAux->temporalReduccion=tareaOk->nombreArchTemporal;
 				infoNodoAux->temporalReduccionLen=strlen(infoNodoAux->temporalReduccion)+1;
-				if(infoNodoAux->nombreNodo=="Nodo3"){
-					infoNodoAux->nodoEncargado=1;
-				}else{
-					infoNodoAux->nodoEncargado=0;
-				}//hrdcoed
-
 				list_add(listaInformacionNodos,infoNodoAux);
-
-
+				list_add(bloques,tareaOk->bloquesReducidos);
 
 
 			}
 		}
+
+	asignarNodoElegido(listaInformacionNodos);
+
 
 	nuevaReduccion->listaNodosSize=list_size(listaInformacionNodos);
 	nuevaReduccion->listaNodos=listaInformacionNodos;
@@ -426,14 +441,29 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 		return  FALLO_SEND;
 	}
 	printf("se enviaron %d bytes de la info de la reduccion global\n",stat);
-	agregarReduccionGlobalAListaEnProceso(nuevaReduccion);
+
+
+	char * bloquesReducidos = string_new();
+	string_append(&bloquesReducidos,"{");
+	for(i=0;i<list_size(bloques);i++){
+		if(i!=0) string_append(&bloquesReducidos,", ");
+		string_append(&bloquesReducidos,(list_get(bloques,i)));
+
+	}
+	string_append(&bloquesReducidos,"}");
+
+
+
+	agregarReduccionGlobalAListaEnProceso(nuevaReduccion,bloquesReducidos);
 
 	int cargaWorker = divideYRedondea(list_size(listaNodosDelJob),2);
 
 	actualizarCargaWorkerEn(getNodoElegido(listaNodosDelJob),cargaWorker);
 	aumentarHistoricoEn(getNodoElegido(listaNodosDelJob),cargaWorker);
+	list_destroy(bloques);
 	return 0;
 }
+
 
 
 bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada){
@@ -463,6 +493,7 @@ bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada){
 
 int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 
+
 	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 	char * buffer;
 	int packSize,stat;
@@ -475,7 +506,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	char *  nodoReductor = tareaFinalizada->nodo;
 	int i;
 
-	TreduccionLocal * infoReduccion = malloc(sizeof(infoReduccion));
+	TreduccionLocal * infoReduccion = malloc(sizeof(TreduccionLocal));
 	infoReduccion->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 	infoReduccion->nombreNodo=nodoReductor;
 	infoReduccion->nombreNodoLen=strlen(infoReduccion->nombreNodo)+1;
@@ -497,7 +528,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 		TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
 		if(tareaOk->job==jobAReducir && tareaOk->nodo==nodoReductor &&tareaOk->etapa==TRANSFORMACION){
-			TreduccionLista * reduccionAux=  malloc(sizeof reduccionAux);
+			TreduccionLista * reduccionAux=  malloc(sizeof (TreduccionLista));
 			reduccionAux->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
 			reduccionAux->nombreTemporal=tareaOk->nombreArchTemporal;
 			reduccionAux->nombreTemporalLen=strlen(reduccionAux->nombreTemporal)+1;
@@ -610,7 +641,6 @@ char *  generarNombreReduccionGlobalTemporal(){
 	return temp;
 }
 
-
 int responderSolicTransf(int sockMaster,t_list * listaBloques){
 
 
@@ -698,6 +728,8 @@ bool sePuedeReplanificar(int idTarea,t_list * listaComposicionArchivo){
 	return false;
 }
 int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
+
+	sleep(retardoPlanificacionSegs);
 	TpackTablaEstados *tareaAReplanificar=getTareaPorId(idTarea);
 	int i,packSize,stat;
 	char * buffer;
@@ -710,7 +742,7 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 	for(i=0;i<list_size(listaComposicionArchivo);i++){
 		TpackageUbicacionBloques * bloqueAux =list_get(listaComposicionArchivo,i);
 		if(tareaAReplanificar->bloqueDelArchivo == bloqueAux->bloque){
-			TpackInfoBloque *bloqueRet=malloc(sizeof(bloqueRet));
+			TpackInfoBloque *bloqueRet=malloc(sizeof(TpackInfoBloque));
 			if(tareaAReplanificar->nodo == bloqueAux->nombreNodoC1){
 				//le paso la info para q labure en el otronodo
 
@@ -938,7 +970,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 
 	//toda esta funcion va a volar, esta hecho asi nomas para ir probandolo. esta tod hardco
 	int maxNombreNodo=10;
-	TpackageUbicacionBloques *bloque0 = malloc(sizeof(bloque0));
+	TpackageUbicacionBloques *bloque0 = malloc(sizeof(TpackageUbicacionBloques));
 	bloque0->bloque=0;
 	bloque0->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque0->nombreNodoC1="Nodo1";
@@ -952,7 +984,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 
 	list_add(listaComposicion,bloque0);
 
-	TpackageUbicacionBloques *bloque1 = malloc(sizeof(bloque1));
+	TpackageUbicacionBloques *bloque1 = malloc(sizeof(TpackageUbicacionBloques));
 	bloque1->bloque=1;
 	bloque1->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque1->nombreNodoC1="Nodo2";
@@ -965,7 +997,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque1->finBloque=1048500;
 	list_add(listaComposicion,bloque1);
 
-	TpackageUbicacionBloques *bloque2 = malloc(sizeof(bloque2));
+	TpackageUbicacionBloques *bloque2 = malloc(sizeof(TpackageUbicacionBloques));
 	bloque2->bloque=2;
 	bloque2->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque2->nombreNodoC1="Nodo3";
@@ -989,7 +1021,7 @@ void generarListaInfoNodos(){
 	int puertoLen=5;
 
 
-	TpackageInfoNodo *nodo1 = malloc(sizeof(nodo1));
+	TpackageInfoNodo *nodo1 = malloc(sizeof(TpackageInfoNodo));
 	nodo1->nombreNodo=malloc(nombreLen);
 	nodo1->nombreNodo="Nodo1";
 	nodo1->tamanioNombre=strlen(nodo1->nombreNodo)+1;
@@ -1001,7 +1033,7 @@ void generarListaInfoNodos(){
 	nodo1->tamanioPuerto=strlen(nodo1->puertoWorker)+1;
 	list_add(listaNodosDelJob,nodo1);
 
-	TpackageInfoNodo *nodo2 = malloc(sizeof(nodo2));
+	TpackageInfoNodo *nodo2 = malloc(sizeof(TpackageInfoNodo));
 	nodo2->nombreNodo=malloc(nombreLen);
 	nodo2->nombreNodo="Nodo2";
 	nodo2->tamanioNombre=strlen(nodo2->nombreNodo)+1;
@@ -1014,7 +1046,7 @@ void generarListaInfoNodos(){
 
 	list_add(listaNodosDelJob,nodo2);
 
-	TpackageInfoNodo *nodo3 = malloc(sizeof(nodo3));
+	TpackageInfoNodo *nodo3 = malloc(sizeof(TpackageInfoNodo));
 	nodo3->nombreNodo=malloc(nombreLen);
 	nodo3->nombreNodo="Nodo3";
 	nodo3->tamanioNombre=strlen(nodo3->nombreNodo)+1;
@@ -1040,15 +1072,15 @@ void generarListaInfoNodos(){
 bool yaFueAgregadoAlistaJobFinalizados(int idTareaFinalizada){
 	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 	int i;
-	//todo mutex jobFinalizados
-
+	MUX_LOCK(&mux_listaJobFinalizados);
 	for(i=0;i<list_size(listaJobFinalizados);i++){
 		TjobFinalizado *job=list_get(listaJobFinalizados,i);
 		if(job->nroJob==tareaFinalizada->job){
+			MUX_UNLOCK(&mux_listaJobFinalizados);
 			return true;
 		}
 	}
-
+	MUX_UNLOCK(&mux_listaJobFinalizados);
 	return false;
 }
 
@@ -1078,7 +1110,8 @@ void liberarCargaNodos(int idTareaFinalizada){
 				}else if(aux->etapa==REDUCCIONLOCAL){
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
-					liberarCargaEn(aux->nodo,10);//todo
+					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
+					liberarCargaEn(aux->nodo,cargaAReducir);
 				}
 			}
 		}
@@ -1093,7 +1126,9 @@ void liberarCargaNodos(int idTareaFinalizada){
 				}else if(aux->etapa==REDUCCIONLOCAL){
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
-					liberarCargaEn(aux->nodo,10);//todo
+					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
+					liberarCargaEn(aux->nodo,cargaAReducir);
+
 				}
 			}
 		}
@@ -1108,7 +1143,8 @@ void liberarCargaNodos(int idTareaFinalizada){
 				}else if(aux->etapa==REDUCCIONLOCAL){
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
-					liberarCargaEn(aux->nodo,10);//todo
+					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
+					liberarCargaEn(aux->nodo,cargaAReducir);
 				}
 			}
 		}
@@ -1130,19 +1166,19 @@ void liberarCargaEn(char * nombreNodo,int cantidad){
 	MUX_UNLOCK(&mux_listaCargaGlobal);
 }
 
-void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion){
+void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion,char * bloquesReducidos){
 		MUX_LOCK(&mux_listaEnProceso);
-		TpackTablaEstados * estado = malloc(sizeof estado);
+		TpackTablaEstados * estado = malloc(sizeof (TpackTablaEstados));
 		estado->idTarea=infoReduccion->idTarea;
 		estado->job=infoReduccion->job;
 		estado->master=idPropio;
-		estado->bloqueDelArchivo=999;//todo: chequear
+		estado->bloqueDelArchivo=-1;
 		estado->nodo=malloc(TAMANIO_NOMBRE_NODO);
 		estado->nodo=getNodoElegido(infoReduccion->listaNodos);
 		estado->etapa=REDUCCIONGLOBAL;
 		estado->nombreArchTemporal=infoReduccion->tempRedGlobal;
-		//estado->bloquesReducidos=malloc(TAMANIO_NOMBRE_TEMPORAL);//todo cambiar x tamanio cant bloques
-		//estado->bloquesReducidos=bloquesReducidos;
+		estado->bloquesReducidos=malloc(strlen(bloquesReducidos)+1);
+		estado->bloquesReducidos=bloquesReducidos;
 		list_add(listaEstadoEnProceso,estado);
 		MUX_UNLOCK(&mux_listaEnProceso);
 		mostrarTablaDeEstados();
@@ -1227,7 +1263,7 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char *
 	MUX_LOCK(&mux_listaEnProceso);
 
 
-	TpackTablaEstados * estado = malloc(sizeof estado);
+	TpackTablaEstados * estado = malloc(sizeof (TpackTablaEstados));
 	estado->idTarea=infoReduccion->idTarea;
 	estado->job=infoReduccion->job;
 	estado->master=idPropio;
@@ -1236,7 +1272,7 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char *
 	estado->nodo=infoReduccion->nombreNodo;
 	estado->etapa=REDUCCIONLOCAL;
 	estado->nombreArchTemporal=infoReduccion->tempRed;
-	estado->bloquesReducidos=malloc(TAMANIO_NOMBRE_TEMPORAL);//todo cambiar x tamanio cant bloques
+	estado->bloquesReducidos=malloc(strlen(bloquesReducidos)+1);
 	estado->bloquesReducidos=bloquesReducidos;
 	list_add(listaEstadoEnProceso,estado);
 	MUX_UNLOCK(&mux_listaEnProceso);
@@ -1246,7 +1282,7 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char *
 void agregarTransformacionAListaEnProceso(int jobActual, int idTarea, TpackInfoBloque *bloque){
 
 	MUX_LOCK(&mux_listaEnProceso);
-	TpackTablaEstados * estado = malloc(sizeof estado);
+	TpackTablaEstados * estado = malloc(sizeof (TpackTablaEstados));
 	estado->idTarea=idTarea;
 	estado->job=jobActual;
 	estado->master= idPropio;
@@ -1272,7 +1308,7 @@ void mostrarTablaDeEstados(){
 	char * etapa;
 	char * nodo;
 	char * archivoTemporal;
-	printf("%-4s%-4s%-7s%-10s%-10s%-15s%-20s%-15s\n", "id", "Job", "Master", "Nodo", "Bloque","Etapa","A Temporal","Estado");
+	printf("%-4s%-4s%-7s%-7s%-25s%-15s%-40s%-10s\n", "id", "Job", "Master", "Nodo", "Bloque","Etapa","A Temporal","Estado");
 	for(i=0;i<list_size(listaEstadoEnProceso);i++){
 		TpackTablaEstados * aux = list_get(listaEstadoEnProceso,i);
 		id = aux->idTarea;
@@ -1286,7 +1322,7 @@ void mostrarTablaDeEstados(){
 		etapa=getNombreEtapa(aux->etapa);
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
-		printf("%-4d%-4d%-7d%-10s%-10s%-15s%-20s%-15s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"En Proceso");
+		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
 	}
 
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
@@ -1302,7 +1338,7 @@ void mostrarTablaDeEstados(){
 		etapa=getNombreEtapa(aux->etapa);
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
-		printf("%-4d%-4d%-7d%-10s%-10s%-15s%-20s%-15s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"Finalizado OK");
+		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 	}
 
 	for(i=0;i<list_size(listaEstadoError);i++){
@@ -1318,23 +1354,24 @@ void mostrarTablaDeEstados(){
 		etapa=getNombreEtapa(aux->etapa);
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
-		printf("%-4d%-4d%-7d%-10s%-10s%-15s%-20s%-15s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERROR");
+		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 	}
+
 	printf("\n\n\n");
 }
 
-char * getNombreEtapa(int etapaEnum){
-	char * ret = string_new();
+char  * getNombreEtapa(int etapaEnum){
+	char * ret=malloc(6);
 	if(etapaEnum==TRANSFORMACION){
-		string_append(&ret,"Transformacion");
+		ret="Tra";
 	}else if(etapaEnum==REDUCCIONGLOBAL){
-		string_append(&ret,"R Global");
+		ret="R Gl";
 	}else if(etapaEnum==REDUCCIONLOCAL){
-		string_append(&ret,"R Local");
+		ret="R Lo";
 	}else if(etapaEnum==ALMACENAMIENTOFINAL){
-			string_append(&ret,"A Final");
+			ret="A F";
 	}else{
-		string_append(&ret,"");
+		ret = " ";
 	}
 	return ret;
 }
@@ -1370,18 +1407,23 @@ char * getPuertoNodo(char * nombreNodo){
 
 t_list * planificar(t_list * listaComposicionArchivo){
 
+
+
+
 	t_list * listaPlanificada=list_create();
 	t_list * listaWorkersPlanificacion = list_create();
 
-	int base = 2;
-	int pwlClock=0;
-	int stat;
+
+
+
+
+	int stat,pwl;
 	TpackageInfoNodo *aux;
 	//lleno la lista con los workers asociados a esta transfo.
 	int i;
 	for(i=0;i<list_size(listaNodosDelJob);i++){
 		aux = list_get(listaNodosDelJob,i);
-		Tplanificacion * nodo = malloc(sizeof nodo);
+		Tplanificacion * nodo = malloc(sizeof (Tplanificacion));
 		nodo->infoNodo.nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 		nodo->infoNodo.nombreNodo=aux->nombreNodo;
 		nodo->infoNodo.tamanioNombre=aux->tamanioNombre;
@@ -1391,8 +1433,17 @@ t_list * planificar(t_list * listaComposicionArchivo){
 		nodo->infoNodo.puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
 		nodo->infoNodo.puertoWorker=aux->puertoWorker;
 		nodo->infoNodo.tamanioPuerto=aux->tamanioPuerto;
-		nodo->disponibilidadBase=base;
-		nodo->pwl=pwlClock;
+		nodo->disponibilidadBase=yama->disponibilidadBase;
+
+		if(yama->algoritmo_balanceo==WCLOCK){
+			int wlMax=getMayorCargaAllWorkers();
+			int wl = getCargaWorker(aux->nombreNodo);
+			pwl=wlMax-wl;
+		}else{
+			pwl=0;
+		}
+
+		nodo->pwl=pwl;
 		nodo->availability=nodo->disponibilidadBase+nodo->pwl;
 		nodo->clock=false;
 		list_add(listaWorkersPlanificacion,nodo);
@@ -1408,7 +1459,7 @@ t_list * planificar(t_list * listaComposicionArchivo){
 		TpackInfoBloque *bloque = asignarBloque(bloqueAux,listaWorkersPlanificacion);
 
 		list_add(listaPlanificada,bloque);
-		actualizarCargaWorkerEn(bloque->nombreNodo,1);
+
 
 	}
 
@@ -1423,18 +1474,18 @@ t_list * planificar(t_list * listaComposicionArchivo){
 }
 
 void actualizarCargaWorkerEn(char * nombreNodo, int cantidadAAumentar){
-
+	MUX_LOCK(&mux_listaCargaGlobal);
 	int i;
 	for(i=0;i<list_size(listaCargaGlobal);i++){
 		TcargaGlobal *aux = list_get(listaCargaGlobal,i);
 		if(aux->nombreNodo == nombreNodo){
 			aux->cargaGlobal +=cantidadAAumentar;
-
+			MUX_UNLOCK(&mux_listaCargaGlobal);
 			return;
 		}
 	}
 
-	//todo mutex
+	MUX_UNLOCK(&mux_listaCargaGlobal);
 }
 void aumentarHistoricoEn(char * nombreNodo,int cantidadAAumentar){
 	int i;
@@ -1454,7 +1505,7 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 
 
 	Tplanificacion *nodoApuntado = getNodoApuntado(listaWorkersPlanificacion);
-	TpackInfoBloque *bloqueRet=malloc(sizeof(bloqueRet));
+	TpackInfoBloque *bloqueRet=malloc(sizeof(TpackInfoBloque));
 
 	if((nodoApuntado->availability > 0 && bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo) ||
 			(nodoApuntado->availability > 0 && bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo)){
@@ -1466,7 +1517,7 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 		}
 		mergeBloque(bloqueRet,nodoApuntado,bloqueAux);
 		nodoApuntado->availability-=1;
-		aumentarHistoricoEn(bloqueRet->nombreNodo,1);
+
 		avanzarClock(listaWorkersPlanificacion);
 
 	}else{
@@ -1480,8 +1531,10 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 
 		mergeBloque(bloqueRet,siguienteNodo,bloqueAux);
 		siguienteNodo->availability-=1;
-		aumentarHistoricoEn(bloqueRet->nombreNodo,1);
+
 	}
+	aumentarHistoricoEn(bloqueRet->nombreNodo,1);
+	actualizarCargaWorkerEn(bloqueRet->nombreNodo,1);
 
 
 	return bloqueRet;
@@ -1624,7 +1677,7 @@ int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
 		if(aux->availability == disponibilidadMasAlta){
 			historico1=getHistorico(aux);
 		}
-		if(historico1>historico2){ //todo cambio
+		if(historico1>historico2){ //todo cambio (?????????????)
 			historico2=historico1;
 			indiceAModificar=i;
 		}
@@ -1650,5 +1703,71 @@ int getHistorico(Tplanificacion *infoWorker){
 	return 0;
 }
 
+int getCargaWorker(char * nombreWorker){
+	int i;
+	int cargaRet =0;
+	for(i=0;i<list_size(listaCargaGlobal);i++){
+		TcargaGlobal * cargaWorker = list_get(listaCargaGlobal,i);
+		if(string_equals_ignore_case(cargaWorker->nombreNodo,nombreWorker)){
+			cargaRet=cargaWorker->cargaGlobal;
+		}
+	}
 
+	return cargaRet;
+}
 
+int getMayorCargaAllWorkers(){
+
+	int mayorCarga=0;
+	int i;
+	for(i=0;i<list_size(listaCargaGlobal);i++){
+		TcargaGlobal * cargaWorker = list_get(listaCargaGlobal,i);
+		if(cargaWorker->cargaGlobal>mayorCarga){
+			mayorCarga=cargaWorker->cargaGlobal;
+		}
+	}
+
+	return mayorCarga;
+
+}
+
+void asignarNodoElegido(t_list * listaReduccionGlobal){
+	TinfoNodoReduccionGlobal *aux = list_get(listaReduccionGlobal,0);
+	char * nodoElegido=aux->nombreNodo;
+	int menorCarga =getCargaWorker(nodoElegido);
+	int cargaAux;
+	int i;
+	for(i=0;i<list_size(listaReduccionGlobal);i++){
+		aux=list_get(listaReduccionGlobal,i);
+		cargaAux=getCargaWorker(aux->nombreNodo);
+		if(cargaAux<menorCarga){
+			menorCarga=cargaAux;
+			nodoElegido=aux->nombreNodo;
+		}
+	}
+
+	for(i=0;i<list_size(listaReduccionGlobal);i++){
+		aux=list_get(listaReduccionGlobal,i);
+		if(aux->nombreNodo==nodoElegido){
+			aux->nodoEncargado=1;
+		}
+	}
+
+	printf("Nodo encargado: %s. menor carga: %d \n",nodoElegido,menorCarga);
+
+	return;
+}
+int getCargaReduccionGlobal(int job){
+	int carga=0;
+	int i;
+	TpackTablaEstados * estado;
+	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+		estado = list_get(listaEstadoFinalizadoOK,i);
+		if(estado->etapa==REDUCCIONLOCAL){
+			carga++;
+		}
+	}
+
+	printf("Libero carga en %d\n",divideYRedondea(carga,2));
+	return divideYRedondea(carga,2);
+}

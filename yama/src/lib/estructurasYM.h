@@ -11,8 +11,10 @@ typedef struct{
 	char* puerto_filesystem;
 	int   algoritmo_balanceo,
 	   	  retardo_planificacion,
+		  disponibilidadBase,
 		  tipo_de_proceso;
 }Tyama;
+
 
 /*typedef struct {
 
