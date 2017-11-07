@@ -1,3 +1,7 @@
 TAMANIO=0
 NODOS=[]
+Nodo1Libre=
+Nodo2Libre=(null)
+Nodo1Total=
 LIBRE=0
+Nodo2Total=(null)

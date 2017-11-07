@@ -86,6 +86,7 @@ void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo 
 Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
+void borrarNodoPorNombre(t_list * lista, char * nombre);
 
 //Directorios
 void crearRoot();

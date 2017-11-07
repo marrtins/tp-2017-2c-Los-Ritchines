@@ -3,7 +3,6 @@
 void eliminarKeyDeArchivo(char * rutaArchivo, char * key){
 	FILE * archivo = fopen(rutaArchivo, "r+");
 	char * buffer = malloc(100);
-	int contiene;
 	int fd = fileno(archivo);
 	unsigned long long i = 0, indiceParaArchivoFinal = 0, indicePasadorDeInfo = 0;
 	unsigned long long tamanio = tamanioArchivo(archivo);

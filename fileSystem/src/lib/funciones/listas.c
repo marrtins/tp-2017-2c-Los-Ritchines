@@ -171,6 +171,14 @@ void borrarNodoPorFD(int fd){
 	list_remove_by_condition(listaDeNodos,buscarPorFDParaLista);
 }
 
+void borrarNodoPorNombre(t_list * lista, char * nombre){
+	bool buscarPorNombreParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return !strcmp(nodo->nombre, nombre);
+	}
+	list_remove_by_condition(lista,buscarPorNombreParaLista);
+}
+
 bool ordenarListaPorMayor(void * directorio1, void * directorio2){
 	Tdirectorio * directorioA = (Tdirectorio*)directorio1;
 	Tdirectorio * directorioB = (Tdirectorio*)directorio2;
