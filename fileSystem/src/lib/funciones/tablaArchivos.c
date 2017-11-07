@@ -130,15 +130,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 		}
 		numeroDeBloqueEnNodo = atoi(array[1]);
 
-		/*if(!eliminarBloqueDeNodo(nodo, numeroDeBloqueEnNodo)){
-			config_destroy(archivo);
-			liberarPunteroDePunterosAChar(array);
-			free(array);
-			return;
-		}*/
-
-		desocuparBloqueEnBitmap(nodo, numeroDeBloque);
-		mostrarBitmap(nodo->bitmap);
+		desocuparBloque(nodo, numeroDeBloqueEnNodo);
 
 		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
 
@@ -157,7 +149,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 }
 
-void ocuparBloqueEnTablaArchivos(char * nombreNodo){
+void ocuparBloqueEnTablaNodos(char * nombreNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
 	//LIBRE
@@ -172,14 +164,14 @@ void ocuparBloqueEnTablaArchivos(char * nombreNodo){
 	free(nodoLibreAString);
 }
 
-void desocuparBloqueEnTablaDeArchivo(char * nombreNodo){
+void desocuparBloqueEnTablaDeNodos(char * nombreNodo){
 	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
 	//LIBRE
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", 1, sumaDeDosNumerosInt);
 
 	char * nodoLibreAString = generarStringNodoNLibre(nombreNodo);
-	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1,	restaDeDosNumerosInt);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1,	sumaDeDosNumerosInt);
 
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
@@ -287,4 +279,34 @@ void mostrarTablaArchivo(Tarchivo* tablaArchivo){
 		i++;
 	}
 
+}
+
+void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque){
+	char * bloqueNCopias;
+	char * bloqueNCopiaM;
+	int cantidadDeCopias;
+
+	puts(rutaLocalArchivo);
+	t_config *archivo = config_create(rutaLocalArchivo);
+	puts("Voy a agregar copia a tabla archivo");
+
+	bloqueNCopias = generarStringBloqueNCopias(nroBloque);
+	puts(bloqueNCopias);
+	puts("paso generar string bloqueNCopias");
+	cantidadDeCopias = config_get_int_value(archivo,bloqueNCopias);
+	printf("cant de copias obtenidas antes de setear %d\n",cantidadDeCopias);
+	setearAtributoDeArchivoConfigConInts(archivo,bloqueNCopias,1,sumaDeDosNumerosInt);
+	puts("seteado el atributo bloqueNCOPIAS");
+
+	char * bloqueDN = string_itoa(bloqueDatabin);
+puts("Aca no rompe");
+	bloqueNCopiaM = generarStringDeBloqueNCopiaN(nroBloque,cantidadDeCopias);
+	puts("genero bloqeNcopiaM");
+	generarArrayParaArchivoConfig(archivo,bloqueNCopiaM,nodo,bloqueDN);
+	puts("ya esta hecho");
+	config_save(archivo);
+	config_destroy(archivo);
+	free(bloqueNCopias);
+	free(bloqueNCopiaM);
+	free(bloqueDN);
 }

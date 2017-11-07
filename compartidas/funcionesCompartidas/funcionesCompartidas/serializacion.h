@@ -20,6 +20,8 @@ Tbuffer * empaquetarBytesMasInt(Theader* head, char * bytes, int numero);
 Tbuffer *empaquetarBytes(Theader * head, char * bytes);
 Tbuffer * empaquetarInt(Theader * head, int numero);
 
+Tbuffer * empaquetarPeticionBloque(Theader* head, int nroBloque, unsigned long long tamanioBloque);
+
 char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int bytesOcupadosBloque,int nombreTemporalLen ,char* nombreTemporal, int *pack_size);
 TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes_serial);
 

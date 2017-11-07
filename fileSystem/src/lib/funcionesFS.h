@@ -53,7 +53,7 @@ void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key,
 void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
 void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
-void ocuparBloqueEnTablaArchivos(char * nombreNodo);
+void ocuparBloqueEnTablaNodos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre);
@@ -67,11 +67,12 @@ int esRutaYamafs(char * ruta);
 void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia);
 int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque);
 void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia);
+void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque);
 char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
 void inicializarListaDeNodosAConectar(t_list * desconectados);
-
-
+void removerArchivos(char * ruta);
+void eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -124,7 +125,9 @@ void almacenarTodosLosBitmaps(t_list * lista);
 void almacenarBitmap(Tnodo * nodo);
 void levantarBitmapDeUnNodo(Tnodo * nodo);
 void inicializarBitmaps();
-void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque);
+void desocuparBloque(Tnodo * nodo, int numeroDeBloque);
+void desocuparBloqueEnTablaDeNodos(char * nombreNodo);
+void setearACeroMalloc(char * memoria, int tamanioMemoria);
 
 //Almacenar Archivo
 int almacenarArchivo(char **palabras);
