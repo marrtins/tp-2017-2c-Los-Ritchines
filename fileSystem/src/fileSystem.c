@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 		}
 		free(flag);
 	}else {
-		//inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
+		inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
 	}
 
 

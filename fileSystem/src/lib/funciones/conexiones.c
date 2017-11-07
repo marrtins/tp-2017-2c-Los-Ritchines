@@ -88,6 +88,7 @@ void conexionesDatanode(void * estructura){
 										puts("pude inicializar");
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
+										almacenarBitmap(nuevoNodo);
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
