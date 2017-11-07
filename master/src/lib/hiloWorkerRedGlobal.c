@@ -19,7 +19,7 @@ void hiloWorkerReduccionGlobal(void *info){
 
 	char *buffer;
 	int packSize;
-	Theader *headEnvio = malloc(sizeof(headEnvio));
+
 	bool finCorrecto = false;
 
 
@@ -120,7 +120,7 @@ void hiloWorkerReduccionGlobal(void *info){
 int conectarseAWorkerParaReduccionGlobal(TreduccionGlobal *infoReduccion,int sockYama){
 
 
-	TatributosHiloReduccionGlobal * atributos = malloc(sizeof atributos);
+	TatributosHiloReduccionGlobal * atributos = malloc(sizeof (TatributosHiloReduccionGlobal));
 	atributos->infoReduccionGlobal.idTarea=infoReduccion->idTarea;
 	atributos->infoReduccionGlobal.job=infoReduccion->job;
 	atributos->infoReduccionGlobal.tempRedGlobalLen=infoReduccion->tempRedGlobalLen;

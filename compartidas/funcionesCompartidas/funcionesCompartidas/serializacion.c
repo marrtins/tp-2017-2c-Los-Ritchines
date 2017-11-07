@@ -76,7 +76,7 @@ TpackInfoBloque *deserializeInfoBloque(char *bytes_serial){
 	int off;
 		TpackInfoBloque *infoBloque;
 
-		if ((infoBloque = malloc(sizeof *infoBloque)) == NULL){
+		if ((infoBloque = malloc(sizeof (TpackInfoBloque))) == NULL){
 			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 			return NULL;
 		}
@@ -188,7 +188,7 @@ TpackBytes *deserializeBytes(char *bytes_serial){
 	int off;
 	TpackBytes *pbytes;
 
-	if ((pbytes = malloc(sizeof *pbytes)) == NULL){
+	if ((pbytes = malloc(sizeof (TpackBytes))) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 		return NULL;
 	}
@@ -211,7 +211,7 @@ TpackBytes *deserializeBytes(char *bytes_serial){
 TpackSrcCode *readFileIntoPack(Tproceso sender, char* ruta){
 
 	FILE *file = fopen(ruta, "rb");
-	TpackSrcCode *src_code = malloc(sizeof *src_code);
+	TpackSrcCode *src_code = malloc(sizeof (TpackSrcCode));
 	src_code->head.tipo_de_proceso = sender;
 	src_code->head.tipo_de_mensaje = SRC_CODE;
 
@@ -347,7 +347,7 @@ TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes
 	int off;
 	TpackDatosTransformacion *datosTransf;
 
-	if ((datosTransf = malloc(sizeof *datosTransf)) == NULL){
+	if ((datosTransf = malloc(sizeof (TpackDatosTransformacion))) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete datos transf\n");
 		return NULL;
 	}
@@ -502,7 +502,7 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 	int off;
 	TreduccionLocal *infoReduccion;
 
-	if ((infoReduccion = malloc(sizeof *infoReduccion)) == NULL){
+	if ((infoReduccion = malloc(sizeof (TreduccionLocal))) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 		return NULL;
 	}
@@ -577,7 +577,7 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 	t_list *listaTemporales = list_create();
 	for(i=0;i<infoReduccion->listaSize;i++){
 
-		TreduccionLista *aux = malloc(sizeof aux);
+		TreduccionLista *aux = malloc(sizeof (TreduccionLista));
 		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
@@ -655,7 +655,7 @@ t_list * deserializarListaNombresTemporales(char * bytes_serial){
 	int i;
 	for(i=0;i<listaSize;i++){
 
-		TreduccionLista *aux = malloc(sizeof aux);
+		TreduccionLista *aux = malloc(sizeof (TreduccionLista));
 		memcpy(&aux->nombreTemporalLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 
@@ -741,7 +741,7 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 	int off;
 	TinfoReduccionLocalMasterWorker *datosReduccion;
 
-	if ((datosReduccion = malloc(sizeof *datosReduccion)) == NULL){
+	if ((datosReduccion = malloc(sizeof (TinfoReduccionLocalMasterWorker))) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete datos reduccion\n");
 		return NULL;
 	}
@@ -970,7 +970,7 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 	int off;
 	TreduccionGlobal *infoReduccionGlobal;
 
-	if ((infoReduccionGlobal = malloc(sizeof *infoReduccionGlobal)) == NULL){
+	if ((infoReduccionGlobal = malloc(sizeof (TreduccionGlobal))) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 		return NULL;
 	}
@@ -1129,7 +1129,7 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial){
 	int off;
 	TinfoAlmacenadoFinal *infoAlmacenado;
 
-		if ((infoAlmacenado = malloc(sizeof *infoAlmacenado)) == NULL){
+		if ((infoAlmacenado = malloc(sizeof (TinfoAlmacenadoFinal))) == NULL){
 			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 			return NULL;
 		}
@@ -1236,7 +1236,7 @@ TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_s
 	int off;
 	TinfoAlmacenadoMasterWorker *infoAlmacenado;
 
-		if ((infoAlmacenado = malloc(sizeof *infoAlmacenado)) == NULL){
+		if ((infoAlmacenado = malloc(sizeof (TinfoAlmacenadoMasterWorker))) == NULL){
 			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 			return NULL;
 		}

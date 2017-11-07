@@ -9,6 +9,10 @@ typedef enum{
 	REDUCCIONGLOBAL=82,
 	ALMACENAMIENTOFINAL=83
 }Etapa;
+typedef enum{
+	CLOCK=121,
+	WCLOCK=122
+}AlgoritmoBalanceo;
 
 typedef enum {
 	INICIO      = 1,

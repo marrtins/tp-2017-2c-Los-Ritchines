@@ -1,14 +1,19 @@
 #include "lib/funcionesYM.h"
 
-int idMasterGlobal,idJobGlobal,idTareaGlobal;
+int idMasterGlobal,idJobGlobal,idTareaGlobal,retardoPlanificacion;
+float retardoPlanificacionSegs;
 t_list *listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 pthread_mutex_t mux_listaJobFinalizados,mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
+Tyama *yama;
 int main(int argc, char* argv[]){
 	int estado,
 		socketMasters,
 		sockMaster,
 		tamanioCliente;
-	Tyama *yama;
+
+
+
+	signal(SIGUSR1, (void*)sigusr1Handler);
 
 	//pthread_t master_thread;
 
@@ -80,7 +85,7 @@ int main(int argc, char* argv[]){
 
 
 			pthread_t masterthread;
-			TatributosHiloMaster * attrHilo = malloc(sizeof attrHilo);
+			TatributosHiloMaster * attrHilo = malloc(sizeof (TatributosHiloMaster));
 			attrHilo->fdMaster=sockMaster;
 			if( pthread_create(&masterthread, &attr_ondemand, (void*) masterHandler, (void*) attrHilo) < 0){
 				//log_error(logTrace,"no pudo creasr hilo");
@@ -112,3 +117,38 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
+
+
+void sigusr1Handler(void){
+
+	puts("Señal SIGUSR1 detectada");
+
+
+
+	t_config *yamaConfig = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
+
+	if(config_has_property(yamaConfig, "RETARDO_PLANIFICACION")){
+		yama->retardo_planificacion = config_get_int_value(yamaConfig, "RETARDO_PLANIFICACION");
+	}
+	if(config_has_property(yamaConfig, "ALGORITMO_BALANCEO")){
+		yama->algoritmo_balanceo = config_get_int_value(yamaConfig, "ALGORITMO_BALANCEO");
+	}
+	if(config_has_property(yamaConfig, "DISPONIBILIDAD_BASE")){
+		yama->disponibilidadBase = config_get_int_value(yamaConfig, "DISPONIBILIDAD_BASE");
+	}
+	retardoPlanificacion=yama->retardo_planificacion;
+	setRetardoPlanificacion();
+
+	config_destroy(yamaConfig);
+
+
+	puts("nueva configuracion en yama");
+	mostrarConfiguracion(yama);
+
+	return;
+}
+
+void setRetardoPlanificacion(){
+	retardoPlanificacionSegs = retardoPlanificacion / 1000.0;
+	printf("Se cambio el retardo de planificacion a %f segundos\n", retardoPlanificacionSegs);
+}

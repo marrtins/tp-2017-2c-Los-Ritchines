@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
 		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
 		return  FALLO_SEND;
 	}
+
 	//printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
 
 

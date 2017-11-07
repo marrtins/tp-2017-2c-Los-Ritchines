@@ -19,7 +19,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 	char *buffer;
 	int packSize;
-	Theader *headEnvio = malloc(sizeof(headEnvio));
+
 	bool finCorrecto = false;
 
 
@@ -34,12 +34,12 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	head.tipo_de_proceso=MASTER;
 	head.tipo_de_mensaje=INICIARALMACENAMIENTOFINAL;
 
-	TinfoAlmacenadoMasterWorker *infoMW = malloc(sizeof(infoMW));
-	infoMW->nombreResultante=malloc(TAMANIO_NOMBRE_TEMPORAL); //todo:tamanio nombre archivo
+	TinfoAlmacenadoMasterWorker *infoMW = malloc(sizeof(TinfoAlmacenadoMasterWorker));
+	infoMW->nombreResultante=malloc(strlen(rutaResultado)+1);
 	infoMW->nombreResultante=rutaResultado;
 	infoMW->nombreResultanteLen=strlen(infoMW->nombreResultante)+1;
 
-	infoMW->nombreTempReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL); //todo:tamanio nombre archivo
+	infoMW->nombreTempReduccion=malloc(strlen(atributos->infoAlmacenamiento.nombreTempReduccion)+1);
 	infoMW->nombreTempReduccion=atributos->infoAlmacenamiento.nombreTempReduccion;
 	infoMW->nombreTempReduccionLen=strlen(infoMW->nombreTempReduccion)+1;
 
@@ -111,7 +111,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 int conectarseAWorkerParaAlmacenamientoFinal(TinfoAlmacenadoFinal *infoAlmacenamiento,int sockYama){
 
 
-	TatributosHiloAlmacenamientoFinal * atributos = malloc(sizeof atributos);
+	TatributosHiloAlmacenamientoFinal * atributos = malloc(sizeof (TatributosHiloAlmacenamientoFinal));
 	atributos->infoAlmacenamiento.idTarea=infoAlmacenamiento->idTarea;
 	atributos->infoAlmacenamiento.job=infoAlmacenamiento->job;
 

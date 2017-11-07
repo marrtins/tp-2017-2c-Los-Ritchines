@@ -5,5 +5,6 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <commons/collections/list.h>
+#include <signal.h>
 
 #endif

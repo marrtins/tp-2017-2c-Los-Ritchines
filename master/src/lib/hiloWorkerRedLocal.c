@@ -24,7 +24,6 @@ void hiloWorkerReduccionLocal(void *info){
 //	char file_size[sizeof(int)];
 	char *buffer;
 	int packSize;
-	Theader *headEnvio = malloc(sizeof(headEnvio));
 	bool finCorrecto = false;
 
 
@@ -115,7 +114,7 @@ void hiloWorkerReduccionLocal(void *info){
 int conectarseAWorkerParaReduccionLocal(TreduccionLocal *infoReduccion,int sockYama){
 
 
-	TatributosHiloReduccionLocal * atributos = malloc(sizeof atributos);
+	TatributosHiloReduccionLocal * atributos = malloc(sizeof (TatributosHiloReduccionLocal));
 	atributos->infoReduccion.idTarea=infoReduccion->idTarea;
 	atributos->infoReduccion.ipLen=infoReduccion->ipLen;
 	atributos->infoReduccion.ipNodo=malloc(MAXIMA_LONGITUD_IP);
