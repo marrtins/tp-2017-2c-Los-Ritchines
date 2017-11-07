@@ -29,7 +29,7 @@ void inicializarListaDeNodosAConectar(t_list * desconectados){
 	while(nodos[i] != NULL){
 		puts(nodos[i]);
 		nodo = malloc(sizeof(Tnodo));
-		strcpy(nodo->nombre, nodos[i]);
+		nodo->nombre = strdup(nodos[i]);
 		nodoNLibres = generarStringNodoNLibre(nodos[i]);
 		nodo->cantidadBloquesLibres = config_get_int_value(archivo, nodoNLibres);
 		nodoNTotal = generarStringNodoNTotal(nodos[i]);

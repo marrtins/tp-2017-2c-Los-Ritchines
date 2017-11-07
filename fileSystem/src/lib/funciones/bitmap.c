@@ -1,12 +1,12 @@
 #include "../funcionesFS.h"
 
-t_bitarray* crearBitmap(int tamanioDatabin){
-	int tamanioEnBits = ceil(tamanioDatabin/8.0);
-	printf("tamanioEnBits %d", tamanioEnBits);
+t_bitarray* crearBitmap(unsigned int tamanioDatabin){
+	int tamanioEnBytes = ceil(tamanioDatabin/8.0);
+	printf("tamanioEnBytes %d", tamanioEnBytes);
 	puts("voy a romper");
-	char * bitarray = calloc(tamanioEnBits,sizeof(char));
+	char * bitarray = calloc(tamanioEnBytes,sizeof(char));
 	puts("no pase");
-	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBits,LSB_FIRST);
+	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBytes,LSB_FIRST);
 	return bitmap;
 }
 

@@ -116,7 +116,7 @@ void removerDirectorioDeTabla(char* directorio);
 
 
 //Bitmap
-t_bitarray* crearBitmap(int tamanioBitmap);
+t_bitarray* crearBitmap(unsigned int tamanioBitmap);
 void mostrarBitmap(t_bitarray* bitmap);
 void ocuparBloque(Tnodo * nodo, int bloqueAOcupar);
 void inicializarBitmap(Tnodo* bitmap);
