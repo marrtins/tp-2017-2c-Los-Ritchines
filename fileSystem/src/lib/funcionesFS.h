@@ -71,6 +71,7 @@ void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDa
 char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
 void inicializarListaDeNodosAConectar(t_list * desconectados);
+void removerArchivos(char * ruta);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -123,7 +124,7 @@ void almacenarTodosLosBitmaps(t_list * lista);
 void almacenarBitmap(Tnodo * nodo);
 void levantarBitmapDeUnNodo(Tnodo * nodo);
 void inicializarBitmaps();
-void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque);
+void desocuparBloque(Tnodo * nodo, int numeroDeBloque);
 void desocuparBloqueEnTablaDeNodos(char * nombreNodo);
 
 //Almacenar Archivo

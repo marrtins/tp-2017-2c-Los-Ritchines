@@ -37,20 +37,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	tBloque->cantidadCopias = 2;
 }
 
-void inicializarBitmap(Tnodo* nodo){
-	int i = 0;
-	while(i < nodo->cantidadBloquesTotal){
-		bitarray_clean_bit(nodo->bitmap, i);
-		i++;
-	}
-}
-
-void ocuparBloque(Tnodo * nodo, int bloqueAOcupar){
-	bitarray_set_bit(nodo->bitmap, bloqueAOcupar);
-	nodo->cantidadBloquesLibres--;
-	ocuparBloqueEnTablaNodos(nodo->nombre);
-}
-
 void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar){
 	Theader * head = malloc(sizeof(Theader));
 	Tbuffer * buffer1;
@@ -378,8 +364,6 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	Tbuffer* bloque = malloc(sizeof(Tbuffer));
 	int fd;
 	char * archivoMapeado;
-	int bloqueDN;
-
 
 	cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
 

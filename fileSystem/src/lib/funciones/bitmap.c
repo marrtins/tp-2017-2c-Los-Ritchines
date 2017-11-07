@@ -27,10 +27,10 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 	char bitChar;
 	int bit;
 	while(!feof(archivo)){
-		fread(bitChar, 1, sizeof(char), archivo);
+		fread(&bitChar, 1, sizeof(char), archivo);
 		printf("el bitchar %c", bitChar);
 		bit = bitChar;
-		printf("el bit", bit);
+		printf("el bit es: %d", bit);
 		if(bit == 1){
 			bitarray_set_bit(nodo->bitmap, i);
 		}
@@ -67,13 +67,39 @@ void almacenarBitmap(Tnodo * nodo){
 	free(rutaArchivo);
 }
 
+void almacenarBitEnBitmap(Tnodo * nodo, int numeroDeBloque){
+	char * rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
+	FILE * archivo = fopen(rutaArchivo, "w+");
+	char bitChar = (char)bitarray_test_bit(nodo->bitmap, numeroDeBloque);
+	fseek(archivo, numeroDeBloque, SEEK_SET);
+	fwrite(&bitChar, 1, sizeof(char), archivo);
+	fclose(archivo);
+}
 
-void desocuparBloqueEnBitmap(Tnodo * nodo, int numeroDeBloque){
+
+void desocuparBloque(Tnodo * nodo, int numeroDeBloque){
 	bitarray_clean_bit(nodo->bitmap, numeroDeBloque);
-	almacenarBitmap(nodo);
+	nodo->cantidadBloquesLibres++;
+	almacenarBitEnBitmap(nodo, numeroDeBloque);
 	desocuparBloqueEnTablaDeNodos(nodo->nombre);
 }
+
+void ocuparBloque(Tnodo * nodo, int numeroDeBloque){
+	bitarray_set_bit(nodo->bitmap, numeroDeBloque);
+	nodo->cantidadBloquesLibres--;
+	almacenarBitEnBitmap(nodo, numeroDeBloque);
+	ocuparBloqueEnTablaNodos(nodo->nombre);
+}
+
 void inicializarBitmaps(){
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/",0777);
 	removerArchivos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps");
+}
+
+void inicializarBitmap(Tnodo* nodo){
+	int i = 0;
+	while(i < nodo->cantidadBloquesTotal){
+		bitarray_clean_bit(nodo->bitmap, i);
+		i++;
+	}
 }

@@ -23,7 +23,7 @@ char * recvRutaArchivo(int socket){
 Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo){
 
 	Tbuffer * buffer = malloc(sizeof(Tbuffer));
-	int tamanioFijo, tamanioNombreNodo, cantBloques, nroBloque = 0;
+	int tamanioFijo, cantBloques;
 	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
 
 	//La estructura que envio es head + cantBloquesArchivo + [ nroBloqueArchivo + tamanioNombreNodo +

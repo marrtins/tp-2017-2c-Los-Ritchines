@@ -130,15 +130,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 		}
 		numeroDeBloqueEnNodo = atoi(array[1]);
 
-		/*if(!eliminarBloqueDeNodo(nodo, numeroDeBloqueEnNodo)){
-			config_destroy(archivo);
-			liberarPunteroDePunterosAChar(array);
-			free(array);
-			return;
-		}*/
-
-		desocuparBloqueEnBitmap(nodo, numeroDeBloque);
-		mostrarBitmap(nodo->bitmap);
+		desocuparBloque(nodo, numeroDeBloque);
 
 		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
 
@@ -179,7 +171,7 @@ void desocuparBloqueEnTablaDeNodos(char * nombreNodo){
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", 1, sumaDeDosNumerosInt);
 
 	char * nodoLibreAString = generarStringNodoNLibre(nombreNodo);
-	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1,	restaDeDosNumerosInt);
+	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1,	sumaDeDosNumerosInt);
 
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
