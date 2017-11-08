@@ -106,12 +106,12 @@ void masterHandler(void *atributos){
 
 			//FS envia: cant de bloques del archivo (si es cero la ruta no es valida) para saber cuantos recv va a tener que hacer sobre
 			//info de un bloque: nro de bloque + tamanioNombreNodo +copiacero nombrenodo+ copiacero nrobloquedatabin + tamanioNombreNodo +copiauno nombrenodo+ copiauno nrobloquedatabin
-			while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
-					if(head.tipo_de_mensaje==ARCH_NO_VALIDO){
-						puts("no");
-					}else if(head.tipo_de_mensaje==INFO_ARCHIVO){
-						int sizePaquete;
-						stat = recv(socketFS, &sizePaquete, sizeof(int), 0);
+			//while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
+			//		if(head.tipo_de_mensaje==ARCH_NO_VALIDO){
+			//			puts("no");
+			/		}else if(head.tipo_de_mensaje==INFO_ARCHIVO){
+			//			int sizePaquete;
+			/*			stat = recv(socketFS, &sizePaquete, sizeof(int), 0);
 						Tbuffer *buffer = malloc(sizeof(Tbuffer));
 						stat = recv(socketFS, buffer, sizePaquete, 0);
 						TinfoArchivoFSYama *infoArchivo = malloc(sizeof(TinfoArchivoFSYama));
@@ -124,7 +124,7 @@ void masterHandler(void *atributos){
 					}
 					}
 
-
+*/
 			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
 			//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
 			/* pido info, la proceso y ahora se a que workers el master se va a conectar y se los paso...*/
