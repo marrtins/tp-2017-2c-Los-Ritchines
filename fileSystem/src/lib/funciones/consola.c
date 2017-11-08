@@ -166,11 +166,16 @@ void consolaRename(char** palabras, int cantidad) {
 void consolaCat(char ** palabras, int cantidad) {
 	if (cantidad == 1) {
 		if(esRutaYamafs(palabras[1])){
-			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-			leerArchivoComoTextoPlano(rutaLocal);
-			free(rutaLocal);
-		} else if (verificarRutaArchivo(palabras[1])){
-			puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
+			if(verificarRutaArchivo(palabras[1])){
+				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+				leerArchivoComoTextoPlano(rutaLocal);
+				free(rutaLocal);
+			}
+			else{
+				puts("La ruta especificada no corresponde a ningun archivo de yamafs.");
+			}
+		} else{
+			puts("Falta la referencia a yamafs:/");
 		}
 	}
 	else {
