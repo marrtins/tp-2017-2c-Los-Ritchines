@@ -101,15 +101,49 @@ int main(int argc, char* argv[]) {
 				if(verificarRutaArchivo(rutaArchivo)){
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
-					buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
+
+					TinfoArchivoFSYama *infoSend = malloc(sizeof(TinfoArchivoFSYama));
+					t_list * listaBloques=list_create();
+
+					int i;
+					int cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+					for(i=0;i<cantBloques;i++){
+						TpackageUbicacionBloques *bloque=malloc(sizeof(TpackageUbicacionBloques));
+						TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia,0);
+						bloque->bloque=i;
+						bloque->nombreNodoC1=malloc(strlen(copia1->nombreDeNodo)+1);
+						bloque->nombreNodoC1=copia1->nombreDeNodo;
+						bloque->nombreNodoC1Len=(strlen(copia1->nombreDeNodo)+1);
+						bloque->bloqueC1=copia1->numeroBloqueDeNodo;
+
+						TcopiaNodo *copia2 = list_get(archivo->bloques[i].copia,1);
+						bloque->nombreNodoC2=malloc(strlen(copia2->nombreDeNodo)+1);
+						bloque->nombreNodoC2=copia2->nombreDeNodo;
+						bloque->nombreNodoC2Len=(strlen(copia2->nombreDeNodo)+1);
+						bloque->bloqueC2=copia2->numeroBloqueDeNodo;
+
+						bloque->finBloque=archivo->bloques[i].bytes;
+						list_add(listaBloques,bloque);
+					}
+
+					infoSend->listaSize=list_size(listaBloques);
+					infoSend->listaBloques=list_create();
+					infoSend->listaBloques=listaBloques;
+					head->tipo_de_mensaje=INFO_ARCHIVO;
+					head->tipo_de_proceso=FILESYSTEM;
+					buffer=serializarInfoArchivoYamaFS(head,TinfoArchivoFSYama);
+
+
+				//	buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
 
 					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
 							 logAndExit("Fallo al enviar la informacion de un archivo");
 						 }
 				}else {
 					//si no es valida se manda cant de bloques en cero
-					buffer = empaquetarInt(head,0);
-					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+					head->tipo_de_mensaje=ARCH_NO_VALIDO;
+					head->tipo_de_proceso = FILESYSTEM;
+					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
 						 logAndExit("Fallo al enviar la informacion de un archivo");
 						}
 				}

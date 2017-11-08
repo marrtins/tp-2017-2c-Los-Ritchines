@@ -244,7 +244,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	puts("voy a obtener el bloque disponible");
 	int primerBloqueLibre = obtenerBloqueDisponible(nodo);
 	printf("bloque libre obtenido: %d", primerBloqueLibre);
-	puts("rompe1");
+
 	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
 	p += sizeof(*head);
@@ -254,7 +254,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	p += sizeof(unsigned long long);
 	memcpy(p, bloque->contenido, bloque->tamanio);
 	p += bloque->tamanio;
-	puts("rompe2");
+
 
 	return buffer;
 }
@@ -1271,5 +1271,115 @@ TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_s
 		return infoAlmacenado;
 }
 
+Tbuffer * serializarInfoArchivoYamaFS(Theader *head,TinfoArchivoFSYama *infoArchivo){
+
+	Tbuffer * buffer=malloc(sizeof(Tbuffer));
+
+	int espacioMalloc=HEAD_SIZE + sizeof(int)*2;
+
+	int i;
+	for(i=0;i<infoArchivo->listaSize;i++){
+		TpackageUbicacionBloques *aux = list_get((infoArchivo->listaBloques),i);
+
+		espacioMalloc+=aux->nombreNodoC1Len;
+		espacioMalloc+=aux->nombreNodoC2Len;
+		espacioMalloc+=5*sizeof(int);
+		espacioMalloc+=sizeof(unsigned long long);
+	}
+
+	buffer->tamanio = espacioMalloc;
+
+	buffer->buffer = malloc(espacioMalloc);
+
+	char * p = buffer->buffer;
+	memcpy(p, head, sizeof(*head));
+	p += sizeof(*head);
+	memcpy(p, &espacioMalloc, sizeof(int));
+		p += sizeof(int);
+	memcpy(p, &infoArchivo->listaSize, sizeof(int));
+	p += sizeof(int);
+	for(i=0;i<infoArchivo->listaSize;i++){
+		TpackageUbicacionBloques *aux = list_get(infoArchivo->listaBloques,i);
+		memcpy(p, &aux->bloque, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, &aux->nombreNodoC1Len, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, aux->nombreNodoC1, aux->nombreNodoC1Len);
+		p += aux->nombreNodoC1Len;
+		memcpy(p, &aux->nombreNodoC2Len, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, &aux->bloqueC1, sizeof(int));
+				p += sizeof(int);
+		memcpy(p, aux->nombreNodoC2, aux->nombreNodoC2Len);
+		p += aux->nombreNodoC2Len;
+		memcpy(p, &aux->bloqueC2, sizeof(int));
+		p += sizeof(int);
+		memcpy(p, &aux->finBloque, sizeof(int));
+		p += sizeof(int);
+
+	}
+
+return buffer;
+
+}
+
+TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(Tbuffer * buffer){
+	int off;
+	TinfoArchivoFSYama *infoArchivo;
+
+	if ((infoArchivo = malloc(sizeof (TinfoArchivoFSYama))) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+
+	memcpy(&infoArchivo->listaSize, buffer->buffer + off, sizeof (int));
+	off += sizeof (int);
+
+	infoArchivo->listaBloques=list_create();
+
+	int i;
+	t_list *listaInfoBloques = list_create();
+	for(i=0;i<infoArchivo->listaSize;i++){
+
+		TpackageUbicacionBloques *bloqueAux = malloc(sizeof (TpackageUbicacionBloques));
+
+		memcpy(&bloqueAux->bloque, buffer->buffer + off, sizeof (int));
+		off += sizeof (int);
+
+		memcpy(&bloqueAux->nombreNodoC1Len, buffer->buffer + off, sizeof (int));
+		off += sizeof (int);
+		if ((bloqueAux->nombreNodoC1 = malloc(bloqueAux->nombreNodoC1Len)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", bloqueAux->nombreNodoC1Len);
+			return NULL;
+		}
+		memcpy(bloqueAux->nombreNodoC1, buffer->buffer + off, bloqueAux->nombreNodoC1Len);
+		off += bloqueAux->nombreNodoC1Len;
+
+		memcpy(&bloqueAux->bloqueC1, buffer->buffer + off, sizeof (int));
+		off += sizeof (int);
+
+		memcpy(&bloqueAux->nombreNodoC2Len, buffer->buffer + off, sizeof (int));
+		off += sizeof (int);
+		if ((bloqueAux->nombreNodoC2 = malloc(bloqueAux->nombreNodoC2Len)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", bloqueAux->nombreNodoC2Len);
+			return NULL;
+		}
+		memcpy(bloqueAux->nombreNodoC2, buffer->buffer + off, bloqueAux->nombreNodoC2Len);
+		off += bloqueAux->nombreNodoC2Len;
+
+		memcpy(&bloqueAux->bloqueC2, buffer->buffer + off, sizeof (int));
+		off += sizeof (int);
+
+		memcpy(&bloqueAux->finBloque, buffer->buffer + off, sizeof (int));
+		off += sizeof (int);
+
+		list_add(listaInfoBloques,bloqueAux);
+	}
+	infoArchivo->listaBloques=listaInfoBloques;
+
+	return infoArchivo;
+}
 
 
