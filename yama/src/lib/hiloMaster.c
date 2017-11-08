@@ -89,8 +89,8 @@ void masterHandler(void *atributos){
 
 			puts("Pido info a filesystem sobre el archivo a transformar");
 
-						head.tipo_de_proceso=YAMA;
-						head.tipo_de_mensaje=INFO_ARCHIVO;
+					//	head.tipo_de_proceso=YAMA;
+				//		head.tipo_de_mensaje=INFO_ARCHIVO;
 
 			//			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
 					//	buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
@@ -98,7 +98,7 @@ void masterHandler(void *atributos){
 					//	if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
 					//		puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
 					//		return;
-						}
+						//}
 			//			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
 
 
@@ -109,7 +109,7 @@ void masterHandler(void *atributos){
 			//while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
 			//		if(head.tipo_de_mensaje==ARCH_NO_VALIDO){
 			//			puts("no");
-			/		}//else if(head.tipo_de_mensaje==INFO_ARCHIVO){
+			//		}//else if(head.tipo_de_mensaje==INFO_ARCHIVO){
 			//			int sizePaquete;
 			/*			stat = recv(socketFS, &sizePaquete, sizeof(int), 0);
 						Tbuffer *buffer = malloc(sizeof(Tbuffer));
@@ -121,8 +121,8 @@ void masterHandler(void *atributos){
 
 
 
-					}
-					}
+				//	}
+					//}
 
 */
 			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
