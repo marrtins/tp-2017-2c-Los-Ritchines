@@ -752,8 +752,43 @@ int verificarRutaArchivo(char * rutaYamafs){
 
 void removerArchivo(char* ruta){
 	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+	t_config * archivo = config_create(rutaArchivo);
+	Tnodo * nodo;
+	char * keyBloqueCopias;
+	char * keyBloqueNCopiaM;
+	char **nombreYPosicion;
+	int cantidadCopias;
+	int i = 0;
+	int j;
+	int cantidadBloques = cantidadDeBloquesDeUnArchivo(config_get_long_value(archivo,"TAMANIO"));
+	while(i < cantidadBloques){
+		keyBloqueCopias = generarStringBloqueNCopias(i);
+		cantidadCopias = config_get_int_value(archivo, keyBloqueCopias);
+		j = 0;
+		while(j < cantidadCopias){
+			keyBloqueNCopiaM = generarStringDeBloqueNCopiaN(i,j);
+			nombreYPosicion = config_get_array_value(archivo,keyBloqueNCopiaM);
+			nodo = buscarNodoPorNombre(listaDeNodos, nombreYPosicion[0]);
+			if(nodo == NULL){
+				puts("no lo encontre asi que voy a buscarlo en desconectados");
+				nodo = buscarNodoPorNombre(listaDeNodosDesconectados, nombreYPosicion[0]);
+				if(nodo == NULL){
+					puts("No se pudo hermano, el nodo con la copia no esta en ningun lado");
+							return;;
+				}
+			}
+			desocuparBloque(nodo, atoi(nombreYPosicion[1]));
+			free(keyBloqueNCopiaM);
+			j++;
+		}
+		free(keyBloqueCopias);
+		i++;
+	}
+
 	remove(rutaArchivo);
 	puts("Ya pude remover el archivo");
+	free(rutaArchivo);
+	config_destroy(archivo);
 	}
 
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio){

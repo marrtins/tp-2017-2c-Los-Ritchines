@@ -1017,11 +1017,11 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque0->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque0->nombreNodoC1="Nodo1";
 	bloque0->nombreNodoC1Len=strlen(bloque0->nombreNodoC1)+1;
-	bloque0->bloqueC1=5;
+	bloque0->bloqueC1=0;
 	bloque0->nombreNodoC2=malloc(sizeof(maxNombreNodo));
 	bloque0->nombreNodoC2="Nodo2";
 	bloque0->nombreNodoC2Len=strlen(bloque0->nombreNodoC2)+1;
-	bloque0->bloqueC2=2;
+	bloque0->bloqueC2=0;
 	bloque0->finBloque=1048576;
 
 	list_add(listaComposicion,bloque0);
@@ -1031,11 +1031,11 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque1->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque1->nombreNodoC1="Nodo2";
 	bloque1->nombreNodoC1Len=strlen(bloque1->nombreNodoC1)+1;
-	bloque1->bloqueC1=10;
+	bloque1->bloqueC1=0;
 	bloque1->nombreNodoC2=malloc(sizeof(maxNombreNodo));
 	bloque1->nombreNodoC2="Nodo3";
 	bloque1->nombreNodoC2Len=strlen(bloque1->nombreNodoC2)+1;
-	bloque1->bloqueC2=7;
+	bloque1->bloqueC2=0;
 	bloque1->finBloque=1048500;
 	list_add(listaComposicion,bloque1);
 
@@ -1044,11 +1044,11 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque2->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque2->nombreNodoC1="Nodo3";
 	bloque2->nombreNodoC1Len=strlen(bloque2->nombreNodoC1)+1;
-	bloque2->bloqueC1=12;
+	bloque2->bloqueC1=0;
 	bloque2->nombreNodoC2=malloc(sizeof(maxNombreNodo));
 	bloque2->nombreNodoC2="Nodo1";
 	bloque2->nombreNodoC2Len=strlen(bloque2->nombreNodoC2)+1;
-	bloque2->bloqueC2=3;
+	bloque2->bloqueC2=0;
 	bloque2->finBloque=1048516;
 	list_add(listaComposicion,bloque2);
 

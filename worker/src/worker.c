@@ -4,6 +4,7 @@ Tworker *worker;
 int cantApareosGlobal;
 int cont;
 t_list * listaTemporalesAsociadosAJob;
+char * archivoMapeado;
 int main(int argc, char* argv[]){
 
 
@@ -19,15 +20,34 @@ int main(int argc, char* argv[]){
 	cont=0;
 	clientSize = sizeof client;
 
-	/*if(argc!=2){
+	if(argc!=2){
 		printf("Error en la cantidad de parametros\n");
 		return EXIT_FAILURE;
-	}*/
-
-	logger = log_create("worker.log", "worker.log", true, LOG_LEVEL_INFO);
+	}
 
 	worker=obtenerConfiguracionWorker(argv[1]);
 	mostrarConfiguracion(worker);
+
+
+	FILE * archivo = fopen(worker->ruta_databin, "rb");
+
+	int fd;
+
+	fd = fileno(archivo);
+	if ((archivoMapeado = mmap(NULL, worker->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		logAndExit("Error al hacer mmap");
+	}
+	fclose(archivo);
+	close(fd);
+
+
+
+
+
+
+	logger = log_create("worker.log", "worker.log", true, LOG_LEVEL_INFO);
+
+
 	listaTemporalesAsociadosAJob=list_create();
 	if((listenSock = crearSocketDeEscucha(worker->puerto_entrada))<0){
 		return FALLO_CONEXION;
