@@ -63,18 +63,6 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	config_destroy(archivo);
 }
 
-void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia){
-	char * bloqueNCopiaN;
-	char * bloqueNCopias;
-	bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
-	puts(bloqueNCopiaN);
-	config_set_value(archivo, bloqueNCopiaN, "[]");
-	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
-	setearAtributoDeArchivoConfigConInts(archivo, bloqueNCopias, 1, restaDeDosNumerosInt);
-	free(bloqueNCopiaN);
-	free(bloqueNCopias);
-}
-
 int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
 	Tbuffer * buffer = malloc(sizeof(Tbuffer));
 	Theader * head = malloc(sizeof(Theader));
@@ -113,17 +101,17 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
 	cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
-	free(bloqueNCopias);
 
 	if(cantidadDeCopias > 1){
 		bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
 		array = config_get_array_value(archivo, bloqueNCopiaN);
-		free(bloqueNCopiaN);
 		nodo = buscarNodoPorNombre(listaDeNodos, array[0]);
 
 		if(nodo == NULL){
 			liberarPunteroDePunterosAChar(array);
 			free(array);
+			free(bloqueNCopias);
+			free(bloqueNCopiaN);
 			puts("El nodo aun no esta conectado, intentelo mas tarde.");
 			config_destroy(archivo);
 			return;
@@ -132,13 +120,17 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 		desocuparBloque(nodo, numeroDeBloqueEnNodo);
 
-		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
+		setearAtributoDeArchivoConfigConInts(archivo, bloqueNCopias, 1, restaDeDosNumerosInt);
 
 		config_save(archivo);
 		config_destroy(archivo);
 
+		eliminarKeyDeArchivo(rutaLocal, bloqueNCopiaN);
+
 		liberarPunteroDePunterosAChar(array);
 		free(array);
+		free(bloqueNCopias);
+		free(bloqueNCopiaN);
 
 	}
 	else{

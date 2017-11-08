@@ -586,3 +586,6 @@
 [ERROR] 09:36:30:604 FileSystem.log/(5349:5349): Fallo la aceptacion del cliente, del FD servidor (fileSystem
 [ERROR] 09:49:45:962 FileSystem.log/(5683:5683): Fallo la aceptacion del cliente, del FD servidor (fileSystem
 [ERROR] 09:52:09:760 FileSystem.log/(5888:5888): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 10:11:41:517 FileSystem.log/(6643:6643): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 10:17:01:429 FileSystem.log/(6963:6963): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 10:20:52:42 FileSystem.log/(7098:7098): Fallo la aceptacion del cliente, del FD servidor (fileSystem

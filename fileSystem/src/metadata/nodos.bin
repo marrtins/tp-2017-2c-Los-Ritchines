@@ -1,5 +1,9 @@
-TAMANIO=20
-NODOS=[Nodo1]
+Nodo4Total=100
+TAMANIO=150
+NODOS=[Nodo1,Nodo2,Nodo4]
+Nodo4Libre=91
 Nodo1Libre=20
+Nodo2Libre=20
 Nodo1Total=20
-LIBRE=20
+LIBRE=131
+Nodo2Total=30

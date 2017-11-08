@@ -137,22 +137,13 @@ void liberarNodosDeLista(void * nodo){
 	liberarNodo(nodoA);
 }
 
-void* buscarNodoPorFD(int fd){
+void* buscarNodoPorFD(t_list * lista, int fd){
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd == fd;
 	}
 
-	return list_find(listaDeNodos, buscarPorFDParaLista);
-}
-
-void* buscarNodoDesconectadoPorFD(int fd){
-	bool buscarPorFDParaLista(void* elementoDeLista){
-		Tnodo* nodo = (Tnodo*) elementoDeLista;
-		return nodo->fd == fd;
-	}
-
-	return list_find(listaDeNodosDesconectados, buscarPorFDParaLista);
+	return list_find(lista, buscarPorFDParaLista);
 }
 
 void borrarNodoDesconectadoPorFD(int fd){

@@ -64,7 +64,7 @@ void conexionesDatanode(void * estructura){
 							break;
 						}
 						else if( estado == 0){
-							nodoEncontrado = buscarNodoPorFD(fileDescriptor);
+							nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
 							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							borrarNodoPorFD(fileDescriptor);
 							eliminarNodoDeTablaDeNodos(nodoEncontrado);
@@ -78,9 +78,9 @@ void conexionesDatanode(void * estructura){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
 
-								if((Tnodo*)buscarNodoPorFD(fileDescriptor) == NULL){
+								if((Tnodo*)buscarNodoPorFD(listaDeNodos, fileDescriptor) == NULL){
 									infoBloque = recvInfoNodo(fileDescriptor);
-									if((Tnodo*)buscarNodoDesconectadoPorFD(fileDescriptor) == NULL){
+									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
 										//nodo nuevo;
 										puts("voy a inicializar nodo");
 										nuevoNodo = malloc(sizeof(Tnodo));
