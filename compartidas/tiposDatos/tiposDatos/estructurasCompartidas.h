@@ -64,7 +64,8 @@ typedef enum {
 	INICIARALMACENAMIENTOFINAL=47,
 	FIN_ALMACENAMIENTOFINALOK=48,
 	FIN_ALMACENAMIENTOFINALFAIL=49,
-	ELIMINAR_BLOQUE=50
+	ELIMINAR_BLOQUE=50,
+	ARCH_NO_VALIDO=51
 
 } Tmensaje;
 
@@ -122,8 +123,13 @@ typedef struct {
 	int nombreNodoC2Len;
 	char *nombreNodoC2;
 	int bloqueC2;
-	int finBloque;
+	unsigned long long finBloque;
 }TpackageUbicacionBloques;
+
+typedef struct{
+	int listaSize;
+	t_list * listaBloques;
+}TinfoArchivoFSYama;
 
 typedef struct {
 	int tamanioNombre;
@@ -270,6 +276,10 @@ typedef struct{
 	int nombreResultanteLen;
 	char * nombreResultante;
 }TinfoAlmacenadoMasterWorker;
+
+typedef struct{
+
+};
 
 t_log* logger;
 

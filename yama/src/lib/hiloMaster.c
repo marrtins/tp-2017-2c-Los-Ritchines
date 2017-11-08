@@ -42,7 +42,7 @@ void masterHandler(void *atributos){
 
 
 	char* buffer;
-	//Tbuffer * buffer1;
+	Tbuffer * buffer1;
 
 	puts("Nuevo hilo MASTERHANDLER creado");
 	puts("Esperando solicitud de master");
@@ -89,16 +89,16 @@ void masterHandler(void *atributos){
 
 			puts("Pido info a filesystem sobre el archivo a transformar");
 
-			//			head.tipo_de_proceso=YAMA;
-			//			head.tipo_de_mensaje=INFO_ARCHIVO;
-			//
+						head.tipo_de_proceso=YAMA;
+						head.tipo_de_mensaje=INFO_ARCHIVO;
+
 			//			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
-			//			buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
+						buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
 			//			puts("Path del archivo a reducir serializado; lo enviamos");
-			//			if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
-			//				puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
-			//				return;
-			//			}
+						if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
+							puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
+							return;
+						}
 			//			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
 
 
@@ -106,12 +106,25 @@ void masterHandler(void *atributos){
 
 			//FS envia: cant de bloques del archivo (si es cero la ruta no es valida) para saber cuantos recv va a tener que hacer sobre
 			//info de un bloque: nro de bloque + tamanioNombreNodo +copiacero nombrenodo+ copiacero nrobloquedatabin + tamanioNombreNodo +copiauno nombrenodo+ copiauno nrobloquedatabin
-			/*while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
-						if(head->tipo_char  *nombre =malloc(MAXSIZETEMPNAME)de_proceso==FILESYSTEM && head->tipo_de_mensaje==RTA_FILEINFO){
-							//recibimos la lista de bloques y demases que componen al archivo a reducir
-						}
+			while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
+					if(head.tipo_de_mensaje==ARCH_NO_VALIDO){
+						puts("no");
+					}else if(head.tipo_de_mensaje==INFO_ARCHIVO){
+						int sizePaquete;
+						stat = recv(socketFS, &sizePaquete, sizeof(int), 0);
+						Tbuffer *buffer = malloc(sizeof(Tbuffer));
+						stat = recv(socketFS, buffer, sizePaquete, 0);
+						TinfoArchivoFSYama *infoArchivo = malloc(sizeof(TinfoArchivoFSYama));
+
+						infoArchivo=deserializarInfoArchivoYamaFS(buffer);
+//seguior aca info nodos ....
+
+
+
 					}
-			 */
+					}
+
+
 			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
 			//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
 			/* pido info, la proceso y ahora se a que workers el master se va a conectar y se los paso...*/
