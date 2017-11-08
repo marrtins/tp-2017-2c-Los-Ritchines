@@ -598,3 +598,4 @@
 [ERROR] 11:32:04:545 FileSystem.log/(8439:8439): Fallo la aceptacion del cliente, del FD servidor (fileSystem
 >>>>>>> 4a550f11f53443eff2f8e8179c64a6cbb8d6d8b5
 [ERROR] 14:09:05:901 FileSystem.log/(8279:8279): Fallo la aceptacion del cliente, del FD servidor (fileSystem
+[ERROR] 16:40:27:445 FileSystem.log/(12443:12445): Fallo al reservar el puerto 5001. Es posible que el puerto este ocupado.

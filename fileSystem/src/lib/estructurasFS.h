@@ -58,6 +58,7 @@ t_list * listaTablaDirectorios;
 
 //Se usa en el cpblock;
 Tbuffer* bloqueACopiar;
+TpackInfoBloqueDN * infoNodo;
 
 pthread_mutex_t bloqueMutex;
 

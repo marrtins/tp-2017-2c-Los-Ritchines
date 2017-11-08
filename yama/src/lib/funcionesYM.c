@@ -66,7 +66,7 @@ void conectarAFS(Tyama *yama){
 	char * mensaje = malloc(100);
 
 	head->tipo_de_proceso=YAMA;
-	head->tipo_de_mensaje=INICIOYAMA;
+	head->tipo_de_mensaje=INICIO_YAMA;
 
 	//Theader head;
 	// Se trata de conectar con FS
@@ -96,6 +96,70 @@ int divideYRedondea(x, y){
    return a;
 }
 
+TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
+	int estado;
+	TpackInfoBloqueDN * infoBloque = malloc(sizeof(TpackInfoBloqueDN));
+	char * nombreNodo;
+	char * ipNodo;
+	char * puertoNodo;
+	int databinEnMB;
+
+	//Recibo el tamaño del nombre del nodo
+	if ((estado = recv(socketFS, &infoBloque->tamanioNombre, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del nombre del nodo");
+		}
+	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	nombreNodo = malloc(infoBloque->tamanioNombre);
+
+	//Recibo el nombre del nodo
+	if ((estado = recv(socketFS, nombreNodo, infoBloque->tamanioNombre, 0)) == -1) {
+		logAndExit("Error al recibir el nombre del nodo");
+		}
+
+	printf("Para el nombre del nodo recibi %d bytes\n", estado);
+
+	//Recibo el tamanio de la ip del nodo
+	if ((estado = recv(socketFS, &infoBloque->tamanioIp, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del ip del nodo");
+		}
+	printf("Para el tamaño de la ip recibi %d bytes\n", estado);
+
+	ipNodo = malloc(infoBloque->tamanioIp);
+
+	//Recibo la ip del nodo
+	if ((estado = recv(socketFS, ipNodo, infoBloque->tamanioIp, 0)) == -1) {
+		logAndExit("Error al recibir el ip del nodo");
+		}
+
+	printf("Para el la ip recibi %d bytes\n", estado);
+
+	//Recibo el tamanio del puerto del nodo
+	if ((estado = recv(socketFS, &infoBloque->tamanioPuerto, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del puerto del nodo");
+		}
+	printf("Para el tamaño del puerto recibi %d bytes\n", estado);
+
+	puertoNodo = malloc(infoBloque->tamanioPuerto);
+
+	//Recibo el puerto del nodo
+	if ((estado = recv(socketFS, puertoNodo, infoBloque->tamanioPuerto, 0)) == -1) {
+		logAndExit("Error al recibir el puerto del nodo");
+		}
+
+	//Recibo el databin en MB
+	if ((estado = recv(socketFS, &databinEnMB, sizeof(int), 0)) == -1) {
+		logAndExit("Error al recibir el tamanio del databin");
+		}
+
+	printf("Para el tamanio del databin recibi %d bytes\n", estado);
+
+	infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
+	free(nombreNodo);
+	free(ipNodo);
+	free(puertoNodo);
+
+	return infoBloque;
+}
 
 
 

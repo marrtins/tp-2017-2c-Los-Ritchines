@@ -173,6 +173,7 @@ void liberarCopia(void * copia);
 
 //YAMA
 char * recvRutaArchivo(int socket);
-Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo);
+TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo);
+void enviarInfoNodoAYama(int socketYama);
 
 #endif

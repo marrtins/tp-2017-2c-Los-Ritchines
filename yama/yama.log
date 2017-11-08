@@ -29,3 +29,5 @@
 [ERROR] 15:04:29:915 yama.log/(7129:7129): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
 [ERROR] 15:04:50:59 yama.log/(7178:7178): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
 [ERROR] 15:05:05:465 yama.log/(7220:7220): Fallo al reservar el puerto 5005. Es posible que el puerto este ocupado.
+[ERROR] 17:21:01:941 yama.log/(14020:14020): No se pudo conectar con FS! sock_fs: -22
+

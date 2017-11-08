@@ -14,7 +14,6 @@ void conexionesDatanode(void * estructura){
 	char * mensaje = malloc(100);
 	Tnodo * nuevoNodo;
 	Tnodo * nodoEncontrado;
-	TpackInfoBloqueDN * infoBloque;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -79,12 +78,12 @@ void conexionesDatanode(void * estructura){
 								puts("Es datanode y quiere mandar la información del nodo");
 
 								if((Tnodo*)buscarNodoPorFD(listaDeNodos, fileDescriptor) == NULL){
-									infoBloque = recvInfoNodo(fileDescriptor);
+									infoNodo = recvInfoNodo(fileDescriptor);
 									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
 										//nodo nuevo;
 										puts("voy a inicializar nodo");
 										nuevoNodo = malloc(sizeof(Tnodo));
-										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
 										puts("pude inicializar");
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
@@ -93,7 +92,7 @@ void conexionesDatanode(void * estructura){
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
-										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoBloque->nombreNodo);
+										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
 										nuevoNodo->fd = fileDescriptor;
 										list_add(listaDeNodos, nuevoNodo);
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
@@ -102,7 +101,7 @@ void conexionesDatanode(void * estructura){
 									}
 									puts("voy a agregar a tabla de nodos");
 									agregarNodoATablaDeNodos(nuevoNodo);
-									liberarTPackInfoBloqueDN(infoBloque);
+									liberarTPackInfoBloqueDN(infoNodo);
 									puts("agregue a tabla de nodos");
 								}
 								else {
