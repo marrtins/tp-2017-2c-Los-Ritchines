@@ -190,6 +190,13 @@ char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
 
 }
 
+char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal){
+	char * archivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
+	char * extension = obtenerExtensionDeUnArchivo(archivoConExtension);
+	free(archivoConExtension);
+	return extension;
+}
+
 //no se si funciona, verificar
 void mostrarNCaracteresDeUnMMap(char * archivoMapeado, unsigned long long tamanio, unsigned long long desde, unsigned long long hasta){
 	unsigned long long incrementador = desde;
@@ -757,7 +764,6 @@ void removerArchivo(char* ruta){
 	}
 
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio){
-	puts("entre2");
 	memcpy(archivoMapeado, archivoAMoverMapeado, tamanio);
 }
 

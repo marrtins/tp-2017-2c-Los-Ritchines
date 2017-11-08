@@ -181,3 +181,23 @@ void mostrarConfiguracion(Tworker *worker){
 	printf("Tipo de proceso: %d\n", worker->tipo_de_proceso);
 }
 
+Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * contenidoArchivo, unsigned long long tamanioArchivoFinal){
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+	buffer->tamanio = sizeof(Theader) + sizeof(int) + (strlen(rutaArchivo) + 1) + sizeof(unsigned long long) + tamanioArchivoFinal;
+	buffer->buffer = malloc(buffer->tamanio);
+	int tamanioRuta = strlen(rutaArchivo) + 1;
+	char * p = buffer->buffer;
+	memcpy(p, header, sizeof(Theader));
+	p += sizeof(Theader);
+	memcpy(p, &tamanioRuta, sizeof(tamanioRuta) );
+	p += sizeof(tamanioRuta);
+	memcpy(p, rutaArchivo, strlen(rutaArchivo) + 1);
+	p += strlen(rutaArchivo) + 1;
+	memcpy(p, &tamanioArchivoFinal, sizeof(tamanioArchivoFinal));
+	p += sizeof(tamanioArchivoFinal);
+	memcpy(p, contenidoArchivo, tamanioArchivoFinal);
+
+	return buffer;
+
+}
+

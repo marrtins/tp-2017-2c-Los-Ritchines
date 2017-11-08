@@ -134,8 +134,8 @@ void conexionesDatanode(void * estructura){
 								bloqueACopiar = malloc(sizeof(Tbuffer));
 								int nroBloqueRecibido;
 								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
-										logAndExit("Error al recibir el tamanio do bloque");
-										}
+									logAndExit("Error al recibir el tamanio do bloque");
+								}
 								puts("voy a copiar el bloque");
 								bloqueACopiar->buffer = malloc(bloqueACopiar->tamanio);
 								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
@@ -159,6 +159,48 @@ void conexionesDatanode(void * estructura){
 					printf("el mensaje es %d\n", head->tipo_de_mensaje);
 					break;
 
+				}
+				else if(head->tipo_de_proceso == WORKER){
+						switch(head->tipo_de_mensaje){
+							TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
+							char * rutaLocal;
+							FILE * archivoFinal;
+							char * extension;
+							char * archivoFinalMapeado;
+							int fileDescriptorArchivoFinal;
+							case ALMACENAR_ARCHIVO:
+								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
+								rutaLocal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
+								extension = obtenerExtensionDeArchivoDeUnaRuta(rutaLocal);
+								if(!strcmp(extension, "csv")){
+									archivoFinal = fopen(rutaLocal, "w");
+								}else{
+									archivoFinal = fopen(rutaLocal, "wb");
+								}
+
+								fileDescriptorArchivoFinal = fileno(archivoFinal);
+
+								if ((archivoFinalMapeado = mmap(NULL, estructuraArchivoFinal->tamanioContenido, PROT_WRITE, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
+									logAndExit("Error al hacer mmap");
+								}
+
+								pasarInfoDeUnArchivoAOtro(estructuraArchivoFinal->contenidoArchivo, archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
+
+								close(fileDescriptorArchivoFinal);
+								fclose(archivoFinal);
+								if (msync(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido, MS_SYNC) < 0) {
+									logAndExit("Sucedio lo imposible, fallo el msync");
+								}
+								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
+								free(rutaLocal);
+								free(extension);
+								free(estructuraArchivoFinal);
+								break;
+							default:
+								log_trace(logger, "Tipo de mensaje no encontrado en el protocolo.");
+								puts("Tipo de mensaje no encontrado en el protocolo.");
+								break;
+						}
 				}
 				else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);

@@ -65,7 +65,8 @@ typedef enum {
 	FIN_ALMACENAMIENTOFINALOK=48,
 	FIN_ALMACENAMIENTOFINALFAIL=49,
 	ELIMINAR_BLOQUE=50,
-	ARCH_NO_VALIDO=51
+	ARCH_NO_VALIDO=51,
+	ALMACENAR_ARCHIVO=52,
 
 } Tmensaje;
 
@@ -276,6 +277,9 @@ typedef struct{
 	int nombreResultanteLen;
 	char * nombreResultante;
 }TinfoAlmacenadoMasterWorker;
+
+//nombreResultante: yamafs:/
+//nombreTempReduccion: rutaLocal
 
 typedef struct{
 

@@ -5,6 +5,7 @@
 
 //serializacion
 void empaquetarBloqueAEliminar(Tbuffer * buffer, Theader * head, int numeroDeBloque);
+void desempaquetarArchivoFinal(int fileDescriptor, TarchivoFinal * archivoFinal);
 
 //Operaciones
 long sumaDeDosNumerosLong(long valor1, long valor2);
@@ -74,6 +75,8 @@ char * generarStringNodoNTotal(char * nombre);
 void inicializarListaDeNodosAConectar(t_list * desconectados);
 void removerArchivos(char * ruta);
 int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
+char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
+void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -170,6 +173,7 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 void liberarTablaDirectorios(void* directorio);
 void liberarCopia(void * copia);
+void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal);
 
 //YAMA
 char * recvRutaArchivo(int socket);

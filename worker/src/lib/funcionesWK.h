@@ -18,4 +18,5 @@ int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar);
 int enviarArchivo(char * rutaArchivo,int sockDestino);
 int realizarAlmacenamientoFinal(int client_sock);
 int compararLineas(int cantArchivos,char arrayLineas[cantArchivos][MAXSIZELINEA]);
+Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * contenidoArchivo, unsigned long long tamanioArchivoFinal);
 #endif
