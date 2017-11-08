@@ -1,7 +1,1 @@
-<<<<<<< HEAD
-1 user 0
 0 root -1
-2 juan 1
-=======
-0 root -1
->>>>>>> 4a550f11f53443eff2f8e8179c64a6cbb8d6d8b5

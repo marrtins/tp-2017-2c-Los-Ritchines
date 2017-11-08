@@ -358,7 +358,7 @@ int getMD5(char* rutaYamafs){
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaTmp);
 	system(comando);
-	printf("Obtuve el MD5 del archivo");
+	puts("Obtuve el MD5 del archivo");
 	remove(rutaTmp);
 	free(comando);
 	free(rutaTmp);
