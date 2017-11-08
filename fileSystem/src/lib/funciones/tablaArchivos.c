@@ -82,6 +82,34 @@ int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
 	return 1;
 }
 
+void pasarArrayDeUnaKeyAOtra(t_config * archivo, char * key1, char * key2){
+	char ** array = config_get_array_value(archivo, key2);
+	int i = 0;
+	config_set_value(archivo, key1, "[]");
+	while(array[i] != NULL){
+		agregarElementoAArrayArchivoConfig(archivo, key1, array[i]);
+		i++;
+	}
+	liberarPunteroDePunterosAChar(array);
+	free(array);
+}
+
+void reordenarCopias(t_config * archivo, int numeroDeBloque, int numeroDeCopia){
+	char * bloqueNCopiaN;
+	char * bloqueNCopiaNSiguiente;
+	char * bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
+	int cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
+	while(numeroDeCopia < cantidadDeCopias){
+		bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
+		bloqueNCopiaNSiguiente = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia + 1);
+		pasarArrayDeUnaKeyAOtra(archivo, bloqueNCopiaN, bloqueNCopiaNSiguiente);
+		free(bloqueNCopiaN);
+		free(bloqueNCopiaNSiguiente);
+		numeroDeCopia++;
+	}
+	free(bloqueNCopias);
+}
+
 void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia){
 	t_config * archivo = config_create(rutaLocal);
 	unsigned long long tamanio = config_get_int_value(archivo, "TAMANIO");
@@ -92,6 +120,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 	char * bloqueNCopias;
 	int cantidadDeCopias;
 	int numeroDeBloqueEnNodo;
+	char * bloqueNCopiaFinal;
 
 	if(numeroDeBloque > cantidadDeBloques-1){
 		puts("El bloque que quiere eliminar, no existe en el archivo");
@@ -122,11 +151,14 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 		setearAtributoDeArchivoConfigConInts(archivo, bloqueNCopias, 1, restaDeDosNumerosInt);
 
+		reordenarCopias(archivo, numeroDeBloque, numeroDeCopia);
+
 		config_save(archivo);
 		config_destroy(archivo);
 
-		eliminarKeyDeArchivo(rutaLocal, bloqueNCopiaN);
-
+		bloqueNCopiaFinal = generarStringDeBloqueNCopiaN(numeroDeBloque, cantidadDeCopias - 1);
+		eliminarKeyDeArchivo(rutaLocal, bloqueNCopiaFinal);
+		free(bloqueNCopiaFinal);
 		liberarPunteroDePunterosAChar(array);
 		free(array);
 		free(bloqueNCopias);
