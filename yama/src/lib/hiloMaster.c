@@ -93,11 +93,11 @@ void masterHandler(void *atributos){
 						head.tipo_de_mensaje=INFO_ARCHIVO;
 
 			//			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
-						buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
+					//	buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
 			//			puts("Path del archivo a reducir serializado; lo enviamos");
-						if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
-							puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
-							return;
+					//	if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
+					//		puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
+					//		return;
 						}
 			//			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
 
@@ -109,7 +109,7 @@ void masterHandler(void *atributos){
 			//while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
 			//		if(head.tipo_de_mensaje==ARCH_NO_VALIDO){
 			//			puts("no");
-			/		}else if(head.tipo_de_mensaje==INFO_ARCHIVO){
+			/		}//else if(head.tipo_de_mensaje==INFO_ARCHIVO){
 			//			int sizePaquete;
 			/*			stat = recv(socketFS, &sizePaquete, sizeof(int), 0);
 						Tbuffer *buffer = malloc(sizeof(Tbuffer));
