@@ -72,7 +72,7 @@ char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
 void inicializarListaDeNodosAConectar(t_list * desconectados);
 void removerArchivos(char * ruta);
-void eliminarKeyDeArchivo(char * rutaArchivo, char * key);
+int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);

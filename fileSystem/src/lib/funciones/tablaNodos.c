@@ -90,9 +90,7 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 
 	//NODONTOTAL
 	char * nodoTotalAString = string_new();
-	puts("holi voy a appendear con format a nodototalastring");
 	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
-	puts("holi voy a obtener el get int value de la tabla de nodos con nodoTotalAString");
 	puts(nodoTotalAString);
 	int nodoTotal = config_get_int_value(tablaDeNodos, nodoTotalAString);
 
@@ -107,17 +105,14 @@ void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
 	//LIBRE
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "LIBRE", nodoLibre, restaDeDosNumerosInt);
 
-	//SETEAR NODONTOTAL
-	config_set_value(tablaDeNodos, nodoTotalAString, "");
-
-	//SETEAR NODONLIBRE
-	config_set_value(tablaDeNodos, nodoLibreAString, "");
-
 	//NODOS
 	eliminarElementoDeArrayArchivosConfig(tablaDeNodos, "NODOS", nuevoNodo->nombre);
 
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
+
+	eliminarKeyDeArchivo("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodoTotalAString);
+	eliminarKeyDeArchivo("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodoLibreAString);
 
 	free(nodoTotalAString);
 	free(nodoLibreAString);

@@ -43,8 +43,6 @@ int main(int argc, char* argv[]) {
 		inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
 	}
 
-
-
 	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
