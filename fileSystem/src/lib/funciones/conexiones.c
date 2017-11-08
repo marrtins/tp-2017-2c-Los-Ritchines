@@ -93,9 +93,9 @@ void conexionesDatanode(void * estructura){
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
-										list_add(listaDeNodos, buscarNodoDesconectadoPorFD(fileDescriptor));
-										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
-										borrarNodoDesconectadoPorFD(fileDescriptor);
+										list_add(listaDeNodos, buscarNodoPorNombre(listaDeNodosDesconectados,infoBloque->nombreNodo));
+										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										borrarNodoPorNombre(listaDeNodosDesconectados,infoBloque->nombreNodo);
 										log_trace(logger, "Nodo que se habia caído, se reconecto");
 									}
 									puts("voy a agregar a tabla de nodos");
