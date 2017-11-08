@@ -1051,7 +1051,7 @@ void generarListaInfoNodos(){
 	nodo2->nombreNodo="Nodo2";
 	nodo2->tamanioNombre=strlen(nodo2->nombreNodo)+1;
 	nodo2->ipNodo=malloc(ipLen);
-	nodo2->ipNodo="192.168.3.24";
+	nodo2->ipNodo="192.168.3.22";
 	nodo2->tamanioIp=strlen(nodo2->ipNodo)+1;
 	nodo2->puertoWorker=malloc(puertoLen);
 	nodo2->puertoWorker = "5014";
