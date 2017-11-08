@@ -22,8 +22,11 @@ int main(int argc, char* argv[]) {
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 
 	if(archivo == NULL){
-		puts("No existe el databin, o esta mal la ruta al archivo.");
-		logAndExit("No existe el databin, o esta mal la ruta al archivo.");
+		puts("No se encontro el databin en la ruta especificada, se procedera a crear el mismo");
+		archivo = fopen(dataNode->ruta_databin, "wb");
+		truncate(dataNode->ruta_databin, dataNode->tamanio_databin_mb * BLOQUE_SIZE);
+		fclose(archivo);
+		archivo = fopen(dataNode->ruta_databin, "rb+");
 	}
 
 	fd = fileno(archivo);
