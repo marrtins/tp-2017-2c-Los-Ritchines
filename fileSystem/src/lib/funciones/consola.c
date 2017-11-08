@@ -110,7 +110,6 @@ void procesarCpblock(char ** palabras){
 					liberarEstructuraBuffer(bloque);
 					return;
 				}
-				//TODO cuando envia el bloque, actualizar el metadata; y el bitmap;
 				agregarCopiaAtablaArchivo(rutaLocalArchivo,palabras[3],bloqueDN,nroBloque);
 				ocuparBloque(nodo, bloqueDN);
 				free(rutaLocalArchivo);
