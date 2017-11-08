@@ -1,12 +1,16 @@
 #include "../funcionesFS.h"
 
-void eliminarKeyDeArchivo(char * rutaArchivo, char * key){
+int eliminarKeyDeArchivo(char * rutaArchivo, char * key){
 	FILE * archivo = fopen(rutaArchivo, "r+");
 	char * buffer = malloc(100);
 	int fd = fileno(archivo);
+	unsigned long long tamanioNuevoArchivo;
 	unsigned long long i = 0, indiceParaArchivoFinal = 0, indicePasadorDeInfo = 0;
 	unsigned long long tamanio = tamanioArchivo(archivo);
 	char * archivoMapeado = mmap(NULL, tamanio, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	char * rutaSinArchivo = obtenerRutaSinArchivo(rutaArchivo);
+	char * ruta2 = string_from_format("%s/tmp.bin", rutaSinArchivo);
+	int loEncontro;
 	while(i < tamanio){
 		indiceParaArchivoFinal = 0;
 		while(archivoMapeado[i] != '\n'){
@@ -16,16 +20,21 @@ void eliminarKeyDeArchivo(char * rutaArchivo, char * key){
 		}
 		buffer[indiceParaArchivoFinal] = '\0';
 		if((int)string_contains(buffer, key)){
+			loEncontro = 1;
 			break;
 		}
 		i++;
 	}
+	if(!loEncontro){
+		return 0;
+	}
 	indiceParaArchivoFinal=0;
 	i -= strlen(buffer);
-	truncate("/home/utnso/holi.txt", tamanio - strlen(buffer) - 1);
-	FILE * archivo2 = fopen("/home/utnso/holi.txt", "r+");
+	FILE * archivo2 = fopen(ruta2, "w+");
+	tamanioNuevoArchivo = tamanio - strlen(buffer);
+	truncate(ruta2, tamanioNuevoArchivo - 1);
 	int fd2 = fileno(archivo2);
-	char * archivoFinal = mmap(NULL, tamanio - strlen(buffer) + 1 , PROT_WRITE, MAP_SHARED, fd2, 0);
+	char * archivoFinal = mmap(NULL, tamanioNuevoArchivo + 1, PROT_WRITE, MAP_SHARED, fd2, 0);
 	while(indicePasadorDeInfo < tamanio){
 		if(indicePasadorDeInfo < i || indicePasadorDeInfo > i + strlen(buffer)){
 			archivoFinal[indiceParaArchivoFinal] = archivoMapeado[indicePasadorDeInfo];
@@ -36,7 +45,16 @@ void eliminarKeyDeArchivo(char * rutaArchivo, char * key){
 
 	fclose(archivo);
 	fclose(archivo2);
+	if(remove(rutaArchivo) < 0){
+		return -1;
+	}
+	if(rename(ruta2, rutaArchivo)){
+		return -1;
+	}
 	free(buffer);
+	free(rutaSinArchivo);
+	free(ruta2);
+	return 1;
 }
 
 void generarArrayParaArchivoConfig(t_config * archivoConf, char * key, char * dato1, char * dato2){

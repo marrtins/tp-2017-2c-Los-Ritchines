@@ -63,18 +63,6 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 	config_destroy(archivo);
 }
 
-void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int numeroDeCopia){
-	char * bloqueNCopiaN;
-	char * bloqueNCopias;
-	bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
-	puts(bloqueNCopiaN);
-	config_set_value(archivo, bloqueNCopiaN, "[]");
-	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
-	setearAtributoDeArchivoConfigConInts(archivo, bloqueNCopias, 1, restaDeDosNumerosInt);
-	free(bloqueNCopiaN);
-	free(bloqueNCopias);
-}
-
 int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
 	Tbuffer * buffer = malloc(sizeof(Tbuffer));
 	Theader * head = malloc(sizeof(Theader));
@@ -94,6 +82,34 @@ int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
 	return 1;
 }
 
+void pasarArrayDeUnaKeyAOtra(t_config * archivo, char * key1, char * key2){
+	char ** array = config_get_array_value(archivo, key2);
+	int i = 0;
+	config_set_value(archivo, key1, "[]");
+	while(array[i] != NULL){
+		agregarElementoAArrayArchivoConfig(archivo, key1, array[i]);
+		i++;
+	}
+	liberarPunteroDePunterosAChar(array);
+	free(array);
+}
+
+void reordenarCopias(t_config * archivo, int numeroDeBloque, int numeroDeCopia){
+	char * bloqueNCopiaN;
+	char * bloqueNCopiaNSiguiente;
+	char * bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
+	int cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
+	while(numeroDeCopia < cantidadDeCopias){
+		bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
+		bloqueNCopiaNSiguiente = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia + 1);
+		pasarArrayDeUnaKeyAOtra(archivo, bloqueNCopiaN, bloqueNCopiaNSiguiente);
+		free(bloqueNCopiaN);
+		free(bloqueNCopiaNSiguiente);
+		numeroDeCopia++;
+	}
+	free(bloqueNCopias);
+}
+
 void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroDeCopia){
 	t_config * archivo = config_create(rutaLocal);
 	unsigned long long tamanio = config_get_int_value(archivo, "TAMANIO");
@@ -104,6 +120,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 	char * bloqueNCopias;
 	int cantidadDeCopias;
 	int numeroDeBloqueEnNodo;
+	char * bloqueNCopiaFinal;
 
 	if(numeroDeBloque > cantidadDeBloques-1){
 		puts("El bloque que quiere eliminar, no existe en el archivo");
@@ -113,17 +130,17 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 	bloqueNCopias = generarStringBloqueNCopias(numeroDeBloque);
 	cantidadDeCopias = config_get_int_value(archivo, bloqueNCopias);
-	free(bloqueNCopias);
 
 	if(cantidadDeCopias > 1){
 		bloqueNCopiaN = generarStringDeBloqueNCopiaN(numeroDeBloque, numeroDeCopia);
 		array = config_get_array_value(archivo, bloqueNCopiaN);
-		free(bloqueNCopiaN);
 		nodo = buscarNodoPorNombre(listaDeNodos, array[0]);
 
 		if(nodo == NULL){
 			liberarPunteroDePunterosAChar(array);
 			free(array);
+			free(bloqueNCopias);
+			free(bloqueNCopiaN);
 			puts("El nodo aun no esta conectado, intentelo mas tarde.");
 			config_destroy(archivo);
 			return;
@@ -132,13 +149,20 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 		desocuparBloque(nodo, numeroDeBloqueEnNodo);
 
-		eliminarBloqueDeTablaDeArchivos(archivo, numeroDeBloque, numeroDeCopia);
+		setearAtributoDeArchivoConfigConInts(archivo, bloqueNCopias, 1, restaDeDosNumerosInt);
+
+		reordenarCopias(archivo, numeroDeBloque, numeroDeCopia);
 
 		config_save(archivo);
 		config_destroy(archivo);
 
+		bloqueNCopiaFinal = generarStringDeBloqueNCopiaN(numeroDeBloque, cantidadDeCopias - 1);
+		eliminarKeyDeArchivo(rutaLocal, bloqueNCopiaFinal);
+		free(bloqueNCopiaFinal);
 		liberarPunteroDePunterosAChar(array);
 		free(array);
+		free(bloqueNCopias);
+		free(bloqueNCopiaN);
 
 	}
 	else{

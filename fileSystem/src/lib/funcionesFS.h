@@ -72,7 +72,7 @@ char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
 void inicializarListaDeNodosAConectar(t_list * desconectados);
 void removerArchivos(char * ruta);
-void eliminarKeyDeArchivo(char * rutaArchivo, char * key);
+int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -147,8 +147,7 @@ int copiarArchivo(char ** palabras);
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo);
 void borrarNodoPorFD(int fd);
-void* buscarNodoPorFD(int fd);
-void borrarNodoDesconectadoPorFD(int fd);
+void* buscarNodoPorFD(t_list * lista, int fd);
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
