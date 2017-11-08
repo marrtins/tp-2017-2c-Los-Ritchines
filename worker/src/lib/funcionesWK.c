@@ -1,6 +1,6 @@
 #include "funcionesWK.h"
 #include <commons/config.h>
-
+extern char * archivoMapeado;
 
 int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 
@@ -149,22 +149,25 @@ Tworker *obtenerConfiguracionWorker(char* ruta){
 	Tworker *worker = malloc(sizeof(Tworker));
 
 	worker->ip_filesystem       =    malloc(MAXIMA_LONGITUD_IP);
-	worker->puerto_entrada= malloc(MAXIMA_LONGITUD_PUERTO);
+	worker->ip_nodo       =    malloc(MAXIMA_LONGITUD_IP);
+	worker->puerto_entrada = malloc(MAXIMA_LONGITUD_PUERTO);
 	worker->puerto_master = malloc(MAXIMA_LONGITUD_PUERTO);
+	worker->puerto_datanode = malloc(MAXIMA_LONGITUD_PUERTO);
 	worker->puerto_filesystem = malloc(MAXIMA_LONGITUD_PUERTO);
 	worker->ruta_databin=malloc(MAXIMA_LONGITUD_RUTA);
-	worker->nombre_nodo=malloc(MAXIMA_LONGITUD_NOMBRE);
+	worker->nombre_nodo=malloc(MAXIMA_LONGITUD_RUTA);
 
 	t_config *workerConfig = config_create(ruta);
 
 	strcpy(worker->ip_filesystem, config_get_string_value(workerConfig, "IP_FILESYSTEM"));
+	strcpy(worker->ip_nodo, config_get_string_value(workerConfig, "IP_NODO"));
 	strcpy(worker->puerto_entrada, config_get_string_value(workerConfig, "PUERTO_WORKER"));
+	strcpy(worker->puerto_datanode, config_get_string_value(workerConfig, "PUERTO_DATANODE"));
 	strcpy(worker->puerto_master, config_get_string_value(workerConfig, "PUERTO_MASTER"));
 	strcpy(worker->puerto_filesystem, config_get_string_value(workerConfig, "PUERTO_FILESYSTEM"));
 	strcpy(worker->ruta_databin, config_get_string_value(workerConfig, "RUTA_DATABIN"));
 	strcpy(worker->nombre_nodo, config_get_string_value(workerConfig, "NOMBRE_NODO"));
-
-	//worker->tipo_de_proceso = DATANODE;
+	worker->tamanio_databin_mb = config_get_int_value(workerConfig,"TAMANIO_DATABIN_MB");
 
 	config_destroy(workerConfig);
 	return worker;
@@ -173,12 +176,15 @@ Tworker *obtenerConfiguracionWorker(char* ruta){
 void mostrarConfiguracion(Tworker *worker){
 
 	printf("Puerto Entrada: %s\n",  worker->puerto_entrada);
-	printf("IP Filesystem %s\n",    worker->ip_filesystem);
-	printf("Puerto Master: %s\n",       worker->puerto_master);
-	printf("Puerto Filesystem: %s\n", worker->puerto_filesystem);
-	printf("Ruta Databin: %s\n", worker->ruta_databin);
-	printf("Nombre Nodo: %s\n", worker->nombre_nodo);
-	printf("Tipo de proceso: %d\n", worker->tipo_de_proceso);
+		printf("IP Filesystem %s\n",    worker->ip_filesystem);
+		printf("IP Nodo %s\n",    worker->ip_nodo);
+		printf("Puerto Master: %s\n",       worker->puerto_master);
+		printf("Puerto Filesystem: %s\n", worker->puerto_filesystem);
+		printf("Puerto Worker: %s\n", worker->puerto_datanode);
+		printf("Ruta Databin: %s\n", worker->ruta_databin);
+		printf("Nombre Nodo: %s\n", worker->nombre_nodo);
+		printf("Tamanio databin en MB: %d\n", worker->tamanio_databin_mb);
+		printf("Tipo de proceso: %d\n", worker->tipo_de_proceso);
 }
 
 Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * contenidoArchivo, unsigned long long tamanioArchivoFinal){
@@ -201,3 +207,9 @@ Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * co
 
 }
 
+char * getBloque(int posicion){
+	char * bloque= malloc(BLOQUE_SIZE);
+	memcpy(bloque, archivoMapeado + posicion*BLOQUE_SIZE,BLOQUE_SIZE);
+	return bloque;
+
+}

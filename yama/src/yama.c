@@ -58,7 +58,7 @@ int main(int argc, char* argv[]){
 	tamanioCliente = sizeof(client);
 
 	//yama cliente
-	//conectarAFS(yama);
+	conectarAFS(yama);
 
 	//yama como servidor
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);

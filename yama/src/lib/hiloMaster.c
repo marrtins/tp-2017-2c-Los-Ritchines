@@ -40,7 +40,6 @@ void masterHandler(void *atributos){
 
 	TpackBytes *pathArchivoAReducir;
 
-
 	char* buffer;
 	Tbuffer * buffer1;
 
@@ -89,42 +88,72 @@ void masterHandler(void *atributos){
 
 			puts("Pido info a filesystem sobre el archivo a transformar");
 
-					//	head.tipo_de_proceso=YAMA;
-				//		head.tipo_de_mensaje=INFO_ARCHIVO;
+						head.tipo_de_proceso=YAMA;
+						head.tipo_de_mensaje=INFO_ARCHIVO;
 
-			//			//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
-					//	buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
-			//			puts("Path del archivo a reducir serializado; lo enviamos");
-					//	if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
-					//		puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
-					//		return;
-						//}
-			//			printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
+					//envio la ruta del archivo a reducir a filesystem para que me devuelva la info del archivo
+				buffer1=empaquetarBytes(&head,pathArchivoAReducir->bytes);
+				puts("Path del archivo a reducir serializado; lo enviamos");
+					if ((stat = send(socketFS, buffer1->buffer, buffer1->tamanio, 0)) == -1){
+						puts("no se pudo enviar Path del archivo a reducir a FILESYSTEM. ");
+						return;
+					}
+					printf("se enviaron %d bytes del Path del archivo a reducir a FS\n",stat);
 
 
 			//Espero a que FS me envie toda la informacion del archivo para seguir ejecutando
 
 			//FS envia: cant de bloques del archivo (si es cero la ruta no es valida) para saber cuantos recv va a tener que hacer sobre
 			//info de un bloque: nro de bloque + tamanioNombreNodo +copiacero nombrenodo+ copiacero nrobloquedatabin + tamanioNombreNodo +copiauno nombrenodo+ copiauno nrobloquedatabin
-			//while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
-			//		if(head.tipo_de_mensaje==ARCH_NO_VALIDO){
-			//			puts("no");
-			//		}//else if(head.tipo_de_mensaje==INFO_ARCHIVO){
-			//			int sizePaquete;
-			/*			stat = recv(socketFS, &sizePaquete, sizeof(int), 0);
-						Tbuffer *buffer = malloc(sizeof(Tbuffer));
-						stat = recv(socketFS, buffer, sizePaquete, 0);
-						TinfoArchivoFSYama *infoArchivo = malloc(sizeof(TinfoArchivoFSYama));
-
-						infoArchivo=deserializarInfoArchivoYamaFS(buffer);
+			while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
+				if (head.tipo_de_mensaje == ARCH_NO_VALIDO) {
+					puts("El archivo no es valido");
+				} else if (head.tipo_de_mensaje == INFO_ARCHIVO) {
+					puts("FS nos quiere mandar la info del archivo que pedi");
+					unsigned long long sizePaquete;
+					stat = recv(socketFS, &sizePaquete, sizeof(unsigned long long), 0);
+					printf("paquete size %d\n",sizePaquete);
+					char *buffer3 = malloc(sizePaquete);
+					puts("Recibo el tamaño del paquete");
+					stat = recv(socketFS, buffer3, sizePaquete, 0);
+					puts("Recibo el paquete");
+					TinfoArchivoFSYama *infoArchivo = malloc(sizeof(TinfoArchivoFSYama));
+					infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
+					puts("deserealice la info del archivo");
 //seguior aca info nodos ....
 
 
+					stat = recv(socketFS, &head, sizeof(Theader), 0);
+					puts("recibo otro head");
+					if (head.tipo_de_mensaje == INFO_NODO) {
+						puts("FS me quiere dar la info del nodo");
+						TpackInfoBloqueDN * infoBloque;
+						infoBloque = recvInfoNodoYAMA(socketFS);
 
-				//	}
+						puts("Recibo la informacion del nodo");
+
+						TpackageInfoNodo * nodo = malloc(
+								sizeof(TpackageInfoNodo));
+
+						nodo->tamanioIp = infoBloque->tamanioIp;
+						nodo->tamanioNombre = infoBloque->tamanioNombre;
+						nodo->tamanioPuerto = infoBloque->tamanioPuerto;
+
+						nodo->ipNodo = malloc(nodo->tamanioIp);
+						nodo->nombreNodo = malloc(nodo->tamanioNombre);
+						nodo->puertoWorker = malloc(nodo->tamanioPuerto);
+
+						strcpy(nodo->ipNodo, infoBloque->ipNodo);
+						strcpy(nodo->nombreNodo, infoBloque->nombreNodo);
+						strcpy(nodo->puertoWorker, infoBloque->puertoNodo);
+						puts("Termine");
+
+					}
+				}
+			}
 					//}
 
-*/
+
 			//Como este es el último atributo que recibimos de master.  Aca le enviamos la "info" de los workers a los que se tiene que conectar
 			//Por el momento info hardcode y sera la info de los unicos 2 workers conectados. Se la pedimos al filesystem y cuando nos la devuelve, le reenviamos a master.
 			/* pido info, la proceso y ahora se a que workers el master se va a conectar y se los paso...*/
@@ -988,11 +1017,11 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque0->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque0->nombreNodoC1="Nodo1";
 	bloque0->nombreNodoC1Len=strlen(bloque0->nombreNodoC1)+1;
-	bloque0->bloqueC1=5;
+	bloque0->bloqueC1=0;
 	bloque0->nombreNodoC2=malloc(sizeof(maxNombreNodo));
 	bloque0->nombreNodoC2="Nodo2";
 	bloque0->nombreNodoC2Len=strlen(bloque0->nombreNodoC2)+1;
-	bloque0->bloqueC2=2;
+	bloque0->bloqueC2=0;
 	bloque0->finBloque=1048576;
 
 	list_add(listaComposicion,bloque0);
@@ -1002,11 +1031,11 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque1->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque1->nombreNodoC1="Nodo2";
 	bloque1->nombreNodoC1Len=strlen(bloque1->nombreNodoC1)+1;
-	bloque1->bloqueC1=10;
+	bloque1->bloqueC1=0;
 	bloque1->nombreNodoC2=malloc(sizeof(maxNombreNodo));
 	bloque1->nombreNodoC2="Nodo3";
 	bloque1->nombreNodoC2Len=strlen(bloque1->nombreNodoC2)+1;
-	bloque1->bloqueC2=7;
+	bloque1->bloqueC2=0;
 	bloque1->finBloque=1048500;
 	list_add(listaComposicion,bloque1);
 
@@ -1015,11 +1044,11 @@ void generarListaComposicionArchivoHardcode(t_list * listaComposicion){
 	bloque2->nombreNodoC1=malloc(sizeof(maxNombreNodo));
 	bloque2->nombreNodoC1="Nodo3";
 	bloque2->nombreNodoC1Len=strlen(bloque2->nombreNodoC1)+1;
-	bloque2->bloqueC1=12;
+	bloque2->bloqueC1=0;
 	bloque2->nombreNodoC2=malloc(sizeof(maxNombreNodo));
 	bloque2->nombreNodoC2="Nodo1";
 	bloque2->nombreNodoC2Len=strlen(bloque2->nombreNodoC2)+1;
-	bloque2->bloqueC2=3;
+	bloque2->bloqueC2=0;
 	bloque2->finBloque=1048516;
 	list_add(listaComposicion,bloque2);
 
@@ -1039,7 +1068,7 @@ void generarListaInfoNodos(){
 	nodo1->nombreNodo="Nodo1";
 	nodo1->tamanioNombre=strlen(nodo1->nombreNodo)+1;
 	nodo1->ipNodo=malloc(ipLen);
-	nodo1->ipNodo="192.168.3.24";
+	nodo1->ipNodo="127.0.0.1";
 	nodo1->tamanioIp=strlen(nodo1->ipNodo)+1;
 	nodo1->puertoWorker=malloc(puertoLen);
 	nodo1->puertoWorker = "5013";
@@ -1051,7 +1080,7 @@ void generarListaInfoNodos(){
 	nodo2->nombreNodo="Nodo2";
 	nodo2->tamanioNombre=strlen(nodo2->nombreNodo)+1;
 	nodo2->ipNodo=malloc(ipLen);
-	nodo2->ipNodo="192.168.3.22";
+	nodo2->ipNodo="127.0.0.1";
 	nodo2->tamanioIp=strlen(nodo2->ipNodo)+1;
 	nodo2->puertoWorker=malloc(puertoLen);
 	nodo2->puertoWorker = "5014";
@@ -1064,7 +1093,7 @@ void generarListaInfoNodos(){
 	nodo3->nombreNodo="Nodo3";
 	nodo3->tamanioNombre=strlen(nodo3->nombreNodo)+1;
 	nodo3->ipNodo=malloc(ipLen);
-	nodo3->ipNodo="192.168.3.2";
+	nodo3->ipNodo="127.0.0.1";
 	nodo3->tamanioIp=strlen(nodo3->ipNodo)+1;
 	nodo3->puertoWorker=malloc(puertoLen);
 	nodo3->puertoWorker = "5034";
