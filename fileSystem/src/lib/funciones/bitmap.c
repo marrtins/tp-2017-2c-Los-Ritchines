@@ -75,6 +75,7 @@ void almacenarBitEnBitmap(Tnodo * nodo, int numeroDeBloque){
 	fwrite(bitChar, 1, sizeof(char), archivo);
 	fclose(archivo);
 	free(bitChar);
+	free(rutaArchivo);
 }
 
 
