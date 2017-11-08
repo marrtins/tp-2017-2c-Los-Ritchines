@@ -94,6 +94,7 @@ void conexionesDatanode(void * estructura){
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
 										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoBloque->nombreNodo);
+										nuevoNodo->fd = fileDescriptor;
 										list_add(listaDeNodos, nuevoNodo);
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
@@ -146,6 +147,7 @@ void conexionesDatanode(void * estructura){
 								puts("voy a hacer el signal");
 								pthread_mutex_unlock(&bloqueMutex);
 								puts("Hice el signal y libere el mutex");
+								liberarEstructuraBuffer(bloqueACopiar);
 								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
