@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 				rutaArchivo = recvRutaArchivo(socketYama);
 
 				//verifico que la ruta que me manda yama sea valida
-				if(verificarRutaArchivo(rutaArchivo)){
+				/*if(verificarRutaArchivo(rutaArchivo)){
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
 						 logAndExit("Fallo al enviar la informacion de un archivo");
 					}
-				}
+				}*/
 
 
 			break;
