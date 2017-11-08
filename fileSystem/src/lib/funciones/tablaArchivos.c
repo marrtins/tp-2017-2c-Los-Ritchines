@@ -46,13 +46,13 @@ void levantarTablaArchivo(Tarchivo * tablaArchivo, char * ruta){
 			copiaNodo->numeroBloqueDeNodo = atoi(temporal[1]);
 			list_add(tablaArchivo->bloques[nroBloque].copia, copiaNodo);
 
+			liberarPunteroDePunterosAChar(temporal);
+			free(temporal);
 			free(bloqueNCopiaM);
 			i++;
 		}
 
 		nroBloque++;
-		liberarPunteroDePunterosAChar(temporal);
-		free(temporal);
 		free(bloqueNCopias);
 		free(bloqueNBytes);
 	}

@@ -36,6 +36,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 		}
 		i++;
 	}
+	free(rutaArchivo);
 }
 
 void almacenarTodosLosBitmaps(t_list * lista){

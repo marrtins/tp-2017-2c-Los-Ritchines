@@ -104,15 +104,17 @@ int main(int argc, char* argv[]) {
 					buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
 
 					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
-							 logAndExit("Fallo al enviar la informacion de un archivo");
-						 }
+						logAndExit("Fallo al enviar la informacion de un archivo");
+					}
+					free(ruta);
 				}else {
 					//si no es valida se manda cant de bloques en cero
 					buffer = empaquetarInt(head,0);
 					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
 						 logAndExit("Fallo al enviar la informacion de un archivo");
-						}
+					}
 				}
+
 
 			break;
 			default:
