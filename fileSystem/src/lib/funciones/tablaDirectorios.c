@@ -146,10 +146,35 @@ void inicializarTablaDirectorios(){
 	free(ruta);
 }
 
+void formatearTablaDeNodos(){
+	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	char * keyTotal;
+	char * keyLibre;
+	char * nodoNTotal;
+	char ** nodos = config_get_array_value(archivo,"NODOS");
+	int i = 0;
+	while(nodos[i]!=NULL){
+		keyTotal = generarStringNodoNTotal(nodos[i]);
+		keyLibre = generarStringNodoNLibre(nodos[i]);
+		nodoNTotal = config_get_string_value(archivo, keyTotal);
+		config_set_value(archivo,keyLibre, nodoNTotal);
+		free(keyTotal);
+		free(keyLibre);
+		free(nodoNTotal);
+		i++;
+	}
+
+	char* tamanio = config_get_string_value(archivo, "TAMANIO");
+	config_set_value(archivo,"LIBRE",tamanio);
+	config_save(archivo);
+	config_destroy(archivo);
+	free(tamanio);
+}
+
 void formatearFS(){
 	//eliminarArchivosMetadata();
 	inicializarTablaDirectorios();
-	inicializarTablaDeNodos();
+	formatearTablaDeNodos();
 	formatearNodos(listaDeNodos);
 	formatearNodos(listaDeNodosDesconectados);
 	levantarTablasDirectorios();

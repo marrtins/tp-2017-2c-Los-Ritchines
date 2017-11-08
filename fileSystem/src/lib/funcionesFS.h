@@ -57,6 +57,7 @@ void ocuparBloqueEnTablaNodos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre);
+void formatearTablaDeNodos();
 void formatearFS();
 void leerArchivoComoTextoPlano(char * rutaLocal);
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal);
