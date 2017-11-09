@@ -52,12 +52,20 @@ typedef struct{
 	TnodoBloque * nodoBloques;
 }Tnodos;
 
+typedef struct{
+	int tamanio;
+	char * rutaArchivo;
+	unsigned long long tamanioContenido;
+	char * contenidoArchivo;
+}TarchivoFinal;
+
 t_list * listaDeNodos;
 t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;
 
 //Se usa en el cpblock;
 Tbuffer* bloqueACopiar;
+TpackInfoBloqueDN * infoNodo;
 
 pthread_mutex_t bloqueMutex;
 

@@ -5,9 +5,8 @@
 
 char * rutaTransformador, * rutaReductor, *rutaResultado;
 
+
 Tmetricas *metricasJob;
-
-
 
 int main(int argc, char* argv[]) {
 
@@ -34,8 +33,8 @@ int main(int argc, char* argv[]) {
 	}
 
 
-
-	logger = log_create("master.log", "master.log", false, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/master.log", "master.log", false, LOG_LEVEL_INFO);
 
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;

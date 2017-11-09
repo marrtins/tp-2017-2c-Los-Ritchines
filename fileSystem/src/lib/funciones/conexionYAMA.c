@@ -14,65 +14,59 @@ char * recvRutaArchivo(int socket){
 	if (recv(socket, rutaArchivo, tamanio, 0) == -1) {
 		logAndExit("Error al recibir la ruta");
 	}
-	memcpy(rutaArchivo, ruta, tamanio);
-	free(ruta);
-	return rutaArchivo;
+	puts(rutaArchivo);
+	memcpy(ruta, rutaArchivo, tamanio);
+	free(rutaArchivo);
+
+	return ruta;
 }
 
-//despues se puede pasar a compartidas aunque en realidad solo la usa FS
-Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo){
 
-	Tbuffer * buffer = malloc(sizeof(Tbuffer));
-	int tamanioFijo, cantBloques;
-	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 
-	//La estructura que envio es head + cantBloquesArchivo + [ nroBloqueArchivo + tamanioNombreNodo +
-	//copiacero->NombreNodo + copiacero->bloqueDatabin + tamanioNombreNodo + copiauno->NombreNodo +
-	//copiauno->bloqueDatabin ]
+	TinfoArchivoFSYama *infoSend = malloc(sizeof(TinfoArchivoFSYama));
+	t_list * listaBloques = list_create();
 
-	tamanioFijo = sizeof(int) * 5 * cantBloques;
-	buffer->tamanio = (HEAD_SIZE + sizeof(int) + tamanioFijo);
-	buffer->buffer = malloc(buffer->tamanio);
-	//TODO Esto
-	char * p = buffer->buffer;
-	memcpy(p, head, sizeof(*head));
-	p += sizeof(*head);
-	memcpy(p, &cantBloques, sizeof(int));
-	p += sizeof(int);
-	/*
-	while(nroBloque != cantBloques){
-		memcpy(p, &nroBloque, sizeof(int));
-		p += sizeof(int);
+	int i;
+	int cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+	for (i = 0; i < cantBloques; i++) {
+		TpackageUbicacionBloques *bloque = malloc(
+				sizeof(TpackageUbicacionBloques));
+		TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia, 0);
+		bloque->bloque = i;
+		bloque->nombreNodoC1 = malloc(strlen(copia1->nombreDeNodo) + 1);
+		bloque->nombreNodoC1 = copia1->nombreDeNodo;
+		bloque->nombreNodoC1Len = (strlen(copia1->nombreDeNodo) + 1);
+		bloque->bloqueC1 = copia1->numeroBloqueDeNodo;
 
-		//copia cero
-		tamanioNombreNodo = strlen(archivo->bloques[nroBloque].copiaCero.nombreDeNodo) +1;
-		memcpy(p,&tamanioNombreNodo,sizeof(int));
-		p += sizeof(int);
+		TcopiaNodo *copia2 = list_get(archivo->bloques[i].copia, 1);
+		bloque->nombreNodoC2 = malloc(strlen(copia2->nombreDeNodo) + 1);
+		bloque->nombreNodoC2 = copia2->nombreDeNodo;
+		bloque->nombreNodoC2Len = (strlen(copia2->nombreDeNodo) + 1);
+		bloque->bloqueC2 = copia2->numeroBloqueDeNodo;
 
-		buffer->tamanio += tamanioNombreNodo;
-		buffer->buffer = realloc(buffer->buffer, tamanioNombreNodo);
+		bloque->finBloque = archivo->bloques[i].bytes;
+		list_add(listaBloques, bloque);
+	}
 
-		memcpy(p,archivo->bloques[nroBloque].copiaCero.nombreDeNodo,tamanioNombreNodo);
-		p += tamanioNombreNodo;
-		memcpy(p,&archivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo,sizeof(int));
-		p += sizeof(int);
+	infoSend->listaSize = list_size(listaBloques);
+	infoSend->listaBloques = list_create();
+	infoSend->listaBloques = listaBloques;
 
-		//copia uno
-		tamanioNombreNodo = strlen(archivo->bloques[nroBloque].copiaUno.nombreDeNodo) +1;
-		memcpy(p,&tamanioNombreNodo,sizeof(int));
-		p += sizeof(int);
+	return infoSend;
 
-		buffer->tamanio += tamanioNombreNodo;
-		buffer->buffer = realloc(buffer->buffer, tamanioNombreNodo);
-
-		memcpy(p,archivo->bloques[nroBloque].copiaUno.nombreDeNodo,tamanioNombreNodo);
-		p += tamanioNombreNodo;
-		memcpy(p,&archivo->bloques[nroBloque].copiaCero.numeroBloqueDeNodo,sizeof(int));
-		p += sizeof(int);
-
-		nroBloque++;
-	}*/
-
-	return buffer;
 }
 
+void enviarInfoNodoAYama(int socketYama){
+
+	Tbuffer * buffer;
+	infoNodo->head.tipo_de_proceso = FILESYSTEM;
+	infoNodo->head.tipo_de_mensaje = INFO_NODO;
+
+	buffer = empaquetarInfoNodo(infoNodo);
+
+	if ((send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+		logAndExit("Fallo al enviar la informacion de un archivo");
+	}
+
+}

@@ -137,22 +137,13 @@ void liberarNodosDeLista(void * nodo){
 	liberarNodo(nodoA);
 }
 
-void* buscarNodoPorFD(int fd){
+void* buscarNodoPorFD(t_list * lista, int fd){
 	bool buscarPorFDParaLista(void* elementoDeLista){
 		Tnodo* nodo = (Tnodo*) elementoDeLista;
 		return nodo->fd == fd;
 	}
 
-	return list_find(listaDeNodos, buscarPorFDParaLista);
-}
-
-void* buscarNodoDesconectadoPorFD(int fd){
-	bool buscarPorFDParaLista(void* elementoDeLista){
-		Tnodo* nodo = (Tnodo*) elementoDeLista;
-		return nodo->fd == fd;
-	}
-
-	return list_find(listaDeNodosDesconectados, buscarPorFDParaLista);
+	return list_find(lista, buscarPorFDParaLista);
 }
 
 void borrarNodoDesconectadoPorFD(int fd){
@@ -169,6 +160,14 @@ void borrarNodoPorFD(int fd){
 		return nodo->fd==fd;
 	}
 	list_remove_by_condition(listaDeNodos,buscarPorFDParaLista);
+}
+
+void borrarNodoPorNombre(t_list * lista, char * nombre){
+	bool buscarPorNombreParaLista(void* elementoDeLista){
+		Tnodo* nodo = (Tnodo*) elementoDeLista;
+		return !strcmp(nodo->nombre, nombre);
+	}
+	list_remove_by_condition(lista,buscarPorNombreParaLista);
 }
 
 bool ordenarListaPorMayor(void * directorio1, void * directorio2){
@@ -199,6 +198,6 @@ Tdirectorio* buscarPorNombreDeDirectorio(char * directorio){
 
 void vaciarLista(){
 	if(!list_is_empty(listaTablaDirectorios)){
-	list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
+		list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
 	}
 }

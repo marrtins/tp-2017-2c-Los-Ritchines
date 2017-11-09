@@ -5,6 +5,7 @@
 
 //serializacion
 void empaquetarBloqueAEliminar(Tbuffer * buffer, Theader * head, int numeroDeBloque);
+void desempaquetarArchivoFinal(int fileDescriptor, TarchivoFinal * archivoFinal);
 
 //Operaciones
 long sumaDeDosNumerosLong(long valor1, long valor2);
@@ -47,16 +48,19 @@ void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void mostrarTablaArchivo(Tarchivo* tablaArchivo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
-void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
+void agregarNodoATablaDeNodos(char * ruta, Tnodo * nuevoNodo);
+void altaDeNodoEnTablaDeNodos(Tnodo * nodo);
+void bajaDeNodoEnTablaDeNodos(Tnodo * nodo);
 void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, char * nombreElemento);
 void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento);
-void inicializarTablaDeNodos();
+void inicializarTablaDeNodos(char * ruta);
 void inicializarTablaDirectorios();
-void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
+void eliminarNodoDeTablaDeNodos(char * ruta, Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaNodos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
 void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre);
+void formatearTablaDeNodos();
 void formatearFS();
 void leerArchivoComoTextoPlano(char * rutaLocal);
 char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal);
@@ -70,9 +74,12 @@ void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int
 void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque);
 char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
-void inicializarListaDeNodosAConectar(t_list * desconectados);
+void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados);
 void removerArchivos(char * ruta);
-void eliminarKeyDeArchivo(char * rutaArchivo, char * key);
+int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
+char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
+void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
+void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -86,6 +93,7 @@ void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo 
 Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
+void borrarNodoPorNombre(t_list * lista, char * nombre);
 
 //Directorios
 void crearRoot();
@@ -146,8 +154,7 @@ int copiarArchivo(char ** palabras);
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo);
 void borrarNodoPorFD(int fd);
-void* buscarNodoPorFD(int fd);
-void borrarNodoDesconectadoPorFD(int fd);
+void* buscarNodoPorFD(t_list * lista, int fd);
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
@@ -169,9 +176,11 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 void liberarTablaDirectorios(void* directorio);
 void liberarCopia(void * copia);
+void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal);
 
 //YAMA
 char * recvRutaArchivo(int socket);
-Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo);
+TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo);
+void enviarInfoNodoAYama(int socketYama);
 
 #endif

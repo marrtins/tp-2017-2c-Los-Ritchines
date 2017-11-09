@@ -58,6 +58,26 @@ int realizarTransformacion(int client_sock){
 	stat = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
 
 
+	char *input1 = getBloque(datosTransf->nroBloque);
+	char * input2=malloc(BLOQUE_SIZE);
+	memcpy(input2,input1,datosTransf->bytesOcupadosBloque);
+
+
+
+	//printf("linea  %s \n",input2);
+
+	FILE *bloqueSTD;
+	char * rutaBloque = string_new();
+	string_append(&rutaBloque,"/home/utnso/tmp/tmpbl-");
+	cont++;
+	string_append(&rutaBloque,string_itoa(cont));
+	string_append(&rutaBloque,"-");
+	string_append(&rutaBloque,worker->nombre_nodo);
+	bloqueSTD = fopen(rutaBloque, "w");
+
+	fwrite(input2, sizeof(char), datosTransf->bytesOcupadosBloque, bloqueSTD);
+
+	fclose(bloqueSTD);
 
 
 	if ( (pid=fork()) == 0 )
@@ -66,8 +86,13 @@ int realizarTransformacion(int client_sock){
 		lineaDeEjecucionTransformacion = string_new();
 		rutaResultadoTransformacion=string_new();
 
+
+
 		//todo: reemplazar cat wban.csv por el bloque de codigo que nos interesa trasnformar.
-		string_append(&lineaDeEjecucionTransformacion,"cat WBAN.csv | ./");
+
+		string_append(&lineaDeEjecucionTransformacion,"cat ");
+		string_append(&lineaDeEjecucionTransformacion,rutaBloque);
+		string_append(&lineaDeEjecucionTransformacion," | ./");
 		string_append(&lineaDeEjecucionTransformacion,nombreScriptTransformador);
 		string_append(&lineaDeEjecucionTransformacion, " | sort  > ");
 		string_append(&rutaResultadoTransformacion,"/home/utnso/");
@@ -76,7 +101,7 @@ int realizarTransformacion(int client_sock){
 
 		printf("linea de eecucion %s\n",lineaDeEjecucionTransformacion);
 		//			printf("Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
-
+		string_append(&rutaBloque,worker->nombre_nodo);
 
 
 		stat = system(lineaDeEjecucionTransformacion);
@@ -88,6 +113,7 @@ int realizarTransformacion(int client_sock){
 		puts("Envio header. fin transfo ok");
 		enviarHeader(client_sock,headEnvio);
 
+		remove(rutaBloque);
 		exit(0);
 
 	}
@@ -99,7 +125,9 @@ int realizarTransformacion(int client_sock){
 	}
 	//printf("Cierro fd %d\n",client_sock);
 	//close(client_sock);
-
+	free(input1);
 	free(headEnvio);
 	return 0;
 }
+
+

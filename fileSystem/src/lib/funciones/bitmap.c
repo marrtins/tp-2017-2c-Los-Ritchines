@@ -36,6 +36,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 		}
 		i++;
 	}
+	free(rutaArchivo);
 }
 
 void almacenarTodosLosBitmaps(t_list * lista){
@@ -75,6 +76,7 @@ void almacenarBitEnBitmap(Tnodo * nodo, int numeroDeBloque){
 	fwrite(bitChar, 1, sizeof(char), archivo);
 	fclose(archivo);
 	free(bitChar);
+	free(rutaArchivo);
 }
 
 

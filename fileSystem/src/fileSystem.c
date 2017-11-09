@@ -40,17 +40,17 @@ int main(int argc, char* argv[]) {
 		}
 		free(flag);
 	}else {
-		//inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
+		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
 	}
 
-
-
-	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
-	inicializarTablaDeNodos();
+	inicializarTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	inicializarTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin");
 	levantarTablasDirectorios();
 
 	FD_ZERO(&masterFD);
@@ -99,22 +99,45 @@ int main(int argc, char* argv[]) {
 
 				rutaArchivo = recvRutaArchivo(socketYama);
 
+				puts(rutaArchivo);
 				//verifico que la ruta que me manda yama sea valida
 				if(verificarRutaArchivo(rutaArchivo)){
+					puts("La ruta del archivo que mando yama es valida");
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
-					buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
+
+					TinfoArchivoFSYama *infoSend;
+
+					infoSend = crearListaTablaArchivoParaYama(archivo);
+					head->tipo_de_mensaje=INFO_ARCHIVO;
+					head->tipo_de_proceso=FILESYSTEM;
+
+					puts("voy a serializar la info del archivo");
+
+					buffer=serializarInfoArchivoYamaFS(head,infoSend);
+
+					puts("serialice la info del archivo");
 
 					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
-							 logAndExit("Fallo al enviar la informacion de un archivo");
-						 }
+						logAndExit("Fallo al enviar la informacion de un archivo");
+					}
+					free(ruta);
+
+					puts("envie info del archivo");
+					//envio la info del nodo
+
+					enviarInfoNodoAYama(socketYama);
+					puts("envie info del nodo");
 				}else {
-					//si no es valida se manda cant de bloques en cero
-					buffer = empaquetarInt(head,0);
-					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+					//si no es valida se manda esto
+					puts("la ruta no es valida");
+					head->tipo_de_mensaje=ARCH_NO_VALIDO;
+					head->tipo_de_proceso = FILESYSTEM;
+					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
 						 logAndExit("Fallo al enviar la informacion de un archivo");
-						}
+					}
 				}
+
 
 			break;
 			default:

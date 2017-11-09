@@ -20,7 +20,7 @@ void generarListaComposicionArchivoHardcode(t_list * listaInfo);
 void generarListaInfoNodos();
 
 
-
+TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS);
 
 //Funciones Planificacion
 int posicionarClock(t_list * listaWorkers);

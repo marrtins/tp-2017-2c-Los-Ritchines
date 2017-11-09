@@ -8,3 +8,27 @@ void empaquetarBloqueAEliminar(Tbuffer * buffer, Theader * head, int numeroDeBlo
 	p += sizeof(*head);
 	memcpy(p, &numeroDeBloque, sizeof(numeroDeBloque));
 }
+
+void desempaquetarArchivoFinal(int fileDescriptor, TarchivoFinal * archivoFinal){
+
+	if (recv(fileDescriptor, &archivoFinal->tamanio, sizeof(archivoFinal->tamanio), 0) == -1) {
+		logAndExit("Error al recibir el tamanio do bloque");
+	}
+
+	archivoFinal->rutaArchivo = malloc(archivoFinal->tamanio);
+
+	if (recv(fileDescriptor, archivoFinal->rutaArchivo, archivoFinal->tamanio, 0) == -1) {
+		logAndExit("Error al recibir el tamanio do bloque");
+	}
+
+	if (recv(fileDescriptor, &archivoFinal->tamanioContenido, sizeof(archivoFinal->tamanioContenido), 0)
+			== -1) {
+		logAndExit("Error al recibir el tamanio do bloque");
+	}
+
+	archivoFinal->contenidoArchivo = malloc(archivoFinal->tamanioContenido);
+
+	if (recv(fileDescriptor, archivoFinal->contenidoArchivo, archivoFinal->tamanioContenido, 0) == -1) {
+		logAndExit("Error al recibir el tamanio do bloque");
+	}
+}

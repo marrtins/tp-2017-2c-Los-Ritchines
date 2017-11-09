@@ -13,7 +13,7 @@ TpackSrcCode *readFileIntoPack(Tproceso sender, char* ruta);
 unsigned long fsize(FILE* f);
 
 Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo);
-Tbuffer * empaquetarInfoBloqueDNaFS(TpackInfoBloqueDN * infoBloque);
+Tbuffer * empaquetarInfoNodo(TpackInfoBloqueDN * infoBloque);
 TpackInfoBloqueDN * desempaquetarInfoNodo(TpackInfoBloqueDN * infoBloque, char * nombreNodo, char * ipNodo, char * puertoNodo);
 
 Tbuffer * empaquetarBytesMasInt(Theader* head, char * bytes, int numero);
@@ -42,5 +42,8 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial);
 
 char *serializeInfoAlmacenadoFinalMasterWorker(Theader head, TinfoAlmacenadoMasterWorker * infoAlmacenado, int *pack_size);
 TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_serial);
+
+Tbuffer * serializarInfoArchivoYamaFS(Theader *head,TinfoArchivoFSYama *infoArchivo);
+TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer);
 
 #endif

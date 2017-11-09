@@ -110,7 +110,6 @@ void procesarCpblock(char ** palabras){
 					liberarEstructuraBuffer(bloque);
 					return;
 				}
-				//TODO cuando envia el bloque, actualizar el metadata; y el bitmap;
 				agregarCopiaAtablaArchivo(rutaLocalArchivo,palabras[3],bloqueDN,nroBloque);
 				ocuparBloque(nodo, bloqueDN);
 				free(rutaLocalArchivo);
@@ -167,11 +166,16 @@ void consolaRename(char** palabras, int cantidad) {
 void consolaCat(char ** palabras, int cantidad) {
 	if (cantidad == 1) {
 		if(esRutaYamafs(palabras[1])){
-			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-			leerArchivoComoTextoPlano(rutaLocal);
-			free(rutaLocal);
-		} else if (verificarRutaArchivo(palabras[1])){
-			puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
+			if(verificarRutaArchivo(palabras[1])){
+				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+				leerArchivoComoTextoPlano(rutaLocal);
+				free(rutaLocal);
+			}
+			else{
+				puts("La ruta especificada no corresponde a ningun archivo de yamafs.");
+			}
+		} else{
+			puts("Falta la referencia a yamafs:/");
 		}
 	}
 	else {
@@ -358,7 +362,7 @@ int getMD5(char* rutaYamafs){
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaTmp);
 	system(comando);
-	printf("Obtuve el MD5 del archivo");
+	puts("Obtuve el MD5 del archivo");
 	remove(rutaTmp);
 	free(comando);
 	free(rutaTmp);

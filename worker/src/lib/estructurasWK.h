@@ -7,12 +7,15 @@
 typedef struct{
 
 	char* ip_filesystem;
-	char* puerto_filesystem;
 	char* puerto_entrada;
 	char* puerto_master;
+	char* puerto_filesystem;
 	char* ruta_databin;
 	char* nombre_nodo;
-	int   tipo_de_proceso;
+	char* ip_nodo;
+	char* puerto_datanode;
+	int tipo_de_proceso;
+	int tamanio_databin_mb;
 }Tworker;
 
 

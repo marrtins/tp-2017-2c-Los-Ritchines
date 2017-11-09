@@ -15,15 +15,19 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 
-	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/dataNode.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 
 	if(archivo == NULL){
-		puts("No existe el databin, o esta mal la ruta al archivo.");
-		logAndExit("No existe el databin, o esta mal la ruta al archivo.");
+		puts("No se encontro el databin en la ruta especificada, se procedera a crear el mismo");
+		archivo = fopen(dataNode->ruta_databin, "wb");
+		truncate(dataNode->ruta_databin, dataNode->tamanio_databin_mb * BLOQUE_SIZE);
+		fclose(archivo);
+		archivo = fopen(dataNode->ruta_databin, "rb+");
 	}
 
 	fd = fileno(archivo);
@@ -75,8 +79,8 @@ int main(int argc, char* argv[]) {
 					int nroBloque;
 
 					if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
-							logAndExit("Error al recibir el numero de bloque");
-						}
+						logAndExit("Error al recibir el numero de bloque");
+					}
 					printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
 					enviarBloqueAFS(nroBloque, socketFS);
 					break;

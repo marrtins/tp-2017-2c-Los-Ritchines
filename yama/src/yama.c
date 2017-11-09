@@ -51,14 +51,14 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-
-	logger = log_create("yama.log", "yama.log", true, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/yama.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/yama.log", "yama.log", true, LOG_LEVEL_INFO);
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 	tamanioCliente = sizeof(client);
 
 	//yama cliente
-	//conectarAFS(yama);
+	conectarAFS(yama);
 
 	//yama como servidor
 	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);

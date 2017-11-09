@@ -377,8 +377,9 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		liberarEstructuraBuffer(bloque);
 		return -1;
 	}
-	fclose(archivo);
+
 	close(fd);
+	fclose(archivo);
 
 	char * p = archivoMapeado;
 	while(nroBloque != cantBloques){

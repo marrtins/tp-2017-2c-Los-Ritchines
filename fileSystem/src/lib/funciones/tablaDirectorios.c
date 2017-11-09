@@ -132,24 +132,49 @@ void crearRoot(){
 }
 
 void inicializarTablaDirectorios(){
-	char * ruta = malloc(100);
+	char * ruta = malloc(120);
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
-
 	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	vaciarLista();
 	fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
-
-	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
+	mkdir(ruta,0777);
 	fclose(archivoDirectorios);
 	removerDirectorios(ruta);
 	crearRoot();
 	free(ruta);
 }
 
+void formatearTablaDeNodos(){
+	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	char * keyTotal;
+	char * keyLibre;
+	char * nodoNTotal;
+	char ** nodos = config_get_array_value(archivo,"NODOS");
+	int i = 0;
+	while(nodos[i]!=NULL){
+		keyTotal = generarStringNodoNTotal(nodos[i]);
+		keyLibre = generarStringNodoNLibre(nodos[i]);
+		nodoNTotal = config_get_string_value(archivo, keyTotal);
+		config_set_value(archivo,keyLibre, nodoNTotal);
+		free(keyTotal);
+		free(keyLibre);
+		free(nodoNTotal);
+		i++;
+	}
+
+	char* tamanio = config_get_string_value(archivo, "TAMANIO");
+	config_set_value(archivo,"LIBRE",tamanio);
+	config_save(archivo);
+	config_destroy(archivo);
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
+	free(tamanio);
+}
+
 void formatearFS(){
 	//eliminarArchivosMetadata();
 	inicializarTablaDirectorios();
-	inicializarTablaDeNodos();
+	formatearTablaDeNodos();
 	formatearNodos(listaDeNodos);
 	formatearNodos(listaDeNodosDesconectados);
 	levantarTablasDirectorios();
@@ -163,6 +188,13 @@ char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
 	free(split);
 	return archivoConExtension;
 
+}
+
+char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal){
+	char * archivoConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocal);
+	char * extension = obtenerExtensionDeUnArchivo(archivoConExtension);
+	free(archivoConExtension);
+	return extension;
 }
 
 //no se si funciona, verificar
@@ -544,7 +576,7 @@ void removerArchivos(char * ruta){
 		liberarPunteroDePunterosAChar(archivos);
 		free(archivos);
 	}else{
-	free(archivos);
+		free(archivos);
 	}
 }
 
@@ -567,7 +599,7 @@ void removerDirectorios(char *ruta){
 		free(directorios);
 	}else {
 
-	free(directorios);
+		free(directorios);
 	}
 
 }
@@ -727,12 +759,46 @@ int verificarRutaArchivo(char * rutaYamafs){
 
 void removerArchivo(char* ruta){
 	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
+	t_config * archivo = config_create(rutaArchivo);
+	Tnodo * nodo;
+	char * keyBloqueCopias;
+	char * keyBloqueNCopiaM;
+	char **nombreYPosicion;
+	int cantidadCopias;
+	int i = 0;
+	int j;
+	int cantidadBloques = cantidadDeBloquesDeUnArchivo(config_get_long_value(archivo,"TAMANIO"));
+	while(i < cantidadBloques){
+		keyBloqueCopias = generarStringBloqueNCopias(i);
+		cantidadCopias = config_get_int_value(archivo, keyBloqueCopias);
+		j = 0;
+		while(j < cantidadCopias){
+			keyBloqueNCopiaM = generarStringDeBloqueNCopiaN(i,j);
+			nombreYPosicion = config_get_array_value(archivo,keyBloqueNCopiaM);
+			nodo = buscarNodoPorNombre(listaDeNodos, nombreYPosicion[0]);
+			if(nodo == NULL){
+				puts("no lo encontre asi que voy a buscarlo en desconectados");
+				nodo = buscarNodoPorNombre(listaDeNodosDesconectados, nombreYPosicion[0]);
+				if(nodo == NULL){
+					puts("No se pudo hermano, el nodo con la copia no esta en ningun lado");
+							return;;
+				}
+			}
+			desocuparBloque(nodo, atoi(nombreYPosicion[1]));
+			free(keyBloqueNCopiaM);
+			j++;
+		}
+		free(keyBloqueCopias);
+		i++;
+	}
+
 	remove(rutaArchivo);
 	puts("Ya pude remover el archivo");
+	free(rutaArchivo);
+	config_destroy(archivo);
 	}
 
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio){
-	puts("entre2");
 	memcpy(archivoMapeado, archivoAMoverMapeado, tamanio);
 }
 
@@ -756,6 +822,13 @@ void moverArchivo(char* ruta1, char* ruta2){
 	int fdAMover = fileno(archivo);
 
 	if ((archivoAMoverMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED, fdAMover, 0)) == MAP_FAILED) {
+		free(rutaLocalArchivo);
+		liberarPunteroDePunterosAChar(palabras);
+		free(palabras);
+		free(nombreArchivoConExtension);
+		free(extension);
+		fclose(archivo);
+		close(fdAMover);
 		log_trace(logger, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
@@ -769,6 +842,15 @@ void moverArchivo(char* ruta1, char* ruta2){
 	int fd = fileno(archivoMovido);
 	ftruncate(fd, tamanio);
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+		free(rutaLocalArchivo);
+		liberarPunteroDePunterosAChar(palabras);
+		free(palabras);
+		free(nombreArchivoConExtension);
+		free(extension);
+		fclose(archivo);
+		fclose(archivoMovido);
+		close(fd);
+		close(fdAMover);
 		log_trace(logger, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
@@ -782,6 +864,8 @@ void moverArchivo(char* ruta1, char* ruta2){
 	fclose(archivoMovido);
 	close(fd);
 	close(fdAMover);
+	munmap(archivoMapeado, tamanio);
+	munmap(archivoAMoverMapeado, tamanio);
 
 	free(rutaLocalDirectorio);
 	free(rutaLocalArchivo);
@@ -804,6 +888,9 @@ void removerDirectorio(char* ruta){
 	rmdir(rutaDirectorio);
 	removerDirectorioDeTabla(nombreDirectorio);
 	free(rutaDirectorio);
+	liberarPunteroDePunterosAChar(palabras);
+	free(palabras);
+	free(nombreDirectorio);
 }
 
 void removerDirectorioDeTabla(char* nombreDirectorio){
@@ -833,13 +920,14 @@ int esDirectorioVacio (char*ruta){
 	char* rutaLocalDirectorio = malloc (200);
 	sprintf(rutaLocalDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/%d", index);
 	char** archivos;
-
+	int condicion;
 
 	archivos = buscarArchivos(rutaLocalDirectorio);
-
-
-	return ((archivos[i] == NULL) && (!esDirectorioPadre(ruta)));
+	condicion = (archivos[i] == NULL) && (!esDirectorioPadre(ruta));
+	liberarPunteroDePunterosAChar(archivos);
+	free(archivos);
 	free(rutaLocalDirectorio);
+	return condicion;
 }
 
 int esDirectorioPadre (char* ruta){
@@ -863,8 +951,12 @@ int esDirectorioRaiz (char*ruta){
 	int tamanioRuta = contarPunteroDePunteros(palabras);
 
 	if (tamanioRuta == 1){
+		liberarPunteroDePunterosAChar(palabras);
+		free(palabras);
 		return 1;
 
 	}
+	liberarPunteroDePunterosAChar(palabras);
+		free(palabras);
 	return 0;
 }
