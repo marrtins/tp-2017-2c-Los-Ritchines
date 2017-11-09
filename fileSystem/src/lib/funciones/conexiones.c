@@ -110,6 +110,7 @@ void conexionesDatanode(void * estructura){
 								}
 								else {
 									puts("Un nodo ya conectado, se esta volviendo a conectar");
+									clearAndClose(fileDescriptor, &masterFD);
 									log_error(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
 								liberarTPackInfoBloqueDN(infoNodo);
