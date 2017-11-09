@@ -87,14 +87,14 @@ void hiloWorkerTransformacion(void *info){
 	if(finCorrecto){
 		puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
 		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALOK;
+		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONOK;
 		enviarHeaderYValor(headASerializar,idTarea,sockYama);
 
 
 	}else{
 		puts("termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONLOCALFAIL;
+		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONFAIL;
 		enviarHeaderYValor(headASerializar,idTarea,sockYama);
 
 	}

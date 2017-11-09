@@ -43,7 +43,10 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial);
 char *serializeInfoAlmacenadoFinalMasterWorker(Theader head, TinfoAlmacenadoMasterWorker * infoAlmacenado, int *pack_size);
 TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_serial);
 
-Tbuffer * serializarInfoArchivoYamaFS(Theader *head,TinfoArchivoFSYama *infoArchivo);
+char * serializarInfoArchivoYamaFS(Theader head,TinfoArchivoFSYama *infoArchivo,int *pack_size);
 TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer);
+
+char * serializarInfoNodosYamaFS(Theader head,TinfoNodosFSYama *infoNodos,int *pack_size);
+TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer);
 
 #endif

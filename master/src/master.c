@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
 	Theader headTmp;
-
+//	int myId;
 	t_list *bloquesTransformacion = list_create();
 
 	metricasJob = malloc(sizeof(Tmetricas));
@@ -73,32 +73,42 @@ int main(int argc, char* argv[]) {
 
 	puts("Enviamos a YAMA las rutas a reducir y almacenar");
 
+
+
+	headTmp.tipo_de_proceso = MASTER;
+	headTmp.tipo_de_mensaje = PATH_RES_FILE ;
+	packSize = 0;
+	buffer=serializeBytes(headTmp,rutaResultado,(strlen(rutaResultado)+1),&packSize);
+	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
+		puts("no se pudo enviar Path del aresultado a YAMA. ");
+		return  FALLO_SEND;
+	}
+	puts("#envio1");
+	//recibo id.
+	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
+	/*stat=recv(sockYama, &headRcv, HEAD_SIZE, 0);
+
+	if(headRcv.tipo_de_proceso==YAMA && head->tipo_de_mensaje==NUEVOID){
+		myId = recibirValor(sockYama);
+		printf("Recibi mi id : %d\n",myId);
+	}*/
+
 	headTmp.tipo_de_proceso = MASTER;
 	headTmp.tipo_de_mensaje = PATH_FILE_TOREDUCE ;
 	packSize = 0;
 	buffer=serializeBytes(headTmp,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
-	//puts("Path del archivo a reducir serializado; lo enviamos");
-
 	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
 		return  FALLO_SEND;
 	}
 
-	//printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
 
 
-	headTmp.tipo_de_proceso = MASTER; headTmp.tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
-	buffer=serializeBytes(headTmp,rutaResultado,(strlen(rutaResultado)+1),&packSize);
-	//puts("Path del resultado serializado; lo enviamos");
+
+	puts("#envio2");
 
 
-	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
-		puts("no se pudo enviar Path del aresultado a YAMA. ");
-		return  FALLO_SEND;
-	}
-	//printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
 
-	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
 
 

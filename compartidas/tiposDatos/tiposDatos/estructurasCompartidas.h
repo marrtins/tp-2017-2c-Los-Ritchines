@@ -36,8 +36,8 @@ typedef enum {
 	TRANSFORMADORLEN=19,
 	ALMACENAR_BLOQUE=20,
 	NUEVATRANSFORMACION=21,
-	FINTRANSFORMACIONLOCALOK=22,
-	FINTRANSFORMACIONLOCALFAIL=23,
+	FINTRANSFORMACIONOK=22,
+	FINTRANSFORMACIONFAIL=23,
 	INFOBLOQUEREPLANIFICADO=24,
 	FINJOB_ERRORREPLANIFICACION=25,
 	INFOREDUCCIONLOCAL=26,
@@ -67,6 +67,7 @@ typedef enum {
 	ELIMINAR_BLOQUE=50,
 	ARCH_NO_VALIDO=51,
 	ALMACENAR_ARCHIVO=52,
+	NUEVOID=53
 
 } Tmensaje;
 
@@ -124,13 +125,18 @@ typedef struct {
 	int nombreNodoC2Len;
 	char *nombreNodoC2;
 	int bloqueC2;
-	unsigned long long finBloque;
+	int finBloque;
 }TpackageUbicacionBloques;
 
 typedef struct{
 	int listaSize;
 	t_list * listaBloques;
 }TinfoArchivoFSYama;
+
+typedef struct{
+	int listaSize;
+	t_list * listaNodos;
+}TinfoNodosFSYama;
 
 typedef struct {
 	int tamanioNombre;

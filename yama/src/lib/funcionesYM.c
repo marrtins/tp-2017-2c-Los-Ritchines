@@ -2,7 +2,7 @@
 #include "funcionesYM.h"
 
 extern int retardoPlanificacion;
-
+extern t_list * listaJobsMaster;
 
 
 
@@ -60,11 +60,12 @@ char * getAlgoritmoBalanceo(int algoritmo){
 	return ret;
 }
 
-void conectarAFS(Tyama *yama){
-	int estado;
+
+int conectarAFS(Tyama *yama){
+
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
-
+	int socketFS;
 	head->tipo_de_proceso=YAMA;
 	head->tipo_de_mensaje=INICIO_YAMA;
 
@@ -76,13 +77,15 @@ void conectarAFS(Tyama *yama){
 	}
 
 
-	// No permitimos continuar la ejecucion hasta lograr un handshake con FS
+	/*// No permitimos continuar la ejecucion hasta lograr un handshake con FS
 	if ((estado = send(socketFS, head, sizeof(Theader), 0)) == -1){
 		sprintf(mensaje, "Fallo send() al socket: %d\n", socketFS);
 		logAndExit(mensaje);
 	}
 
 	printf("Se enviaron: %d bytes a FS del handshake \n", estado);
+*/
+	return socketFS;
 }
 
 
@@ -159,6 +162,55 @@ TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
 	free(puertoNodo);
 
 	return infoBloque;
+}
+
+char * recibirPathArchivo(int sockMaster){
+	char * buffer;
+	TpackBytes *pathArchivo;
+	Theader head;
+	int stat;
+	//stat = recv(sockMaster, &head, sizeof(Theader), 0);
+
+
+	puts("Nos llega el path del archivo");
+
+	if ((buffer = recvGeneric(sockMaster)) == NULL){
+		puts("Fallo recepcion de PATH_FILE_TOREDUCE");
+		return NULL;
+	}
+
+	if ((pathArchivo = (TpackBytes *) deserializeBytes(buffer)) == NULL){
+		puts("Fallo deserializacion de Bytes del path arch a reducir");
+		return NULL;
+	}
+
+	printf("Path archivo: %s\n",pathArchivo->bytes);
+
+	return pathArchivo->bytes;
+}
+
+TjobMaster * getJobPorMasterID(int masterId){
+	int i;
+	for(i=0;i<list_size(listaJobsMaster);i++){
+		TjobMaster *ret = list_get(listaJobsMaster,i);
+		if(ret->masterId==masterId){
+			return ret;
+		}
+	}
+
+	return NULL;
+}
+
+TjobMaster * getJobPorNroJob(int nroJob){
+	int i;
+	for(i=0;i<list_size(listaJobsMaster);i++){
+		TjobMaster *ret = list_get(listaJobsMaster,i);
+		if(ret->nroJob==nroJob){
+			return ret;
+		}
+	}
+
+	return NULL;
 }
 
 

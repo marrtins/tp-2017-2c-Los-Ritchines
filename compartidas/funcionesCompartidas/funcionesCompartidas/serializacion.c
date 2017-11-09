@@ -261,6 +261,11 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 
 Tbuffer * empaquetarInfoNodo(TpackInfoBloqueDN * infoBloque){
 
+
+
+
+
+
 		Tbuffer *buffer = malloc(sizeof(Tbuffer));
 		int espacioEnteros = sizeof(int) * 4;
 		int espaciosVariables = infoBloque->tamanioIp + infoBloque->tamanioPuerto + infoBloque->tamanioNombre;
@@ -1269,55 +1274,67 @@ TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_s
 		return infoAlmacenado;
 }
 
-Tbuffer * serializarInfoArchivoYamaFS(Theader *head,TinfoArchivoFSYama *infoArchivo){
+char * serializarInfoArchivoYamaFS(Theader head,TinfoArchivoFSYama *infoArchivo,int *pack_size){
 
-	Tbuffer * buffer=malloc(sizeof(Tbuffer));
 
-	int espacioMalloc=HEAD_SIZE + sizeof(int)*2;
+		char *bytes_serial;
 
-	int i;
-	for(i=0;i<infoArchivo->listaSize;i++){
-		TpackageUbicacionBloques *aux = list_get((infoArchivo->listaBloques),i);
+		int espacioMalloc=HEAD_SIZE + sizeof(int)*2;
 
-		espacioMalloc+=aux->nombreNodoC1Len;
-		espacioMalloc+=aux->nombreNodoC2Len;
-		espacioMalloc+=5*sizeof(int);
-		espacioMalloc+=sizeof(unsigned long long);
-	}
+		int i;
+		for(i=0;i<infoArchivo->listaSize;i++){
+			TpackageUbicacionBloques *aux = list_get((infoArchivo->listaBloques),i);
 
-	buffer->tamanio = espacioMalloc;
+			espacioMalloc+=aux->nombreNodoC1Len;
+			espacioMalloc+=aux->nombreNodoC2Len;
+			espacioMalloc+=6*sizeof(int);
 
-	buffer->buffer = malloc(espacioMalloc);
+		}
 
-	char * p = buffer->buffer;
-	memcpy(p, head, sizeof(*head));
-	p += sizeof(*head);
-	memcpy(p, &espacioMalloc, sizeof(int));
-	p += sizeof(int);
-	memcpy(p, &infoArchivo->listaSize, sizeof(int));
-	p += sizeof(int);
+
+		if ((bytes_serial = malloc(espacioMalloc)) == NULL){
+			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+			return NULL;
+		}
+
+
+		*pack_size = 0;
+		memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+		*pack_size += HEAD_SIZE;
+
+		// hacemos lugar para el payload_size
+		*pack_size += sizeof(int);
+
+		memcpy(bytes_serial + *pack_size, &infoArchivo->listaSize, sizeof(int));
+		*pack_size += sizeof(int);
+
 	for(i=0;i<infoArchivo->listaSize;i++){
 		TpackageUbicacionBloques *aux = list_get(infoArchivo->listaBloques,i);
-		memcpy(p, &aux->bloque, sizeof(int));
-		p += sizeof(int);
-		memcpy(p, &aux->nombreNodoC1Len, sizeof(int));
-		p += sizeof(int);
-		memcpy(p, aux->nombreNodoC1, aux->nombreNodoC1Len);
-		p += aux->nombreNodoC1Len;
-		memcpy(p, &aux->nombreNodoC2Len, sizeof(int));
-		p += sizeof(int);
-		memcpy(p, &aux->bloqueC1, sizeof(int));
-				p += sizeof(int);
-		memcpy(p, aux->nombreNodoC2, aux->nombreNodoC2Len);
-		p += aux->nombreNodoC2Len;
-		memcpy(p, &aux->bloqueC2, sizeof(int));
-		p += sizeof(int);
-		memcpy(p, &aux->finBloque, sizeof(int));
-		p += sizeof(int);
+		memcpy(bytes_serial + *pack_size, &aux->bloque, sizeof(int));
+		*pack_size += sizeof(int);
+
+		memcpy(bytes_serial + *pack_size, &aux->nombreNodoC1Len, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, aux->nombreNodoC1, aux->nombreNodoC1Len);
+		*pack_size += aux->nombreNodoC1Len;
+		memcpy(bytes_serial + *pack_size, &aux->bloqueC1, sizeof(int));
+		*pack_size += sizeof(int);
+
+		memcpy(bytes_serial + *pack_size, &aux->nombreNodoC2Len, sizeof(int));
+		*pack_size += sizeof(int);
+		memcpy(bytes_serial + *pack_size, aux->nombreNodoC2, aux->nombreNodoC2Len);
+		*pack_size += aux->nombreNodoC2Len;
+		memcpy(bytes_serial + *pack_size, &aux->bloqueC2, sizeof(int));
+		*pack_size += sizeof(int);
+
+		memcpy(bytes_serial + *pack_size, &aux->finBloque, sizeof(int));
+		*pack_size += sizeof(int);
 
 	}
 
-return buffer;
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+return bytes_serial;
 
 }
 
@@ -1380,4 +1397,128 @@ TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer){
 	return infoArchivo;
 }
 
+char * serializarInfoNodosYamaFS(Theader head,TinfoNodosFSYama *infoNodos,int *pack_size){
 
+	char *bytes_serial;
+
+	int espacioMalloc=HEAD_SIZE + sizeof(int)*2;
+
+	int i;
+	for(i=0;i<infoNodos->listaSize;i++){
+		TpackageInfoNodo *aux = list_get((infoNodos->listaNodos),i);
+		espacioMalloc+=aux->tamanioIp;
+		espacioMalloc+=aux->tamanioNombre;
+		espacioMalloc+=aux->tamanioPuerto;
+		espacioMalloc+=3*sizeof(int);
+	}
+
+
+	if ((bytes_serial = malloc(espacioMalloc)) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+
+	*pack_size = 0;
+	memcpy(bytes_serial + *pack_size, &head, HEAD_SIZE);
+	*pack_size += HEAD_SIZE;
+
+	// hacemos lugar para el payload_size
+	*pack_size += sizeof(int);
+
+	memcpy(bytes_serial + *pack_size, &infoNodos->listaSize, sizeof(int));
+	*pack_size += sizeof(int);
+
+
+	for(i=0;i<infoNodos->listaSize;i++){
+			TpackageInfoNodo *aux = list_get(infoNodos->listaNodos,i);
+
+			memcpy(bytes_serial + *pack_size, &aux->tamanioNombre, sizeof(int));
+			*pack_size += sizeof(int);
+			memcpy(bytes_serial + *pack_size, aux->nombreNodo, aux->tamanioNombre);
+			*pack_size += aux->tamanioNombre;
+
+			memcpy(bytes_serial + *pack_size, &aux->tamanioIp, sizeof(int));
+			*pack_size += sizeof(int);
+			memcpy(bytes_serial + *pack_size, aux->ipNodo, aux->tamanioIp);
+			*pack_size += aux->tamanioIp;
+
+
+			memcpy(bytes_serial + *pack_size, &aux->tamanioPuerto, sizeof(int));
+			*pack_size += sizeof(int);
+			memcpy(bytes_serial + *pack_size, aux->puertoWorker, aux->tamanioPuerto);
+			*pack_size += aux->tamanioPuerto;
+
+		}
+
+	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
+
+
+
+	return bytes_serial;
+
+
+}
+
+TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer){
+
+
+	int off;
+	TinfoNodosFSYama *infoNodos;
+
+	if ((infoNodos = malloc(sizeof (TinfoArchivoFSYama))) == NULL){
+		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		return NULL;
+	}
+
+	off = 0;
+
+	memcpy(&infoNodos->listaSize, buffer + off, sizeof (int));
+	off += sizeof (int);
+
+	infoNodos->listaNodos=list_create();
+
+	int i;
+	t_list *listaInfoNodos = list_create();
+	for(i=0;i<infoNodos->listaSize;i++){
+
+		TpackageInfoNodo *nodoAux = malloc(sizeof (TpackageInfoNodo));
+
+		memcpy(&nodoAux->tamanioNombre, buffer + off, sizeof (int));
+		off += sizeof (int);
+		if ((nodoAux->nombreNodo = malloc(nodoAux->tamanioNombre)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioNombre);
+			return NULL;
+		}
+		memcpy(nodoAux->nombreNodo, buffer + off, nodoAux->tamanioNombre);
+		off += nodoAux->tamanioNombre;
+
+		memcpy(&nodoAux->tamanioIp, buffer + off, sizeof (int));
+		off += sizeof (int);
+		if ((nodoAux->ipNodo = malloc(nodoAux->tamanioIp)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioIp);
+			return NULL;
+		}
+		memcpy(nodoAux->ipNodo, buffer + off, nodoAux->tamanioIp);
+		off += nodoAux->tamanioIp;
+
+
+		memcpy(&nodoAux->tamanioPuerto, buffer + off, sizeof (int));
+		off += sizeof (int);
+		if ((nodoAux->puertoWorker = malloc(nodoAux->tamanioPuerto)) == NULL){
+			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioPuerto);
+			return NULL;
+		}
+		memcpy(nodoAux->puertoWorker, buffer + off, nodoAux->tamanioPuerto);
+		off += nodoAux->tamanioPuerto;
+		list_add(listaInfoNodos,nodoAux);
+
+	}
+	infoNodos->listaNodos=listaInfoNodos;
+
+	return infoNodos;
+
+
+
+
+}

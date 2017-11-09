@@ -182,5 +182,6 @@ void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal);
 char * recvRutaArchivo(int socket);
 TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo);
 void enviarInfoNodoAYama(int socketYama);
+void generarListaInfoNodos(t_list *nodos);
 
 #endif

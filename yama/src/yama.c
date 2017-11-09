@@ -1,18 +1,12 @@
 #include "lib/funcionesYM.h"
 
-int idMasterGlobal,idJobGlobal,idTareaGlobal,retardoPlanificacion;
+int idMasterGlobal,idJobGlobal,idTareaGlobal,retardoPlanificacion,idTempName;
 float retardoPlanificacionSegs;
-t_list *listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
+t_list *listaJobsMaster,*listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 pthread_mutex_t mux_listaJobFinalizados,mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 Tyama *yama;
 int main(int argc, char* argv[]){
-	int estado,
-		socketMasters,
-		sockMaster,
-		tamanioCliente;
-
-
-
+	int estado;
 	signal(SIGUSR1, (void*)sigusr1Handler);
 
 	//pthread_t master_thread;
@@ -22,15 +16,15 @@ int main(int argc, char* argv[]){
 	pthread_attr_setdetachstate(&attr_ondemand, PTHREAD_CREATE_DETACHED);
 
 
-	struct sockaddr client;
-	Theader head;
+
+	//Theader head;
 
 //	TpackageRutas * estructuraDeRutas = malloc(sizeof(TpackageRutas));
 
 	listaHistoricaTareas=list_create();
 	listaCargaGlobal = list_create();
 	listaJobFinalizados= list_create();
-
+	listaJobsMaster=list_create();
 	listaEstadoEnProceso=list_create();
 	listaEstadoError = list_create();
 	listaEstadoFinalizadoOK=list_create();
@@ -45,6 +39,7 @@ int main(int argc, char* argv[]){
 	pthread_mutex_init(&mux_idTareaGlobal,   NULL);
 	pthread_mutex_init(&mux_listaJobFinalizados,   NULL);
 
+	idTempName=0;
 
 	if(argc!=1){
 		printf("Error en la cantidad de parametros\n");
@@ -55,52 +50,148 @@ int main(int argc, char* argv[]){
 	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/yama.log", "yama.log", true, LOG_LEVEL_INFO);
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
-	tamanioCliente = sizeof(client);
+
+
+
+	Theader * head = malloc(sizeof(Theader));
+
+	fd_set readFD, masterFD;
+	int socketDeEscuchaMaster,
+	fileDescriptorMax = -1,
+	cantModificados = 0,
+	nuevoFileDescriptor,
+	fileDescriptor;
+
+	FD_ZERO(&masterFD);
+	FD_ZERO(&readFD);
 
 	//yama cliente
-	conectarAFS(yama);
 
-	//yama como servidor
-	socketMasters = crearSocketDeEscucha(yama->puerto_entrada);
+	int sockFS=conectarAFS(yama);
+	//int sockFS=4;
+	//fileDescriptorMax = MAXIMO(sockFS, fileDescriptorMax);
+	//FD_SET(sockFS, &masterFD);
 
-	if ((estado = listen(socketMasters , BACKLOG)) == -1){
-		logAndExit("No se pudo hacer el listen al socket.");
+
+
+
+	socketDeEscuchaMaster = crearSocketDeEscucha(yama->puerto_entrada);
+
+	fileDescriptorMax = MAXIMO(socketDeEscuchaMaster, fileDescriptorMax);
+	puts("antes de entrar al while");
+
+	while (listen(socketDeEscuchaMaster, BACKLOG) == -1){
+		log_trace(logger, "Fallo al escuchar el socket servidor de file system.");
+		puts("Reintentamos...");
 	}
-	//acepta y escucha comunicaciones
 
-	puts("Esperando comunicaciones entrantes...");
 
-	while((sockMaster = accept(socketMasters, &client, (socklen_t*) &tamanioCliente)) != -1){
+	FD_SET(socketDeEscuchaMaster, &masterFD);
+	printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 
-		puts("Conexion aceptada");
+	while(1){
 
-		if (recv(sockMaster, &head, sizeof(Theader), 0) < 0){
-			logAndExit("Error en la recepcion del header de master.");
+		readFD = masterFD;
+
+		if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
+			logAndExit("Fallo el select.");
 		}
 
-		switch(head.tipo_de_proceso){
+		for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
 
-		case MASTER:
-			puts("Se conecto master, creamos hilo manejador");
+			if(FD_ISSET(fileDescriptor, &readFD)){
+				printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
+
+				if(fileDescriptor == socketDeEscuchaMaster){
+					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
+					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
+					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
+					break;
+				}
+				puts("Recibiendo...");
 
 
-			pthread_t masterthread;
-			TatributosHiloMaster * attrHilo = malloc(sizeof (TatributosHiloMaster));
-			attrHilo->fdMaster=sockMaster;
-			if( pthread_create(&masterthread, &attr_ondemand, (void*) masterHandler, (void*) attrHilo) < 0){
-				//log_error(logTrace,"no pudo creasr hilo");
-				perror("no pudo crear hilo. error");
-				return FALLO_GRAL;
+				if ((estado = recv(fileDescriptor, head, HEAD_SIZE, 0)) == -1){
+					perror("Error en recv() de algun socket. error");
+					break;
+
+				} else if (estado == 0){
+					printf("Se desconecto el socket %d\nLo sacamos del set listen...\n", fileDescriptor);
+					clearAndClose(fileDescriptor, &masterFD);
+					break;
+				}
+
+				if(head->tipo_de_proceso==MASTER){
+					switch(head->tipo_de_mensaje){
+					case INICIOMASTER:
+						puts("se conecto master");
+						break;
+
+					case PATH_RES_FILE:
+
+						iniciarNuevoJob(fileDescriptor,sockFS);
+						break;
+					case FINTRANSFORMACIONOK:
+						manejarFinTransformacionOK(fileDescriptor);
+						break;
+
+					case FINTRANSFORMACIONFAIL:
+						manejarFinTransformacionFail(fileDescriptor);
+						break;
+
+					case FIN_REDUCCIONLOCALOK:
+						manejarFinReduccionLocalOK(fileDescriptor);
+						break;
+
+					case FIN_REDUCCIONLOCALFAIL:
+						manejarFinReduccionLocalFail(fileDescriptor);
+						break;
+
+					case FIN_REDUCCIONGLOBALOK:
+						manejarFinReduccionGlobalOK(fileDescriptor);
+						break;
+
+					case FIN_REDUCCIONGLOBALFAIL:
+						manejarFinReduccionGlobalFail(fileDescriptor);
+						break;
+					case FIN_ALMACENAMIENTOFINALOK:
+						manejarFinAlmacenamientoOK(fileDescriptor);
+						break;
+					case FIN_ALMACENAMIENTOFINALFAIL:
+						manejarFinAlmacenamientoFail(fileDescriptor);
+						break;
+
+					default:
+						puts("Tipo de Mensaje no encontrado en el protocolo");
+						log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
+						break;
+					}
+
+
+					break;
+
+				}
+				else if(head->tipo_de_proceso == FILESYSTEM){
+					switch(head->tipo_de_mensaje){
+					//no tendria q entrar aca x ahora..
+					default:
+						log_trace(logger, "Tipo de mensaje no encontrado en el protocolo.");
+						puts("Tipo de mensaje no encontrado en el protocolo.");
+						break;
+					}
+				}
+				else{
+					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
+					puts("Hacker detected");
+					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
+					clearAndClose(fileDescriptor, &masterFD);
+				}
+
 			}
 
 
 
-			break;
-		default:
-			puts("Trato de conectarse algo no manejado!");
-			printf("El tipo de proceso y mensaje son: %d y %d\n", head.tipo_de_proceso, head.tipo_de_mensaje);
-			printf("Se recibio esto del socket: %d\n", sockMaster);
-			return CONEX_INVAL;
 
 		}
 
@@ -108,16 +199,9 @@ int main(int argc, char* argv[]){
 
 	}
 
-
-
-
-	log_trace(logger, "Fallo el accept de master.");
-
-	//liberarConfiguracionYama();
-	return 0;
+//todo liberar listast etc
+return 0;
 }
-
-
 
 void sigusr1Handler(void){
 
@@ -151,4 +235,16 @@ void sigusr1Handler(void){
 void setRetardoPlanificacion(){
 	retardoPlanificacionSegs = retardoPlanificacion / 1000.0;
 	printf("Se cambio el retardo de planificacion a %f segundos\n", retardoPlanificacionSegs);
+}
+
+
+int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){
+		int nuevoFileDescriptor = aceptarCliente(fileDescriptor);
+		FD_SET(nuevoFileDescriptor, bolsaDeFileDescriptors);
+		return nuevoFileDescriptor;
+}
+
+void clearAndClose(int fileDescriptor, fd_set* masterFD){
+	FD_CLR(fileDescriptor, masterFD);
+	close(fileDescriptor);
 }

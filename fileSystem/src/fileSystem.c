@@ -113,12 +113,15 @@ int main(int argc, char* argv[]) {
 					head->tipo_de_proceso=FILESYSTEM;
 
 					puts("voy a serializar la info del archivo");
-
-					buffer=serializarInfoArchivoYamaFS(head,infoSend);
+					int packSize;
+					Theader head2;
+					head2.tipo_de_proceso=FILESYSTEM;
+					head2.tipo_de_mensaje=INFO_ARCHIVO;
+					char * buffer2=serializarInfoArchivoYamaFS(head2,infoSend,&packSize);
 
 					puts("serialice la info del archivo");
 
-					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
 						logAndExit("Fallo al enviar la informacion de un archivo");
 					}
 					free(ruta);
