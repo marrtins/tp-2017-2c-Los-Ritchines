@@ -66,7 +66,7 @@ void conexionesDatanode(void * estructura){
 							nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
 							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							borrarNodoPorFD(fileDescriptor);
-							eliminarNodoDeTablaDeNodos(nodoEncontrado);
+							bajaDeNodoEnTablaDeNodos(nodoEncontrado);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
@@ -88,6 +88,7 @@ void conexionesDatanode(void * estructura){
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
 										almacenarBitmap(nuevoNodo);
+										agregarNodoATablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nuevoNodo);
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -98,9 +99,10 @@ void conexionesDatanode(void * estructura){
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
 										log_trace(logger, "Nodo que se habia caído, se reconecto");
+										altaDeNodoEnTablaDeNodos(nuevoNodo);
 									}
 									puts("voy a agregar a tabla de nodos");
-									agregarNodoATablaDeNodos(nuevoNodo);
+
 									liberarTPackInfoBloqueDN(infoNodo);
 									puts("agregue a tabla de nodos");
 								}

@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
-	inicializarTablaDeNodos();
+	inicializarTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	inicializarTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin");
 	levantarTablasDirectorios();
 
 	FD_ZERO(&masterFD);

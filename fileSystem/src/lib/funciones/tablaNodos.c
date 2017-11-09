@@ -1,14 +1,25 @@
 #include "../funcionesFS.h"
 
-void inicializarTablaDeNodos(){
-	FILE * archivo = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", "wb");
+void inicializarTablaDeNodos(char * ruta){
+	FILE * archivo = fopen(ruta, "wb");
 	fclose(archivo);
-	t_config * archivoNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+	t_config * archivoNodos = config_create(ruta);
 	config_set_value(archivoNodos, "TAMANIO", "0");
 	config_set_value(archivoNodos, "LIBRE","0");
 	config_set_value(archivoNodos, "NODOS", "[]");
 	config_save(archivoNodos);
 	config_destroy(archivoNodos);
+}
+
+void bajaDeNodoEnTablaDeNodos(Tnodo * nodo){
+	eliminarNodoDeTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodo);
+	agregarNodoATablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin", nodo);
+}
+
+void altaDeNodoEnTablaDeNodos(Tnodo * nodo){
+	agregarNodoATablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodo);
+	eliminarNodoDeTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin", nodo);
+
 }
 
 char * generarStringNodoNLibre(char * nombre){
@@ -52,8 +63,8 @@ void inicializarListaDeNodosAConectar(t_list * desconectados){
 	mostrarListaDeNodos(desconectados);
 }
 
-void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
-	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+void agregarNodoATablaDeNodos(char * ruta, Tnodo * nuevoNodo){
+	t_config * tablaDeNodos = config_create(ruta);
 
 	//TAMANIO
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "TAMANIO", nuevoNodo->cantidadBloquesTotal, sumaDeDosNumerosInt);
@@ -85,8 +96,8 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 	free(bloquesTotalString);
 }
 
-void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
-	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+void eliminarNodoDeTablaDeNodos(char * ruta, Tnodo * nuevoNodo){
+	t_config * tablaDeNodos = config_create(ruta);
 
 	//NODONTOTAL
 	char * nodoTotalAString = string_new();

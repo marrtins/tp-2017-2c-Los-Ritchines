@@ -132,14 +132,12 @@ void crearRoot(){
 }
 
 void inicializarTablaDirectorios(){
-	char * ruta = malloc(100);
+	char * ruta = malloc(120);
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
-
 	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	vaciarLista();
 	fprintf(archivoDirectorios, "%d %s %d", 0, "root", -1);
-
-	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/",0777);
+	mkdir(ruta,0777);
 	fclose(archivoDirectorios);
 	removerDirectorios(ruta);
 	crearRoot();
@@ -168,6 +166,8 @@ void formatearTablaDeNodos(){
 	config_set_value(archivo,"LIBRE",tamanio);
 	config_save(archivo);
 	config_destroy(archivo);
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
 	free(tamanio);
 }
 
@@ -599,7 +599,7 @@ void removerDirectorios(char *ruta){
 		free(directorios);
 	}else {
 
-	free(directorios);
+		free(directorios);
 	}
 
 }

@@ -198,6 +198,6 @@ Tdirectorio* buscarPorNombreDeDirectorio(char * directorio){
 
 void vaciarLista(){
 	if(!list_is_empty(listaTablaDirectorios)){
-	list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
+		list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
 	}
 }
