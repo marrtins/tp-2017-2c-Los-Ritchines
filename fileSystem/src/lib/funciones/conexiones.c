@@ -1,19 +1,26 @@
 #include "../funcionesFS.h"
 
 void conexionesDatanode(void * estructura){
-	TfileSystem * fileSystem = (TfileSystem *) estructura;
-	fd_set readFD, masterFD;
-	int socketDeEscuchaDatanodes,
-		fileDescriptorMax = -1,
-		cantModificados = 0,
-		nuevoFileDescriptor,
-		fileDescriptor,
-		cantNodosPorConectar = fileSystem->cant_nodos,
-		estado;
-	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
+	char * rutaLocalArchivoFinal;
+	char * extensionArchivoFinal;
+	char * archivoFinalMapeado;
+	int socketDeEscuchaDatanodes;
+	int fileDescriptorMax = -1;
+	int cantModificados = 0;
+	int	nuevoFileDescriptor;
+	int fileDescriptor;
+	int	cantNodosPorConectar;
+	int	estado;
+	int fileDescriptorArchivoFinal;
+	fd_set readFD, masterFD;
+	FILE * archivoFinal;
 	Tnodo * nuevoNodo;
 	Tnodo * nodoEncontrado;
+	TfileSystem * fileSystem = (TfileSystem *) estructura;
+	Theader * head = malloc(sizeof(Theader));
+	TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
+	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -66,7 +73,6 @@ void conexionesDatanode(void * estructura){
 							nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
 							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							borrarNodoPorFD(fileDescriptor);
-							bajaDeNodoEnTablaDeNodos(nodoEncontrado);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
 							log_trace(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
@@ -76,9 +82,8 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
-
-								if((Tnodo*)buscarNodoPorFD(listaDeNodos, fileDescriptor) == NULL){
-									infoNodo = recvInfoNodo(fileDescriptor);
+								infoNodo = recvInfoNodo(fileDescriptor);
+								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
 									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
 										//nodo nuevo;
 										puts("voy a inicializar nodo");
@@ -88,7 +93,7 @@ void conexionesDatanode(void * estructura){
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
 										almacenarBitmap(nuevoNodo);
-										agregarNodoATablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nuevoNodo);
+										agregarNodoATablaDeNodos(nuevoNodo);
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -99,17 +104,15 @@ void conexionesDatanode(void * estructura){
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
 										log_trace(logger, "Nodo que se habia caído, se reconecto");
-										altaDeNodoEnTablaDeNodos(nuevoNodo);
 									}
 									puts("voy a agregar a tabla de nodos");
-
-									liberarTPackInfoBloqueDN(infoNodo);
 									puts("agregue a tabla de nodos");
 								}
 								else {
 									puts("Un nodo ya conectado, se esta volviendo a conectar");
 									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
+								liberarTPackInfoBloqueDN(infoNodo);
 								break;
 
 							case OBTENER_BLOQUE_Y_NRO:
@@ -163,20 +166,14 @@ void conexionesDatanode(void * estructura){
 				}
 				else if(head->tipo_de_proceso == WORKER){
 						switch(head->tipo_de_mensaje){
-							TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
-							char * rutaLocal;
-							FILE * archivoFinal;
-							char * extension;
-							char * archivoFinalMapeado;
-							int fileDescriptorArchivoFinal;
 							case ALMACENAR_ARCHIVO:
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
-								rutaLocal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
-								extension = obtenerExtensionDeArchivoDeUnaRuta(rutaLocal);
-								if(!strcmp(extension, "csv")){
-									archivoFinal = fopen(rutaLocal, "w");
+								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
+								extensionArchivoFinal = obtenerExtensionDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
+								if(!strcmp(extensionArchivoFinal, "csv")){
+									archivoFinal = fopen(rutaLocalArchivoFinal, "w");
 								}else{
-									archivoFinal = fopen(rutaLocal, "wb");
+									archivoFinal = fopen(rutaLocalArchivoFinal, "wb");
 								}
 
 								fileDescriptorArchivoFinal = fileno(archivoFinal);
@@ -193,8 +190,8 @@ void conexionesDatanode(void * estructura){
 									logAndExit("Sucedio lo imposible, fallo el msync");
 								}
 								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
-								free(rutaLocal);
-								free(extension);
+								free(rutaLocalArchivoFinal);
+								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
 								break;
 							default:

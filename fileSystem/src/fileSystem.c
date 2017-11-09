@@ -43,14 +43,13 @@ int main(int argc, char* argv[]) {
 		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
 	}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/FileSystem.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/FileSystem.log", "FileSystem", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
-	inicializarTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-	inicializarTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin");
+	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
 
 	FD_ZERO(&masterFD);
@@ -59,7 +58,7 @@ int main(int argc, char* argv[]) {
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
-		log_trace(logger,"Fallo al escuchar el socket servidor de file system.");
+		log_error(logger,"Fallo al escuchar el socket servidor de file system.");
 		puts("Reintentamos...");
 	}
 		socketYama = aceptarCliente(socketDeEscuchaYama);
@@ -72,12 +71,12 @@ int main(int argc, char* argv[]) {
 		estado = recv(socketYama, head, sizeof(Theader), 0);
 
 		if(estado == -1){
-			log_trace(logger, "Error al recibir información de un cliente.");
+			log_error(logger, "Error al recibir información de un cliente.");
 			break;
 		}
 		else if( estado == 0){
 			sprintf(mensaje, "Se desconecto YAMA fd: %d.", socketYama);
-			log_trace(logger, mensaje);
+			log_error(logger, mensaje);
 			break;
 		}
 		if(head->tipo_de_proceso == YAMA){

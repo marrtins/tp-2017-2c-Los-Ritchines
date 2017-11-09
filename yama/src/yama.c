@@ -51,8 +51,8 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/yama.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/yama.log", "yama.log", true, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log", "yama.log", true, LOG_LEVEL_ERROR);
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 	tamanioCliente = sizeof(client);
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]){
 
 
 
-	log_trace(logger, "Fallo el accept de master.");
+	log_error(logger, "Fallo el accept de master.");
 
 	//liberarConfiguracionYama();
 	return 0;

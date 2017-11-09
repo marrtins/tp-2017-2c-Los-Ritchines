@@ -132,7 +132,7 @@ void crearRoot(){
 }
 
 void inicializarTablaDirectorios(){
-	char * ruta = malloc(120);
+	char * ruta = malloc(150);
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	vaciarLista();
@@ -146,19 +146,19 @@ void inicializarTablaDirectorios(){
 
 void formatearTablaDeNodos(){
 	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-	char * keyTotal;
-	char * keyLibre;
 	char * nodoNTotal;
+	char * nodoNLibre;
+	char * nodoNTotalStringValue;
 	char ** nodos = config_get_array_value(archivo,"NODOS");
 	int i = 0;
 	while(nodos[i]!=NULL){
-		keyTotal = generarStringNodoNTotal(nodos[i]);
-		keyLibre = generarStringNodoNLibre(nodos[i]);
-		nodoNTotal = config_get_string_value(archivo, keyTotal);
-		config_set_value(archivo,keyLibre, nodoNTotal);
-		free(keyTotal);
-		free(keyLibre);
+		nodoNTotal = generarStringNodoNTotal(nodos[i]);
+		nodoNLibre = generarStringNodoNLibre(nodos[i]);
+		nodoNTotalStringValue = config_get_string_value(archivo, nodoNTotal);
+		config_set_value(archivo,nodoNLibre, nodoNTotalStringValue);
 		free(nodoNTotal);
+		free(nodoNLibre);
+		free(nodoNTotalStringValue);
 		i++;
 	}
 
