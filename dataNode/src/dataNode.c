@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/dataNode.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/dataNode.log", "dataNode", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log", "dataNode", false, LOG_LEVEL_ERROR);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 

@@ -41,7 +41,7 @@ int main(int argc, char* argv[]){
 	close(fd);
 
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/worker/worker.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/worker.log", "worker.log", true, LOG_LEVEL_ERROR);
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/worker.log", "worker.log", false, LOG_LEVEL_ERROR);
 
 
 	listaTemporalesAsociadosAJob=list_create();
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
 
 	//Listen
 	while ((estado = listen(listenSock , BACKLOG)) < 0){
-		log_trace(logger,"No se pudo escuchar el puerto.");
+		log_error(logger,"No se pudo escuchar el puerto.");
 	}
 
 	//acepta y escucha
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
 	while((client_sock = accept(listenSock, (struct sockaddr*) &client, (socklen_t*) &clientSize)) != -1){
 		//puts("Conexion aceptada");
 		while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
-			log_trace(logger,"Error en la recepcion del header.");
+			log_error(logger,"Error en la recepcion del header.");
 		}
 
 		//printf("Cantidad de bytes recibidos: %d\n", estado);

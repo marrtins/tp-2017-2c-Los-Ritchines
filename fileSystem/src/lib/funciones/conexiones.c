@@ -30,7 +30,7 @@ void conexionesDatanode(void * estructura){
 	puts("antes de entrar al while");
 
 	while (listen(socketDeEscuchaDatanodes, BACKLOG) == -1){
-				log_trace(logger, "Fallo al escuchar el socket servidor de file system.");
+				log_error(logger, "Fallo al escuchar el socket servidor de file system.");
 				puts("Reintentamos...");
 	}
 
@@ -66,7 +66,7 @@ void conexionesDatanode(void * estructura){
 						estado = recv(fileDescriptor, head, sizeof(Theader), 0);
 
 						if(estado == -1){
-							log_trace(logger, "Error al recibir información de un cliente.");
+							log_error(logger, "Error al recibir información de un cliente.");
 							break;
 						}
 						else if( estado == 0){
@@ -74,7 +74,7 @@ void conexionesDatanode(void * estructura){
 							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							borrarNodoPorFD(fileDescriptor);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
-							log_trace(logger, mensaje);
+							log_error(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
 							break;
 						}
@@ -103,14 +103,14 @@ void conexionesDatanode(void * estructura){
 										list_add(listaDeNodos, nuevoNodo);
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
-										log_trace(logger, "Nodo que se habia caído, se reconecto");
+										log_error(logger, "Nodo que se habia caído, se reconecto");
 									}
 									puts("voy a agregar a tabla de nodos");
 									puts("agregue a tabla de nodos");
 								}
 								else {
 									puts("Un nodo ya conectado, se esta volviendo a conectar");
-									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
+									log_error(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
 								liberarTPackInfoBloqueDN(infoNodo);
 								break;
@@ -154,7 +154,7 @@ void conexionesDatanode(void * estructura){
 								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
-								log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
+								log_error(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
 								break;
 					}
 
@@ -195,7 +195,7 @@ void conexionesDatanode(void * estructura){
 								free(estructuraArchivoFinal);
 								break;
 							default:
-								log_trace(logger, "Tipo de mensaje no encontrado en el protocolo.");
+								log_error(logger, "Tipo de mensaje no encontrado en el protocolo.");
 								puts("Tipo de mensaje no encontrado en el protocolo.");
 								break;
 						}
@@ -203,7 +203,7 @@ void conexionesDatanode(void * estructura){
 				else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
-					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
+					log_error(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
 					clearAndClose(fileDescriptor, &masterFD);
 				}
 

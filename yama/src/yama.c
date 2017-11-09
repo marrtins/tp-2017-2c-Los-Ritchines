@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
 	}
 
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log", "yama.log", true, LOG_LEVEL_ERROR);
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log", "yama.log", false, LOG_LEVEL_ERROR);
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 	tamanioCliente = sizeof(client);
