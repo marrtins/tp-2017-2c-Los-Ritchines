@@ -40,10 +40,11 @@ int main(int argc, char* argv[]) {
 		}
 		free(flag);
 	}else {
-		inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
+		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
 	}
 
-	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;

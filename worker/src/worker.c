@@ -40,12 +40,8 @@ int main(int argc, char* argv[]){
 	fclose(archivo);
 	close(fd);
 
-
-
-
-
-
-	logger = log_create("worker.log", "worker.log", true, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/worker.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/worker.log", "worker.log", true, LOG_LEVEL_INFO);
 
 
 	listaTemporalesAsociadosAJob=list_create();

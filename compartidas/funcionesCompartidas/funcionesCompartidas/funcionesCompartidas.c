@@ -5,6 +5,11 @@ void logAndExit(char * mensaje){
 	exit(-1);
 }
 
+void inicializarArchivoDeLogs(char * ruta){
+	FILE * archivo = fopen(ruta, "w");
+	fclose(archivo);
+}
+
 int contarPunteroDePunteros(char ** puntero){
 	char ** aux = puntero;
 	int contador = 0;

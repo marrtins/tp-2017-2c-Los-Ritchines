@@ -74,11 +74,12 @@ void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int
 void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque);
 char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
-void inicializarListaDeNodosAConectar(t_list * desconectados);
+void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados);
 void removerArchivos(char * ruta);
 int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
+void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);

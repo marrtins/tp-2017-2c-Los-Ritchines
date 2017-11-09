@@ -30,19 +30,29 @@ char * generarStringNodoNTotal(char * nombre){
 	return string_from_format("%sTotal", nombre);
 }
 
-void inicializarListaDeNodosAConectar(t_list * desconectados){
-	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
+void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados){
+	FILE * archivoTablaDeNodos = fopen(ruta, "rb");
+	char * mensaje;
+	if(archivoTablaDeNodos == NULL){
+		mensaje = malloc(250);
+		sprintf(mensaje, "No se pudo levantar un estado anterior ya que no existe el archivo de la ruta: %s", ruta);
+		log_trace(logger, mensaje);
+		return;
+	}
+	fclose(archivoTablaDeNodos);
+	t_config * archivo = config_create(ruta);
 	char ** nodos = config_get_array_value(archivo, "NODOS");
 	int i = 0;
 	char * nodoNTotal;
 	char * nodoNLibres;
 	Tnodo * nodo;
-	while(nodos[i] != NULL){
+	while (nodos[i] != NULL) {
 		puts(nodos[i]);
 		nodo = malloc(sizeof(Tnodo));
 		nodo->nombre = strdup(nodos[i]);
 		nodoNLibres = generarStringNodoNLibre(nodos[i]);
-		nodo->cantidadBloquesLibres = config_get_int_value(archivo, nodoNLibres);
+		nodo->cantidadBloquesLibres = config_get_int_value(archivo,
+				nodoNLibres);
 		nodoNTotal = generarStringNodoNTotal(nodos[i]);
 		nodo->cantidadBloquesTotal = config_get_int_value(archivo, nodoNTotal);
 		puts("creando bitmap");
@@ -60,7 +70,14 @@ void inicializarListaDeNodosAConectar(t_list * desconectados){
 	liberarPunteroDePunterosAChar(nodos);
 	free(nodos);
 	config_destroy(archivo);
+	puts("voy a mostrar");
 	mostrarListaDeNodos(desconectados);
+}
+
+void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
+	inicializarListaDeNodosPorConectar("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", desconectados);
+	inicializarListaDeNodosPorConectar("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin", desconectados);
+
 }
 
 void agregarNodoATablaDeNodos(char * ruta, Tnodo * nuevoNodo){
