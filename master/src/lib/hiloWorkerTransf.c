@@ -133,6 +133,11 @@ int conectarseAWorkerParaReplanificarTransformacion(TpackInfoBloque *infoBloque,
 
 int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama){
 
+	time_t hrInicioTransf;
+	time(hrInicioTransf);
+	char *hrInicio = temporal_get_string_time();
+	printf("Hora Inicio Transf  %s\n",hrInicio);
+
 	pthread_attr_t attr_ondemand;
 	pthread_attr_init(&attr_ondemand);
 	pthread_attr_setdetachstate(&attr_ondemand, PTHREAD_CREATE_DETACHED);

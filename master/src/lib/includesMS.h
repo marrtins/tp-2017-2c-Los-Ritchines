@@ -3,6 +3,7 @@
 
 #include <funcionesCompartidas/serializacion.h>
 #include <string.h>
+#include <commons/temporal.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
