@@ -5,6 +5,9 @@
 
 char * rutaTransformador, * rutaReductor, *rutaResultado;
 
+
+Tmetricas *metricasJob;
+
 int main(int argc, char* argv[]) {
 
 	int sockYama,
@@ -18,7 +21,7 @@ int main(int argc, char* argv[]) {
 
 	t_list *bloquesTransformacion = list_create();
 
-
+	metricasJob = malloc(sizeof(Tmetricas));
 	rutaTransformador = string_new();
 	rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -35,7 +38,6 @@ int main(int argc, char* argv[]) {
 
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;
-
 
 	// arg[0]: nombre de la funcion
 	// arg[1]: ruta transformador
@@ -57,8 +59,11 @@ int main(int argc, char* argv[]) {
 	printf("Archivo a reducir Path: %s\n",rutaArchivoAReducir);
 	printf("Resultado Path: %s\n",rutaResultado);
 
+	char buffInicio[100];
 
-
+	time(&metricasJob->horaInicio);
+	strftime (buffInicio, 100, "%Y-%m-%d %H:%M:%S.000", localtime (&metricasJob->horaInicio));
+	printf ("Hora de inicio del job: %s\n", buffInicio);
 
 	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
 
