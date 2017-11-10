@@ -133,8 +133,8 @@ int conectarseAWorkerParaReplanificarTransformacion(TpackInfoBloque *infoBloque,
 
 int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama){
 
-	time_t hrInicioTransf;
-	time(hrInicioTransf);
+	//time_t hrInicioTransf;
+	//time(hrInicioTransf);
 	char *hrInicio = temporal_get_string_time();
 	printf("Hora Inicio Transf  %s\n",hrInicio);
 

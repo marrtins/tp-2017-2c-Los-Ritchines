@@ -77,6 +77,9 @@ void liberarCargaEn(char * nombreNodo,int cantidad);
 int getCargaReduccionGlobal(int job);
 
 
+void mostrarTablaHistorica();
+void mostrarTablaCargas();
+
 char * recibirPathArchivo(int sockMaster);
 int responderTransformacion(TjobMaster *job);
 void iniciarNuevoJob(int sockMaster,int socketFS);

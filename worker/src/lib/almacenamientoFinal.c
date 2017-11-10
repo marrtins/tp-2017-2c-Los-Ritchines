@@ -7,7 +7,7 @@
 
 
 #include "funcionesWK.h"
-
+extern Tworker *worker;
 
 int realizarAlmacenamientoFinal(client_sock){
 
@@ -36,6 +36,11 @@ int realizarAlmacenamientoFinal(client_sock){
 	printf("llego la info apra almacenamientofinal\n");
 	printf("nombre resultante %s\n tempred %s\n",infoAlmacenado->nombreResultante,infoAlmacenado->nombreTempReduccion);
 
+	puts("me conecto a fs");
+	int sockFS=conectarAServidor(worker->ip_filesystem,worker->puerto_filesystem);
+	printf("sock fs:%d\n",sockFS);
+
+
 	archivoFinal = fopen(infoAlmacenado->nombreTempReduccion, "r");
 	tamanioArchivoFinal = tamanioArchivo(archivoFinal);
 	fileDescriptorArchivoFinal = fileno(archivoFinal);
@@ -49,7 +54,7 @@ int realizarAlmacenamientoFinal(client_sock){
 	//yamafs
 	tbuffer = empaquetarArchivoFinal(header, infoAlmacenado->nombreResultante, contenidoArchivoFinal, tamanioArchivoFinal);
 
-	if (send(client_sock, tbuffer->buffer , tbuffer->tamanio, 0) == -1){
+	if (send(sockFS, tbuffer->buffer , tbuffer->tamanio, 0) == -1){
 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	}
 

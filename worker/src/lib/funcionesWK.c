@@ -1,7 +1,7 @@
 #include "funcionesWK.h"
 #include <commons/config.h>
 extern char * archivoMapeado;
-
+extern Tworker *worker;
 int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 
 	char * lineaPermisoEjecucion;
@@ -207,7 +207,21 @@ Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * co
 
 }
 
-char * getBloque(int posicion){
+char * getBloqueWorker(int posicion){
+	//todo: revisar esta funcion
+	FILE * archivo = fopen(worker->ruta_databin, "rb");
+
+	int fd;
+
+	fd = fileno(archivo);
+
+	if ((archivoMapeado = mmap(NULL, worker->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+		logAndExit("Error al hacer mmap");
+	}
+	fclose(archivo);
+	close(fd);
+
+
 	char * bloque= malloc(BLOQUE_SIZE);
 	memcpy(bloque, archivoMapeado + posicion*BLOQUE_SIZE,BLOQUE_SIZE);
 	return bloque;

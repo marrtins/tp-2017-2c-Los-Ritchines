@@ -5,7 +5,7 @@
 
 Tworker *obtenerConfiguracionWorker(char* ruta);
 void mostrarConfiguracion(Tworker *worker);
-
+char * getBloqueWorker(int nroBloque);
 int manejarConexionMaster(Theader *header,int client_sock);
 int manejarConexionWorker(Theader *head, int client_sock);
 

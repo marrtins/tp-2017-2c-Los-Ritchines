@@ -78,14 +78,14 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 	}
 	if(finCorrecto){
-		puts("Termina la conexion con worker.. La reduccion Global salio OK. Le avisamos a yama ");
+		puts("Termina la conexion con worker..  almac final salio OK. Le avisamos a yama ");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 		enviarHeaderYValor(head,idTarea,sockYama);
 
 
 	}else{
-		puts("termino la conexion con worker de manera inesperada. reduccion global fallo. Le avisamos a yama");
+		puts("termino la conexion con worker de manera inesperada. almac finalfallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
 		enviarHeaderYValor(head,idTarea,sockYama);

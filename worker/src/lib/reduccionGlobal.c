@@ -65,7 +65,7 @@ int realizarReduccionGlobal(client_sock){
 	//le pido a todos los workers que me pasen sus reducciones locales.
 
 	char * rutaApareoFinal=string_new();
-	string_append(&rutaApareoFinal,"/home/utnso/apareoGlobalFinal-");
+	string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
 	cont++;
 	string_append(&rutaApareoFinal,string_itoa(cont));
 	stat = realizarApareoGlobal(infoReduccionGlobal->listaNodos,rutaApareoFinal);
@@ -101,7 +101,7 @@ int realizarReduccionGlobal(client_sock){
 		string_append(&lineaDeEjecucionReduccionGlobal,rutaApareoFinal);
 		string_append(&lineaDeEjecucionReduccionGlobal," | ./");
 		string_append(&lineaDeEjecucionReduccionGlobal,nombreScriptReductor);
-		string_append(&lineaDeEjecucionReduccionGlobal, " > /home/utnso");
+		string_append(&lineaDeEjecucionReduccionGlobal, " > /home/utnso/");
 		string_append(&rutaResultadoReduccionGlobal,infoReduccionGlobal->tempRedGlobal);
 		string_append(&lineaDeEjecucionReduccionGlobal,rutaResultadoReduccionGlobal);
 

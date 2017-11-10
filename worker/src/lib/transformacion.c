@@ -58,7 +58,7 @@ int realizarTransformacion(int client_sock){
 	stat = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
 
 
-	char *input1 = getBloque(datosTransf->nroBloque);
+	char *input1 = getBloqueWorker(datosTransf->nroBloque);
 	char * input2=malloc(BLOQUE_SIZE);
 	memcpy(input2,input1,datosTransf->bytesOcupadosBloque);
 
@@ -101,7 +101,7 @@ int realizarTransformacion(int client_sock){
 
 		printf("linea de eecucion %s\n",lineaDeEjecucionTransformacion);
 		//			printf("Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
-		string_append(&rutaBloque,worker->nombre_nodo);
+
 
 
 		stat = system(lineaDeEjecucionTransformacion);
@@ -113,7 +113,9 @@ int realizarTransformacion(int client_sock){
 		puts("Envio header. fin transfo ok");
 		enviarHeader(client_sock,headEnvio);
 
-		remove(rutaBloque);
+		//remove(rutaBloque);
+		//remove(rutaScriptTransformador);
+
 		exit(0);
 
 	}

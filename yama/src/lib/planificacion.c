@@ -51,6 +51,7 @@ t_list * planificar(TjobMaster *job){
 		nodo->pwl=pwl;
 		nodo->availability=nodo->disponibilidadBase+nodo->pwl;
 		nodo->clock=false;
+		printf("Nodo:%s, ava:%d, clock:%d\n,",nodo->infoNodo.nombreNodo,nodo->availability,nodo->clock);
 		list_add(listaWorkersPlanificacion,nodo);
 	}
 
@@ -60,9 +61,9 @@ t_list * planificar(TjobMaster *job){
 	int k;
 	for(k=0;k<list_size(job->listaComposicionArchivo);k++){
 		TpackageUbicacionBloques *bloqueAux=list_get(job->listaComposicionArchivo,k);
-
+		//printf("asigno al bloque del archivo %d\n",bloqueAux->bloque);
 		TpackInfoBloque *bloque = asignarBloque(bloqueAux,listaWorkersPlanificacion,job);
-
+		printf("asigne al bloque %d, el nodo %s. bloque databin %d \n",bloque->bloqueDelArchivo,bloque->nombreNodo,bloque->bloqueDelDatabin);
 		list_add(listaPlanificada,bloque);
 
 
@@ -71,7 +72,7 @@ t_list * planificar(TjobMaster *job){
 	int q;
 	for(q=0;q<list_size(listaPlanificada);q++){
 		TpackInfoBloque *aux = list_get(listaPlanificada,q);
-		printf("%d %d %s\n",aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
+		printf("b arch %d  bdata %d %d %s\n",aux->bloqueDelArchivo,aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
 	}
 
 
@@ -83,27 +84,64 @@ void actualizarCargaWorkerEn(char * nombreNodo, int cantidadAAumentar){
 	int i;
 	for(i=0;i<list_size(listaCargaGlobal);i++){
 		TcargaGlobal *aux = list_get(listaCargaGlobal,i);
-		if(aux->nombreNodo == nombreNodo){
+		if(string_equals_ignore_case(aux->nombreNodo,nombreNodo)){
 			aux->cargaGlobal +=cantidadAAumentar;
-
+			mostrarTablaCargas();
 			return;
 		}
 	}
 
 
+	TcargaGlobal *nuevaCarga = malloc(sizeof(TcargaGlobal));
+	nuevaCarga->nombreNodo=malloc(strlen(nombreNodo)+1);
+	nuevaCarga->nombreNodo=nombreNodo;
+	nuevaCarga->cargaGlobal=1;
+	list_add(listaCargaGlobal,nuevaCarga);
+	mostrarTablaCargas();
+	return;
+
 }
 void aumentarHistoricoEn(char * nombreNodo,int cantidadAAumentar){
 	int i;
-
+	bool aumente =false;
 	for(i=0;i<list_size(listaHistoricaTareas);i++){
 		ThistorialTareas *historial = list_get(listaHistoricaTareas,i);
-		if(historial->nombreNodo == nombreNodo){
+		if(string_equals_ignore_case(historial->nombreNodo,nombreNodo)){
 			historial->tareasRealizadas+=cantidadAAumentar;
+			aumente=true;
 		}
 
 	}
 
+	if(!aumente){
+		ThistorialTareas *historial = malloc(sizeof(ThistorialTareas));
+		historial->nombreNodo=malloc(strlen(nombreNodo)+1);
+		historial->nombreNodo=nombreNodo;
+		historial->tareasRealizadas=1;
+		list_add(listaHistoricaTareas,historial);
+	}
 
+
+	mostrarTablaHistorica();
+
+}
+
+void mostrarTablaHistorica(){
+	puts("muestro tabla historica");
+	int i;
+	for(i=0;i<list_size(listaHistoricaTareas);i++){
+			ThistorialTareas *historial = list_get(listaHistoricaTareas,i);
+			printf("%s ; historico: %d\n",historial->nombreNodo,historial->tareasRealizadas);
+	}
+}
+
+void mostrarTablaCargas(){
+	int i;
+	puts("muestro tabla cargas");
+	for(i=0;i<list_size(listaCargaGlobal);i++){
+			TcargaGlobal *historial = list_get(listaCargaGlobal,i);
+			printf("%s ; carga: %d\n",historial->nombreNodo,historial->cargaGlobal);
+	}
 }
 
 TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *listaWorkersPlanificacion,TjobMaster *job){
@@ -112,36 +150,49 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 	Tplanificacion *nodoApuntado = getNodoApuntado(listaWorkersPlanificacion);
 	TpackInfoBloque *bloqueRet=malloc(sizeof(TpackInfoBloque));
 
-
-	if((nodoApuntado->availability > 0 && bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo) ||
-			(nodoApuntado->availability > 0 && bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo)){
-		if(bloqueAux->nombreNodoC1==nodoApuntado->infoNodo.nombreNodo ){
+	//puts("en asignar bloque");
+	printf("copias del bloque %d: %s y %s \n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->nombreNodoC2);
+	printf("nodo apuntado %s. availability %d\n",nodoApuntado->infoNodo.nombreNodo,nodoApuntado->availability);
+	if((nodoApuntado->availability > 0 && string_equals_ignore_case(bloqueAux->nombreNodoC1,nodoApuntado->infoNodo.nombreNodo)) ||
+			(nodoApuntado->availability > 0 && string_equals_ignore_case(bloqueAux->nombreNodoC2,nodoApuntado->infoNodo.nombreNodo))){
+		if(string_equals_ignore_case(bloqueAux->nombreNodoC1,nodoApuntado->infoNodo.nombreNodo) ){
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
+			printf("asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,nodoApuntado->infoNodo.nombreNodo);
 		}
-		if(bloqueAux->nombreNodoC2==nodoApuntado->infoNodo.nombreNodo ){
+		if(string_equals_ignore_case(bloqueAux->nombreNodoC2,nodoApuntado->infoNodo.nombreNodo) ){
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
+			printf("asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,nodoApuntado->infoNodo.nombreNodo);
 		}
+
 		mergeBloque(bloqueRet,nodoApuntado,bloqueAux,job->masterId);
 		nodoApuntado->availability-=1;
-
+	//	printf("cumplio. le asigno el bloque %d al nodo apuntado %s. bloque databn %d\n",bloqueRet->bloqueDelArchivo,bloqueRet->nombreNodo,bloqueRet->bloqueDelDatabin);
 		avanzarClock(listaWorkersPlanificacion);
 
 	}else{
+		puts("no cumplio. busco el siguiente nodo");
 		Tplanificacion *siguienteNodo = getSiguienteNodoDisponible(listaWorkersPlanificacion,bloqueAux->nombreNodoC1,bloqueAux->nombreNodoC2);
-
-		if(siguienteNodo->infoNodo.nombreNodo == bloqueAux->nombreNodoC1){
+		printf("consegui el siguiente dispo. el nodo %s\n",siguienteNodo->infoNodo.nombreNodo);
+		if(string_equals_ignore_case(siguienteNodo->infoNodo.nombreNodo,bloqueAux->nombreNodoC1)){
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
+			printf("asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,siguienteNodo->infoNodo.nombreNodo);
 		}else{
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
+			printf("asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,siguienteNodo->infoNodo.nombreNodo);
 		}
 
 		mergeBloque(bloqueRet,siguienteNodo,bloqueAux,job->masterId);
 		siguienteNodo->availability-=1;
-
+		//printf("le asigno el bloque %d al nodo q recien consegui %s, bloque databind :%d \n",bloqueRet->bloqueDelArchivo,siguienteNodo->infoNodo.nombreNodo,bloqueRet->bloqueDelDatabin);
 	}
 	aumentarHistoricoEn(bloqueRet->nombreNodo,1);
 	actualizarCargaWorkerEn(bloqueRet->nombreNodo,1);
-
+	//printf("aumento carga e historico y asi queda mi tabla de nodos\n");
+	int i;
+	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
+		Tplanificacion *aux=list_get(listaWorkersPlanificacion,i);
+		printf("nombrenodo %s. ava %d clock %d \n",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
+	}
 
 	return bloqueRet;
 }
@@ -149,6 +200,7 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 
 void avanzarClock(t_list *listaWorkersPlanificacion){
 	int i;
+	puts("avanzo clock");
 	Tplanificacion *siguiente;
 	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
 		Tplanificacion *aux=list_get(listaWorkersPlanificacion,i);
@@ -160,6 +212,7 @@ void avanzarClock(t_list *listaWorkersPlanificacion){
 			}
 			aux->clock=false;
 			siguiente->clock=true;
+			printf("ahora %s tiene false y %s tiene true el clock\n",aux->infoNodo.nombreNodo,siguiente->infoNodo.nombreNodo);
 			if(siguiente->availability==0){
 				siguiente->availability=siguiente->disponibilidadBase;
 				avanzarClock(listaWorkersPlanificacion);
@@ -187,6 +240,7 @@ void mergeBloque(TpackInfoBloque *bloqueRet,Tplanificacion *nodoApuntado,Tpackag
 	bloqueRet->tamanioPuerto=nodoApuntado->infoNodo.tamanioPuerto;
 	bloqueRet->bloqueDelArchivo = bloqueAux->bloque;
 
+
 }
 
 Tplanificacion * getNodoApuntado(t_list * listaWorkersPlanificacion){
@@ -207,6 +261,7 @@ Tplanificacion * getSiguienteNodoDisponible(t_list * listaWorkersPlanificacion,c
 	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
 		Tplanificacion *aux= list_get(listaWorkersPlanificacion,i);
 		if(aux->clock){
+			printf("busco el siguiente al apuntado actualmente que es %s\n",aux->infoNodo.nombreNodo);
 			Tplanificacion *siguienteDisponible = getSiguienteConDisponibilidadPositivaPosible(listaWorkersPlanificacion,i,nombreNodo1,nombreNodo2);
 			return siguienteDisponible;
 
@@ -220,24 +275,35 @@ Tplanificacion * getSiguienteNodoDisponible(t_list * listaWorkersPlanificacion,c
 
 Tplanificacion * getSiguienteConDisponibilidadPositivaPosible(t_list * listaWorkersPlanificacion, int indice,char * nombre1,char * nombre2){
 //todo
+	puts("en get sig c dispo positiva posibla");
 	int i;
 	for(i=indice+1;i<list_size(listaWorkersPlanificacion)+indice;i++){
 		if(i>=list_size(listaWorkersPlanificacion)){
 			i=0;
 		}
 		Tplanificacion *aux = list_get(listaWorkersPlanificacion,i);
+		printf("pruebo con %s. availa: %d . necesito %s o %s\n",aux->infoNodo.nombreNodo,aux->availability,nombre1,nombre2);
 		if(aux->availability>0){
 			if(i!= indice){
-				if(aux->infoNodo.nombreNodo == nombre1 ||aux->infoNodo.nombreNodo == nombre2 ){
+				if(string_equals_ignore_case(aux->infoNodo.nombreNodo,nombre1)||string_equals_ignore_case(aux->infoNodo.nombreNodo,nombre2) ){
+					printf("cumplio. devuelvo %s \n",aux->infoNodo.nombreNodo);
 					return aux;
 				}
 			}else{
 				sumarDisponibilidadBaseATodos(listaWorkersPlanificacion);
-				i=indice+1;
+				printf("di la vuelta. i: %d, nombre nodo(tendria  qser el apuntado) %s. sumo dispo a todos.\n",i,aux->infoNodo.nombreNodo);
+				i=indice;
 			}
+		}
+
+		if(i+1==list_size(listaWorkersPlanificacion)){
+			i=indice -1;
 		}
 	}
 
+
+
+	puts("error getsiguientecdispopositiva");
 	return NULL;
 }
 
@@ -249,20 +315,26 @@ void sumarDisponibilidadBaseATodos(t_list * listaWorkersPlanificacion){
 	}
 }
 int posicionarClock(t_list *listaWorkers){
-
+	puts("posiciono clock");
 	int i;
 	int disponibilidadMasAlta = -1;
 	bool empate=false;
 	for(i=0;i<list_size(listaWorkers);i++){
 		Tplanificacion *aux = list_get(listaWorkers,i);
+		printf("dispo mas alta %d \n",disponibilidadMasAlta);
+		printf("Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
 		if(aux->availability > disponibilidadMasAlta){
 			disponibilidadMasAlta=aux->availability;
+			printf("nueva dispo mas alta %d \n",disponibilidadMasAlta);
+			puts("no hay empate");
 			empate=false;
 		}else if(aux->availability==disponibilidadMasAlta){
+			puts("hay empate");
 			empate=true;
 		}
 	}
 	if(empate){
+		puts("hubo empate. desempato");
 		desempatarClock(disponibilidadMasAlta,listaWorkers);
 	}
 
@@ -280,16 +352,20 @@ int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
 	Tplanificacion *aux;
 	for(i=0;i<list_size(listaWorkers);i++){
 		aux = list_get(listaWorkers,i);
+		printf("Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
 		if(aux->availability == disponibilidadMasAlta){
 			historico1=getHistorico(aux);
+			printf("historico %s:%d\n,",aux->infoNodo.nombreNodo,historico1);
 		}
 		if(historico1>historico2){ //todo cambio (?????????????)
+			printf("historico de %s:(%d) es el mayor. x ahora lo modifico\n,",aux->infoNodo.nombreNodo,historico1);
 			historico2=historico1;
 			indiceAModificar=i;
 		}
 
 	}
 	aux=list_get(listaWorkers,indiceAModificar);
+	printf("le pongo el clock a %s, historico %d\n",aux->infoNodo.nombreNodo,historico2);
 	aux->clock=true;
 
 	return 0;
@@ -300,7 +376,7 @@ int getHistorico(Tplanificacion *infoWorker){
 
 	for(i=0;i<list_size(listaHistoricaTareas);i++){
 		ThistorialTareas *aux = list_get(listaHistoricaTareas,i);
-		if(infoWorker->infoNodo.nombreNodo==aux->nombreNodo){
+		if(string_equals_ignore_case(infoWorker->infoNodo.nombreNodo,aux->nombreNodo)){
 
 			return aux->tareasRealizadas;
 		}
@@ -354,7 +430,7 @@ void asignarNodoElegido(t_list * listaReduccionGlobal){
 
 	for(i=0;i<list_size(listaReduccionGlobal);i++){
 		aux=list_get(listaReduccionGlobal,i);
-		if(aux->nombreNodo==nodoElegido){
+		if(string_equals_ignore_case(aux->nombreNodo,nodoElegido)){
 			aux->nodoEncargado=1;
 		}
 	}
@@ -611,7 +687,7 @@ void mostrarTablaDeEstados(){
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
-		free(etapa);
+		//free(etapa);
 	}
 
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
@@ -628,7 +704,7 @@ void mostrarTablaDeEstados(){
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
-		free(etapa);
+		//free(etapa);
 	}
 
 	for(i=0;i<list_size(listaEstadoError);i++){
@@ -645,7 +721,7 @@ void mostrarTablaDeEstados(){
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
-		free(etapa);
+		//free(etapa);
 	}
 
 	printf("\n\n\n");
@@ -675,7 +751,7 @@ char * getIpNodo(char * nombreNodo,TjobMaster *job){
 	int i;
 	for(i=0;i<list_size(job->listaNodosArchivo);i++){
 		nodoAux=list_get(job->listaNodosArchivo,i);
-		if(nodoAux->nombreNodo == nombreNodo){
+		if(string_equals_ignore_case(nodoAux->nombreNodo, nombreNodo)){
 			return nodoAux->ipNodo;
 		}
 	}
@@ -687,7 +763,7 @@ char * getPuertoNodo(char * nombreNodo,TjobMaster *job){
 	int i;
 	for(i=0;i<list_size(job->listaNodosArchivo);i++){
 		nodoAux=list_get(job->listaNodosArchivo,i);
-		if(nodoAux->nombreNodo == nombreNodo){
+		if(string_equals_ignore_case(nodoAux->nombreNodo, nombreNodo)){
 			return nodoAux->puertoWorker;
 		}
 	}
@@ -772,7 +848,7 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 		TpackageUbicacionBloques * bloqueAux =list_get(listaComposicionArchivo,i);
 		if(tareaAReplanificar->bloqueDelArchivo == bloqueAux->bloque){
 			TpackInfoBloque *bloqueRet=malloc(sizeof(TpackInfoBloque));
-			if(tareaAReplanificar->nodo == bloqueAux->nombreNodoC1){
+			if(string_equals_ignore_case(tareaAReplanificar->nodo, bloqueAux->nombreNodoC1)){
 				//le paso la info para q labure en el otronodo
 
 				bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;

@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 		switch (headRcv.tipo_de_mensaje) {
 
 		case (INFOBLOQUE):
-			//puts("Nos llega info de un bloque");
+			puts("Nos llega info de un bloque");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
 
 
 		case (INFOULTIMOBLOQUE):
-			//puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
+			puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -186,6 +186,11 @@ int main(int argc, char* argv[]) {
 			}
 
 			stat = conectarseAWorkerParaAlmacenamientoFinal(infoAlmacenado,sockYama);
+			break;
+		case(ARCH_NO_VALIDO):
+			puts("yama nos avisa q el archivo no es valido. fin deol proceso");
+			close(sockYama);
+			return 0;
 			break;
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);

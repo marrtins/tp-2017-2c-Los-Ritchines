@@ -27,6 +27,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 
 	list_add(listaJobsMaster,nuevoJob);
 	Theader head;
+	Theader *headEnvio=malloc(sizeof(Theader));
 	int stat;
 	stat = recv(sockMaster, &head, sizeof(Theader), 0);
 	char * pathArchivoAReducir;
@@ -67,6 +68,10 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	stat = recv(socketFS, &head, sizeof(Theader), 0);
 	if (head.tipo_de_mensaje == ARCH_NO_VALIDO) {
 		puts("El archivo no es valido");
+		headEnvio->tipo_de_proceso=YAMA;
+		headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO;
+		enviarHeader(sockMaster,headEnvio);
+		return;
 	} else if (head.tipo_de_mensaje == INFO_ARCHIVO) {
 		puts("FS nos quiere mandar la info del archivo que pedi");
 
@@ -101,66 +106,6 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	nuevoJob->listaNodosArchivo=list_create();
 	nuevoJob->listaNodosArchivo=infoNodos->listaNodos;
 
-
-
-
-
-	/*while((stat = recv(socketFS, &head, sizeof(Theader), 0))>0){
-		if (head.tipo_de_mensaje == ARCH_NO_VALIDO) {
-			puts("El archivo no es valido");
-		} else if (head.tipo_de_mensaje == INFO_ARCHIVO) {
-			puts("FS nos quiere mandar la info del archivo que pedi");
-			unsigned long long sizePaquete;
-			stat = recv(socketFS, &sizePaquete, sizeof(unsigned long long), 0);
-			printf("paquete size %llu\n",sizePaquete);
-			char *buffer3 = malloc(sizePaquete);
-			puts("Recibo el tamaño del paquete");
-			stat = recv(socketFS, buffer3, sizePaquete, 0);
-			puts("Recibo el paquete");
-			TinfoArchivoFSYama *infoArchivo = malloc(sizeof(TinfoArchivoFSYama));
-			infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
-			nuevoJob->listaComposicionArchivo=list_create();
-			nuevoJob->listaComposicionArchivo=infoArchivo->listaBloques;
-			puts("deserealice la info del archivo");
-			//seguior aca info nodos ....
-
-
-			stat = recv(socketFS, &head, sizeof(Theader), 0);
-			puts("recibo otro head");
-			if (head.tipo_de_mensaje == INFO_NODO) {
-				puts("FS me quiere dar la info del nodo");
-				TpackInfoBloqueDN * infoBloque;
-				infoBloque = recvInfoNodoYAMA(socketFS);
-
-				puts("Recibo la informacion del nodo");
-
-				TpackageInfoNodo * nodo = malloc(
-						sizeof(TpackageInfoNodo));
-
-				nodo->tamanioIp = infoBloque->tamanioIp;
-				nodo->tamanioNombre = infoBloque->tamanioNombre;
-				nodo->tamanioPuerto = infoBloque->tamanioPuerto;
-
-				nodo->ipNodo = malloc(nodo->tamanioIp);
-				nodo->nombreNodo = malloc(nodo->tamanioNombre);
-				nodo->puertoWorker = malloc(nodo->tamanioPuerto);
-
-				strcpy(nodo->ipNodo, infoBloque->ipNodo);
-				strcpy(nodo->nombreNodo, infoBloque->nombreNodo);
-				strcpy(nodo->puertoWorker, infoBloque->puertoNodo);
-				puts("Termine");
-
-			}
-		}
-	}
-	*/
-
-
-	//fs me devuelve una lista de nodos y una lista d ebloques
-
-	//t_list *listaComposicionArchivo=list_create();
-	//generarListaComposicionArchivoHardcode(listaComposicionArchivo);
-
 	responderTransformacion(nuevoJob);
 }
 
@@ -184,10 +129,10 @@ int responderTransformacion(TjobMaster *job){
 
 	t_list *listaBloquesPlanificados=planificar(job);
 
-	if((stat=responderSolicTransf(sockMaster,listaBloquesPlanificados,job))<0){
+	/*if((stat=responderSolicTransf(sockMaster,listaBloquesPlanificados,job))<0){
 		puts("No se pudo responder la solicitud de transferencia");
 		return -1;
-	}
+	}*/
 
 
 	Theader head;
@@ -199,7 +144,7 @@ int responderTransformacion(TjobMaster *job){
 
 	printf("Cantidad de paquetes con info de bloques a enviar: %d\n",list_size(listaBloquesPlanificados));
 	for (i=0;i<list_size(listaBloquesPlanificados);i++){
-		if(i<=list_size(listaBloquesPlanificados)-2){
+		if(i+1<list_size(listaBloquesPlanificados)){
 			head.tipo_de_mensaje=INFOBLOQUE;
 		}else{
 			head.tipo_de_mensaje=INFOULTIMOBLOQUE;

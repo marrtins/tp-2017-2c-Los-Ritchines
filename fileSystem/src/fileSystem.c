@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	char * rutaArchivo;
-	Tbuffer * buffer;
+
 
 	listaDeNodos = list_create();
 	listaDeNodosDesconectados = list_create();

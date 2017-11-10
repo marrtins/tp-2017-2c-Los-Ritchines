@@ -92,7 +92,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	t_list * bloques = list_create();
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 		TpackTablaEstados *tareaOk = list_get(listaEstadoFinalizadoOK,i);
-		if(tareaOk->job==jobAReducir && tareaOk->nodo==nodoReductor &&tareaOk->etapa==TRANSFORMACION){
+		if(tareaOk->job==jobAReducir && string_equals_ignore_case(tareaOk->nodo,nodoReductor) &&tareaOk->etapa==TRANSFORMACION){
 			TreduccionLista * reduccionAux=  malloc(sizeof (TreduccionLista));
 			reduccionAux->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
 			reduccionAux->nombreTemporal=tareaOk->nombreArchTemporal;
@@ -124,7 +124,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	char * bloquesReducidos = string_new();
 	string_append(&bloquesReducidos,"[");
 	for(i=0;i<list_size(bloques);i++){
-		if(i!=0) string_append(&bloquesReducidos,", ");
+		if(i!=0) string_append(&bloquesReducidos,",");
 		string_append(&bloquesReducidos,(list_get(bloques,i)));
 
 	}
@@ -153,7 +153,7 @@ bool sePuedeComenzarReduccionLocal(int idTareaFinalizada){
 	for(i=0;i<list_size(listaEstadoEnProceso);i++){
 		tareaAuxiliar=list_get(listaEstadoEnProceso,i);
 		if(tareaFinalizada->job == tareaAuxiliar->job){
-			if((tareaFinalizada->nodo == tareaAuxiliar->nodo) && (tareaAuxiliar->etapa == TRANSFORMACION)){
+			if((string_equals_ignore_case(tareaFinalizada->nodo, tareaAuxiliar->nodo)) && (tareaAuxiliar->etapa == TRANSFORMACION)){
 				return false;
 			}
 		}

@@ -93,6 +93,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 				infoNodoAux->temporalReduccion=malloc(TAMANIO_NOMBRE_TEMPORAL);
 				infoNodoAux->temporalReduccion=tareaOk->nombreArchTemporal;
 				infoNodoAux->temporalReduccionLen=strlen(infoNodoAux->temporalReduccion)+1;
+				infoNodoAux->nodoEncargado=0;
 				list_add(listaInformacionNodos,infoNodoAux);
 				list_add(bloques,tareaOk->bloquesReducidos);
 
@@ -100,7 +101,29 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 			}
 		}
 
-	asignarNodoElegido(listaInformacionNodos);
+
+
+	TinfoNodoReduccionGlobal *aux = list_get(listaInformacionNodos,0);
+	int indiceElegido = 0;
+	int menorCarga =getCargaWorker(aux->nombreNodo);
+	int cargaAux;
+
+	for(i=0;i<list_size(listaInformacionNodos);i++){
+		aux=list_get(listaInformacionNodos,i);
+		cargaAux=getCargaWorker(aux->nombreNodo);
+		if(cargaAux<menorCarga){
+			menorCarga=cargaAux;
+			indiceElegido=i;
+		}
+	}
+
+	aux=list_get(listaInformacionNodos,indiceElegido);
+	aux->nodoEncargado=1;
+
+
+	printf("Nodo encargado: %s. menor carga: %d \n",getNodoElegido(listaInformacionNodos),menorCarga);
+
+
 
 
 	nuevaReduccion->listaNodosSize=list_size(listaInformacionNodos);
@@ -124,7 +147,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	char * bloquesReducidos = string_new();
 	string_append(&bloquesReducidos,"{");
 	for(i=0;i<list_size(bloques);i++){
-		if(i!=0) string_append(&bloquesReducidos,", ");
+		if(i!=0) string_append(&bloquesReducidos,",");
 		string_append(&bloquesReducidos,(list_get(bloques,i)));
 
 	}
@@ -136,8 +159,8 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
 	int cargaWorker = divideYRedondea(list_size(job->listaNodosArchivo),2);
 
-	actualizarCargaWorkerEn(getNodoElegido(job->listaNodosArchivo),cargaWorker);
-	aumentarHistoricoEn(getNodoElegido(job->listaNodosArchivo),cargaWorker);
+	actualizarCargaWorkerEn(getNodoElegido(listaInformacionNodos),cargaWorker);
+	aumentarHistoricoEn(getNodoElegido(listaInformacionNodos),cargaWorker);
 	list_destroy(bloques);
 	return 0;
 }
