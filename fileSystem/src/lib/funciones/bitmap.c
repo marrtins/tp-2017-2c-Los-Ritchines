@@ -20,22 +20,32 @@ void mostrarBitmap(t_bitarray* bitmap){
 }
 
 void levantarBitmapDeUnNodo(Tnodo * nodo){
-	char * rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
+	char * rutaArchivo = malloc(150);
+	rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
+	puts(rutaArchivo);
 	FILE * archivo = fopen(rutaArchivo, "r");
-	puts("pude abrir");
+	if(archivo == NULL){
+		logAndExit("No se pudo abrir el bitmap del nodo, probablemente no existe.");
+	}
 	int i = 0;
 	char bitChar;
 	int bit;
 	while(!feof(archivo)){
 		fread(&bitChar, 1, sizeof(char), archivo);
-		printf("el bitchar %c", bitChar);
-		bit = bitChar;
-		printf("el bit es: %d", bit);
+		putchar(bitChar);
+		bit = bitChar - '0';
 		if(bit == 1){
 			bitarray_set_bit(nodo->bitmap, i);
 		}
+		else if(bit == 0){
+			bitarray_clean_bit(nodo->bitmap, i);
+		}
+		else{
+			logAndExit("Hubo un error turbio al leer un bit del archivo bitmap.");
+		}
 		i++;
 	}
+	mostrarListaDeNodos(listaDeNodosDesconectados);
 	free(rutaArchivo);
 }
 

@@ -1,20 +1,26 @@
 #include "../funcionesFS.h"
 
 void conexionesDatanode(void * estructura){
-	TfileSystem * fileSystem = (TfileSystem *) estructura;
-	fd_set readFD, masterFD;
-	int socketDeEscuchaDatanodes,
-		fileDescriptorMax = -1,
-		cantModificados = 0,
-		nuevoFileDescriptor,
-		fileDescriptor,
-		cantNodosPorConectar = fileSystem->cant_nodos,
-		estado;
-	Theader * head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
+	char * rutaLocalArchivoFinal;
+	char * extensionArchivoFinal;
+	char * archivoFinalMapeado;
+	int socketDeEscuchaDatanodes;
+	int fileDescriptorMax = -1;
+	int cantModificados = 0;
+	int	nuevoFileDescriptor;
+	int fileDescriptor;
+	int	cantNodosPorConectar;
+	int	estado;
+	int fileDescriptorArchivoFinal;
+	fd_set readFD, masterFD;
+	FILE * archivoFinal;
 	Tnodo * nuevoNodo;
 	Tnodo * nodoEncontrado;
-	TpackInfoBloqueDN * infoBloque;
+	TfileSystem * fileSystem = (TfileSystem *) estructura;
+	Theader * head = malloc(sizeof(Theader));
+	TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
+	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -24,7 +30,7 @@ void conexionesDatanode(void * estructura){
 	puts("antes de entrar al while");
 
 	while (listen(socketDeEscuchaDatanodes, BACKLOG) == -1){
-				log_trace(logger, "Fallo al escuchar el socket servidor de file system.");
+				log_error(logger, "Fallo al escuchar el socket servidor de file system.");
 				puts("Reintentamos...");
 	}
 
@@ -60,16 +66,15 @@ void conexionesDatanode(void * estructura){
 						estado = recv(fileDescriptor, head, sizeof(Theader), 0);
 
 						if(estado == -1){
-							log_trace(logger, "Error al recibir información de un cliente.");
+							log_error(logger, "Error al recibir información de un cliente.");
 							break;
 						}
 						else if( estado == 0){
 							nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
 							list_add(listaDeNodosDesconectados, nodoEncontrado);
 							borrarNodoPorFD(fileDescriptor);
-							eliminarNodoDeTablaDeNodos(nodoEncontrado);
 							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
-							log_trace(logger, mensaje);
+							log_error(logger, mensaje);
 							clearAndClose(fileDescriptor, &masterFD);
 							break;
 						}
@@ -77,38 +82,38 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
 								puts("Es datanode y quiere mandar la información del nodo");
-
-								if((Tnodo*)buscarNodoPorFD(listaDeNodos, fileDescriptor) == NULL){
-									infoBloque = recvInfoNodo(fileDescriptor);
+								infoNodo = recvInfoNodo(fileDescriptor);
+								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
 									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
 										//nodo nuevo;
 										puts("voy a inicializar nodo");
 										nuevoNodo = malloc(sizeof(Tnodo));
-										nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
+										nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
 										puts("pude inicializar");
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
 										almacenarBitmap(nuevoNodo);
+										agregarNodoATablaDeNodos(nuevoNodo);
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
-										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoBloque->nombreNodo);
+										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
 										nuevoNodo->fd = fileDescriptor;
 										list_add(listaDeNodos, nuevoNodo);
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
-										log_trace(logger, "Nodo que se habia caído, se reconecto");
+										log_error(logger, "Nodo que se habia caído, se reconecto");
 									}
 									puts("voy a agregar a tabla de nodos");
-									agregarNodoATablaDeNodos(nuevoNodo);
-									liberarTPackInfoBloqueDN(infoBloque);
 									puts("agregue a tabla de nodos");
 								}
 								else {
 									puts("Un nodo ya conectado, se esta volviendo a conectar");
-									log_trace(logger, "Un nodo ya conectado, se esta volviendo a conectar");
+									clearAndClose(fileDescriptor, &masterFD);
+									log_error(logger, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
+								liberarTPackInfoBloqueDN(infoNodo);
 								break;
 
 							case OBTENER_BLOQUE_Y_NRO:
@@ -134,8 +139,8 @@ void conexionesDatanode(void * estructura){
 								bloqueACopiar = malloc(sizeof(Tbuffer));
 								int nroBloqueRecibido;
 								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
-										logAndExit("Error al recibir el tamanio do bloque");
-										}
+									logAndExit("Error al recibir el tamanio do bloque");
+								}
 								puts("voy a copiar el bloque");
 								bloqueACopiar->buffer = malloc(bloqueACopiar->tamanio);
 								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
@@ -150,7 +155,7 @@ void conexionesDatanode(void * estructura){
 								break;
 							default:
 								puts("Tipo de Mensaje no encontrado en el protocolo");
-								log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
+								log_error(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
 								break;
 					}
 
@@ -160,10 +165,51 @@ void conexionesDatanode(void * estructura){
 					break;
 
 				}
+				else if(head->tipo_de_proceso == WORKER){
+						switch(head->tipo_de_mensaje){
+							case ALMACENAR_ARCHIVO:
+								puts("llego conexion de worker");
+								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
+								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
+								puts(rutaLocalArchivoFinal);
+								extensionArchivoFinal = obtenerExtensionDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
+								puts(extensionArchivoFinal);
+								if(!strcmp(extensionArchivoFinal, "csv")){
+									archivoFinal = fopen(rutaLocalArchivoFinal, "w");
+								}else{
+									archivoFinal = fopen(rutaLocalArchivoFinal, "wb");
+								}
+								truncate(rutaLocalArchivoFinal, estructuraArchivoFinal->tamanioContenido);
+								puts("pase extensio");
+								fileDescriptorArchivoFinal = fileno(archivoFinal);
+
+								if ((archivoFinalMapeado = mmap(NULL, estructuraArchivoFinal->tamanioContenido, PROT_WRITE, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
+									logAndExit("Error al hacer mmap");
+								}
+								puts("pase archivo final");
+
+								pasarInfoDeUnArchivoAOtro(estructuraArchivoFinal->contenidoArchivo, archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
+
+								close(fileDescriptorArchivoFinal);
+								fclose(archivoFinal);
+								if (msync(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido, MS_SYNC) < 0) {
+									logAndExit("Sucedio lo imposible, fallo el msync");
+								}
+								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
+								free(rutaLocalArchivoFinal);
+								free(extensionArchivoFinal);
+								free(estructuraArchivoFinal);
+								break;
+							default:
+								log_error(logger, "Tipo de mensaje no encontrado en el protocolo.");
+								puts("Tipo de mensaje no encontrado en el protocolo.");
+								break;
+						}
+				}
 				else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
-					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
+					log_error(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
 					clearAndClose(fileDescriptor, &masterFD);
 				}
 

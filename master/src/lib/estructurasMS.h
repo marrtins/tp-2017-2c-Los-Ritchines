@@ -36,4 +36,16 @@ typedef struct{
 	int sockYama;
 }TatributosHiloAlmacenamientoFinal;
 
+typedef struct {
+	time_t horaInicio;
+	int tiempoTransformacion;
+	int tiempoRL;
+	int tiempoRG;
+	int tiempoAlmacenado;
+	int cantMaxTransfParalelas;
+	int cantMaxRLParalelas;
+	int cantTotalTareas;
+	int cantFallos;
+}Tmetricas;
+
 #endif

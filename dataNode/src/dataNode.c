@@ -15,7 +15,8 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 
-	logger = log_create("dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log", "dataNode", false, LOG_LEVEL_ERROR);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]) {
 
 		} else if (estado == 0) {
 			sprintf(mensaje, "Se desconecto el socket de fd: %d\n", socketFS);
-			log_trace(logger, mensaje);
+			log_error(logger, mensaje);
 			break;
 		}
 		printf("Recibi el head %d bytes\n", estado);
@@ -78,8 +79,8 @@ int main(int argc, char* argv[]) {
 					int nroBloque;
 
 					if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
-							logAndExit("Error al recibir el numero de bloque");
-						}
+						logAndExit("Error al recibir el numero de bloque");
+					}
 					printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
 					enviarBloqueAFS(nroBloque, socketFS);
 					break;

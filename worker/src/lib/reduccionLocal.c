@@ -126,6 +126,7 @@ int realizarReduccionLocal(int client_sock){
 
 		puts("Envio header. fin reduccion ok");
 		enviarHeader(client_sock,headEnvio);
+		remove(rutaScriptReductor);
 		//close(client_sock);
 		exit(0);
 

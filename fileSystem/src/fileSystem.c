@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	char * rutaArchivo;
-	Tbuffer * buffer;
+
 
 	listaDeNodos = list_create();
 	listaDeNodosDesconectados = list_create();
@@ -40,10 +40,11 @@ int main(int argc, char* argv[]) {
 		}
 		free(flag);
 	}else {
-		inicializarListaDeNodosAConectar(listaDeNodosDesconectados);
+		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
 	}
 
-	logger = log_create("FileSystem.log", "FileSystem.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/FileSystem.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/FileSystem.log", "FileSystem", false, LOG_LEVEL_ERROR);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
@@ -57,7 +58,7 @@ int main(int argc, char* argv[]) {
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
-		log_trace(logger,"Fallo al escuchar el socket servidor de file system.");
+		log_error(logger,"Fallo al escuchar el socket servidor de file system.");
 		puts("Reintentamos...");
 	}
 		socketYama = aceptarCliente(socketDeEscuchaYama);
@@ -70,12 +71,12 @@ int main(int argc, char* argv[]) {
 		estado = recv(socketYama, head, sizeof(Theader), 0);
 
 		if(estado == -1){
-			log_trace(logger, "Error al recibir información de un cliente.");
+			log_error(logger, "Error al recibir información de un cliente.");
 			break;
 		}
 		else if( estado == 0){
 			sprintf(mensaje, "Se desconecto YAMA fd: %d.", socketYama);
-			log_trace(logger, mensaje);
+			log_error(logger, mensaje);
 			break;
 		}
 		if(head->tipo_de_proceso == YAMA){
@@ -97,57 +98,47 @@ int main(int argc, char* argv[]) {
 
 				rutaArchivo = recvRutaArchivo(socketYama);
 
+				puts(rutaArchivo);
 				//verifico que la ruta que me manda yama sea valida
-				/*if(verificarRutaArchivo(rutaArchivo)){
+				if(verificarRutaArchivo(rutaArchivo)){
+					puts("La ruta del archivo que mando yama es valida");
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
 
-					TinfoArchivoFSYama *infoSend = malloc(sizeof(TinfoArchivoFSYama));
-					t_list * listaBloques=list_create();
+					TinfoArchivoFSYama *infoSend;
 
-					int i;
-					int cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
-					for(i=0;i<cantBloques;i++){
-						TpackageUbicacionBloques *bloque=malloc(sizeof(TpackageUbicacionBloques));
-						TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia,0);
-						bloque->bloque=i;
-						bloque->nombreNodoC1=malloc(strlen(copia1->nombreDeNodo)+1);
-						bloque->nombreNodoC1=copia1->nombreDeNodo;
-						bloque->nombreNodoC1Len=(strlen(copia1->nombreDeNodo)+1);
-						bloque->bloqueC1=copia1->numeroBloqueDeNodo;
-
-						TcopiaNodo *copia2 = list_get(archivo->bloques[i].copia,1);
-						bloque->nombreNodoC2=malloc(strlen(copia2->nombreDeNodo)+1);
-						bloque->nombreNodoC2=copia2->nombreDeNodo;
-						bloque->nombreNodoC2Len=(strlen(copia2->nombreDeNodo)+1);
-						bloque->bloqueC2=copia2->numeroBloqueDeNodo;
-
-						bloque->finBloque=archivo->bloques[i].bytes;
-						list_add(listaBloques,bloque);
-					}
-
-					infoSend->listaSize=list_size(listaBloques);
-					infoSend->listaBloques=list_create();
-					infoSend->listaBloques=listaBloques;
+					infoSend = crearListaTablaArchivoParaYama(archivo);
 					head->tipo_de_mensaje=INFO_ARCHIVO;
 					head->tipo_de_proceso=FILESYSTEM;
-					buffer=serializarInfoArchivoYamaFS(head,TinfoArchivoFSYama);
 
+					puts("voy a serializar la info del archivo");
+					int packSize;
+					Theader head2;
+					head2.tipo_de_proceso=FILESYSTEM;
+					head2.tipo_de_mensaje=INFO_ARCHIVO;
+					char * buffer2=serializarInfoArchivoYamaFS(head2,infoSend,&packSize);
 
-				//	buffer = empaquetarInfoArchivo(head , archivo);//hay que ver si esta bien
+					puts("serialice la info del archivo");
 
-					if ((estado = send(socketYama, buffer->buffer , buffer->tamanio, 0)) == -1){
+					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
 						logAndExit("Fallo al enviar la informacion de un archivo");
 					}
 					free(ruta);
+
+					puts("envie info del archivo");
+					//envio la info del nodo
+
+					enviarInfoNodoAYama(socketYama);
+					puts("envie info del nodo");
 				}else {
-					//si no es valida se manda cant de bloques en cero
+					//si no es valida se manda esto
+					puts("la ruta no es valida");
 					head->tipo_de_mensaje=ARCH_NO_VALIDO;
 					head->tipo_de_proceso = FILESYSTEM;
 					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
 						 logAndExit("Fallo al enviar la informacion de un archivo");
 					}
-				}*/
+				}
 
 
 			break;

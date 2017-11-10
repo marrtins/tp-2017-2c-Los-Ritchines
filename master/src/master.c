@@ -6,8 +6,7 @@
 char * rutaTransformador, * rutaReductor, *rutaResultado;
 
 
-
-
+Tmetricas *metricasJob;
 
 int main(int argc, char* argv[]) {
 
@@ -19,10 +18,10 @@ int main(int argc, char* argv[]) {
 	Tmaster *master;
 	Theader * head = malloc(sizeof(Theader));
 	Theader headTmp;
-
+//	int myId;
 	t_list *bloquesTransformacion = list_create();
 
-
+	metricasJob = malloc(sizeof(Tmetricas));
 	rutaTransformador = string_new();
 	rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
@@ -34,12 +33,11 @@ int main(int argc, char* argv[]) {
 	}
 
 
-
-	logger = log_create("master.log", "master.log", false, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/master/master.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/master/master.log", "master.log", false, LOG_LEVEL_ERROR);
 
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;
-
 
 	// arg[0]: nombre de la funcion
 	// arg[1]: ruta transformador
@@ -61,8 +59,11 @@ int main(int argc, char* argv[]) {
 	printf("Archivo a reducir Path: %s\n",rutaArchivoAReducir);
 	printf("Resultado Path: %s\n",rutaResultado);
 
+	char buffInicio[100];
 
-
+	time(&metricasJob->horaInicio);
+	strftime (buffInicio, 100, "%Y-%m-%d %H:%M:%S.000", localtime (&metricasJob->horaInicio));
+	printf ("Hora de inicio del job: %s\n", buffInicio);
 
 	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
 
@@ -72,32 +73,42 @@ int main(int argc, char* argv[]) {
 
 	puts("Enviamos a YAMA las rutas a reducir y almacenar");
 
+
+
+	headTmp.tipo_de_proceso = MASTER;
+	headTmp.tipo_de_mensaje = PATH_RES_FILE ;
+	packSize = 0;
+	buffer=serializeBytes(headTmp,rutaResultado,(strlen(rutaResultado)+1),&packSize);
+	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
+		puts("no se pudo enviar Path del aresultado a YAMA. ");
+		return  FALLO_SEND;
+	}
+	puts("#envio1");
+	//recibo id.
+	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
+	/*stat=recv(sockYama, &headRcv, HEAD_SIZE, 0);
+
+	if(headRcv.tipo_de_proceso==YAMA && head->tipo_de_mensaje==NUEVOID){
+		myId = recibirValor(sockYama);
+		printf("Recibi mi id : %d\n",myId);
+	}*/
+
 	headTmp.tipo_de_proceso = MASTER;
 	headTmp.tipo_de_mensaje = PATH_FILE_TOREDUCE ;
 	packSize = 0;
 	buffer=serializeBytes(headTmp,rutaArchivoAReducir,(strlen(rutaArchivoAReducir)+1),&packSize);
-	//puts("Path del archivo a reducir serializado; lo enviamos");
-
 	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar Path del archivo a reducir a YAMA. ");
 		return  FALLO_SEND;
 	}
 
-	//printf("se enviaron %d bytes del Path del archivo a reducir a YAMA\n",stat);
 
 
-	headTmp.tipo_de_proceso = MASTER; headTmp.tipo_de_mensaje = PATH_RES_FILE ;packSize = 0;
-	buffer=serializeBytes(headTmp,rutaResultado,(strlen(rutaResultado)+1),&packSize);
-	//puts("Path del resultado serializado; lo enviamos");
+
+	puts("#envio2");
 
 
-	if ((stat = send(sockYama, buffer, packSize, 0)) == -1){
-		puts("no se pudo enviar Path del aresultado a YAMA. ");
-		return  FALLO_SEND;
-	}
-	//printf("se enviaron %d bytes del Path del resultado a YAMA\n",stat);
 
-	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
 
 
@@ -113,7 +124,7 @@ int main(int argc, char* argv[]) {
 		switch (headRcv.tipo_de_mensaje) {
 
 		case (INFOBLOQUE):
-			//puts("Nos llega info de un bloque");
+			puts("Nos llega info de un bloque");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -126,7 +137,7 @@ int main(int argc, char* argv[]) {
 
 
 		case (INFOULTIMOBLOQUE):
-			//puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
+			puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -175,6 +186,11 @@ int main(int argc, char* argv[]) {
 			}
 
 			stat = conectarseAWorkerParaAlmacenamientoFinal(infoAlmacenado,sockYama);
+			break;
+		case(ARCH_NO_VALIDO):
+			puts("yama nos avisa q el archivo no es valido. fin deol proceso");
+			close(sockYama);
+			return 0;
 			break;
 		default:
 			printf("Proceso: %d \n", headTmp.tipo_de_proceso);

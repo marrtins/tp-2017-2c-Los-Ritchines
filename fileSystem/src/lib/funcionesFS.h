@@ -5,6 +5,7 @@
 
 //serializacion
 void empaquetarBloqueAEliminar(Tbuffer * buffer, Theader * head, int numeroDeBloque);
+void desempaquetarArchivoFinal(int fileDescriptor, TarchivoFinal * archivoFinal);
 
 //Operaciones
 long sumaDeDosNumerosLong(long valor1, long valor2);
@@ -48,6 +49,8 @@ void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void mostrarTablaArchivo(Tarchivo* tablaArchivo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
 void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
+void altaDeNodoEnTablaDeNodos(Tnodo * nodo);
+void bajaDeNodoEnTablaDeNodos(Tnodo * nodo);
 void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, char * nombreElemento);
 void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento);
 void inicializarTablaDeNodos();
@@ -71,9 +74,11 @@ void eliminarBloqueDeTablaDeArchivos(t_config * archivo, int numeroDeBloque, int
 void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDatabin, int nroBloque);
 char * generarStringNodoNLibre(char * nombre);
 char * generarStringNodoNTotal(char * nombre);
-void inicializarListaDeNodosAConectar(t_list * desconectados);
+void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados);
 void removerArchivos(char * ruta);
 int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
+char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
+void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -170,9 +175,12 @@ void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque);
 void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 void liberarTablaDirectorios(void* directorio);
 void liberarCopia(void * copia);
+void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal);
 
 //YAMA
 char * recvRutaArchivo(int socket);
-Tbuffer * empaquetarInfoArchivo(Theader* head, Tarchivo * archivo);
+TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo);
+void enviarInfoNodoAYama(int socketYama);
+void generarListaInfoNodos(t_list *nodos);
 
 #endif

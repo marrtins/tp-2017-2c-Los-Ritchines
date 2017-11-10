@@ -5,6 +5,12 @@ void liberarEstructuraBuffer(Tbuffer * buffer){
 	free(buffer);
 }
 
+void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal){
+	free(archivoFinal->rutaArchivo);
+	free(archivoFinal->contenidoArchivo);
+	free(archivoFinal);
+}
+
 void liberarEstructuraBloquesAEnviar(TbloqueAEnviar * infoBloque){
 	free(infoBloque->contenido);
 	free(infoBloque);

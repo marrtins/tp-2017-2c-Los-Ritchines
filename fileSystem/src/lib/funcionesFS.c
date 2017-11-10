@@ -225,7 +225,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
-		log_trace(logger, "Error al almacenar archivo, está vacío");
+		log_error(logger, "Error al almacenar archivo, está vacío");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
@@ -237,7 +237,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
-		log_trace(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
+		log_error(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		puts("voy a violar el segmento");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
@@ -391,7 +391,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	ftruncate(fd, tablaArchivo->tamanioTotal);
 
 	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
-		log_trace(logger,"Error al hacer mmap");
+		log_error(logger,"Error al hacer mmap");
 		puts("Error al hacer mmap");
 		liberarEstructuraBuffer(bloque);
 		return -1;
@@ -421,7 +421,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		puts("pase el mutex, voy a copiar un bloque");
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
 			puts("Error al copiar bloque recibido. Intentelo de nuevo");
-			log_trace(logger,"Error al copiar bloque recibido");
+			log_error(logger,"Error al copiar bloque recibido");
 			liberarEstructuraBuffer(bloque);
 		//borrar archivo
 			return -1;
@@ -434,7 +434,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	}
 
 	if (msync((void *)archivoMapeado, tablaArchivo->tamanioTotal, MS_SYNC) < 0) {
-		log_trace(logger,"Error al hacer msync");
+		log_error(logger,"Error al hacer msync");
 		puts("Error al hacer msync");
 		return -1;
 	}
