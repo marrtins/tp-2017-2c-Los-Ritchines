@@ -23,9 +23,6 @@ char * generarStringNodoNTotal(char * nombre){
 void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
 	char * ruta = strdup("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 	FILE * archivoTablaDeNodos = fopen(ruta, "rb");
-	if(archivoTablaDeNodos == NULL){
-		log_error(logger, "No se pudo levantar la tabla de nodos, error irrecuperable");
-	}
 	char * mensaje;
 	if (archivoTablaDeNodos == NULL) {
 		mensaje = malloc(250);
@@ -45,12 +42,11 @@ void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
 		nodo = malloc(sizeof(Tnodo));
 		nodo->nombre = strdup(nodos[i]);
 		nodoNLibres = generarStringNodoNLibre(nodos[i]);
-		nodo->cantidadBloquesLibres = config_get_int_value(archivo,
-				nodoNLibres);
+		nodo->cantidadBloquesLibres = config_get_int_value(archivo,	nodoNLibres);
 		nodoNTotal = generarStringNodoNTotal(nodos[i]);
 		nodo->cantidadBloquesTotal = config_get_int_value(archivo, nodoNTotal);
 		nodo->bitmap = crearBitmap(nodo->cantidadBloquesTotal);
-		puts("levantando bitmap");
+		mostrarBitmap(nodo->bitmap);
 		levantarBitmapDeUnNodo(nodo);
 		nodo->fd = -1;
 		list_add(desconectados, nodo);

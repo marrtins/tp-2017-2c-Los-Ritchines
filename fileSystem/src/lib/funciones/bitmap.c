@@ -20,7 +20,7 @@ void mostrarBitmap(t_bitarray* bitmap){
 }
 
 void levantarBitmapDeUnNodo(Tnodo * nodo){
-	char * rutaArchivo = malloc(200);
+	char * rutaArchivo = malloc(150);
 	rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
 	puts(rutaArchivo);
 	FILE * archivo = fopen(rutaArchivo, "r");

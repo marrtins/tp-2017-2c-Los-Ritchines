@@ -5,8 +5,6 @@ char * recvRutaArchivo(int socket){
 
 	char * buffer;
 	TpackBytes *pathArchivo;
-	Theader head;
-	int stat;
 
 	puts("Nos llega el path del archivo");
 
