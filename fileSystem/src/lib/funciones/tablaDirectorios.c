@@ -146,29 +146,36 @@ void inicializarTablaDirectorios(){
 
 void formatearTablaDeNodos(){
 	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-	char * nodoNTotal;
-	char * nodoNLibre;
-	char * nodoNTotalStringValue;
+	char * nodoNTotalKey;
+	char * nodoNLibreKey;
+	int nodoNTotal;
+	char * tamanioString;
+	char * nodoNTotalString;
+	int tamanio;
 	char ** nodos = config_get_array_value(archivo,"NODOS");
 	int i = 0;
+
 	while(nodos[i]!=NULL){
-		nodoNTotal = generarStringNodoNTotal(nodos[i]);
-		nodoNLibre = generarStringNodoNLibre(nodos[i]);
-		nodoNTotalStringValue = config_get_string_value(archivo, nodoNTotal);
-		config_set_value(archivo,nodoNLibre, nodoNTotalStringValue);
-		free(nodoNTotal);
-		free(nodoNLibre);
-		free(nodoNTotalStringValue);
+		nodoNTotalKey = generarStringNodoNTotal(nodos[i]);
+		nodoNLibreKey = generarStringNodoNLibre(nodos[i]);
+		nodoNTotal = config_get_int_value(archivo, nodoNTotalKey);
+		nodoNTotalString = string_itoa(nodoNTotal);
+		config_set_value(archivo, nodoNLibreKey, nodoNTotalString);
+		free(nodoNTotalKey);
+		free(nodoNLibreKey);
+		free(nodoNTotalString);
 		i++;
 	}
 
-	char* tamanio = config_get_string_value(archivo, "TAMANIO");
-	config_set_value(archivo,"LIBRE",tamanio);
+	tamanio = config_get_int_value(archivo, "TAMANIO");
+	tamanioString = string_itoa(tamanio);
+	config_set_value(archivo,"LIBRE",string_itoa(tamanio));
 	config_save(archivo);
 	config_destroy(archivo);
 	liberarPunteroDePunterosAChar(nodos);
 	free(nodos);
-	free(tamanio);
+	free(tamanioString);
+
 }
 
 void formatearFS(){
@@ -586,22 +593,15 @@ void removerDirectorios(char *ruta){
 
 	directorios = buscarDirectorios(ruta);
 
-	if(directorios[i] != NULL){
+	while (directorios[i] != NULL) {
 
-		while(directorios[i] != NULL){
+		removerArchivos(directorios[i]);
+		rmdir(directorios[i]);
+		i++;
 
-			removerArchivos(directorios[i]);
-			rmdir(directorios[i]);
-			i++;
-
-		}
-		liberarPunteroDePunterosAChar(directorios);
-		free(directorios);
-	}else {
-
-		free(directorios);
 	}
-
+	liberarPunteroDePunterosAChar(directorios);
+	free(directorios);
 }
 
 
