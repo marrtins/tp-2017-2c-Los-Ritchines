@@ -121,6 +121,7 @@ int validarQueLaRutaTengaElNombreDelArchivo(char * ruta);
 void removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
 void removerDirectorioDeTabla(char* directorio);
+int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs);
 
 
 //Bitmap
