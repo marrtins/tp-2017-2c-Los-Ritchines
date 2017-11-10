@@ -92,6 +92,8 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 	}
 	printf("fin thread de almacenamiento final del job %d \n",atributos->infoAlmacenamiento.job);
+	puts("fin conexion c yaama");
+	close(sockYama);
 }
 
 

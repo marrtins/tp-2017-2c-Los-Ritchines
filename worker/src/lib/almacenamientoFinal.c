@@ -36,6 +36,10 @@ int realizarAlmacenamientoFinal(client_sock){
 	printf("llego la info apra almacenamientofinal\n");
 	printf("nombre resultante %s\n tempred %s\n",infoAlmacenado->nombreResultante,infoAlmacenado->nombreTempReduccion);
 
+
+
+
+
 	puts("me conecto a fs");
 	int sockFS=conectarAServidor(worker->ip_filesystem,worker->puerto_filesystem);
 	printf("sock fs:%d\n",sockFS);
@@ -69,7 +73,7 @@ int realizarAlmacenamientoFinal(client_sock){
 
 //puts aca envio a filesystem
 
-	sleep(1);
+	sleep(2);
 
 
 	Theader *headEnvio=malloc(sizeof(Theader));

@@ -61,13 +61,17 @@ int realizarReduccionGlobal(client_sock){
 	if(stat<0){
 		puts("error");
 	}
-
+puts("recibi");
 	//le pido a todos los workers que me pasen sus reducciones locales.
 
 	char * rutaApareoFinal=string_new();
+	puts("str new");
 	string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
+	puts(rutaApareoFinal);
 	cont++;
 	string_append(&rutaApareoFinal,string_itoa(cont));
+	puts(rutaApareoFinal);
+	puts("realizar apaglobal");
 	stat = realizarApareoGlobal(infoReduccionGlobal->listaNodos,rutaApareoFinal);
 	if(stat<0){
 			puts("error");
@@ -118,6 +122,7 @@ int realizarReduccionGlobal(client_sock){
 
 		puts("Envio header. fin reduccion global ok");
 		enviarHeader(client_sock,head);
+		remove(rutaScriptReductor);
 		//close(client_sock);
 		exit(0);
 
@@ -141,44 +146,48 @@ int realizarReduccionGlobal(client_sock){
 int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	int i,stat;
 
+
+
 	int packSize2;
 	Theader headEnvio;
 	headEnvio.tipo_de_proceso=WORKER;
 	headEnvio.tipo_de_mensaje=GIVE_TMPREDUCCIONLOCAL;
 	char * buffer2;
 	int cantArch = list_size(listaInfoNodos);
-
+	int fdWorker;
 	char * rutaMiTemporal = string_new();
 	string_append(&rutaMiTemporal,"/home/utnso/");
 	t_list * listaFds = list_create();
 	for(i=0;i<list_size(listaInfoNodos);i++){
 		TinfoNodoReduccionGlobal *infoNodo = list_get(listaInfoNodos,i);
 		if(infoNodo->nodoEncargado!=1){//no soy yo.(soy el unico encargado(==1)
-			int fdWorker = conectarAServidor(infoNodo->ipNodo,infoNodo->puertoNodo);
+			fdWorker = conectarAServidor(infoNodo->ipNodo,infoNodo->puertoNodo);
 			buffer2=serializeBytes(headEnvio,infoNodo->temporalReduccion,infoNodo->temporalReduccionLen,&packSize2);
 			if ((stat = send(fdWorker, buffer2, packSize2, 0)) == -1){
 				puts("no se pudo enviar path del archivo temporal que necesitamos. ");
 				return  FALLO_SEND;
 			}
-			TinfoApareoGlobal *infoWorker = malloc(sizeof (TinfoApareoGlobal));
-			infoWorker->fdWorker=fdWorker;
-			infoWorker->eofTemporal=false;
-			infoWorker->encargado=false;
-			list_add(listaFds,infoWorker);
+			TinfoApareoGlobal *infoWorker1 = malloc(sizeof (TinfoApareoGlobal));
+			infoWorker1->fdWorker=fdWorker;
+			infoWorker1->eofTemporal=false;
+			infoWorker1->encargado=false;
+			list_add(listaFds,infoWorker1);
 		}else{
 
 
 			string_append(&rutaMiTemporal,infoNodo->temporalReduccion);
-			TinfoApareoGlobal *infoWorker = malloc(sizeof (TinfoApareoGlobal));
-			infoWorker->fdWorker=-1;
-			infoWorker->eofTemporal=false;
-			infoWorker->encargado=true;
-			list_add(listaFds,infoWorker);
+			TinfoApareoGlobal *infoWorker2 = malloc(sizeof (TinfoApareoGlobal));
+			infoWorker2->fdWorker=-1;
+			infoWorker2->eofTemporal=false;
+			infoWorker2->encargado=true;
+			list_add(listaFds,infoWorker2);
 
 		}
 	}
 
+	puts("pase pedir info. abro archivo");
 	FILE * fdTempFilePropio;
+	puts(rutaMiTemporal);
 	fdTempFilePropio = fopen(rutaMiTemporal,"r");
 
 	int eofTotal = list_size(listaFds);
@@ -189,40 +198,59 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	head->tipo_de_mensaje=GIVE_NEXTLINE;
 	TpackBytes *siguienteLinea;
 
+
+	puts("pongo listafsds");
+	for(i=0;i<list_size(listaFds);i++){
+		TinfoApareoGlobal *infoWorker3 = list_get(listaFds,i);
+		printf("fd %d\n",infoWorker3->fdWorker);
+	}
+
+
 	char * lineaAux=malloc(MAXSIZELINEA);
 
 	char lineas[cantArch][MAXSIZELINEA];
 	char * buffer ;
-
+	puts("pido la primer linea");
+	//int fdWorker;
 	//pido la primer linea a cada worker y leo la mia:
 	for(i=0;i<list_size(listaFds);i++){
-		TinfoApareoGlobal *infoWorker = list_get(listaFds,i);
-		int fdWorker = infoWorker->fdWorker;
-		if(!infoWorker->encargado){
-
+		TinfoApareoGlobal *infoWorker4 = list_get(listaFds,i);
+		puts("pase infow");
+		printf("fdw %d\n ",infoWorker4->fdWorker);
+		fdWorker = infoWorker4->fdWorker;
+		printf("fdw %d\n ",fdWorker);
+		puts("pase fdw");
+		if(!infoWorker4->encargado){
+			puts("if 1");
 			head->tipo_de_mensaje=GIVE_NEXTLINE;
 			enviarHeader(fdWorker,head);
-
+			puts("envie hejader");
 			if ((stat = recv(fdWorker, head, sizeof(Theader), 0)) < 0){
 				log_error(logger,"Error en la recepcion del header.");
 			}
+			puts("recibo");
 			if(head->tipo_de_mensaje==TAKE_NEXTLINE){
 				if ((buffer = recvGeneric(fdWorker)) == NULL){
 					puts("Fallo recepcion de nextline");
 					return FALLO_RECV;
 				}
+				puts("pase buffer");
 
 				if ((siguienteLinea =  deserializeBytes(buffer)) == NULL){
 					puts("Fallo deserializacion de Bytes de nextline");
 					return FALLO_GRAL;
 				}
-
+				puts("pase sig linea");
 				printf("Linea Recibida: %s\n",siguienteLinea->bytes);
 				strcpy(lineas[i],siguienteLinea->bytes);
 			}
 		}else{
+			puts("hago fscanf");
+			printf("FD:%d\n",fdTempFilePropio);
 			fscanf (fdTempFilePropio, "%s", lineaAux);
 			strcpy(lineas[i],lineaAux);
+			puts("linea:");
+			puts(lineaAux);
 		}
 	}
 	puts("tengo estas lineas x el momento");

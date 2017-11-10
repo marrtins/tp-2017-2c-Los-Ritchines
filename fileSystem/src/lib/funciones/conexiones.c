@@ -168,20 +168,25 @@ void conexionesDatanode(void * estructura){
 				else if(head->tipo_de_proceso == WORKER){
 						switch(head->tipo_de_mensaje){
 							case ALMACENAR_ARCHIVO:
+								puts("llego conexion de worker");
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
+								puts(rutaLocalArchivoFinal);
 								extensionArchivoFinal = obtenerExtensionDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
+								puts(extensionArchivoFinal);
 								if(!strcmp(extensionArchivoFinal, "csv")){
 									archivoFinal = fopen(rutaLocalArchivoFinal, "w");
 								}else{
 									archivoFinal = fopen(rutaLocalArchivoFinal, "wb");
 								}
-
+								truncate(rutaLocalArchivoFinal, estructuraArchivoFinal->tamanioContenido);
+								puts("pase extensio");
 								fileDescriptorArchivoFinal = fileno(archivoFinal);
 
 								if ((archivoFinalMapeado = mmap(NULL, estructuraArchivoFinal->tamanioContenido, PROT_WRITE, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
 									logAndExit("Error al hacer mmap");
 								}
+								puts("pase archivo final");
 
 								pasarInfoDeUnArchivoAOtro(estructuraArchivoFinal->contenidoArchivo, archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
 

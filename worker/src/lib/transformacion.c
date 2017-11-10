@@ -113,8 +113,8 @@ int realizarTransformacion(int client_sock){
 		puts("Envio header. fin transfo ok");
 		enviarHeader(client_sock,headEnvio);
 
-		//remove(rutaBloque);
-		//remove(rutaScriptTransformador);
+		remove(rutaBloque);
+		remove(rutaScriptTransformador);
 
 		exit(0);
 
