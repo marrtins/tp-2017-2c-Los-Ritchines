@@ -254,6 +254,25 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	return 1;
 }
 
+int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs){
+/*	char* nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(rutaLocalArchivo);
+	char* rutaArchivoYamafs = string_new();
+	char input;
+	string_append(rutaArchivoYamafs,rutaDestinoYamafs);
+	string_append(rutaArchivoYamafs,"/");
+	string_append(rutaArchivoYamafs,nombreArchivo);
+	int index = obtenerIndexDeUnaRuta(rutaDestinoYamafs);
+	if(existeArchivo(index,rutaArchivoYamafs)){
+		puts("Epa, parece que existe el archivo en la ubicacion que pusiste");
+		puts("Desea sobreescribirlo? s / n");
+		do {
+			scanf("%c",&input);
+		}
+		while (input != 's' || input != 'n' || input != 'S' || input != 'N');
+	}*/
+	return 1;
+}
+
 int almacenarArchivo(char **palabras){
 	//palabras[1] --> ruta archivo a almacenar
 	//palabras[2] --> ruta de nuestro directorio
