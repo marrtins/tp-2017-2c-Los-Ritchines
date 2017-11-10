@@ -82,7 +82,7 @@ int crearDirectorio(char * ruta) {
 		liberarPunteroDePunterosAChar(carpetas);
 		free(carpetas);
 		free(directorio);
-		log_trace(logger, "Ya exiten 100 directorios, no se pudo crear otro.");
+		log_error(logger, "Ya exiten 100 directorios, no se pudo crear otro.");
 		return -1;
 	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
@@ -123,7 +123,7 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
-			log_trace(logger, "No se pudo crear un directorio dentro de un directorio que no existe");
+			log_error(logger, "No se pudo crear un directorio dentro de un directorio que no existe");
 			return -1;
 	}
 }
@@ -132,7 +132,7 @@ void crearRoot(){
 }
 
 void inicializarTablaDirectorios(){
-	char * ruta = malloc(120);
+	char * ruta = malloc(150);
 	FILE * archivoDirectorios = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/directorios.txt", "w");
 	strcpy(ruta,"/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	vaciarLista();
@@ -146,19 +146,19 @@ void inicializarTablaDirectorios(){
 
 void formatearTablaDeNodos(){
 	t_config * archivo = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
-	char * keyTotal;
-	char * keyLibre;
 	char * nodoNTotal;
+	char * nodoNLibre;
+	char * nodoNTotalStringValue;
 	char ** nodos = config_get_array_value(archivo,"NODOS");
 	int i = 0;
 	while(nodos[i]!=NULL){
-		keyTotal = generarStringNodoNTotal(nodos[i]);
-		keyLibre = generarStringNodoNLibre(nodos[i]);
-		nodoNTotal = config_get_string_value(archivo, keyTotal);
-		config_set_value(archivo,keyLibre, nodoNTotal);
-		free(keyTotal);
-		free(keyLibre);
+		nodoNTotal = generarStringNodoNTotal(nodos[i]);
+		nodoNLibre = generarStringNodoNLibre(nodos[i]);
+		nodoNTotalStringValue = config_get_string_value(archivo, nodoNTotal);
+		config_set_value(archivo,nodoNLibre, nodoNTotalStringValue);
 		free(nodoNTotal);
+		free(nodoNLibre);
+		free(nodoNTotalStringValue);
 		i++;
 	}
 
@@ -227,7 +227,7 @@ void mostrarCsv(char * rutaLocal){
 	char * archivoMapeado;
 	int fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logger, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}
@@ -250,7 +250,7 @@ void mostrarBinario(char * rutaLocal){
 	char * archivoMapeado;
 	int fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logger, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}
@@ -321,7 +321,7 @@ int directorioNoExistente(char ** carpetas) {
 	return -1;
 	}else{
 		puts("Falta la referencia al filesystem local 'yamafs:'");
-		log_trace(logger, "No se pudo crear el directorio por que no existe la referencia 'yamafs:'");
+		log_error(logger, "No se pudo crear el directorio por que no existe la referencia 'yamafs:'");
 		free(yamafs);
 		return -1;
 	}
@@ -349,7 +349,7 @@ int buscarIndexPorNombreDeDirectorio(char * directorio){
 	if(estructuraDirectorio != NULL){
 		return estructuraDirectorio->index;
 	}
-	log_trace(logger, "No existe el nombre de directorio.");
+	log_error(logger, "No existe el nombre de directorio.");
 	return -1;
 }
 
@@ -490,7 +490,7 @@ char** buscarDirectorios(char * ruta){
 	  if (directorioActual == NULL){
 	    puts("No pudo abrir el directorio");
 
-	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
+	    log_error(logger,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los directorios que estan adentro del directorio actual
@@ -532,7 +532,7 @@ char** buscarArchivos(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
-	    log_trace(logger,"No se pudo abrir el directorio, hubo un error.");
+	    log_error(logger,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los archivos que estan adentro del directorio actual
@@ -634,7 +634,7 @@ void listarArchivos(char* ruta){
 		}else {
 		printf("El directorio de ruta %s no tiene archivos\n", ruta);
 
-		log_trace(logger,"El directorio no tiene archivos");
+		log_error(logger,"El directorio no tiene archivos");
 		free(archivos);
 		free(rutaArchivosDirectorio);
 		}
@@ -829,7 +829,7 @@ void moverArchivo(char* ruta1, char* ruta2){
 		free(extension);
 		fclose(archivo);
 		close(fdAMover);
-		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logger, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}
@@ -851,7 +851,7 @@ void moverArchivo(char* ruta1, char* ruta2){
 		fclose(archivoMovido);
 		close(fd);
 		close(fdAMover);
-		log_trace(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logger, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}

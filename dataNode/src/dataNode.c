@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
-	int socketFS, fd, estado, bloqueAEliminar;
+	int socketFS, fd, estado;
 	char *bufferHead = malloc(sizeof(Theader));
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/dataNode.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/dataNode.log", "dataNode", false, LOG_LEVEL_INFO);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log");
+	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log", "dataNode", false, LOG_LEVEL_ERROR);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 
 		} else if (estado == 0) {
 			sprintf(mensaje, "Se desconecto el socket de fd: %d\n", socketFS);
-			log_trace(logger, mensaje);
+			log_error(logger, mensaje);
 			break;
 		}
 		printf("Recibi el head %d bytes\n", estado);

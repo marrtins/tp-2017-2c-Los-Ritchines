@@ -1,6 +1,7 @@
 #include "../funcionesFS.h"
 
-void inicializarTablaDeNodos(char * ruta){
+void inicializarTablaDeNodos(){
+	char * ruta = strdup("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 	FILE * archivo = fopen(ruta, "wb");
 	fclose(archivo);
 	t_config * archivoNodos = config_create(ruta);
@@ -11,17 +12,6 @@ void inicializarTablaDeNodos(char * ruta){
 	config_destroy(archivoNodos);
 }
 
-void bajaDeNodoEnTablaDeNodos(Tnodo * nodo){
-	eliminarNodoDeTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodo);
-	agregarNodoATablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin", nodo);
-}
-
-void altaDeNodoEnTablaDeNodos(Tnodo * nodo){
-	agregarNodoATablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodo);
-	eliminarNodoDeTablaDeNodos("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin", nodo);
-
-}
-
 char * generarStringNodoNLibre(char * nombre){
 	return string_from_format("%sLibre", nombre);
 }
@@ -30,13 +20,18 @@ char * generarStringNodoNTotal(char * nombre){
 	return string_from_format("%sTotal", nombre);
 }
 
-void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados){
+void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
+	char * ruta = strdup("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 	FILE * archivoTablaDeNodos = fopen(ruta, "rb");
-	char * mensaje;
 	if(archivoTablaDeNodos == NULL){
+		log_error(logger, "No se pudo levantar la tabla de nodos, error irrecuperable");
+	}
+	char * mensaje;
+	if (archivoTablaDeNodos == NULL) {
 		mensaje = malloc(250);
 		sprintf(mensaje, "No se pudo levantar un estado anterior ya que no existe el archivo de la ruta: %s", ruta);
-		log_trace(logger, mensaje);
+		log_error(logger, mensaje);
+		free(mensaje);
 		return;
 	}
 	fclose(archivoTablaDeNodos);
@@ -47,7 +42,6 @@ void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados){
 	char * nodoNLibres;
 	Tnodo * nodo;
 	while (nodos[i] != NULL) {
-		puts(nodos[i]);
 		nodo = malloc(sizeof(Tnodo));
 		nodo->nombre = strdup(nodos[i]);
 		nodoNLibres = generarStringNodoNLibre(nodos[i]);
@@ -55,12 +49,9 @@ void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados){
 				nodoNLibres);
 		nodoNTotal = generarStringNodoNTotal(nodos[i]);
 		nodo->cantidadBloquesTotal = config_get_int_value(archivo, nodoNTotal);
-		puts("creando bitmap");
-		printf("%d", nodo->cantidadBloquesTotal);
 		nodo->bitmap = crearBitmap(nodo->cantidadBloquesTotal);
 		puts("levantando bitmap");
 		levantarBitmapDeUnNodo(nodo);
-		puts("bitmap");
 		nodo->fd = -1;
 		list_add(desconectados, nodo);
 		free(nodoNLibres);
@@ -70,18 +61,11 @@ void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados){
 	liberarPunteroDePunterosAChar(nodos);
 	free(nodos);
 	config_destroy(archivo);
-	puts("voy a mostrar");
-	mostrarListaDeNodos(desconectados);
+	free(ruta);
 }
 
-void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
-	inicializarListaDeNodosPorConectar("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", desconectados);
-	inicializarListaDeNodosPorConectar("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodosDesconectados.bin", desconectados);
-
-}
-
-void agregarNodoATablaDeNodos(char * ruta, Tnodo * nuevoNodo){
-	t_config * tablaDeNodos = config_create(ruta);
+void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
+	t_config * tablaDeNodos = config_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 
 	//TAMANIO
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, "TAMANIO", nuevoNodo->cantidadBloquesTotal, sumaDeDosNumerosInt);
@@ -113,7 +97,8 @@ void agregarNodoATablaDeNodos(char * ruta, Tnodo * nuevoNodo){
 	free(bloquesTotalString);
 }
 
-void eliminarNodoDeTablaDeNodos(char * ruta, Tnodo * nuevoNodo){
+void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo){
+	char * ruta = strdup("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin");
 	t_config * tablaDeNodos = config_create(ruta);
 
 	//NODONTOTAL
@@ -139,11 +124,12 @@ void eliminarNodoDeTablaDeNodos(char * ruta, Tnodo * nuevoNodo){
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
 
-	eliminarKeyDeArchivo("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodoTotalAString);
-	eliminarKeyDeArchivo("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/nodos.bin", nodoLibreAString);
+	eliminarKeyDeArchivo(ruta, nodoTotalAString);
+	eliminarKeyDeArchivo(ruta, nodoLibreAString);
 
 	free(nodoTotalAString);
 	free(nodoLibreAString);
+	free(ruta);
 }
 
 void levantarTablaNodos(Tnodos * tablaNodos){

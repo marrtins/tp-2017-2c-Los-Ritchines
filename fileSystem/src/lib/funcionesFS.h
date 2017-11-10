@@ -48,14 +48,14 @@ void levantarTablaNodos(Tnodos * tablaNodos);
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos);
 void mostrarTablaArchivo(Tarchivo* tablaArchivo);
 void guardarTablaDeArchivo(Tarchivo * archivoAAlmacenar, char * rutaDestino);
-void agregarNodoATablaDeNodos(char * ruta, Tnodo * nuevoNodo);
+void agregarNodoATablaDeNodos(Tnodo * nuevoNodo);
 void altaDeNodoEnTablaDeNodos(Tnodo * nodo);
 void bajaDeNodoEnTablaDeNodos(Tnodo * nodo);
 void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, char * nombreElemento);
 void eliminarElementoDeArrayArchivosConfig(t_config * archivoConfig, char * key, char * nombreElemento);
-void inicializarTablaDeNodos(char * ruta);
+void inicializarTablaDeNodos();
 void inicializarTablaDirectorios();
-void eliminarNodoDeTablaDeNodos(char * ruta, Tnodo * nuevoNodo);
+void eliminarNodoDeTablaDeNodos(Tnodo * nuevoNodo);
 void ocuparBloqueEnTablaNodos(char * nombreNodo);
 void generarArrayParaArchivoConfig(t_config * archivoConfig, char * key, char * dato1, char * dato2);
 int cantidadDeBloquesDeUnArchivo(unsigned long long tamanio);
@@ -79,7 +79,6 @@ void removerArchivos(char * ruta);
 int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
-void inicializarListaDeNodosPorConectar(char * ruta, t_list * desconectados);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
