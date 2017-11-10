@@ -265,8 +265,8 @@ int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs)
 	if(existeArchivo(index,rutaArchivoYamafs)){
 		puts("Epa, parece que existe el archivo en la ubicacion que pusiste");
 		puts("Desea sobreescribirlo? s / n");
-		scanf("%c",&input);
-		while (input != 's' || input != 'n' || input != 'S' || input != 'N'){
+		scanf(" %c",&input);
+		while (input != 's' && input != 'n' && input != 'S' && input != 'N'){
 			puts("dale boludo, pone s ó n");
 			scanf("%c", &input);
 		}
