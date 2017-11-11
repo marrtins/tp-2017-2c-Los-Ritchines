@@ -209,7 +209,10 @@ void consolaCpfrom(char** palabras, int cantidad){
 	if(cantidad == 2){
 		if(esRutaYamafs(palabras[2])){
 			if(existeDirectorio(palabras[2])){
-				almacenarArchivo(palabras);
+				if(archivoRepetidoEnDirectorio(palabras[1],palabras[2])){
+					almacenarArchivo(palabras);
+				}
+				else return;
 			}
 			else {
 				puts("No existe el directorio");
@@ -285,6 +288,7 @@ void consolaRemove (char** palabras, int cantidad){
 		if (esRutaYamafs(palabras[1])){
 			if(verificarRutaArchivo(palabras[1])){
 				removerArchivo(palabras[1]);
+				puts("ya pude remover el archivo");
 			} else{
 				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
 			}
