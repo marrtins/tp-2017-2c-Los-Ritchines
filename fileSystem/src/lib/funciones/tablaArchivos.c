@@ -72,13 +72,12 @@ int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
 	empaquetarBloqueAEliminar(buffer, head, numeroDeBloque);
 
 	if ((send(nodo->fd, buffer->buffer, buffer->tamanio, 0)) == -1) {
-		puts("No se pudo comunicar con datanode, para que elimine el nodo.");
+		log_error(logError, "No se pudo enviar informacion a datanode para que se borre un bloque.")
 		free(head);
 		liberarEstructuraBuffer(buffer);
 		return 0;
 	}
 
-	puts("Bloque eliminado");
 	return 1;
 }
 
@@ -124,6 +123,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 
 	if(numeroDeBloque > cantidadDeBloques-1){
 		puts("El bloque que quiere eliminar, no existe en el archivo");
+		log_error(logError, "El bloque a eliminar, no existe en el archivo");
 		config_destroy(archivo);
 		return;
 	}
@@ -274,9 +274,7 @@ void almacenarEstructuraArchivoEnUnArchivo(Tarchivo * archivoAAlmacenar, char * 
 		free(cantidadDeCopiasString);
 	}
 
-	puts("guardando TODO");
 	config_save(archivoConfig);
-	puts("guardado.");
 	config_destroy(archivoConfig);
 
 }
@@ -312,22 +310,18 @@ void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDa
 
 	puts(rutaLocalArchivo);
 	t_config *archivo = config_create(rutaLocalArchivo);
-	puts("Voy a agregar copia a tabla archivo");
 
 	bloqueNCopias = generarStringBloqueNCopias(nroBloque);
-	puts(bloqueNCopias);
-	puts("paso generar string bloqueNCopias");
+
 	cantidadDeCopias = config_get_int_value(archivo,bloqueNCopias);
-	printf("cant de copias obtenidas antes de setear %d\n",cantidadDeCopias);
 	setearAtributoDeArchivoConfigConInts(archivo,bloqueNCopias,1,sumaDeDosNumerosInt);
-	puts("seteado el atributo bloqueNCOPIAS");
 
 	char * bloqueDN = string_itoa(bloqueDatabin);
-puts("Aca no rompe");
+
 	bloqueNCopiaM = generarStringDeBloqueNCopiaN(nroBloque,cantidadDeCopias);
-	puts("genero bloqeNcopiaM");
+
 	generarArrayParaArchivoConfig(archivo,bloqueNCopiaM,nodo,bloqueDN);
-	puts("ya esta hecho");
+
 	config_save(archivo);
 	config_destroy(archivo);
 	free(bloqueNCopias);

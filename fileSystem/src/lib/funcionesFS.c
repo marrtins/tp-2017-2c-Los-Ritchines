@@ -212,7 +212,14 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	printf("El tamaño del archivo es: %llu\n", tamanio);
 
-	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
+	if(tamanio == 0){
+		puts("Error al almacenar archivo, está vacío");
+		log_error(logError, "Error al almacenar archivo, está vacío");
+		liberarEstructuraBloquesAEnviar(infoBloque);
+		return -1;
+	}
+
+	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED, fd, 0)) == MAP_FAILED) {
 		logErrorAndExit("Error al hacer mmap");
 	}
 
@@ -223,15 +230,10 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	printf("La cantidad de bloquees es: %d \n", cantidadDeBloquesDeUnArchivo(tamanio));
 
-	if(tamanio == 0){
-		puts("Error al almacenar archivo, está vacío");
-		log_error(logError, "Error al almacenar archivo, está vacío");
-		liberarEstructuraBloquesAEnviar(infoBloque);
-		return -1;
-	}
-
 	if(list_size(listaDeNodos) <= 1){
-		puts("No hay nodos conectados, hermano");
+		puts("No hay nodos conectados, imposible realizar la operacion.");
+		log_error(logError, "Los nodos no están conectados, en error en realizar la operación de almacenar en yamafs.");
+		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
 
@@ -298,9 +300,10 @@ int almacenarArchivo(char **palabras){
 		liberarPunteroDePunterosAChar(splitDeRuta);
 		free(splitDeRuta);
 		free(nombreArchivoConExtension);
+		//no se utiliza la funcion que libera la estructura porque
+		//si falla, no se malloquean los bloques
 		free(archivoAAlmacenar->nombreArchivoSinExtension);
 		free(archivoAAlmacenar->extensionArchivo);
-		free(archivoAAlmacenar->bloques);
 		free(archivoAAlmacenar);
 		return -1;
 	}

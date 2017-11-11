@@ -31,10 +31,10 @@ void procesarInput(char* linea) {
 		if (cantidad == 2) {
 			if (verificarRutaArchivo(palabras[1])) {
 				if (copiarArchivo(palabras) != -1) {
-					puts("Se copio el archivo, bro.");
+					puts("Se copio el archivo correctamente.");
 					return;
 				} else {
-					puts("No se pudo copiar el archivo, bro.");
+					puts("No se pudo copiar el archivo.");
 				}
 			}
 		}else {
@@ -78,19 +78,18 @@ void procesarCpblock(char ** palabras){
 				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
 
 				if (nroBloque>=cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)) {
-					puts("Numero de bloque incorrecto");
+					puts("Numero de bloque incorrecto, intentelo de nuevo.");
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
 				}
 				if (nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0) {
-					puts("No se encontraron los nodos con las copias del bloque");
+					puts("No se encontraron los nodos con las copias del bloque.");
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
 				}
 				pthread_mutex_init(&bloqueMutex, NULL);
-				puts("Voy a pedir bloque");
 				if (pedirBloque(tablaArchivo, nroBloque) == -1) {
-					puts("Error al solicitar bloque");
+					puts("Error al solicitar bloque.");
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
 				}
@@ -100,7 +99,7 @@ void procesarCpblock(char ** palabras){
 				puts("voy a copiar bloque");
 				bloque = malloc(sizeof(Tbuffer));
 				if (copiarBloque(bloqueACopiar, bloque) == -1) {
-					puts("Error al copiar bloque recibido");
+					puts("Error al copiar bloque recibido.");
 				}
 				liberarEstructuraBuffer(bloqueACopiar);
 				bloqueAEnviar = malloc(sizeof(TbloqueAEnviar));
@@ -108,7 +107,7 @@ void procesarCpblock(char ** palabras){
 				bloqueAEnviar->tamanio = bloque->tamanio;
 				bloqueAEnviar->numeroDeBloque = bloqueDN;
 				if (enviarBloqueA(bloqueAEnviar, palabras[3]) == -1) {
-					puts("Error no se pudo enviar el bloque");
+					puts("Error no se pudo enviar el bloque.");
 					liberarEstructuraBuffer(bloque);
 					return;
 				}
@@ -116,7 +115,7 @@ void procesarCpblock(char ** palabras){
 				ocuparBloque(nodo, bloqueDN);
 				free(rutaLocalArchivo);
 				liberarEstructuraBuffer(bloque);
-				puts("Perfeeecto, el bloque se copio lo mas bien");
+				puts("El bloque se copio exitosamente.");
 			}
 			else{
 				puts("El nodo destino esta lleno.");
@@ -153,15 +152,15 @@ void consolaRename(char** palabras, int cantidad) {
 				}
 			}
 			else {
-				puts("No se puede renombrar el root");
+				puts("No se puede renombrar el root.");
 			}
 		}
 		else {
-			puts("Falta la referencia a yamafs:/");
+			puts("Falta la referencia a yamafs:/.");
 		}
 
 	} else {
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }
 
@@ -177,11 +176,11 @@ void consolaCat(char ** palabras, int cantidad) {
 				puts("La ruta especificada no corresponde a ningun archivo de yamafs.");
 			}
 		} else{
-			puts("Falta la referencia a yamafs:/");
+			puts("Falta la referencia a yamafs:/.");
 		}
 	}
 	else {
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }
 
@@ -189,21 +188,21 @@ void consolaMkdir(char**palabras, int cantidad){
 	if(cantidad == 1){
 		if(esRutaYamafs(palabras[1])){
 			if(existeDirectorio(palabras[1])){
-				puts("El directorio ya existe");
+				puts("El directorio ya existe.");
 			}
 			else{
-				puts("No existe el directorio");
+				puts("No existe el directorio.");
 				if(crearDirectorio(palabras[1])>=0){
 					persistirTablaDeDirectorios();
 				}
 			}
 		}
 		else{
-			puts("Falta la referencia a yamafs:/");
+			puts("Falta la referencia a yamafs:/.");
 		}
 	}
 	else{
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }
 
@@ -217,15 +216,15 @@ void consolaCpfrom(char** palabras, int cantidad){
 				else return;
 			}
 			else {
-				puts("No existe el directorio");
+				puts("No existe el directorio.");
 			}
 		}
 		else{
-			puts("Falta la referencia a yamafs en el segundo parametro");
+			puts("Falta la referencia a yamafs en el segundo parametro.");
 		}
 	}
 	else {
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }
 
@@ -234,7 +233,7 @@ void consolaMd5(char** palabras, int cantidad){
 		if(esRutaYamafs(palabras[1])){
 			getMD5(palabras[1]);
 		} else{
-			puts("Falta la referencia a yamafs:/");
+			puts("Falta la referencia a yamafs:/.");
 		}
 	}
 	else {
@@ -249,15 +248,15 @@ void consolaLs(char**palabras, int cantidad){
 				listarArchivos(palabras[1]);
 			}
 			else{
-				puts("No existe el directorio");
+				puts("No existe el directorio.");
 			}
 		}
 		else{
-			puts("Falta la referencia a yamafs");
+			puts("Falta la referencia a yamafs.");
 		}
 	}
 	else{
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }
 
@@ -273,15 +272,15 @@ void consolaInfo(char**palabras, int cantidad){
 				free(rutaLocal);
 			}
 			else{
-				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
+				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs.");
 			}
 		}
 		else{
-			puts("Falta la referencia a yamafs");
+			puts("Falta la referencia a yamafs.");
 		}
 	}
 	else{
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }
 
@@ -290,13 +289,13 @@ void consolaRemove (char** palabras, int cantidad){
 		if (esRutaYamafs(palabras[1])){
 			if(verificarRutaArchivo(palabras[1])){
 				removerArchivo(palabras[1]);
-				puts("ya pude remover el archivo");
+				puts("El archivo se elimino correctamente.");
 			} else{
-				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
+				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs.");
 			}
 		}
 		else{
-			puts("Falta la referencia a yamafs");
+			puts("Falta la referencia a yamafs.");
 		}
 	}
 	else if (cantidad ==2){
@@ -304,23 +303,23 @@ void consolaRemove (char** palabras, int cantidad){
 			if(esRutaYamafs(palabras[2])){
 				if(existeDirectorio(palabras[2])){
 					if(esDirectorioRaiz(palabras[2])){
-						puts("No se puede remover el directorio raíz");
+						puts("No se puede remover el directorio raíz.");
 					}
 					else if(esDirectorioVacio(palabras[2])){
 						removerDirectorio(palabras[2]);
-						puts("Ya pude remover el directorio");
+						puts("El directorio se elimino correctamente.");
 					}
 					 else{
-						puts("El directorio no esta vacío. No se puede remover");
+						puts("El directorio no esta vacío, por lo tanto, no se puede remover.");
 					}
 				}
 				else{
-					puts("No existe el directorio a remover");
+					puts("No existe el directorio a remover.");
 				}
 			}
 		}
 		else{
-			puts("Error, utilice el prefijo -d para borrar un directorio");
+			puts("Error, utilice el prefijo -d para borrar un directorio.");
 		}
 	}
 	else if(cantidad == 4){
@@ -337,20 +336,20 @@ void consolaRemove (char** palabras, int cantidad){
 					}
 				}
 				else{
-					puts("La ruta ingresada, no corresponde a ningún archivo del yamafs");
+					puts("La ruta ingresada, no corresponde a ningún archivo del yamafs.");
 				}
 			}
 			else{
-				puts("Falta la referencia a yamafs");
+				puts("Falta la referencia a yamafs.");
 			}
 		}
 		else{
-			puts("Error, utilice el prefijo -b para borrar un bloque");
+			puts("Error, utilice el prefijo -b para borrar un bloque.");
 		}
 	}
 
 	else{
-		puts("Error en la cantidad de parámetros");
+		puts("Error en la cantidad de parámetros.");
 	}
 }
 
@@ -368,7 +367,6 @@ int getMD5(char* rutaYamafs){
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaTmp);
 	system(comando);
-	puts("Obtuve el MD5 del archivo");
 	remove(rutaTmp);
 	free(comando);
 	free(rutaTmp);
@@ -383,11 +381,11 @@ void consolaMove(char ** palabras, int cantidad){
 		char** carpetas1 = string_split(palabras[1], "/");
 		char** carpetas2 = string_split(palabras[2], "/");
 		if(strcmp(carpetas1[0], "yamafs:") || strcmp(carpetas2[0], "yamafs:")){
-			puts("Falta la referencia a yamafs:/ en alguna de las rutas");
+			puts("Falta la referencia a yamafs:/ en alguna de las rutas.");
 		} else if(verificarRutaArchivo(palabras[1])){
 			moverArchivo(palabras[1], palabras[2]);
 		} else{
-			puts("No se quiere mover un archivo");
+			puts("Hubo un error y no se pudo mover el archivo. Verifique los parametros.");
 		}
 
 		liberarPunteroDePunterosAChar(carpetas1);
@@ -395,6 +393,6 @@ void consolaMove(char ** palabras, int cantidad){
 		liberarPunteroDePunterosAChar(carpetas2);
 		free(carpetas2);
 	}else{
-		puts("Error en la cantidad de parametros");
+		puts("Error en la cantidad de parametros.");
 	}
 }

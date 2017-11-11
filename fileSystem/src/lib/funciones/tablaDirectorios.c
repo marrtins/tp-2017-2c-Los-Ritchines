@@ -39,7 +39,7 @@ void levantarTablasDirectorios(){
 
 	if ((archivoMapeado = mmap(NULL,tam, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
 		puts("Error al hacer mmap");
-		logErrorAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap al levantar tabla de directorios. Error irreparable.");
 	}
 	fclose(archivoDirectorios);
 	close(fd);
@@ -78,15 +78,15 @@ int crearDirectorio(char * ruta) {
 	Tdirectorio * tDirectorio;
 
 	if(list_size(listaTablaDirectorios)>=100){
-		puts("Ya hay 100 directorios creados, no se puede crear el directorio");
+		puts("Ya hay 100 directorios creados, no se puede crear el directorio.");
 		liberarPunteroDePunterosAChar(carpetas);
 		free(carpetas);
 		free(directorio);
-		log_error(logError, "Ya exiten 100 directorios, no se pudo crear otro.");
 		return -1;
 	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
-		puts("No se puede crear el directorio");
+		//TODO falta decir por que no se pudo crear el directorio
+		puts("No se puede crear el directorio.");
 		liberarPunteroDePunterosAChar(carpetas);
 		free(carpetas);
 		free(directorio);
@@ -98,9 +98,6 @@ int crearDirectorio(char * ruta) {
 			if(indicePadre == -1){
 				indicePadre = 0;
 			}
-			printf("Indice padre del nuevo directorio %d\n", indicePadre);
-			printf("Index asignado al nuevo directorio %d\n", index);
-
 			indice = string_itoa(index);
 			string_append(&directorio, indice);
 			free(indice);
@@ -119,11 +116,10 @@ int crearDirectorio(char * ruta) {
 			free(directorio);
 			return 0;
 		}
-			puts("No se puede crear directorio dentro de un directorio que no existe");
+			puts("No se puede crear directorio dentro de un directorio que no existe.");
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
-			log_error(logError, "No se pudo crear un directorio dentro de un directorio que no existe");
 			return -1;
 	}
 }
@@ -245,10 +241,15 @@ void mostrarCsv(char * rutaLocal){
 	char entrada = 's';
 	int tamanioLineas = 20;
 	unsigned long long leido = 0;
-	while(leido < tamanio && entrada == 's'){
+	while(leido < tamanio && (entrada == 's' || entrada == 'a')){
 		leido += mostrarlineaDeUnMMap(archivoMapeado, tamanio, leido, tamanioLineas);
-		printf("Desea Seguir? (s/n) ");
-		scanf(" %c", &entrada);
+		if(entrada == 's'){
+			puts("Presione (s) para mostrar mas lineas.");
+			puts("Presione (n) si desea terminar.");
+			puts("Presione (a) si quiere mostrar todo.");
+			scanf(" %c", &entrada);
+		}
+
 	}
 	puts("Finalizado, archivo leído.");
 	close(fd);
@@ -268,16 +269,20 @@ void mostrarBinario(char * rutaLocal){
 	char entrada = 's';
 	unsigned long long contador = 0;
 	int sumador = 500;
-	while(contador < tamanio && entrada == 's'){
+	while(contador < tamanio && (entrada == 's' || entrada == 'a')){
 		mostrarNCaracteresDeUnMMap(archivoMapeado, tamanio, contador, contador+sumador);
 		contador += sumador + 1;
 		if(contador+sumador >= tamanio){
 			sumador = tamanio - contador - 1;
 		}
-		printf("Desea Seguir? (s/n) ");
-		scanf(" %c", &entrada);
+		if(entrada == 's'){
+			puts("Presione (s) para mostrar mas lineas.");
+			puts("Presione (n) si desea terminar.");
+			puts("Presione (a) si quiere mostrar todo.");
+			scanf(" %c", &entrada);
+		}
 	}
-	puts("Finalizado, archivo leído.");
+	puts("Finalizado.");
 	close(fd);
 }
 
@@ -297,7 +302,6 @@ void leerArchivoComoTextoPlano(char * rutaLocal){
 	}else{
 		mostrarBinario(rutaTmp);
 	}
-	remove(rutaTmp);
 	liberarTablaDeArchivo(archivo);
 	free(nombreArchivoConExtension);
 	free(extension);
@@ -347,7 +351,7 @@ int obtenerIndexDeUnaRuta(char * rutaDestino){
 	if(cant == 1){
 		indice = 0;
 	}else{
-	indice = buscarIndexPorNombreDeDirectorio(directorio);
+		indice = buscarIndexPorNombreDeDirectorio(directorio);
 	}
 	free(directorio);
 	return indice;
@@ -441,18 +445,15 @@ void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
 				if (rename(rutaLocal, nuevaRuta) == 0) {
 					puts("Se renombro el archivo");
 				} else {
-					puts(
-							"La ruta especificada no concuerda con la ruta del archivo a renombrar");
+					puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
 				}
 				free(rutaLocal);
 				free(nuevaRuta);
 			} else {
-				puts(
-						"La extension tiene que ser la misma que la del archivo orginal");
+				puts("La extension tiene que ser la misma que la del archivo orginal");
 			}
 		} else {
-			puts(
-					"Tiene que ingresar el nuevo nombre con la extension del archivo original");
+			puts("Tiene que ingresar el nuevo nombre con la extension del archivo original");
 		}
 	} else {
 		directorio = buscarPorNombreDeDirectorio(ultimoElemento);
@@ -498,34 +499,33 @@ char** buscarDirectorios(char * ruta){
 	  directorioActual = opendir(ruta);
 
 	  if (directorioActual == NULL){
-	    puts("No pudo abrir el directorio");
+		  puts("No pudo abrir el directorio");
+		  log_error(logError,"No se pudo abrir el directorio, hubo un error.");
+	  }
+	  else{
+		  // Leo uno por uno los directorios que estan adentro del directorio actual
+		  while ((directorio = readdir(directorioActual)) != NULL) {
 
-	    log_error(logError,"No se pudo abrir el directorio, hubo un error.");
-
-	  }else{
-	  // Leo uno por uno los directorios que estan adentro del directorio actual
-	  while ((directorio = readdir(directorioActual)) != NULL) {
-
-		  //Con readdir aparece siempre . y .. como no me interesa no lo contemplo
-		if ((strcmp(directorio->d_name, ".") != 0) && (strcmp(directorio->d_name, "..") != 0)) {
+			  //Con readdir aparece siempre . y .. como no me interesa no lo contemplo
+			if ((strcmp(directorio->d_name, ".") != 0) && (strcmp(directorio->d_name, "..") != 0)) {
 
 
-			rutaNueva = string_duplicate(ruta);
-			string_append(&rutaNueva,directorio->d_name);
+				rutaNueva = string_duplicate(ruta);
+				string_append(&rutaNueva,directorio->d_name);
 
-			directorios[i] = malloc(256);
-			if(esDirectorio(rutaNueva)){
-				strcpy(directorios[i],rutaNueva);
-				i++;
+				directorios[i] = malloc(256);
+				if(esDirectorio(rutaNueva)){
+					strcpy(directorios[i],rutaNueva);
+					i++;
+				}
+				free(rutaNueva);
 			}
-			free(rutaNueva);
-		}
 
-	}
+		  }
 
 
-	  closedir (directorioActual);
-}
+		  closedir (directorioActual);
+	  }
 	  directorios[i] = NULL;
 	  return directorios;
 }
@@ -538,10 +538,10 @@ char** buscarArchivos(char * ruta){
 	  char * rutaNueva;
 	  int i = 0;
 
-	  directorioActual = opendir (ruta);
+	  directorioActual = opendir(ruta);
 
 	  if (directorioActual == NULL){
-	    puts("No puedo abrir el directorio");
+	    puts("No puedo abrir el directorio.");
 	    log_error(logError,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
@@ -634,12 +634,12 @@ void listarArchivos(char* ruta){
 			free(carpetas);
 			free(archivos);
 			free(rutaArchivosDirectorio);
-		}else {
-		printf("El directorio de ruta %s no tiene archivos\n", ruta);
-
-		log_error(logError,"El directorio no tiene archivos");
-		free(archivos);
-		free(rutaArchivosDirectorio);
+		}
+		else {
+			printf("El directorio de ruta %s no tiene archivos\n", ruta);
+			log_error(logError,"El directorio no tiene archivos.");
+			free(archivos);
+			free(rutaArchivosDirectorio);
 		}
 }
 
@@ -754,7 +754,7 @@ int verificarRutaArchivo(char * rutaYamafs){
 		}
 		free(rutaSinArchivo);
 	}else{
-	puts("La ruta yamafs debe contener el nombre del archivo y la extensión");
+		puts("La ruta yamafs debe contener el nombre del archivo y la extensión.");
 	}
 	return 0;
 
@@ -783,7 +783,7 @@ void removerArchivo(char* ruta){
 				puts("no lo encontre asi que voy a buscarlo en desconectados");
 				nodo = buscarNodoPorNombre(listaDeNodosDesconectados, nombreYPosicion[0]);
 				if(nodo == NULL){
-					puts("No se pudo hermano, el nodo con la copia no esta en ningun lado");
+					puts("No se pudo completar la operacion, el nodo con la copia no esta en ningun lado.");
 							return;;
 				}
 			}
