@@ -13,21 +13,21 @@ void procesarInput(char* linea) {
 	int cantidad;
 	char **palabras = string_split(linea, " ");
 	cantidad = cantidadParametros(palabras);
-	if (string_equals_ignore_case(*palabras, "format")) {
+	if (!strcmp(*palabras, "format")) {
 		consolaFormat(palabras, cantidad);
-	} else if (string_equals_ignore_case(*palabras, "rm")) {
+	} else if (!strcmp(*palabras, "rm")) {
 		consolaRemove(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "rename")) {
+	} else if (!strcmp(*palabras, "rename")) {
 		consolaRename(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "mv")) {
+	} else if (!strcmp(*palabras, "mv")) {
 		consolaMove(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "cat")) {
+	} else if (!strcmp(*palabras, "cat")) {
 		consolaCat(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "mkdir")) {
+	} else if (!strcmp(*palabras, "mkdir")) {
 		consolaMkdir(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
+	} else if (!strcmp(*palabras, "cpfrom")) {
 		consolaCpfrom(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "cpto")) {
+	} else if (!strcmp(*palabras, "cpto")) {
 		if (cantidad == 2) {
 			if (verificarRutaArchivo(palabras[1])) {
 				if (copiarArchivo(palabras) != -1) {
@@ -40,16 +40,16 @@ void procesarInput(char* linea) {
 		}else {
 			puts("Error en la cantidad de parametros");
 		}
-	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
+	} else if (!strcmp(*palabras, "cpblock")) {
 		procesarCpblock(palabras);
-	} else if (string_equals_ignore_case(*palabras, "md5")) {
+	} else if (!strcmp(*palabras, "md5")) {
 		consolaMd5(palabras,cantidad);
 
-	} else if (string_equals_ignore_case(*palabras, "ls")) {
+	} else if (!strcmp(*palabras, "ls")) {
 		consolaLs(palabras,cantidad);
-	} else if (string_equals_ignore_case(*palabras, "info")) {
+	} else if (!strcmp(*palabras, "info")) {
 		consolaInfo(palabras,cantidad);
-	} else if(string_equals_ignore_case(*palabras, "exit")){
+	} else if(!strcmp(*palabras, "exit")){
 		printf("Finalizando consola\n");
 		liberarPunteroDePunterosAChar(palabras);
 		free(palabras);
@@ -300,7 +300,7 @@ void consolaRemove (char** palabras, int cantidad){
 		}
 	}
 	else if (cantidad ==2){
-		if (string_equals_ignore_case(palabras[1], "-d")){
+		if (!strcmp(palabras[1], "-d")){
 			if(esRutaYamafs(palabras[2])){
 				if(existeDirectorio(palabras[2])){
 					if(esDirectorioRaiz(palabras[2])){
@@ -324,7 +324,7 @@ void consolaRemove (char** palabras, int cantidad){
 		}
 	}
 	else if(cantidad == 4){
-		if (string_equals_ignore_case(palabras[1], "-b")){
+		if (!strcmp(palabras[1], "-b")){
 			if(esRutaYamafs(palabras[2])){
 				if(verificarRutaArchivo(palabras[2])){
 					if(isdigit(*palabras[3]) && isdigit(*palabras[4])){
@@ -382,7 +382,7 @@ void consolaMove(char ** palabras, int cantidad){
 	if(cantidad==2){
 		char** carpetas1 = string_split(palabras[1], "/");
 		char** carpetas2 = string_split(palabras[2], "/");
-		if(!string_equals_ignore_case(carpetas1[0], "yamafs:") || !string_equals_ignore_case(carpetas2[0], "yamafs:")){
+		if(strcmp(carpetas1[0], "yamafs:") || strcmp(carpetas2[0], "yamafs:")){
 			puts("Falta la referencia a yamafs:/ en alguna de las rutas");
 		} else if(verificarRutaArchivo(palabras[1])){
 			moverArchivo(palabras[1], palabras[2]);

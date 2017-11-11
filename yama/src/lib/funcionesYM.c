@@ -81,7 +81,7 @@ int conectarAFS(Tyama *yama){
 	 //No permitimos continuar la ejecucion hasta lograr un handshake con FS
 	if ((estado = send(socketFS, head, sizeof(Theader), 0)) == -1){
 		sprintf(mensaje, "Fallo send() al socket: %d\n", socketFS);
-		logAndExit(mensaje);
+		logErrorAndExit(mensaje);
 	}
 
 	printf("Se enviaron: %d bytes a FS del handshake \n", estado);

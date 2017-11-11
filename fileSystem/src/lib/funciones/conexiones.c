@@ -5,6 +5,9 @@ void conexionesDatanode(void * estructura){
 	char * rutaLocalArchivoFinal;
 	char * extensionArchivoFinal;
 	char * archivoFinalMapeado;
+	char * nombreDeArchivoFinalConExtension;
+	char * rutaATemporal;
+	char ** rutasParaCpfrom = malloc(sizeof(char *) * 3);
 	int socketDeEscuchaDatanodes;
 	int fileDescriptorMax = -1;
 	int cantModificados = 0;
@@ -173,24 +176,23 @@ void conexionesDatanode(void * estructura){
 						switch(head->tipo_de_mensaje){
 							case ALMACENAR_ARCHIVO:
 								puts("llego conexion de worker");
+								rutaATemporal = malloc(250);
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
-								puts(rutaLocalArchivoFinal);
+								nombreDeArchivoFinalConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
 								extensionArchivoFinal = obtenerExtensionDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
-								puts(extensionArchivoFinal);
+								sprintf(rutaATemporal, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/%s", nombreDeArchivoFinalConExtension);
 								if(!strcmp(extensionArchivoFinal, "csv")){
-									archivoFinal = fopen(rutaLocalArchivoFinal, "w");
+									archivoFinal = fopen(rutaATemporal, "w+");
 								}else{
-									archivoFinal = fopen(rutaLocalArchivoFinal, "wb");
+									archivoFinal = fopen(rutaATemporal, "wb+");
 								}
-								truncate(rutaLocalArchivoFinal, estructuraArchivoFinal->tamanioContenido);
-								puts("pase extensio");
+								truncate(rutaATemporal, estructuraArchivoFinal->tamanioContenido);
 								fileDescriptorArchivoFinal = fileno(archivoFinal);
 
 								if ((archivoFinalMapeado = mmap(NULL, estructuraArchivoFinal->tamanioContenido, PROT_WRITE, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
 									logErrorAndExit("Error al hacer mmap");
 								}
-								puts("pase archivo final");
 
 								pasarInfoDeUnArchivoAOtro(estructuraArchivoFinal->contenidoArchivo, archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
 
@@ -200,9 +202,22 @@ void conexionesDatanode(void * estructura){
 									logErrorAndExit("Sucedio lo imposible, fallo el msync");
 								}
 								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
+
+								rutasParaCpfrom[0] = strdup("cpfrom");
+								rutasParaCpfrom[1] = strdup(rutaATemporal);
+								rutasParaCpfrom[2] = strdup(estructuraArchivoFinal->rutaArchivo);
+
+								if(almacenarArchivo(rutasParaCpfrom) == -1){
+									log_error(logError, "Error al guardar el archivo final en yamafs.");
+								}
+
+								liberarPunteroDePunterosAChar(rutasParaCpfrom);
+								liberarEstructuraArchivoFinal(estructuraArchivoFinal);
+								free(rutasParaCpfrom);
 								free(rutaLocalArchivoFinal);
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
+								free(rutaATemporal);
 								break;
 							default:
 								log_error(logError, "Tipo de mensaje no encontrado en el protocolo.");

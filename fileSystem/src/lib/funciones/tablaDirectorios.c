@@ -187,13 +187,16 @@ void formatearFS(){
 	levantarTablasDirectorios();
 }
 
-char * obtenerNombreDeArchivoDeUnaRuta(char * rutaLocal){
+char * obtenerNombreDeArchivoDeUnaRuta(char * ruta){
 	char * archivoConExtension;
-	char ** split = string_split(rutaLocal, "/");
+	char ** split = string_split(ruta, "/");
 	archivoConExtension = obtenerUltimoElementoDeUnSplit(split);
 	liberarPunteroDePunterosAChar(split);
 	free(split);
-	return archivoConExtension;
+	if(strstr(archivoConExtension, ".") != NULL){
+		return archivoConExtension;
+	}
+	return NULL;
 
 }
 
