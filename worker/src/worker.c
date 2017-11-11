@@ -35,13 +35,15 @@ int main(int argc, char* argv[]){
 
 	fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, worker->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap");
 	}
 	fclose(archivo);
 	close(fd);
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/worker/worker.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/worker.log", "worker.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/worker/error.log");
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/worker/info.log");
+	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/error.log", "WORKER", false, LOG_LEVEL_ERROR);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/info.log", "WORKER", false, LOG_LEVEL_INFO);
 
 
 	listaTemporalesAsociadosAJob=list_create();
@@ -51,7 +53,7 @@ int main(int argc, char* argv[]){
 
 	//Listen
 	while ((estado = listen(listenSock , BACKLOG)) < 0){
-		log_error(logger,"No se pudo escuchar el puerto.");
+		log_error(logError,"No se pudo escuchar el puerto.");
 	}
 
 	//acepta y escucha
@@ -59,7 +61,7 @@ int main(int argc, char* argv[]){
 	while((client_sock = accept(listenSock, (struct sockaddr*) &client, (socklen_t*) &clientSize)) != -1){
 		//puts("Conexion aceptada");
 		while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
-			log_error(logger,"Error en la recepcion del header.");
+			log_error(logError,"Error en la recepcion del header.");
 		}
 
 		//printf("Cantidad de bytes recibidos: %d\n", estado);

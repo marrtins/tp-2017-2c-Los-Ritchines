@@ -27,7 +27,7 @@ void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
 	if (archivoTablaDeNodos == NULL) {
 		mensaje = malloc(250);
 		sprintf(mensaje, "No se pudo levantar un estado anterior ya que no existe el archivo de la ruta: %s", ruta);
-		log_error(logger, mensaje);
+		log_error(logError, mensaje);
 		free(mensaje);
 		return;
 	}

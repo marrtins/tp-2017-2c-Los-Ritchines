@@ -216,7 +216,7 @@ char * getBloqueWorker(int posicion){
 	fd = fileno(archivo);
 
 	if ((archivoMapeado = mmap(NULL, worker->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap");
 	}
 	fclose(archivo);
 	close(fd);

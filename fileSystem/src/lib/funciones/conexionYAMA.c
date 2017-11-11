@@ -101,7 +101,7 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 	buffer = serializarInfoNodosYamaFS(head,infoNodos,&packSize);
 
 	if ((send(socketYama, buffer ,packSize, 0)) == -1){
-		logAndExit("Fallo al enviar la informacion de un archivo");
+		logErrorAndExit("Fallo al enviar la informacion de un archivo");
 	}
 	printf("pack size info nodos %d\n",packSize);
 	puts("envie lista de nodos");

@@ -226,15 +226,10 @@ typedef struct{
 	t_list * listaTemporalesTransformacion;
 }TreduccionLocal;
 
-
-
-
-
 typedef struct {
 	int nombreTemporalLen;
 	char * nombreTemporal;
 }TreduccionLista;
-
 
 typedef struct{
 	int job;
@@ -244,8 +239,6 @@ typedef struct{
 	int listaNodosSize;
 	t_list * listaNodos;
 }TreduccionGlobal;
-
-
 
 typedef struct{
 	int nombreNodoLen;
@@ -273,6 +266,7 @@ typedef struct{
 	int listaNodosSize;
 	t_list * listaNodos;
 }TinfoReduccionGlobalMasterWorker;
+
 typedef struct{
 	int idTarea;
 	int job;
@@ -283,6 +277,7 @@ typedef struct{
 	int nombreTempReduccionLen;
 	char * nombreTempReduccion;
 }TinfoAlmacenadoFinal;
+
 typedef struct{
 	int nombreTempReduccionLen;
 	char * nombreTempReduccion;
@@ -290,13 +285,7 @@ typedef struct{
 	char * nombreResultante;
 }TinfoAlmacenadoMasterWorker;
 
-//nombreResultante: yamafs:/
-//nombreTempReduccion: rutaLocal
-
-typedef struct{
-
-};
-
-t_log* logger;
+t_log * logError;
+t_log * logInfo;
 
 #endif

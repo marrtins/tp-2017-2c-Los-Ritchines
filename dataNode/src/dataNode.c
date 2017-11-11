@@ -15,8 +15,10 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/dataNode.log", "dataNode", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log");
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log");
+	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log", "dataNode", false, LOG_LEVEL_ERROR);
+	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", false, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
@@ -32,7 +34,7 @@ int main(int argc, char* argv[]) {
 
 	fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, dataNode->tamanio_databin_mb*BLOQUE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap");
 	}
 	fclose(archivo);
 	close(fd);
@@ -50,12 +52,12 @@ int main(int argc, char* argv[]) {
 	while (1) {
 
 		if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {
-			logAndExit("Error al recibir informacion");
+			logErrorAndExit("Error al recibir informacion");
 			break;
 
 		} else if (estado == 0) {
 			sprintf(mensaje, "Se desconecto el socket de fd: %d\n", socketFS);
-			log_error(logger, mensaje);
+			log_error(logError, mensaje);
 			break;
 		}
 		printf("Recibi el head %d bytes\n", estado);
@@ -79,7 +81,7 @@ int main(int argc, char* argv[]) {
 					int nroBloque;
 
 					if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
-						logAndExit("Error al recibir el numero de bloque");
+						logErrorAndExit("Error al recibir el numero de bloque");
 					}
 					printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
 					enviarBloqueAFS(nroBloque, socketFS);
@@ -89,10 +91,10 @@ int main(int argc, char* argv[]) {
 					int nroBloque_;
 					unsigned long long int tamanioBloque_;
 					if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
-						logAndExit("Error al recibir el numero do bloque");
+						logErrorAndExit("Error al recibir el numero do bloque");
 					}
 					if (recv(socketFS, &tamanioBloque_, sizeof(unsigned long long int),0) == -1){
-						logAndExit("Error al recibir el tamanio del bloque");
+						logErrorAndExit("Error al recibir el tamanio del bloque");
 					}
 					enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
 					puts("Envie el bloque a FS");

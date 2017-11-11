@@ -59,13 +59,13 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
 	printf("Tamanio del buffer que se va a enviar %llu \n", buffer1->tamanio);
 	 if ((estado = send(nodo1->fd, buffer1->buffer , buffer1->tamanio, 0)) == -1){
-		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 
 	buffer2 = empaquetarBloque(head,bloque,nodo2);
 	printf("Se envio bloque a Nodo1 %d bytes\n", estado);
 	 if ((estado = send(nodo2->fd, buffer2->buffer , buffer2->tamanio, 0)) == -1){
-		 logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
 	/*double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
 		if(nodo->cantidadBloquesLibres == 0) return 1;
@@ -213,7 +213,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	printf("El tamaño del archivo es: %llu\n", tamanio);
 
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap");
 	}
 
 	fclose(archivoOrigen);
@@ -225,7 +225,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	if(tamanio == 0){
 		puts("Error al almacenar archivo, está vacío");
-		log_error(logger, "Error al almacenar archivo, está vacío");
+		log_error(logError, "Error al almacenar archivo, está vacío");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
@@ -237,7 +237,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
-		log_error(logger, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
+		log_error(logError, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		puts("voy a violar el segmento");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
@@ -337,21 +337,21 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	//Recibo el tamaño del nombre del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioNombre, sizeof(int), 0)) == -1) {
-		logAndExit("Error al recibir el tamanio del nombre del nodo");
+		logErrorAndExit("Error al recibir el tamanio del nombre del nodo");
 		}
 	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
 	nombreNodo = malloc(infoBloque->tamanioNombre);
 
 	//Recibo el nombre del nodo
 	if ((estado = recv(socketFS, nombreNodo, infoBloque->tamanioNombre, 0)) == -1) {
-		logAndExit("Error al recibir el nombre del nodo");
+		logErrorAndExit("Error al recibir el nombre del nodo");
 		}
 
 	printf("Para el nombre del nodo recibi %d bytes\n", estado);
 
 	//Recibo el tamanio de la ip del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioIp, sizeof(int), 0)) == -1) {
-		logAndExit("Error al recibir el tamanio del ip del nodo");
+		logErrorAndExit("Error al recibir el tamanio del ip del nodo");
 		}
 	printf("Para el tamaño de la ip recibi %d bytes\n", estado);
 
@@ -359,14 +359,14 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	//Recibo la ip del nodo
 	if ((estado = recv(socketFS, ipNodo, infoBloque->tamanioIp, 0)) == -1) {
-		logAndExit("Error al recibir el ip del nodo");
+		logErrorAndExit("Error al recibir el ip del nodo");
 		}
 
 	printf("Para el la ip recibi %d bytes\n", estado);
 
 	//Recibo el tamanio del puerto del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioPuerto, sizeof(int), 0)) == -1) {
-		logAndExit("Error al recibir el tamanio del puerto del nodo");
+		logErrorAndExit("Error al recibir el tamanio del puerto del nodo");
 		}
 	printf("Para el tamaño del puerto recibi %d bytes\n", estado);
 
@@ -374,12 +374,12 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	//Recibo el puerto del nodo
 	if ((estado = recv(socketFS, puertoNodo, infoBloque->tamanioPuerto, 0)) == -1) {
-		logAndExit("Error al recibir el puerto del nodo");
+		logErrorAndExit("Error al recibir el puerto del nodo");
 		}
 
 	//Recibo el databin en MB
 	if ((estado = recv(socketFS, &infoBloque->databinEnMB, sizeof(int), 0)) == -1) {
-		logAndExit("Error al recibir el tamanio del databin");
+		logErrorAndExit("Error al recibir el tamanio del databin");
 		}
 
 	printf("Para el tamanio del databin recibi %d bytes\n", estado);
@@ -407,7 +407,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	ftruncate(fd, tablaArchivo->tamanioTotal);
 
 	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
-		log_error(logger,"Error al hacer mmap");
+		log_error(logError,"Error al hacer mmap");
 		puts("Error al hacer mmap");
 		liberarEstructuraBuffer(bloque);
 		return -1;
@@ -437,7 +437,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		puts("pase el mutex, voy a copiar un bloque");
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
 			puts("Error al copiar bloque recibido. Intentelo de nuevo");
-			log_error(logger,"Error al copiar bloque recibido");
+			log_error(logError,"Error al copiar bloque recibido");
 			liberarEstructuraBuffer(bloque);
 		//borrar archivo
 			return -1;
@@ -450,7 +450,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	}
 
 	if (msync((void *)archivoMapeado, tablaArchivo->tamanioTotal, MS_SYNC) < 0) {
-		log_error(logger,"Error al hacer msync");
+		log_error(logError,"Error al hacer msync");
 		puts("Error al hacer msync");
 		return -1;
 	}

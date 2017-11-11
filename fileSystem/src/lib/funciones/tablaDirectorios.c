@@ -39,7 +39,7 @@ void levantarTablasDirectorios(){
 
 	if ((archivoMapeado = mmap(NULL,tam, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
 		puts("Error al hacer mmap");
-		logAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap");
 	}
 	fclose(archivoDirectorios);
 	close(fd);
@@ -82,7 +82,7 @@ int crearDirectorio(char * ruta) {
 		liberarPunteroDePunterosAChar(carpetas);
 		free(carpetas);
 		free(directorio);
-		log_error(logger, "Ya exiten 100 directorios, no se pudo crear otro.");
+		log_error(logError, "Ya exiten 100 directorios, no se pudo crear otro.");
 		return -1;
 	}
 	if ((nroDirectorio = directorioNoExistente(carpetas)) < 0) {
@@ -123,7 +123,7 @@ int crearDirectorio(char * ruta) {
 			liberarPunteroDePunterosAChar(carpetas);
 			free(carpetas);
 			free(directorio);
-			log_error(logger, "No se pudo crear un directorio dentro de un directorio que no existe");
+			log_error(logError, "No se pudo crear un directorio dentro de un directorio que no existe");
 			return -1;
 	}
 }
@@ -234,7 +234,7 @@ void mostrarCsv(char * rutaLocal){
 	char * archivoMapeado;
 	int fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		log_error(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logError, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}
@@ -257,7 +257,7 @@ void mostrarBinario(char * rutaLocal){
 	char * archivoMapeado;
 	int fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		log_error(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logError, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}
@@ -328,7 +328,7 @@ int directorioNoExistente(char ** carpetas) {
 	return -1;
 	}else{
 		puts("Falta la referencia al filesystem local 'yamafs:'");
-		log_error(logger, "No se pudo crear el directorio por que no existe la referencia 'yamafs:'");
+		log_error(logError, "No se pudo crear el directorio por que no existe la referencia 'yamafs:'");
 		free(yamafs);
 		return -1;
 	}
@@ -356,7 +356,7 @@ int buscarIndexPorNombreDeDirectorio(char * directorio){
 	if(estructuraDirectorio != NULL){
 		return estructuraDirectorio->index;
 	}
-	log_error(logger, "No existe el nombre de directorio.");
+	log_error(logError, "No existe el nombre de directorio.");
 	return -1;
 }
 
@@ -497,7 +497,7 @@ char** buscarDirectorios(char * ruta){
 	  if (directorioActual == NULL){
 	    puts("No pudo abrir el directorio");
 
-	    log_error(logger,"No se pudo abrir el directorio, hubo un error.");
+	    log_error(logError,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los directorios que estan adentro del directorio actual
@@ -539,7 +539,7 @@ char** buscarArchivos(char * ruta){
 
 	  if (directorioActual == NULL){
 	    puts("No puedo abrir el directorio");
-	    log_error(logger,"No se pudo abrir el directorio, hubo un error.");
+	    log_error(logError,"No se pudo abrir el directorio, hubo un error.");
 
 	  }else{
 	  // Leo uno por uno los archivos que estan adentro del directorio actual
@@ -634,7 +634,7 @@ void listarArchivos(char* ruta){
 		}else {
 		printf("El directorio de ruta %s no tiene archivos\n", ruta);
 
-		log_error(logger,"El directorio no tiene archivos");
+		log_error(logError,"El directorio no tiene archivos");
 		free(archivos);
 		free(rutaArchivosDirectorio);
 		}
@@ -828,7 +828,7 @@ void moverArchivo(char* ruta1, char* ruta2){
 		free(extension);
 		fclose(archivo);
 		close(fdAMover);
-		log_error(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logError, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}
@@ -850,7 +850,7 @@ void moverArchivo(char* ruta1, char* ruta2){
 		fclose(archivoMovido);
 		close(fd);
 		close(fdAMover);
-		log_error(logger, "No se pudo abrir el archivo especificado.");
+		log_error(logError, "No se pudo abrir el archivo especificado.");
 		puts("No se pudo abrir el archivo especificado.");
 		return;
 	}

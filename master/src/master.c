@@ -33,8 +33,10 @@ int main(int argc, char* argv[]) {
 	}
 
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/master/master.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/master/master.log", "master.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/master/error.log");
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/master/info.log");
+	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/master/error.log", "MASTER", false, LOG_LEVEL_ERROR);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/master/info.log", "MASTER", false, LOG_LEVEL_INFO);
 
 	head->tipo_de_proceso = MASTER;
 	head->tipo_de_mensaje = INICIOMASTER;

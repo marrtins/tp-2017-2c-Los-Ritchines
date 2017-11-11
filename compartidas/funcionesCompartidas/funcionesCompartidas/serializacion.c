@@ -403,7 +403,7 @@ int enviarHeaderYValor(Theader head, int valorAEnviar,int socketDestino){
 	memcpy(bytes_serial + HEAD_SIZE, &pack_size, sizeof(int));
 
 	if ((estado = send(socketDestino, bytes_serial, pack_size, 0)) == -1){
-		logAndExit("Fallo al enviar el header");
+		logErrorAndExit("Fallo al enviar el header");
 	}
 
 

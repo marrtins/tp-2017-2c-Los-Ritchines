@@ -50,7 +50,7 @@ int realizarAlmacenamientoFinal(client_sock){
 	fileDescriptorArchivoFinal = fileno(archivoFinal);
 	contenidoArchivoFinal = malloc(tamanioArchivoFinal);
 	if ((archivoFinalMapeado = mmap(NULL, tamanioArchivoFinal, PROT_READ, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
-		logAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap");
 	}
 
 	memcpy(contenidoArchivoFinal, archivoFinalMapeado, tamanioArchivoFinal);
@@ -59,7 +59,7 @@ int realizarAlmacenamientoFinal(client_sock){
 	tbuffer = empaquetarArchivoFinal(header, infoAlmacenado->nombreResultante, contenidoArchivoFinal, tamanioArchivoFinal);
 
 	if (send(sockFS, tbuffer->buffer , tbuffer->tamanio, 0) == -1){
-		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+		logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	}
 
 	munmap(archivoFinalMapeado, infoAlmacenado->nombreTempReduccionLen);

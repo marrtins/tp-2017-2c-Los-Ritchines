@@ -1,7 +1,7 @@
 #include "funcionesCompartidas.h"
 
-void logAndExit(char * mensaje){
-	log_error(logger,mensaje);
+void logErrorAndExit(char * mensaje){
+	log_error(logError,mensaje);
 	exit(-1);
 }
 
@@ -92,16 +92,16 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 	setupHints(&hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
 
 	if ((estado = getaddrinfo(NULL, puertoDeEscucha, &hints, &infoDelServer)) != 0){
-		logAndExit("No se pudo crear el adrrinfo.");
+		logErrorAndExit("No se pudo crear el adrrinfo.");
 	}
 
 	if ((socketDeEscucha = socket(infoDelServer->ai_family, infoDelServer->ai_socktype, infoDelServer->ai_protocol)) == -1){
-		logAndExit("No se pudo crear el socket.");
+		logErrorAndExit("No se pudo crear el socket.");
 	}
 
 	if ((bind(socketDeEscucha, infoDelServer->ai_addr, infoDelServer->ai_addrlen)) == -1){
 		sprintf(mensaje, "Fallo al reservar el puerto %s. Es posible que el puerto este ocupado." , puertoDeEscucha);
-		logAndExit(mensaje);
+		logErrorAndExit(mensaje);
 	}
 
 	freeaddrinfo(infoDelServer);
@@ -111,7 +111,7 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 
 void crearHilo(pthread_t * nombreHilo, void * nombreFuncion, void * parametros){
 	if(pthread_create(nombreHilo, NULL, nombreFuncion, parametros) < 0){
-				logAndExit("No se pudo crear el hilo.");
+				logErrorAndExit("No se pudo crear el hilo.");
 		}
 }
 
@@ -124,7 +124,7 @@ int aceptarCliente(int fileDescriptor){
 
 	if((socketAceptado = accept(fileDescriptor, (struct sockaddr*) &direccionDeCliente, &tamanioDeCliente)) == -1){
 		sprintf(mensaje, "Fallo la aceptacion del cliente, del FD servidor (fileSystem): %d", fileDescriptor);
-		logAndExit(mensaje);
+		logErrorAndExit(mensaje);
 	}
 
 	printf("el socket acceptado es: %d", socketAceptado);
@@ -166,7 +166,7 @@ int enviarHeader(int socketDestino,Theader * head){
 	int estado;
 
 	if ((estado = send(socketDestino, head, sizeof(Theader), 0)) == -1){
-		logAndExit("Fallo al enviar el header");
+		logErrorAndExit("Fallo al enviar el header");
 	}
 
 	return estado;

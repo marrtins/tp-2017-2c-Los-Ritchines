@@ -226,7 +226,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			enviarHeader(fdWorker,head);
 			puts("envie hejader");
 			if ((stat = recv(fdWorker, head, sizeof(Theader), 0)) < 0){
-				log_error(logger,"Error en la recepcion del header.");
+				log_error(logError,"Error en la recepcion del header.");
 			}
 			puts("recibo");
 			if(head->tipo_de_mensaje==TAKE_NEXTLINE){
@@ -279,7 +279,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 				enviarHeader(infoWorker->fdWorker,head);
 
 				if ((stat = recv(infoWorker->fdWorker, head, sizeof(Theader), 0)) < 0){
-					log_error(logger,"Error en la recepcion del header.");
+					log_error(logError,"Error en la recepcion del header.");
 				}
 				if(head->tipo_de_mensaje==TAKE_NEXTLINE){
 					if ((buffer = recvGeneric(infoWorker->fdWorker)) == NULL){

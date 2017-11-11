@@ -46,8 +46,10 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/yama.log", "yama.log", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/yama/error.log");
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/yama/info.log");
+	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/error.log", "YAMA", false, LOG_LEVEL_ERROR);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/yama/info.log", "YAMA", false, LOG_LEVEL_INFO);
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 
@@ -81,7 +83,7 @@ int main(int argc, char* argv[]){
 	puts("antes de entrar al while");
 
 	while (listen(socketDeEscuchaMaster, BACKLOG) == -1){
-		log_trace(logger, "Fallo al escuchar el socket servidor de file system.");
+		log_trace(logError, "Fallo al escuchar el socket servidor de file system.");
 		puts("Reintentamos...");
 	}
 
@@ -94,7 +96,7 @@ int main(int argc, char* argv[]){
 		readFD = masterFD;
 
 		if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
-			logAndExit("Fallo el select.");
+			logErrorAndExit("Fallo el select.");
 		}
 
 		for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
@@ -164,7 +166,7 @@ int main(int argc, char* argv[]){
 
 					default:
 						puts("Tipo de Mensaje no encontrado en el protocolo");
-						log_trace(logger, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
+						log_trace(logError, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
 						break;
 					}
 
@@ -176,7 +178,7 @@ int main(int argc, char* argv[]){
 					switch(head->tipo_de_mensaje){
 					//no tendria q entrar aca x ahora..
 					default:
-						log_trace(logger, "Tipo de mensaje no encontrado en el protocolo.");
+						log_trace(logError, "Tipo de mensaje no encontrado en el protocolo.");
 						puts("Tipo de mensaje no encontrado en el protocolo.");
 						break;
 					}
@@ -184,7 +186,7 @@ int main(int argc, char* argv[]){
 				else{
 					printf("se quiso conectar el proceso: %d\n",head->tipo_de_proceso);
 					puts("Hacker detected");
-					log_trace(logger, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
+					log_trace(logError, "Se conecto a filesystem, un proceso que no es conocido/confiable. Expulsandolo...");
 					clearAndClose(fileDescriptor, &masterFD);
 				}
 
@@ -195,7 +197,7 @@ int main(int argc, char* argv[]){
 
 		}
 
-	log_error(logger, "Fallo el accept de master.");
+	log_error(logError, "Fallo el accept de master.");
 
 
 

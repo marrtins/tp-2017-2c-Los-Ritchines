@@ -3,7 +3,7 @@
 
 #include <tiposDatos/estructurasCompartidas.h>
 
-void logAndExit(char * mensaje);
+void logErrorAndExit(char * mensaje);
 void inicializarArchivoDeLogs(char * ruta);
 void setupHints(struct addrinfo *hints, int familiaDeProtocolos, int tipoDeProtocolo, int flags);
 int crearSocketDeEscucha(char*);

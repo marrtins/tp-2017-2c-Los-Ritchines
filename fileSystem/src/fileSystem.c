@@ -44,8 +44,10 @@ int main(int argc, char* argv[]) {
 		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
 	}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/FileSystem.log");
-	logger = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/FileSystem.log", "FileSystem", false, LOG_LEVEL_ERROR);
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/error.log");
+	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/info.log");
+	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/error.log", "FileSystem", false, LOG_LEVEL_ERROR);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/info.log", "FileSystem", false, LOG_LEVEL_INFO);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 	cantNodosPorConectar = fileSystem->cant_nodos;
@@ -59,7 +61,7 @@ int main(int argc, char* argv[]) {
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
-		log_error(logger,"Fallo al escuchar el socket servidor de file system.");
+		log_error(logError,"Fallo al escuchar el socket servidor de file system.");
 		puts("Reintentamos...");
 	}
 		socketYama = aceptarCliente(socketDeEscuchaYama);
@@ -72,12 +74,12 @@ int main(int argc, char* argv[]) {
 		estado = recv(socketYama, head, sizeof(Theader), 0);
 
 		if(estado == -1){
-			log_error(logger, "Error al recibir información de un cliente.");
+			log_error(logError, "Error al recibir información de un cliente.");
 			break;
 		}
 		else if( estado == 0){
 			sprintf(mensaje, "Se desconecto YAMA fd: %d.", socketYama);
-			log_error(logger, mensaje);
+			log_error(logError, mensaje);
 			break;
 		}
 		if(head->tipo_de_proceso == YAMA){
@@ -118,7 +120,7 @@ int main(int argc, char* argv[]) {
 					puts("Serialice la info del archivo");
 
 					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
-						logAndExit("Fallo al enviar la informacion de un archivo");
+						logErrorAndExit("Fallo al enviar la informacion de un archivo");
 					}
 
 
@@ -141,7 +143,7 @@ int main(int argc, char* argv[]) {
 					head->tipo_de_mensaje=ARCH_NO_VALIDO;
 
 					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
-						 logAndExit("Fallo al enviar la informacion de un archivo");
+						 logErrorAndExit("Fallo al enviar la informacion de un archivo");
 					}
 				}
 

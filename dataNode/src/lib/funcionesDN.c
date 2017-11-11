@@ -52,7 +52,7 @@ void setBloque(int posicion, Tbloque * bloque){
 	memcpy(aux += posicion* bloqueSize, bloque->contenido,bloque->tamanioContenido);
 
 	if (msync((void *)archivoMapeado, bloque->tamanioContenido, MS_SYNC) < 0) {
-				logAndExit("Error al hacer msync");
+				logErrorAndExit("Error al hacer msync");
 		}
 }
 
@@ -85,7 +85,7 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 
 	buffer = empaquetarInfoNodo(infoBloque);
 	 if ((estado = send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
-	 		logAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+	 		logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 	}
 
 
@@ -98,14 +98,14 @@ Tbloque * recvBloque(int socketFS) {
 	int estado;
 	Tbloque * bloque = malloc(sizeof(Tbloque));
 	if ((estado = recv(socketFS, &bloque->nroBloque, sizeof(int), 0)) == -1) {
-		logAndExit("Error al recibir el numero de bloque");
+		logErrorAndExit("Error al recibir el numero de bloque");
 	}
 	printf("Para el nro de bloque recibi %d bytes\n", estado);
 	printf("Recibí el numero de bloque %d\n", bloque->nroBloque);
 
 	if ((estado = recv(socketFS, &bloque->tamanioContenido, sizeof(unsigned long long),
 			0)) == -1) {
-		logAndExit("Error al recibir el tamaño de bloque");
+		logErrorAndExit("Error al recibir el tamaño de bloque");
 	}
 	printf("Para el tamanio de bloque recibi %d bytes\n", estado);
 
@@ -114,7 +114,7 @@ Tbloque * recvBloque(int socketFS) {
 	contenidoBloque = malloc(bloque->tamanioContenido);
 
 	if ((estado = recv(socketFS, contenidoBloque, bloque->tamanioContenido, MSG_WAITALL)) == -1) {
-		logAndExit("Error al recibir el contenido del bloque");
+		logErrorAndExit("Error al recibir el contenido del bloque");
 	}
 	printf("Para el contenido de bloque recibi %d bytes\n", estado);
 
@@ -134,7 +134,7 @@ void enviarBloqueAFS(int nroBloque, int socketFS){
 
 	buffer = empaquetarBytesMasInt(head, bloque, nroBloque);
 	if ((send(socketFS, buffer->buffer , buffer->tamanio, 0)) == -1){
-		logAndExit("Fallo al enviar a FS el bloque que pidió");
+		logErrorAndExit("Fallo al enviar a FS el bloque que pidió");
 	}
 
 	free(head);
@@ -150,6 +150,6 @@ void enviarBloque(int nroBloque, unsigned long long int tamanio, int socketFS){
 	puts("voy a empaquetar el bloque");
 	buffer = empaquetarBloqueConNBytes(head, tamanio, bloque, nroBloque);
 	if (send(socketFS, buffer->buffer, buffer->tamanio, 0) <= 0){
-		logAndExit("Fallo al enviar a FS el bloque que pidio");
+		logErrorAndExit("Fallo al enviar a FS el bloque que pidio");
 	}
 }

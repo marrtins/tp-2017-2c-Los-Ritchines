@@ -25,7 +25,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 	puts(rutaArchivo);
 	FILE * archivo = fopen(rutaArchivo, "r");
 	if(archivo == NULL){
-		logAndExit("No se pudo abrir el bitmap del nodo, probablemente no existe.");
+		logErrorAndExit("No se pudo abrir el bitmap del nodo, probablemente no existe.");
 	}
 	int i = 0;
 	char bitChar;
@@ -41,7 +41,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 			bitarray_clean_bit(nodo->bitmap, i);
 		}
 		else{
-			logAndExit("Hubo un error turbio al leer un bit del archivo bitmap.");
+			logErrorAndExit("Hubo un error turbio al leer un bit del archivo bitmap.");
 		}
 		i++;
 	}

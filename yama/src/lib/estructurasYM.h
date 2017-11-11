@@ -72,6 +72,7 @@ typedef struct {
 	int nroJob;
 	bool finCorrecto;
 }TjobFinalizado;
+
 typedef struct{
 	int nroJob;
 	int fdMaster;
@@ -80,10 +81,5 @@ typedef struct{
 	t_list * listaComposicionArchivo;
 	t_list * listaNodosArchivo;
 }TjobMaster;
-
-
-t_log* logger;
-
-
 
 #endif
