@@ -10,7 +10,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	copia0->nroDeCopia = 0;
 	printf("El nombre de nodo es %s\n", copia0->nombreDeNodo);
 	
-
 	tBloque->copia = list_create();
 
 	int bloqueAOcupar = obtenerBloqueDisponible(nodo1);
@@ -31,7 +30,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	mostrarBitmap(nodo2->bitmap);
 
 	tBloque->bytes = bloque->tamanio;
-	printf("El tamaño del bloque en bytes es: %llu", tBloque->bytes);
+	printf("El tamaño del bloque en bytes es: %llu\n", tBloque->bytes);
 
 	list_add(tBloque->copia, copia1);
 	tBloque->cantidadCopias = 2;
@@ -41,19 +40,12 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	Theader * head = malloc(sizeof(Theader));
 	Tbuffer * buffer1;
 	Tbuffer * buffer2;
-	//Tnodo * nodo1 = NULL;
-	//Tnodo * nodo2 = NULL;
 	int estado;
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
-	puts("llegue y rompi");
-	//buscarLosDosNodosConMasDisponibilidad(listaDeNodos, nodo1, nodo2);
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
-	//Tnodo* nodo3 = (Tnodo*)list_get(listaDeNodos, 2);
-	//Tnodo* nodo4 = (Tnodo*)list_get(listaDeNodos, 3);
-	puts("che, pude pasar");
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
@@ -161,6 +153,7 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 			infoBloque->tamanio = bytesACopiar;
 		}
 		bytesFaltantesPorEnviar-=bytesACopiar;
+		//TODO
 		//freir infoBloque->contenido en enviarBloque;
 		//los tamaños varian según la posición del \n;
 		printf("bloque a enviar %d\n",infoBloque->numeroDeBloque);

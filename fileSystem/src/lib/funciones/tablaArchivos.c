@@ -72,7 +72,7 @@ int eliminarBloqueDeNodo(Tnodo * nodo, int numeroDeBloque){
 	empaquetarBloqueAEliminar(buffer, head, numeroDeBloque);
 
 	if ((send(nodo->fd, buffer->buffer, buffer->tamanio, 0)) == -1) {
-		log_error(logError, "No se pudo enviar informacion a datanode para que se borre un bloque.")
+		log_error(logError, "No se pudo enviar informacion a datanode para que se borre un bloque.");
 		free(head);
 		liberarEstructuraBuffer(buffer);
 		return 0;

@@ -302,6 +302,7 @@ void leerArchivoComoTextoPlano(char * rutaLocal){
 	}else{
 		mostrarBinario(rutaTmp);
 	}
+	remove(rutaTmp);
 	liberarTablaDeArchivo(archivo);
 	free(nombreArchivoConExtension);
 	free(extension);

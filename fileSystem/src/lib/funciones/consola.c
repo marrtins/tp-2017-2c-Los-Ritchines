@@ -4,6 +4,12 @@ void consolaFS(){
 	puts("Bienvenido a la consola. Ingrese un comando:");
 	while(1){
 		char *linea = readline(">");
+		//esto se hace por que si el tipo apreta enter
+		//rompe todo
+		if(!strcmp(linea, "")){
+			free(linea);
+			continue;
+		}
 		add_history(linea);
 		procesarInput(linea);
 	}
@@ -56,7 +62,7 @@ void procesarInput(char* linea) {
 		free(linea);
 		pthread_kill(pthread_self(),SIGKILL);
 	} else {
-		printf("No existe el comando\n");
+		puts("El comando no existe.");
 	}
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
