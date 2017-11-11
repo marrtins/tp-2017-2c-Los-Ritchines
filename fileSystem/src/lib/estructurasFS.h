@@ -62,10 +62,10 @@ typedef struct{
 t_list * listaDeNodos;
 t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;
+t_list * listaInfoNodo;
 
 //Se usa en el cpblock;
 Tbuffer* bloqueACopiar;
-TpackInfoBloqueDN * infoNodo;
 
 pthread_mutex_t bloqueMutex;
 

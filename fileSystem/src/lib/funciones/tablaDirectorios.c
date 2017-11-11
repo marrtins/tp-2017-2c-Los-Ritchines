@@ -793,7 +793,6 @@ void removerArchivo(char* ruta){
 	}
 
 	remove(rutaArchivo);
-	puts("Ya pude remover el archivo");
 	free(rutaArchivo);
 	config_destroy(archivo);
 	}

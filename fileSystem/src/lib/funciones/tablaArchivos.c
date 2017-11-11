@@ -334,3 +334,26 @@ puts("Aca no rompe");
 	free(bloqueNCopiaM);
 	free(bloqueDN);
 }
+
+char ** obtenerNodosDeUnArchivo(Tarchivo * archivo){
+	TcopiaNodo * copia;
+	int cantBloques, cantCopias, z = 0 ,j = 0, i = 0;
+	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+	char ** nodos = calloc(10,sizeof(char*));
+
+	while(i < cantBloques){
+		cantCopias = archivo->bloques[i].cantidadCopias;
+		while(j < cantCopias){
+			copia = list_get(archivo->bloques[i].copia,j);
+
+			if(!punteroDeStringsContieneString(nodos,copia->nombreDeNodo)){
+				nodos[z] = strdup(copia->nombreDeNodo);
+				z++;
+			}
+			j++;
+		}
+		i++;
+	}
+
+	return nodos;
+}

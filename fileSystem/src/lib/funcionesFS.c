@@ -254,6 +254,31 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	return 1;
 }
 
+int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs){
+	char* nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(rutaLocalArchivo);
+	char* rutaArchivoYamafs = string_new();
+	char input;
+	string_append(&rutaArchivoYamafs,rutaDestinoYamafs);
+	string_append(&rutaArchivoYamafs,"/");
+	string_append(&rutaArchivoYamafs,nombreArchivo);
+	int index = obtenerIndexDeUnaRuta(rutaDestinoYamafs);
+	if(existeArchivo(index,rutaArchivoYamafs)){
+		puts("Epa, parece que existe el archivo en la ubicacion que pusiste");
+		puts("Desea sobreescribirlo? s / n");
+		scanf(" %c",&input);
+		while (input != 's' && input != 'n' && input != 'S' && input != 'N'){
+			puts("dale boludo, pone s ó n");
+			scanf("%c", &input);
+		}
+		if (input == 'n' || input == 'N'){
+			return 0;
+		}
+		puts("Bueno, procederemos a sobreescribir el archivo");
+		removerArchivo(rutaArchivoYamafs);
+	}
+	return 1;
+}
+
 int almacenarArchivo(char **palabras){
 	//palabras[1] --> ruta archivo a almacenar
 	//palabras[2] --> ruta de nuestro directorio
@@ -282,6 +307,16 @@ int almacenarArchivo(char **palabras){
 	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
 	return 1;
+}
+
+TinfoNodo * inicializarInfoNodo(TpackInfoBloqueDN * infoBloqueRecibido){
+	TinfoNodo * infoNuevoNodo = malloc(sizeof(TinfoNodo));
+
+	infoNuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
+	infoNuevoNodo->ip = strdup(infoBloqueRecibido->ipNodo);
+	infoNuevoNodo->puerto = strdup(infoBloqueRecibido->puertoNodo);
+
+	return infoNuevoNodo;
 }
 
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo){

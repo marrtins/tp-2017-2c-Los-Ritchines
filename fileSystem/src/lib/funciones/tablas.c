@@ -134,3 +134,15 @@ void setearAtributoDeArchivoConfigConLongs(t_config * archivoConf, char * key, l
 	free(tamanioString);
 }
 
+int punteroDeStringsContieneString(char ** punteroDeString ,char * string){
+	int i = 0;
+
+	while(punteroDeString[i] != NULL){
+		if(string_equals_ignore_case(punteroDeString[i],string)){
+			return 1;
+		}
+		i++;
+	}
+	return 0;
+}
+
