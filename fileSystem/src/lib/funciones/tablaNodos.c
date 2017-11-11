@@ -10,6 +10,7 @@ void inicializarTablaDeNodos(){
 	config_set_value(archivoNodos, "NODOS", "[]");
 	config_save(archivoNodos);
 	config_destroy(archivoNodos);
+	free(ruta);
 }
 
 char * generarStringNodoNLibre(char * nombre){

@@ -1,3 +1,7 @@
-TAMANIO=0
-NODOS=[]
-LIBRE=0
+TAMANIO=80
+NODOS=[Nodo2,Nodo1]
+Nodo1Libre=40
+Nodo2Libre=40
+Nodo1Total=40
+LIBRE=80
+Nodo2Total=40
