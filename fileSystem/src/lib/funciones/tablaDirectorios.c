@@ -169,7 +169,7 @@ void formatearTablaDeNodos(){
 
 	tamanio = config_get_int_value(archivo, "TAMANIO");
 	tamanioString = string_itoa(tamanio);
-	config_set_value(archivo,"LIBRE",string_itoa(tamanio));
+	config_set_value(archivo,"LIBRE",tamanioString);
 	config_save(archivo);
 	config_destroy(archivo);
 	liberarPunteroDePunterosAChar(nodos);

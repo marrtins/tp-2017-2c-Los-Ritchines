@@ -4,7 +4,7 @@
 int main(int argc, char* argv[]) {
 
 	TdataNode *dataNode;
-	int socketFS, fd, estado, bloqueAEliminar;
+	int socketFS, fd, estado;
 	char *bufferHead = malloc(sizeof(Theader));
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));

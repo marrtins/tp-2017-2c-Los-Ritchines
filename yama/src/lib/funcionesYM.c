@@ -66,6 +66,7 @@ int conectarAFS(Tyama *yama){
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	int socketFS;
+	int estado;
 	head->tipo_de_proceso=YAMA;
 	head->tipo_de_mensaje=INICIO_YAMA;
 
@@ -77,14 +78,14 @@ int conectarAFS(Tyama *yama){
 	}
 
 
-	/*// No permitimos continuar la ejecucion hasta lograr un handshake con FS
+	 //No permitimos continuar la ejecucion hasta lograr un handshake con FS
 	if ((estado = send(socketFS, head, sizeof(Theader), 0)) == -1){
 		sprintf(mensaje, "Fallo send() al socket: %d\n", socketFS);
 		logAndExit(mensaje);
 	}
 
 	printf("Se enviaron: %d bytes a FS del handshake \n", estado);
-*/
+
 	return socketFS;
 }
 

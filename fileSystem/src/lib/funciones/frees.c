@@ -20,6 +20,7 @@ void liberarCopia(void * copia){
 
 	TcopiaNodo * copiaNodo = (TcopiaNodo*) copia;
 	free(copiaNodo->nombreDeNodo);
+	free(copiaNodo);
 }
 
 void liberarTablaDeArchivo(Tarchivo * tablaDeArchivos){

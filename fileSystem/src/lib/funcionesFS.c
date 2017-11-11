@@ -271,11 +271,15 @@ int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs)
 			scanf("%c", &input);
 		}
 		if (input == 'n' || input == 'N'){
+			free(rutaArchivoYamafs);
+			free(nombreArchivo);
 			return 0;
 		}
 		puts("Bueno, procederemos a sobreescribir el archivo");
 		removerArchivo(rutaArchivoYamafs);
 	}
+	free(rutaArchivoYamafs);
+	free(nombreArchivo);
 	return 1;
 }
 
@@ -396,7 +400,6 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	int cantBloques, nroBloque=0;
-	Tbuffer* bloque = malloc(sizeof(Tbuffer));
 	int fd;
 	char * archivoMapeado;
 
@@ -409,7 +412,6 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
 		log_error(logger,"Error al hacer mmap");
 		puts("Error al hacer mmap");
-		liberarEstructuraBuffer(bloque);
 		return -1;
 	}
 
@@ -435,10 +437,12 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		//pthread_mutex_unlock(&bloqueMutex);
 
 		puts("pase el mutex, voy a copiar un bloque");
+		Tbuffer* bloque = malloc(sizeof(Tbuffer));
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
 			puts("Error al copiar bloque recibido. Intentelo de nuevo");
 			log_error(logger,"Error al copiar bloque recibido");
 			liberarEstructuraBuffer(bloque);
+			liberarEstructuraBuffer(bloqueACopiar);
 		//borrar archivo
 			return -1;
 		}
@@ -446,6 +450,8 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		memcpy(p,bloque->buffer,bloque->tamanio);
 		p += bloque->tamanio;
 		puts("hice el memcpy");
+		liberarEstructuraBuffer(bloque);
+		liberarEstructuraBuffer(bloqueACopiar);
 		nroBloque++;
 	}
 
@@ -455,7 +461,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		return -1;
 	}
 	puts("Achivo copiado con éxito");
-	liberarEstructuraBuffer(bloque);
+
 	munmap(archivoMapeado,tablaArchivo->tamanioTotal);
 	return 1;
 }

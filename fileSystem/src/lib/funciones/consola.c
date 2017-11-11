@@ -28,15 +28,17 @@ void procesarInput(char* linea) {
 	} else if (string_equals_ignore_case(*palabras, "cpfrom")) {
 		consolaCpfrom(palabras,cantidad);
 	} else if (string_equals_ignore_case(*palabras, "cpto")) {
-		if(verificarRutaArchivo(palabras[1])){
-			if(copiarArchivo(palabras) != -1){
-				puts("Se copio el archivo, bro.");
-				return;
+		if (cantidad == 2) {
+			if (verificarRutaArchivo(palabras[1])) {
+				if (copiarArchivo(palabras) != -1) {
+					puts("Se copio el archivo, bro.");
+					return;
+				} else {
+					puts("No se pudo copiar el archivo, bro.");
+				}
 			}
-			else
-			{
-				puts("No se pudo copiar el archivo, bro.");
-			}
+		}else {
+			puts("Error en la cantidad de parametros");
 		}
 	} else if (string_equals_ignore_case(*palabras, "cpblock")) {
 		procesarCpblock(palabras);
@@ -371,7 +373,8 @@ int getMD5(char* rutaYamafs){
 	free(comando);
 	free(rutaTmp);
 	free(rutaLocal);
-
+	free(nombreArchivoConExtension);
+	liberarTablaDeArchivo(archivo);
 	return 0;
 }
 

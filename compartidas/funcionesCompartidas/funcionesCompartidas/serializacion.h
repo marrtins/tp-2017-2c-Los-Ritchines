@@ -7,6 +7,9 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 TpackInfoBloque *deserializeInfoBloque(char *bytes_serial);
 
 char *serializeBytes(Theader head, char* buffer, int buffer_size, int *pack_size);
+
+Tbuffer * empaquetarBloqueConNBytes(Theader* head, unsigned long long int tamanio, char* bloque, int nroBloque);
+
 TpackBytes *deserializeBytes(char *bytes_serial);
 
 TpackSrcCode *readFileIntoPack(Tproceso sender, char* ruta);
