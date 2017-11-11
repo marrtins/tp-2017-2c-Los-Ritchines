@@ -59,6 +59,7 @@ void conexionesDatanode(void * estructura){
 					if(fileDescriptor == socketDeEscuchaDatanodes){
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
 						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+						log_info(logInfo,"Nuevo nodo conectado");
 						fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 						printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 						break;
@@ -83,6 +84,7 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
+								log_info(logInfo,"Es datanode y quiere mandar la información del nodo");
 								puts("Es datanode y quiere mandar la información del nodo");
 								infoNodo = recvInfoNodo(fileDescriptor);
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
@@ -102,6 +104,7 @@ void conexionesDatanode(void * estructura){
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
+										log_info(logInfo,"Es datanode y quiere reconectarse");
 										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
 										nuevoNodo->fd = fileDescriptor;
 										list_add(listaDeNodos, nuevoNodo);
@@ -140,6 +143,7 @@ void conexionesDatanode(void * estructura){
 								break;
 							case OBTENER_BLOQUE:
 								puts("Es datanode y nos mando un bloque");
+								log_info(logInfo,"Es datanode y mando un bloque");
 								bloqueACopiar = malloc(sizeof(Tbuffer));
 								int nroBloqueRecibido;
 								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
@@ -172,6 +176,7 @@ void conexionesDatanode(void * estructura){
 				else if(head->tipo_de_proceso == WORKER){
 						switch(head->tipo_de_mensaje){
 							case ALMACENAR_ARCHIVO:
+								log_info(logInfo,"Es worker y quiere almacenar un archivo en yamafs");
 								puts("llego conexion de worker");
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);

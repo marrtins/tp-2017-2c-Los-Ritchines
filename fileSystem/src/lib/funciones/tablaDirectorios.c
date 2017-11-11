@@ -959,3 +959,7 @@ int esDirectorioRaiz (char*ruta){
 		free(palabras);
 	return 0;
 }
+
+void crearDirectorioTemporal(){
+	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/",0777);
+}
