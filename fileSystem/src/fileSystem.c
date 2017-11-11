@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
 
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
+	crearDirectorioTemporal();
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -86,6 +87,7 @@ int main(int argc, char* argv[]) {
 		switch(head->tipo_de_mensaje){
 			case INICIO_YAMA:
 				puts("Es yama");
+				log_info(logInfo,"Se conecto YAMA por primera vez");
 				if (cantNodosPorConectar == 0) {
 					puts("Filesystem estable");
 				}
@@ -93,6 +95,7 @@ int main(int argc, char* argv[]) {
 
 			case INFO_ARCHIVO:
 				puts("Es yama y quiere informacion sobre un archivo");
+				log_info(logInfo,"Es YAMA y quiere información sobre un archivo");
 				char * ruta;
 				Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
@@ -102,6 +105,7 @@ int main(int argc, char* argv[]) {
 				//verifico que la ruta que me manda yama sea valida
 				if(verificarRutaArchivo(rutaArchivo)){
 					puts("La ruta del archivo que mando yama es valida");
+					log_info(logInfo,"La ruta yamafs del archivo que envió YAMA es válida");
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
 
@@ -123,11 +127,12 @@ int main(int argc, char* argv[]) {
 						logErrorAndExit("Fallo al enviar la informacion de un archivo");
 					}
 
-
+					log_info(logInfo,"Se envió a YAMA la información del archivo que pidió");
 					puts("Envie info del archivo");
 					//envio la info del nodo
 
 					enviarInfoNodoAYama(socketYama, archivo);
+					log_info(logInfo,"Se envió a YAMA la información de los nodos en los que está almacenado el archivo");
 					puts("Envie info del nodo");
 
 					liberarTablaDeArchivo(archivo);
@@ -138,12 +143,13 @@ int main(int argc, char* argv[]) {
 				}else {
 					//si no es valida se manda esto
 					puts("La ruta no es valida");
+					log_info(logInfo,"La ruta del archivo que mando yama NO es valida");
 
 					head->tipo_de_proceso = FILESYSTEM;
 					head->tipo_de_mensaje=ARCH_NO_VALIDO;
 
 					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
-						 logErrorAndExit("Fallo al enviar la informacion de un archivo");
+						 logErrorAndExit("Fallo al enviar header a YAMA");
 					}
 				}
 
