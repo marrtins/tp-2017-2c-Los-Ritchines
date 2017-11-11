@@ -18,13 +18,14 @@ int main(int argc, char* argv[]) {
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log");
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log");
 	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log", "dataNode", false, LOG_LEVEL_ERROR);
-	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", false, LOG_LEVEL_INFO);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", false, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 
 	if(archivo == NULL){
+		log_info(logInfo,"No se encontro el databin en la ruta especificada, se procedera a crear el mismo");
 		puts("No se encontro el databin en la ruta especificada, se procedera a crear el mismo");
 		archivo = fopen(dataNode->ruta_databin, "wb");
 		truncate(dataNode->ruta_databin, dataNode->tamanio_databin_mb * BLOQUE_SIZE);
@@ -46,8 +47,10 @@ int main(int argc, char* argv[]) {
 	puts("Conectado con file system");
 
 	//manda el nombre la ip y el puerto del nodo
+
 	estado = enviarInfoNodo(socketFS, dataNode);
 	printf("Envie %d bytes con la informacion del nodo\n",estado);
+	log_info(logInfo,"Se envio la informacion del nodo a FILESYSTEM");
 
 	while (1) {
 
@@ -65,12 +68,14 @@ int main(int argc, char* argv[]) {
 		if (head->tipo_de_proceso == FILESYSTEM) {
 			switch (head->tipo_de_mensaje) {
 				case ALMACENAR_BLOQUE:
+					log_info(logInfo,"Es FileSystem y quiere almacenar un bloque");
 					puts("Es FileSystem y quiere almacenar un bloque");
 
 					bloque = recvBloque(socketFS);
 					puts("voy a almacenar el bloque");
 					setBloque(bloque->nroBloque, bloque);
 					puts("Bloque almacenado");
+					log_info(logInfo,"Bloque almacenado");
 
 					free(bloque->contenido);
 					free(bloque);
@@ -87,7 +92,8 @@ int main(int argc, char* argv[]) {
 					enviarBloqueAFS(nroBloque, socketFS);
 					break;
 				case OBTENER_BLOQUE:
-					puts("ES fileSystem y quiere un bloque");
+					puts("Es fileSystem y quiere un bloque");
+					log_info(logInfo,"Es FileSystem y quiere obtener un bloque");
 					int nroBloque_;
 					unsigned long long int tamanioBloque_;
 					if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
@@ -97,6 +103,7 @@ int main(int argc, char* argv[]) {
 						logErrorAndExit("Error al recibir el tamanio del bloque");
 					}
 					enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
+					log_info(logInfo,"Se envio el bloque a FILESYSTEM");
 					puts("Envie el bloque a FS");
 					break;
 				default:
