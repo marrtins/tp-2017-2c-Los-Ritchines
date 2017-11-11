@@ -79,24 +79,24 @@ TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 
 }
 
-void enviarInfoNodoAYama(int socketYama){
-
-
+void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 
 	char * buffer;
 	int packSize;
+	char ** nodos;
 	Theader head;
 	head.tipo_de_proceso=FILESYSTEM;
 	head.tipo_de_mensaje=INFO_NODO;
-	t_list * listaNodos = list_create();
-	//lista hardcode para probar:
-	generarListaInfoNodos(listaNodos);
+	t_list * listaNodos;
+
+	nodos = obtenerNodosDeUnArchivo(archivo);
+
+	listaNodos = generarListaInfoNodos(nodos);
 
 	TinfoNodosFSYama *infoNodos = malloc(sizeof(TinfoNodosFSYama));
 	infoNodos->listaSize=list_size(listaNodos);
 	infoNodos->listaNodos=list_create();
 	infoNodos->listaNodos=listaNodos;
-
 
 	buffer = serializarInfoNodosYamaFS(head,infoNodos,&packSize);
 
@@ -106,58 +106,48 @@ void enviarInfoNodoAYama(int socketYama){
 	printf("pack size info nodos %d\n",packSize);
 	puts("envie lista de nodos");
 
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
+	list_destroy_and_destroy_elements(listaNodos,liberarTPackageInfoNodo);
+	list_destroy_and_destroy_elements(infoNodos->listaNodos, liberarTPackageInfoNodo);
+	free(infoNodos);
+	free(buffer);
+
 }
 
 
 
 
-void generarListaInfoNodos(t_list *nodos){
+t_list* generarListaInfoNodos(char **nodos){
 
-	//lsita hardcode para probar
+	t_list * listaNodos = list_create();
+	TinfoNodo * infoNodo = malloc(sizeof(TinfoNodo));
+	int i = 0;
 
-	int nombreLen=6;
-	int ipLen=10;
-	int puertoLen=5;
+	int ipTamanio=10;
+	int puertoTamanio=5;
 
+	while(nodos[i] != NULL){
 
-	TpackageInfoNodo *nodo1 = malloc(sizeof(TpackageInfoNodo));
-	nodo1->nombreNodo=malloc(nombreLen);
-	nodo1->nombreNodo="Nodo1";
-	nodo1->tamanioNombre=strlen(nodo1->nombreNodo)+1;
-	nodo1->ipNodo=malloc(ipLen);
-	nodo1->ipNodo="127.0.0.1";
-	nodo1->tamanioIp=strlen(nodo1->ipNodo)+1;
-	nodo1->puertoWorker=malloc(puertoLen);
-	nodo1->puertoWorker = "5013";
-	nodo1->tamanioPuerto=strlen(nodo1->puertoWorker)+1;
-	list_add(nodos,nodo1);
-
-	TpackageInfoNodo *nodo2 = malloc(sizeof(TpackageInfoNodo));
-	nodo2->nombreNodo=malloc(nombreLen);
-	nodo2->nombreNodo="Nodo2";
-	nodo2->tamanioNombre=strlen(nodo2->nombreNodo)+1;
-	nodo2->ipNodo=malloc(ipLen);
-	nodo2->ipNodo="127.0.0.1";
-	nodo2->tamanioIp=strlen(nodo2->ipNodo)+1;
-	nodo2->puertoWorker=malloc(puertoLen);
-	nodo2->puertoWorker = "5014";
-	nodo2->tamanioPuerto=strlen(nodo2->puertoWorker)+1;
-
-	list_add(nodos,nodo2);
-
-	TpackageInfoNodo *nodo3 = malloc(sizeof(TpackageInfoNodo));
-	nodo3->nombreNodo=malloc(nombreLen);
-	nodo3->nombreNodo="Nodo3";
-	nodo3->tamanioNombre=strlen(nodo3->nombreNodo)+1;
-	nodo3->ipNodo=malloc(ipLen);
-	nodo3->ipNodo="127.0.0.1";
-	nodo3->tamanioIp=strlen(nodo3->ipNodo)+1;
-	nodo3->puertoWorker=malloc(puertoLen);
-	nodo3->puertoWorker = "5034";
-	nodo3->tamanioPuerto=strlen(nodo3->puertoWorker)+1;
-
-	list_add(nodos,nodo3);
+		TpackageInfoNodo *nodo = malloc(sizeof(TpackageInfoNodo));
+		infoNodo = buscarInfoNodoPorNombre(listaInfoNodo, nodos[i]);
 
 
+		nodo->nombreNodo = malloc(TAMANIO_NOMBRE_NODO);
+		strcpy(nodo->nombreNodo,infoNodo->nombre);
+		nodo->tamanioNombre = strlen(nodo->nombreNodo)+1;
+
+		nodo->ipNodo = malloc(ipTamanio);
+		strcpy(nodo->ipNodo,infoNodo->ip);
+		nodo->tamanioIp = strlen(nodo->ipNodo)+1;
+
+		nodo->puertoWorker =malloc(puertoTamanio);
+		strcpy(nodo->puertoWorker,infoNodo->puerto);
+		nodo->tamanioPuerto=strlen(nodo->puertoWorker)+1;
+
+		list_add(listaNodos,nodo);
+	}
+
+	return listaNodos;
 }
 

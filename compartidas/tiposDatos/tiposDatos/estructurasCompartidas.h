@@ -189,6 +189,12 @@ typedef struct{
 }TbloqueAEnviar;
 
 typedef struct{
+	char * nombre;
+	char * ip;
+	char * puerto;
+}TinfoNodo;
+
+typedef struct{
 	char* nombre;
 	int fd;
 	unsigned int cantidadBloquesTotal;

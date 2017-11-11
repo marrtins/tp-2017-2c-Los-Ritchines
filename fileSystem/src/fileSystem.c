@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
 	listaDeNodos = list_create();
 	listaDeNodosDesconectados = list_create();
 	listaTablaDirectorios = list_create();
+	listaInfoNodo = list_create();
 
 	/*if(argc != 1){
 		puts("Error en la cantidad de parametros.");
@@ -93,9 +94,6 @@ int main(int argc, char* argv[]) {
 				char * ruta;
 				Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
-				head->tipo_de_proceso = FILESYSTEM;
-				head->tipo_de_mensaje = INFO_ARCHIVO;
-
 				rutaArchivo = recvRutaArchivo(socketYama);
 
 				puts(rutaArchivo);
@@ -108,37 +106,47 @@ int main(int argc, char* argv[]) {
 					TinfoArchivoFSYama *infoSend;
 
 					infoSend = crearListaTablaArchivoParaYama(archivo);
-					head->tipo_de_mensaje=INFO_ARCHIVO;
 					head->tipo_de_proceso=FILESYSTEM;
+					head->tipo_de_mensaje=INFO_ARCHIVO;
+
 
 					puts("voy a serializar la info del archivo");
 					int packSize;
-					Theader head2;
-					head2.tipo_de_proceso=FILESYSTEM;
-					head2.tipo_de_mensaje=INFO_ARCHIVO;
-					char * buffer2=serializarInfoArchivoYamaFS(head2,infoSend,&packSize);
 
-					puts("serialice la info del archivo");
+					char * buffer2 = serializarInfoArchivoYamaFS(*head,infoSend,&packSize);
+
+					puts("Serialice la info del archivo");
 
 					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
 						logAndExit("Fallo al enviar la informacion de un archivo");
 					}
-					free(ruta);
 
-					puts("envie info del archivo");
+
+					puts("Envie info del archivo");
 					//envio la info del nodo
 
-					enviarInfoNodoAYama(socketYama);
-					puts("envie info del nodo");
+					enviarInfoNodoAYama(socketYama, archivo);
+					puts("Envie info del nodo");
+
+					liberarTablaDeArchivo(archivo);
+					free(ruta);
+					free(buffer2);
+					list_destroy_and_destroy_elements(infoSend->listaBloques, liberarTpackageUbicacionBloques);
+
 				}else {
 					//si no es valida se manda esto
-					puts("la ruta no es valida");
-					head->tipo_de_mensaje=ARCH_NO_VALIDO;
+					puts("La ruta no es valida");
+
 					head->tipo_de_proceso = FILESYSTEM;
+					head->tipo_de_mensaje=ARCH_NO_VALIDO;
+
 					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
 						 logAndExit("Fallo al enviar la informacion de un archivo");
 					}
 				}
+
+				free(rutaArchivo);
+
 
 
 			break;

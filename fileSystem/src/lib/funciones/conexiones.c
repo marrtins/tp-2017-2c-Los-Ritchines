@@ -17,6 +17,8 @@ void conexionesDatanode(void * estructura){
 	FILE * archivoFinal;
 	Tnodo * nuevoNodo;
 	Tnodo * nodoEncontrado;
+	TinfoNodo * infoNodoNuevo;
+	TpackInfoBloqueDN * infoNodo;
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	Theader * head = malloc(sizeof(Theader));
 	TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
@@ -88,8 +90,10 @@ void conexionesDatanode(void * estructura){
 										//nodo nuevo;
 										puts("voy a inicializar nodo");
 										nuevoNodo = malloc(sizeof(Tnodo));
+										infoNodoNuevo = inicializarInfoNodo(infoNodo);
 										nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
 										puts("pude inicializar");
+										list_add(listaInfoNodo,infoNodoNuevo);
 										list_add(listaDeNodos, nuevoNodo);
 										cantNodosPorConectar--;
 										almacenarBitmap(nuevoNodo);

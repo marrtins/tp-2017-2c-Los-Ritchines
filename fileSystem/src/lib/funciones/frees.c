@@ -47,3 +47,19 @@ void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque){
 void liberarTablaDirectorios(void * directorio){
 	free(directorio);
 }
+
+void liberarTPackageInfoNodo (void * infoNodo){
+	TpackageInfoNodo * nodo = (TpackageInfoNodo *) infoNodo;
+	free(nodo->nombreNodo);
+	free(nodo->ipNodo);
+	free(nodo->puertoWorker);
+	free(nodo);
+
+}
+
+void liberarTpackageUbicacionBloques(void * bloque){
+	TpackageUbicacionBloques * bloqueA = (TpackageUbicacionBloques *) bloque;
+	free(bloqueA->nombreNodoC1);
+	free(bloqueA->nombreNodoC2);
+	free(bloqueA);
+}

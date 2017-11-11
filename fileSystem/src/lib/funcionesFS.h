@@ -13,6 +13,7 @@ long restaDeDosNumerosLong(long valor1, long valor2);
 int sumaDeDosNumerosInt(int valor1, int valor2);
 int restaDeDosNumerosInt(int valor1, int valor2);
 void setearAtributoDeArchivoConfigConInts(t_config * archivoConf, char * key, int value, int(*funcion)(int valor1, int valor2));
+int punteroDeStringsContieneString(char ** punteroDeString ,char * string);
 
 //Configuracion
 TfileSystem *obtenerConfiguracionFS(char* ruta);
@@ -79,6 +80,7 @@ void removerArchivos(char * ruta);
 int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
+char ** obtenerNodosDeUnArchivo(Tarchivo * archivo);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -90,9 +92,11 @@ int sumarBloquesLibresDeNodoSinElMaximo(Tnodo * maximo);
 void mostrarListaDeNodos(t_list * lista);
 void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2);
 Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre);
+TinfoNodo * buscarInfoNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
 void borrarNodoPorNombre(t_list * lista, char * nombre);
+
 
 //Directorios
 void crearRoot();
@@ -151,6 +155,7 @@ int copiarArchivo(char ** palabras);
 
 //Nodos
 TpackInfoBloqueDN * recvInfoNodo(int socketFS);
+TinfoNodo * inicializarInfoNodo(TpackInfoBloqueDN * infoBloqueRecibido);
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo);
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(t_list * lista, int fd);
@@ -176,11 +181,13 @@ void liberarTPackInfoBloqueDN(TpackInfoBloqueDN * bloque);
 void liberarTablaDirectorios(void* directorio);
 void liberarCopia(void * copia);
 void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal);
+void liberarTPackageInfoNodo (void * infoNodo);
+void liberarTpackageUbicacionBloques(void * bloque);
 
 //YAMA
 char * recvRutaArchivo(int socket);
 TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo);
-void enviarInfoNodoAYama(int socketYama);
-void generarListaInfoNodos(t_list *nodos);
+void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo);
+t_list * generarListaInfoNodos(char ** nodos);
 
 #endif

@@ -284,6 +284,16 @@ int almacenarArchivo(char **palabras){
 	return 1;
 }
 
+TinfoNodo * inicializarInfoNodo(TpackInfoBloqueDN * infoBloqueRecibido){
+	TinfoNodo * infoNuevoNodo = malloc(sizeof(TinfoNodo));
+
+	infoNuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
+	infoNuevoNodo->ip = strdup(infoBloqueRecibido->ipNodo);
+	infoNuevoNodo->puerto = strdup(infoBloqueRecibido->puertoNodo);
+
+	return infoNuevoNodo;
+}
+
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo){
 	nuevoNodo->fd = fileDescriptor;
 	nuevoNodo->cantidadBloquesTotal = infoBloqueRecibido->databinEnMB;

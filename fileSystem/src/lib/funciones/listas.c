@@ -110,6 +110,16 @@ Tnodo * buscarNodoPorNombre(t_list * lista, char * nombre){
 	return (Tnodo *)list_find(lista, buscarPorNombre);
 }
 
+TinfoNodo * buscarInfoNodoPorNombre(t_list * lista, char * nombre){
+
+	bool buscarPorNombre(void * nodo){
+		TinfoNodo * nodoA = (TinfoNodo *) nodo;
+		return !strcmp(nombre, nodoA->nombre);
+	}
+
+	return (TinfoNodo *)list_find(lista, buscarPorNombre);
+}
+
 int sumarListasPorTamanioDatabin(){
 	int cantidadDeElementos = listaDeNodos->elements_count;
 	int tamanioTotalDisponible = 0;
