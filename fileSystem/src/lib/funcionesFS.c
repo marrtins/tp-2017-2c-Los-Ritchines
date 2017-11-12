@@ -415,12 +415,12 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	fclose(archivo);
 
 	char * p = archivoMapeado;
-	while(nroBloque != cantBloques){
+	while(nroBloque < cantBloques){
 
 		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
 			puts("No se encontraron los nodos con las copias del bloque");
 			return -1;
-			}
+		}
 
 		//pthread_cond_init(&bloqueCond, NULL);
 		pthread_mutex_init(&bloqueMutex,NULL);
@@ -442,10 +442,8 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		//borrar archivo
 			return -1;
 		}
-		puts("voy a hacer un memcpy");
 		memcpy(p,bloque->buffer,bloque->tamanio);
 		p += bloque->tamanio;
-		puts("hice el memcpy");
 		liberarEstructuraBuffer(bloque);
 		liberarEstructuraBuffer(bloqueACopiar);
 		nroBloque++;

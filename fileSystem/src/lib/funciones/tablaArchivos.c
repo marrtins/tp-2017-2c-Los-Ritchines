@@ -163,6 +163,7 @@ void eliminarBloqueDeUnArchivo(char * rutaLocal, int numeroDeBloque, int numeroD
 		free(array);
 		free(bloqueNCopias);
 		free(bloqueNCopiaN);
+		puts("Se elimino el bloque correctamente");
 
 	}
 	else{

@@ -12,6 +12,7 @@ void consolaFS(){
 		}
 		add_history(linea);
 		procesarInput(linea);
+		free(linea);
 	}
 }
 
@@ -66,7 +67,6 @@ void procesarInput(char* linea) {
 	}
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
-	free(linea);
 
 }
 
@@ -147,9 +147,9 @@ void consolaFormat(char**palabras, int cantidad){
 }
 void consolaRename(char** palabras, int cantidad) {
 	if (cantidad == 2) {
-		if (!esRutaYamafs(palabras[1])){
+		if (esRutaYamafs(palabras[1])){
 			int esRutaARoot = string_ends_with(palabras[1], "yamafs:/");
-			if (esRutaARoot) {
+			if (!esRutaARoot) {
 				if (existeDirectorio(palabras[1]) || verificarRutaArchivo(palabras[1])) {
 					renombrarArchivoODirectorio(palabras[1], palabras[2]);
 				}

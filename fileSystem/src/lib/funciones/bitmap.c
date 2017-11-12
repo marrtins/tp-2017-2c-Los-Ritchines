@@ -22,8 +22,7 @@ void mostrarBitmap(t_bitarray* bitmap){
 void levantarBitmapDeUnNodo(Tnodo * nodo){
 	char * rutaArchivo = malloc(150);
 	rutaArchivo = string_from_format("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/bitmaps/%s.dat", nodo->nombre);
-	puts(rutaArchivo);
-	FILE * archivo = fopen(rutaArchivo, "r");
+	FILE * archivo = fopen(rutaArchivo, "r+");
 	if(archivo == NULL){
 		logErrorAndExit("No se pudo abrir el bitmap del nodo, probablemente no existe.");
 	}
@@ -45,6 +44,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 		}
 		i++;
 	}
+	fclose(archivo);
 	mostrarListaDeNodos(listaDeNodosDesconectados);
 	free(rutaArchivo);
 }

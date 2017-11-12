@@ -436,8 +436,6 @@ void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
 
 			if (string_equals_ignore_case(extensionOriginal, extensionNueva)) {
 
-				free(extensionNueva);
-				free(extensionOriginal);
 				char * rutaLocal = obtenerRutaLocalDeArchivo(rutaYamafs);
 				char *nuevaRuta = obtenerRutaSinArchivo(rutaLocal);
 				string_append(&nuevaRuta, "/");
@@ -453,6 +451,8 @@ void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
 			} else {
 				puts("La extension tiene que ser la misma que la del archivo orginal");
 			}
+			free(extensionNueva);
+			free(extensionOriginal);
 		} else {
 			puts("Tiene que ingresar el nuevo nombre con la extension del archivo original");
 		}
@@ -781,14 +781,19 @@ void removerArchivo(char* ruta){
 			nombreYPosicion = config_get_array_value(archivo,keyBloqueNCopiaM);
 			nodo = buscarNodoPorNombre(listaDeNodos, nombreYPosicion[0]);
 			if(nodo == NULL){
-				puts("no lo encontre asi que voy a buscarlo en desconectados");
 				nodo = buscarNodoPorNombre(listaDeNodosDesconectados, nombreYPosicion[0]);
 				if(nodo == NULL){
 					puts("No se pudo completar la operacion, el nodo con la copia no esta en ningun lado.");
-							return;;
+					liberarPunteroDePunterosAChar(nombreYPosicion);
+					free(nombreYPosicion);
+					free(keyBloqueCopias);
+					free(keyBloqueNCopiaM);
+					return;
 				}
 			}
 			desocuparBloque(nodo, atoi(nombreYPosicion[1]));
+			liberarPunteroDePunterosAChar(nombreYPosicion);
+			free(nombreYPosicion);
 			free(keyBloqueNCopiaM);
 			j++;
 		}
@@ -870,6 +875,7 @@ void moverArchivo(char* ruta1, char* ruta2){
 	munmap(archivoMapeado, tamanio);
 	munmap(archivoAMoverMapeado, tamanio);
 
+	remove(rutaLocalArchivo);
 	free(rutaLocalDirectorio);
 	free(rutaLocalArchivo);
 	liberarPunteroDePunterosAChar(palabras);
@@ -877,7 +883,6 @@ void moverArchivo(char* ruta1, char* ruta2){
 	free(nombreArchivoConExtension);
 	free(extension);
 
-	remove(rutaLocalArchivo);
 	puts("Se movio el archivo correctamente.");
 }
 
