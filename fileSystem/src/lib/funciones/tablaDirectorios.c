@@ -349,7 +349,7 @@ int obtenerIndexDeUnaRuta(char * rutaDestino){
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
-	if(cant == 1){
+	if(cant == 1 || cant == 2){ //todo:revisar esto
 		indice = 0;
 	}else{
 		indice = buscarIndexPorNombreDeDirectorio(directorio);

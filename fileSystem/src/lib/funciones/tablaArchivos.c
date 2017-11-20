@@ -347,6 +347,7 @@ char ** obtenerNodosDeUnArchivo(Tarchivo * archivo){
 			}
 			j++;
 		}
+		j=0; //todo: revisar
 		i++;
 	}
 

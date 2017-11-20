@@ -135,10 +135,10 @@ int main(int argc, char* argv[]) {
 					log_info(logInfo,"Se envió a YAMA la información de los nodos en los que está almacenado el archivo");
 					puts("Envie info del nodo");
 
-					liberarTablaDeArchivo(archivo);
-					free(ruta);
-					free(buffer2);
-					list_destroy_and_destroy_elements(infoSend->listaBloques, liberarTpackageUbicacionBloques);
+					//liberarTablaDeArchivo(archivo);
+					//free(ruta);
+					//free(buffer2);
+					//list_destroy_and_destroy_elements(infoSend->listaBloques, liberarTpackageUbicacionBloques);
 
 				}else {
 					//si no es valida se manda esto

@@ -213,13 +213,13 @@ void conexionesDatanode(void * estructura){
 									log_error(logError, "Error al guardar el archivo final en yamafs.");
 								}
 								log_info(logInfo, "Se guardo el archivo final correctamente.");
-								liberarPunteroDePunterosAChar(rutasParaCpfrom);
-								liberarEstructuraArchivoFinal(estructuraArchivoFinal);
+							//todo rompe aca	liberarPunteroDePunterosAChar(rutasParaCpfrom);
+								/*liberarEstructuraArchivoFinal(estructuraArchivoFinal);
 								free(rutasParaCpfrom);
 								free(rutaLocalArchivoFinal);
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
-								free(rutaATemporal);
+								free(rutaATemporal);*/
 								break;
 							default:
 								log_error(logError, "Tipo de mensaje no encontrado en el protocolo.");

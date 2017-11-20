@@ -66,6 +66,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 		TinfoNodosFSYama *infoNodos;
 		TinfoArchivoFSYama *infoArchivo;
 	stat = recv(socketFS, &head, sizeof(Theader), 0);
+	printf("stat %d \n",stat);
 	if (head.tipo_de_mensaje == ARCH_NO_VALIDO) {
 		puts("El archivo no es valido");
 		headEnvio->tipo_de_proceso=YAMA;

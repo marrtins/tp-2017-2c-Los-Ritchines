@@ -80,7 +80,7 @@ int enviarInfoNodo(int socketFS, TdataNode * dataNode){
 	strcpy(infoBloque->ipNodo, dataNode->ip_nodo);
 	infoBloque->tamanioPuerto = strlen(dataNode->puerto_entrada) + 1;
 	infoBloque->puertoNodo = malloc(infoBloque->tamanioPuerto);
-	strcpy(infoBloque->puertoNodo, dataNode->puerto_entrada);
+	strcpy(infoBloque->puertoNodo, dataNode->puerto_worker);//cambio esto
 	infoBloque->databinEnMB = dataNode->tamanio_databin_mb;
 
 	buffer = empaquetarInfoNodo(infoBloque);

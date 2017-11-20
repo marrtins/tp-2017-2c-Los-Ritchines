@@ -106,12 +106,12 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 	printf("pack size info nodos %d\n",packSize);
 	puts("envie lista de nodos");
 
-	liberarPunteroDePunterosAChar(nodos);
-	free(nodos);
-	list_destroy_and_destroy_elements(listaNodos,liberarTPackageInfoNodo);
-	list_destroy_and_destroy_elements(infoNodos->listaNodos, liberarTPackageInfoNodo);
-	free(infoNodos);
-	free(buffer);
+	//liberarPunteroDePunterosAChar(nodos);
+	//free(nodos);
+	//list_destroy_and_destroy_elements(listaNodos,liberarTPackageInfoNodo);
+	//list_destroy_and_destroy_elements(infoNodos->listaNodos, liberarTPackageInfoNodo);
+	//free(infoNodos);
+	//free(buffer);
 
 }
 
@@ -146,6 +146,7 @@ t_list* generarListaInfoNodos(char **nodos){
 		nodo->tamanioPuerto=strlen(nodo->puertoWorker)+1;
 
 		list_add(listaNodos,nodo);
+		i++;
 	}
 
 	return listaNodos;
