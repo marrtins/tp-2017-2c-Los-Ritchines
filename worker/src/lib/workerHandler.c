@@ -20,7 +20,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 
 	if(head->tipo_de_mensaje==GIVE_TMPREDUCCIONLOCAL){
 
-		puts("Nos llega el path del archivo temporal que precisa");
+		//puts("Nos llega el path del archivo temporal que precisa");
 
 
 		if ((buffer = recvGeneric(client_sock)) == NULL){
@@ -33,7 +33,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			return FALLO_GRAL;
 		}
 
-		printf("Path archivo que vamos a enviarle: %s\n",pathArchivoTemporal->bytes);
+		//printf("Path archivo que vamos a enviarle: %s\n",pathArchivoTemporal->bytes);
 		FILE * fdTempFilePropio;
 		fdTempFilePropio = fopen((pathArchivoTemporal->bytes),"r");
 
@@ -48,11 +48,11 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			switch (headRcv.tipo_de_mensaje) {
 
 			case(GIVE_NEXTLINE):
-					puts("give next");
+					//puts("give next");
 						headEnvio.tipo_de_proceso=WORKER;
 						headEnvio.tipo_de_mensaje=TAKE_NEXTLINE;
 						if(fscanf (fdTempFilePropio, "%s", lineaAux)!=-1){
-							printf("Envio: %s\n",lineaAux);
+							//printf("Envio: %s\n",lineaAux);
 							buffer=serializeBytes(headEnvio,lineaAux,strlen(lineaAux)+1,&packSize);
 							if ((stat = send(client_sock, buffer, packSize, 0)) == -1){
 								puts("no se pudo enviar path del archivo temporal que necesitamos. ");

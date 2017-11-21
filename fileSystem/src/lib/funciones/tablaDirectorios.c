@@ -302,6 +302,7 @@ void leerArchivoComoTextoPlano(char * rutaLocal){
 	}else{
 		mostrarBinario(rutaTmp);
 	}
+
 	remove(rutaTmp);
 	liberarTablaDeArchivo(archivo);
 	free(nombreArchivoConExtension);
@@ -579,7 +580,6 @@ void removerArchivos(char * ruta){
 
 	if(archivos[i] != NULL){
 		while(archivos[i] != NULL){
-
 			remove(archivos[i]);
 			i++;
 

@@ -85,7 +85,8 @@ int conectarAFS(Tyama *yama){
 	}
 
 	printf("Se enviaron: %d bytes a FS del handshake \n", estado);
-
+	free(mensaje);
+	free(head);
 	return socketFS;
 }
 
@@ -168,8 +169,8 @@ TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
 char * recibirPathArchivo(int sockMaster){
 	char * buffer;
 	TpackBytes *pathArchivo;
-	Theader head;
-	int stat;
+	//Theader head;
+	//int stat;
 	//stat = recv(sockMaster, &head, sizeof(Theader), 0);
 
 

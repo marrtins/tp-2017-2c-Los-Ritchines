@@ -45,6 +45,7 @@ int eliminarKeyDeArchivo(char * rutaArchivo, char * key){
 
 	fclose(archivo);
 	fclose(archivo2);
+
 	if(remove(rutaArchivo) < 0){
 		return -1;
 	}

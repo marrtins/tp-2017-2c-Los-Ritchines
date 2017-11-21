@@ -28,22 +28,22 @@ int realizarReduccionGlobal(client_sock){
 		return FALLO_GRAL;
 	}
 	printf("llego la info apra la reduccion global\n");
-	printf("job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
+	//printf("job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
 
-	printf("list size %d\n",infoReduccionGlobal->listaNodosSize);
+	//printf("list size %d\n",infoReduccionGlobal->listaNodosSize);
 
-	int i;
+	/*int i;
 	for(i=0;i<list_size(infoReduccionGlobal->listaNodos);i++){
 		TinfoNodoReduccionGlobal *infoNodo = list_get(infoReduccionGlobal->listaNodos,i);
-		printf(" nombre nodo: %s \n",infoNodo->nombreNodo);
-		printf(" ip nodo: %s \n",infoNodo->ipNodo);
-		printf(" peurto: %s \n",infoNodo->puertoNodo);
-		printf(" temp red loc: %s \n",infoNodo->temporalReduccion);
-		printf(" encargado: %d \n",infoNodo->nodoEncargado);
-	}
+		//printf(" nombre nodo: %s \n",infoNodo->nombreNodo);
+		//printf(" ip nodo: %s \n",infoNodo->ipNodo);
+		//printf(" peurto: %s \n",infoNodo->puertoNodo);
+		//printf(" temp red loc: %s \n",infoNodo->temporalReduccion);
+		//printf(" encargado: %d \n",infoNodo->nodoEncargado);
+	}*/
 
 
-	puts("Ahora recibo el script reductor");
+	//puts("Ahora recibo el script reductor");
 
 
 	nombreScriptReductor=string_new();
@@ -61,23 +61,23 @@ int realizarReduccionGlobal(client_sock){
 	if(stat<0){
 		puts("error");
 	}
-puts("recibi");
+	//puts("recibi");
 	//le pido a todos los workers que me pasen sus reducciones locales.
 
 	char * rutaApareoFinal=string_new();
-	puts("str new");
+	//puts("str new");
 	string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
 	puts(rutaApareoFinal);
 	cont++;
 	string_append(&rutaApareoFinal,string_itoa(cont));
 	puts(rutaApareoFinal);
-	puts("realizar apaglobal");
+	//puts("realizar apaglobal");
 	stat = realizarApareoGlobal(infoReduccionGlobal->listaNodos,rutaApareoFinal);
 	if(stat<0){
 			puts("error");
 		}
 
-	puts("hago reduccion global\n");
+	//puts("hago reduccion global\n");
 
 
 
@@ -85,7 +85,7 @@ puts("recibi");
 
 
 
-	puts("Forkeo");
+	//puts("Forkeo");
 	char * lineaDeEjecucionReduccionGlobal;
 	char * rutaResultadoReduccionGlobal;
 	pid_t pidRedGl;
@@ -109,18 +109,18 @@ puts("recibi");
 		string_append(&rutaResultadoReduccionGlobal,infoReduccionGlobal->tempRedGlobal);
 		string_append(&lineaDeEjecucionReduccionGlobal,rutaResultadoReduccionGlobal);
 
-		printf("linea de eecucion red global %s\n",lineaDeEjecucionReduccionGlobal);
-		printf("Ruta resutlado reduccion %s\n",rutaResultadoReduccionGlobal);
+		//printf("linea de eecucion red global %s\n",lineaDeEjecucionReduccionGlobal);
+		//printf("Ruta resutlado reduccion %s\n",rutaResultadoReduccionGlobal);
 
 
 
 		stat = system(lineaDeEjecucionReduccionGlobal);
-		printf("Stat lineaDeEjecucion :%d \n",stat);
+		//printf("Stat lineaDeEjecucion :%d \n",stat);
 		Theader *head = malloc(sizeof (Theader));
 		head->tipo_de_proceso = WORKER;
 		head->tipo_de_mensaje = FIN_REDUCCIONGLOBALOK;
 
-		puts("Envio header. fin reduccion global ok");
+		//puts("Envio header. fin reduccion global ok");
 		enviarHeader(client_sock,head);
 		remove(rutaScriptReductor);
 		//close(client_sock);
@@ -185,7 +185,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 		}
 	}
 
-	puts("pase pedir info. abro archivo");
+	//puts("pase pedir info. abro archivo");
 	FILE * fdTempFilePropio;
 	puts(rutaMiTemporal);
 	fdTempFilePropio = fopen(rutaMiTemporal,"r");
@@ -199,63 +199,63 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	TpackBytes *siguienteLinea;
 
 
-	puts("pongo listafsds");
+	/*//puts("pongo listafsds");
 	for(i=0;i<list_size(listaFds);i++){
 		TinfoApareoGlobal *infoWorker3 = list_get(listaFds,i);
-		printf("fd %d\n",infoWorker3->fdWorker);
-	}
+		//printf("fd %d\n",infoWorker3->fdWorker);
+	}*/
 
 
 	char * lineaAux=malloc(MAXSIZELINEA);
 
 	char lineas[cantArch][MAXSIZELINEA];
 	char * buffer ;
-	puts("pido la primer linea");
+	//puts("pido la primer linea");
 	//int fdWorker;
 	//pido la primer linea a cada worker y leo la mia:
 	for(i=0;i<list_size(listaFds);i++){
 		TinfoApareoGlobal *infoWorker4 = list_get(listaFds,i);
-		puts("pase infow");
-		printf("fdw %d\n ",infoWorker4->fdWorker);
+		//puts("pase infow");
+		//printf("fdw %d\n ",infoWorker4->fdWorker);
 		fdWorker = infoWorker4->fdWorker;
-		printf("fdw %d\n ",fdWorker);
-		puts("pase fdw");
+		//printf("fdw %d\n ",fdWorker);
+		//puts("pase fdw");
 		if(!infoWorker4->encargado){
-			puts("if 1");
+			//puts("if 1");
 			head->tipo_de_mensaje=GIVE_NEXTLINE;
 			enviarHeader(fdWorker,head);
-			puts("envie hejader");
+			//puts("envie hejader");
 			if ((stat = recv(fdWorker, head, sizeof(Theader), 0)) < 0){
 				log_error(logError,"Error en la recepcion del header.");
 			}
-			puts("recibo");
+			//puts("recibo");
 			if(head->tipo_de_mensaje==TAKE_NEXTLINE){
 				if ((buffer = recvGeneric(fdWorker)) == NULL){
 					puts("Fallo recepcion de nextline");
 					return FALLO_RECV;
 				}
-				puts("pase buffer");
+				//puts("pase buffer");
 
 				if ((siguienteLinea =  deserializeBytes(buffer)) == NULL){
 					puts("Fallo deserializacion de Bytes de nextline");
 					return FALLO_GRAL;
 				}
-				puts("pase sig linea");
-				printf("Linea Recibida: %s\n",siguienteLinea->bytes);
+				//puts("pase sig linea");
+				//printf("Linea Recibida: %s\n",siguienteLinea->bytes);
 				strcpy(lineas[i],siguienteLinea->bytes);
 			}
 		}else{
-			puts("hago fscanf");
-			printf("FD:%d\n",fdTempFilePropio);
+			//puts("hago fscanf");
+			//printf("FD:%d\n",fdTempFilePropio);
 			fscanf (fdTempFilePropio, "%s", lineaAux);
 			strcpy(lineas[i],lineaAux);
-			puts("linea:");
-			puts(lineaAux);
+			//puts("linea:");
+			//puts(lineaAux);
 		}
 	}
-	puts("tengo estas lineas x el momento");
+	//puts("tengo estas lineas x el momento");
 	for(i=0;i<list_size(listaInfoNodos);i++){
-		printf("%s\n",lineas[i]);
+		//printf("%s\n",lineas[i]);
 	}
 
 	int mayorIndice;
@@ -310,7 +310,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 
 			}
 	}
-	puts("fin apareo global");
+	//puts("fin apareo global");
 	fclose(fdTempFilePropio);
 	fclose(fdArchivoResultado);
 	for(i=0;i<list_size(listaFds);i++){

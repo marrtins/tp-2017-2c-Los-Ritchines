@@ -40,11 +40,11 @@ int realizarAlmacenamientoFinal(client_sock){
 
 
 
-	puts("me conecto a fs");
+	//puts("me conecto a fs");
 	int sockFS=conectarAServidor(worker->ip_filesystem,worker->puerto_filesystem);
-	printf("sock fs:%d\n",sockFS);
+	//printf("sock fs:%d\n",sockFS);
 
-
+	log_info(logInfo,"nombre temp reduccion %s ",infoAlmacenado->nombreTempReduccion);
 	archivoFinal = fopen(infoAlmacenado->nombreTempReduccion, "r");
 	tamanioArchivoFinal = tamanioArchivo(archivoFinal);
 	fileDescriptorArchivoFinal = fileno(archivoFinal);
@@ -54,7 +54,8 @@ int realizarAlmacenamientoFinal(client_sock){
 	}
 
 	memcpy(contenidoArchivoFinal, archivoFinalMapeado, tamanioArchivoFinal);
-
+	log_info(logInfo,"contenido archv final %s ",contenidoArchivoFinal);
+	//printf("contenido archivo final  %s\n",contenidoArchivoFinal);
 	//yamafs
 	tbuffer = empaquetarArchivoFinal(header, infoAlmacenado->nombreResultante, contenidoArchivoFinal, tamanioArchivoFinal);
 
@@ -73,7 +74,10 @@ int realizarAlmacenamientoFinal(client_sock){
 
 //puts aca envio a filesystem
 
-	sleep(2);
+	//sleep(2);
+
+
+	//todo: que fs me envie un header diciendo si salio ok
 
 
 	Theader *headEnvio=malloc(sizeof(Theader));
@@ -82,7 +86,10 @@ int realizarAlmacenamientoFinal(client_sock){
 	headEnvio->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 	enviarHeader(client_sock,headEnvio);
 
-	puts("fin almacenamiento global. envie header");
+
+
+
+	//puts("fin almacenamiento global. envie header");
 
 	return 0;
 }

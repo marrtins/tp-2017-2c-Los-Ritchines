@@ -373,6 +373,7 @@ int getMD5(char* rutaYamafs){
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaTmp);
 	system(comando);
+
 	remove(rutaTmp);
 	free(comando);
 	free(rutaTmp);

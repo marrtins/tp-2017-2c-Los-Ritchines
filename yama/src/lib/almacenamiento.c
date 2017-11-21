@@ -38,6 +38,7 @@ void manejarFinAlmacenamientoFail(int sockMaster){
 		jobFinAF->finCorrecto=false;
 		list_add(listaJobFinalizados,jobFinAF);
 	}
+	free(headEnvio);
 
 }
 
@@ -82,7 +83,7 @@ int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster){
 	}
 	printf("se enviaron %d bytes de la info del almacenado final\n",stat);
 
-
+	free(buffer);
 
 
 

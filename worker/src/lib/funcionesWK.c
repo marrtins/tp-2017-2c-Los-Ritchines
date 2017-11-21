@@ -36,7 +36,7 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	fclose(scriptFile);
 
 	//puts("recibi archivo");
-	printf("Ruta Script  %s\n",rutaAAlmacenar);
+	//printf("Ruta Script  %s\n",rutaAAlmacenar);
 
 
 
@@ -45,8 +45,8 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	string_append(&lineaPermisoEjecucion,rutaAAlmacenar);
 	printf("%s \n",lineaPermisoEjecucion);
 	stat=system(lineaPermisoEjecucion);
-	printf("Stat lineaPermisoEjecucion :%d \n",stat);
-	puts("Permisos de ejecucion otorgados al script recibido");
+	//printf("Stat lineaPermisoEjecucion :%d \n",stat);
+	//puts("Permisos de ejecucion otorgados al script recibido");
 
 	return 0;
 
@@ -89,8 +89,8 @@ int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar){
 	}
 	fclose(scriptFile);
 
-	puts("recibi archivo");
-	printf("Ruta archivo  %s\n",rutaAAlmacenar);
+	//puts("recibi archivo");
+	//printf("Ruta archivo  %s\n",rutaAAlmacenar);
 
 
 

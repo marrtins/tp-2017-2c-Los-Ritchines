@@ -23,7 +23,7 @@ int realizarTransformacion(int client_sock){
 	char * nombreScriptTransformador;
 	char * rutaScriptTransformador ;
 	Theader *headEnvio  = malloc(sizeof (Theader));
-	int stat;
+	int status;
 	pid_t pid;
 
 	puts("llego solicitud para nueva transformacion. recibimos bloque cant bytes y nombre temporal..");
@@ -55,7 +55,7 @@ int realizarTransformacion(int client_sock){
 	string_append(&rutaScriptTransformador,nombreScriptTransformador);
 
 
-	stat = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
+	status = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
 
 
 	char *input1 = getBloqueWorker(datosTransf->nroBloque);
@@ -88,7 +88,7 @@ int realizarTransformacion(int client_sock){
 
 
 
-		//todo: reemplazar cat wban.csv por el bloque de codigo que nos interesa trasnformar.
+
 
 		string_append(&lineaDeEjecucionTransformacion,"cat ");
 		string_append(&lineaDeEjecucionTransformacion,rutaBloque);
@@ -100,12 +100,12 @@ int realizarTransformacion(int client_sock){
 		string_append(&lineaDeEjecucionTransformacion,rutaResultadoTransformacion);
 
 		printf("linea de eecucion %s\n",lineaDeEjecucionTransformacion);
-		//			printf("Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
+		printf("Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
 
 
 
-		stat = system(lineaDeEjecucionTransformacion);
-		printf("Stat lineaDeEjecucion :%d \n",stat);
+		status = system(lineaDeEjecucionTransformacion);
+		printf("Stat lineaDeEjecucion :%d \n",status);
 
 		headEnvio->tipo_de_proceso = WORKER;
 		headEnvio->tipo_de_mensaje = FIN_LOCALTRANSF;

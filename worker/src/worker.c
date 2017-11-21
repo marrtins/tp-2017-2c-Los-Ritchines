@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
 	}
 
 	//acepta y escucha
-	puts("esperando comunicaciones entrantes...");
+	///puts("esperando comunicaciones entrantes...");
 	while((client_sock = accept(listenSock, (struct sockaddr*) &client, (socklen_t*) &clientSize)) != -1){
 		//puts("Conexion aceptada");
 		while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
@@ -70,12 +70,12 @@ int main(int argc, char* argv[]){
 		switch(head->tipo_de_proceso){
 
 		case MASTER:
-			puts("Es master");
+			//puts("Es master");
 			manejarConexionMaster(head,client_sock);
 
 			break;
 		case WORKER:
-			puts("es worker");
+			//puts("es worker");
 			manejarConexionWorker(head,client_sock);
 			break;
 		default:
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]){
 
 	// Si salio del ciclo es porque fallo el accept()
 
-	perror("Fallo el accept(). error");
+	//perror("Fallo el accept(). error");
 
 	//liberarConfiguracionYama();
 

@@ -21,14 +21,14 @@ void desempaquetarArchivoFinal(int fileDescriptor, TarchivoFinal * archivoFinal)
 		logErrorAndExit("Error al recibir el tamanio do bloque");
 	}
 
-	if (recv(fileDescriptor, &archivoFinal->tamanioContenido, sizeof(archivoFinal->tamanioContenido), 0)//todo:msgwaitall
+	if (recv(fileDescriptor, &archivoFinal->tamanioContenido, sizeof(archivoFinal->tamanioContenido), 0)
 			== -1) {
 		logErrorAndExit("Error al recibir el tamanio do bloque");
 	}
 
 	archivoFinal->contenidoArchivo = malloc(archivoFinal->tamanioContenido);
 
-	if (recv(fileDescriptor, archivoFinal->contenidoArchivo, archivoFinal->tamanioContenido, 0) == -1) {
+	if (recv(fileDescriptor, archivoFinal->contenidoArchivo, archivoFinal->tamanioContenido, MSG_WAITALL) == -1) {
 		logErrorAndExit("Error al recibir el tamanio do bloque");
 	}
 }

@@ -23,7 +23,7 @@ int realizarReduccionLocal(int client_sock){
 	char * lineaDeEjecucionReduccion;
 	char * lineaDeEjecucionApareo;
 
-	int stat;
+	int status;
 	pid_t pidRed;
 	Theader *headEnvio  = malloc(sizeof (Theader));
 	puts("Llego solicitud de inicio para reduccion local");
@@ -40,18 +40,18 @@ int realizarReduccionLocal(int client_sock){
 	}
 
 
-	printf("\n\n\n esta es la info q  me llego");
-	printf("Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
+	//printf("\n\n\n esta es la info q  me llego");
+	//printf("Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
 
 	int i;
 
-	printf("LIST SIZE %d\n",infoReduccion->listaSize);
+	//printf("LIST SIZE %d\n",infoReduccion->listaSize);
 	lineaDeEjecucionApareo=string_new();
 	string_append(&lineaDeEjecucionApareo,"sort -m");
 
 	for(i=0;i<infoReduccion->listaSize;i++){
 		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporales,i);
-		printf("Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
+		//printf("Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
 		string_append(&lineaDeEjecucionApareo," /home/utnso/");
 		string_append(&lineaDeEjecucionApareo,infoAux->nombreTemporal);
 
@@ -66,9 +66,9 @@ int realizarReduccionLocal(int client_sock){
 	string_append(&lineaDeEjecucionApareo," > ");
 	string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
 
-	printf("linea de ejec apareo %s \n",lineaDeEjecucionApareo);
+	//printf("linea de ejec apareo %s \n",lineaDeEjecucionApareo);
 	system(lineaDeEjecucionApareo);
-	puts("Ahora recibo el script reductor");
+	//puts("Ahora recibo el script reductor");
 
 
 	nombreScriptReductor=string_new();
@@ -82,7 +82,7 @@ int realizarReduccionLocal(int client_sock){
 	string_append(&rutaScriptReductor,nombreScriptReductor);
 
 
-	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
+	status = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
 
 
 
@@ -91,7 +91,7 @@ int realizarReduccionLocal(int client_sock){
 
 
 
-	puts("Forkeo");
+	//puts("Forkeo");
 
 	if ( (pidRed=fork()) == 0 )
 	{ /* hijo */
@@ -113,18 +113,18 @@ int realizarReduccionLocal(int client_sock){
 		string_append(&rutaResultadoReduccion,infoReduccion->nombreTempReduccion);
 		string_append(&lineaDeEjecucionReduccion,rutaResultadoReduccion);
 
-		printf("linea de eecucion %s\n",lineaDeEjecucionReduccion);
-		printf("Ruta resutlado reduccion %s\n",rutaResultadoReduccion);
+		//printf("linea de eecucion %s\n",lineaDeEjecucionReduccion);
+		//printf("Ruta resutlado reduccion %s\n",rutaResultadoReduccion);
 
 
 
-		stat = system(lineaDeEjecucionReduccion);
-		printf("Stat lineaDeEjecucion :%d \n",stat);
+		status = system(lineaDeEjecucionReduccion);
+		//printf("Stat lineaDeEjecucion :%d \n",stat);
 
 		headEnvio->tipo_de_proceso = WORKER;
 		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALOK;
 
-		puts("Envio header. fin reduccion ok");
+		//puts("Envio header. fin reduccion ok");
 		enviarHeader(client_sock,headEnvio);
 		remove(rutaScriptReductor);
 		//close(client_sock);

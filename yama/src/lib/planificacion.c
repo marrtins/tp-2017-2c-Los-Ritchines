@@ -51,7 +51,7 @@ t_list * planificar(TjobMaster *job){
 		nodo->pwl=pwl;
 		nodo->availability=nodo->disponibilidadBase+nodo->pwl;
 		nodo->clock=false;
-		printf("Nodo:%s, ava:%d, clock:%d\n,",nodo->infoNodo.nombreNodo,nodo->availability,nodo->clock);
+		printf("Nodo:%s, ava:%d, clock:%d\n",nodo->infoNodo.nombreNodo,nodo->availability,nodo->clock);
 		list_add(listaWorkersPlanificacion,nodo);
 	}
 
@@ -252,6 +252,7 @@ Tplanificacion * getNodoApuntado(t_list * listaWorkersPlanificacion){
 			return aux;
 		}
 	}
+	puts("error no hay nodo apuntado");
 	return NULL;
 }
 Tplanificacion * getSiguienteNodoDisponible(t_list * listaWorkersPlanificacion,char * nombreNodo1,char* nombreNodo2){
@@ -318,6 +319,7 @@ int posicionarClock(t_list *listaWorkers){
 	puts("posiciono clock");
 	int i;
 	int disponibilidadMasAlta = -1;
+	int indiceAModificar;
 	bool empate=false;
 	for(i=0;i<list_size(listaWorkers);i++){
 		Tplanificacion *aux = list_get(listaWorkers,i);
@@ -328,6 +330,7 @@ int posicionarClock(t_list *listaWorkers){
 			printf("nueva dispo mas alta %d \n",disponibilidadMasAlta);
 			puts("no hay empate");
 			empate=false;
+			indiceAModificar = i;
 		}else if(aux->availability==disponibilidadMasAlta){
 			puts("hay empate");
 			empate=true;
@@ -336,6 +339,9 @@ int posicionarClock(t_list *listaWorkers){
 	if(empate){
 		puts("hubo empate. desempato");
 		desempatarClock(disponibilidadMasAlta,listaWorkers);
+	}else{
+		Tplanificacion *aux = list_get(listaWorkers,indiceAModificar);
+		aux->clock=true;
 	}
 
 
@@ -855,13 +861,14 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 
 				bloqueRet->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 				bloqueRet->nombreNodo=bloqueAux->nombreNodoC2;
+				bloqueRet->tamanioNombre=strlen(bloqueRet->nombreNodo)+1;
 
 				bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
 				bloqueRet->puertoWorker=getPuertoNodo(bloqueRet->nombreNodo,job);
-
+				bloqueRet->tamanioPuerto=strlen(bloqueRet->puertoWorker)+1;
 				bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
 				bloqueRet->ipWorker=getIpNodo(bloqueRet->nombreNodo,job);
-
+				bloqueRet->tamanioIp=strlen(bloqueRet->ipWorker)+1;
 
 			}else{
 				//le paso la info para q trabaje en el otronodo
@@ -869,12 +876,16 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 
 				bloqueRet->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
 				bloqueRet->nombreNodo=bloqueAux->nombreNodoC1;
+				bloqueRet->tamanioNombre=strlen(bloqueRet->nombreNodo)+1;
 
 				bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
 				bloqueRet->puertoWorker=getPuertoNodo(bloqueRet->nombreNodo,job);
+				bloqueRet->tamanioPuerto=strlen(bloqueRet->puertoWorker)+1;
 
 				bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
 				bloqueRet->ipWorker=getIpNodo(bloqueRet->nombreNodo,job);
+				bloqueRet->tamanioIp=strlen(bloqueRet->ipWorker)+1;
+
 			}
 
 			bloqueRet->bloqueDelArchivo=tareaAReplanificar->bloqueDelArchivo;
@@ -882,7 +893,10 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 
 			bloqueRet->idTarea=idTareaGlobal++;
 
-			bloqueRet->nombreTemporal=malloc(strlen(tareaAReplanificar->nombreArchTemporal)+1);
+			bloqueRet->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
+			bloqueRet->nombreTemporal=generarNombreTemporal(job->masterId);
+			bloqueRet->nombreTemporalLen=strlen(bloqueRet->nombreTemporal)+1;
+
 			tareaAReplanificar->fueReplanificada=true;
 
 
@@ -904,6 +918,7 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 			agregarTransformacionAListaEnProceso(job,bloqueRet);
 			actualizarCargaWorkerEn(tareaAReplanificar->nodo,1);
 			aumentarHistoricoEn(bloqueRet->nombreNodo,1);
+			free(buffer);
 			return 0;
 		}
 	}

@@ -220,6 +220,7 @@ void conexionesDatanode(void * estructura){
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
 								free(rutaATemporal);*/
+
 								break;
 							default:
 								log_error(logError, "Tipo de mensaje no encontrado en el protocolo.");

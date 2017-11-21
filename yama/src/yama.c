@@ -203,7 +203,7 @@ int main(int argc, char* argv[]){
 
 	}
 
-//todo liberar listast etc
+free(head);
 return 0;
 }
 
