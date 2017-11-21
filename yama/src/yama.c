@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
 	socketDeEscuchaMaster = crearSocketDeEscucha(yama->puerto_entrada);
 
 	fileDescriptorMax = MAXIMO(socketDeEscuchaMaster, fileDescriptorMax);
-	puts("antes de entrar al while");
+	log_info(logInfo,"antes de entrar al while");
 
 	while (listen(socketDeEscuchaMaster, BACKLOG) == -1){
 		log_trace(logError, "Fallo al escuchar el socket servidor de file system.");
@@ -89,29 +89,32 @@ int main(int argc, char* argv[]){
 
 
 	FD_SET(socketDeEscuchaMaster, &masterFD);
-	printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
+	log_info(logInfo,"El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 
 	while(1){
 
 		readFD = masterFD;
 
 		if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
+			puts("fallo el select");
+
 			logErrorAndExit("Fallo el select.");
+
 		}
 
 		for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
 
 			if(FD_ISSET(fileDescriptor, &readFD)){
-				printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
+				log_info(logInfo,"Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
 				if(fileDescriptor == socketDeEscuchaMaster){
 					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
-					printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+					log_info(logInfo,"Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
 					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
-					printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
+					log_info(logInfo,"El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 					break;
 				}
-				puts("Recibiendo...");
+				log_info(logInfo,"Recibiendo...");
 
 
 				if ((estado = recv(fileDescriptor, head, HEAD_SIZE, 0)) == -1){
@@ -127,7 +130,7 @@ int main(int argc, char* argv[]){
 				if(head->tipo_de_proceso==MASTER){
 					switch(head->tipo_de_mensaje){
 					case INICIOMASTER:
-						puts("se conecto master");
+						log_info(logInfo,"se conecto master");
 						break;
 
 					case PATH_RES_FILE:
@@ -140,6 +143,10 @@ int main(int argc, char* argv[]){
 
 					case FINTRANSFORMACIONFAIL:
 						manejarFinTransformacionFail(fileDescriptor);
+						break;
+
+					case FINTRANSFORMACIONFAILDESCONEXION:
+						manejarFinTransformacionFailDesconexion(fileDescriptor);
 						break;
 
 					case FIN_REDUCCIONLOCALOK:
@@ -165,7 +172,7 @@ int main(int argc, char* argv[]){
 						break;
 
 					default:
-						puts("Tipo de Mensaje no encontrado en el protocolo");
+						log_info(logInfo,"Tipo de Mensaje no encontrado en el protocolo");
 						log_trace(logError, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
 						break;
 					}
@@ -179,7 +186,7 @@ int main(int argc, char* argv[]){
 					//no tendria q entrar aca x ahora..
 					default:
 						log_trace(logError, "Tipo de mensaje no encontrado en el protocolo.");
-						puts("Tipo de mensaje no encontrado en el protocolo.");
+						log_info(logInfo,"Tipo de mensaje no encontrado en el protocolo.");
 						break;
 					}
 				}
@@ -209,7 +216,7 @@ return 0;
 
 void sigusr1Handler(void){
 
-	puts("Señal SIGUSR1 detectada");
+	log_info(logInfo,"Señal SIGUSR1 detectada");
 
 
 
@@ -238,7 +245,7 @@ void sigusr1Handler(void){
 
 void setRetardoPlanificacion(){
 	retardoPlanificacionSegs = retardoPlanificacion / 1000.0;
-	printf("Se cambio el retardo de planificacion a %f segundos\n", retardoPlanificacionSegs);
+	log_info(logInfo,"Se cambio el retardo de planificacion a %f segundos\n", retardoPlanificacionSegs);
 }
 
 

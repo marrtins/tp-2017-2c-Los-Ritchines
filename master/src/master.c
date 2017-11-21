@@ -5,9 +5,12 @@
 
 char * rutaTransformador, * rutaReductor, *rutaResultado;
 
-
-Tmetricas *metricasJob;
-
+int maximoTransformacionesParalelas,maximoReduccionesParalelas,
+cantTransformaciones,cantRL,cantFallos;
+double duracionRG,duracionAlmacenado,duracionJob;
+time_t horaInicio;
+t_list * transfEjecutando,*transfFin,*rlEjecutando,*rlFin,*duracionTransformaciones,*duracionRL;
+pthread_mutex_t mux_transfEjecutando,mux_transfFin,mux_rlEjecutando,mux_rlFin,mux_duracionTransformaciones,mux_duracionRL,mux_cantFallos;
 int main(int argc, char* argv[]) {
 
 	int sockYama,
@@ -20,17 +23,53 @@ int main(int argc, char* argv[]) {
 	Theader headTmp;
 //	int myId;
 	t_list *bloquesTransformacion = list_create();
-
-	metricasJob = malloc(sizeof(Tmetricas));
+	maximoTransformacionesParalelas=-1;
+	maximoReduccionesParalelas=-1;
+	cantRL=0;
+	cantTransformaciones=0;
+	cantFallos=0;
+	//metricasJob = malloc(sizeof(Tmetricas));
 	rutaTransformador = string_new();
 	rutaReductor = string_new();
 	char *rutaArchivoAReducir = string_new();
 	rutaResultado = string_new();
 	char *buffer;
+	transfEjecutando = list_create();
+	pthread_mutex_init(&mux_transfEjecutando, NULL);
+	transfFin= list_create();
+	pthread_mutex_init(&mux_transfFin, NULL);
+	rlEjecutando= list_create();
+	pthread_mutex_init(&mux_rlEjecutando, NULL);
+	rlFin= list_create();
+	pthread_mutex_init(&mux_rlFin, NULL);
+	duracionRL=list_create();
+	pthread_mutex_init(&mux_duracionRL, NULL);
+	duracionTransformaciones=list_create();
+	pthread_mutex_init(&mux_duracionTransformaciones, NULL);
+
+	pthread_mutex_init(&mux_cantFallos, NULL);
 
 	if(argc != 5){
 			puts("Error en la cantidad de parametros.");
 	}
+
+	/*char * rutaLogInfo = string_new();
+	string_append(&rutaLogInfo,"home/utnso/tp-2017-2c-Los-Ritchines/master/");
+	//string_append(&rutaLogInfo,argv[3]);
+	string_append(&rutaLogInfo,"info.log");
+
+
+	char * rutaLogError = string_new();
+	string_append(&rutaLogError,"home/utnso/tp-2017-2c-Los-Ritchines/master/");
+	//string_append(&rutaLogError,argv[3]);
+	string_append(&rutaLogError,"error.log");
+
+
+	inicializarArchivoDeLogs(rutaLogError);
+	inicializarArchivoDeLogs(rutaLogInfo);
+	logError = log_create(rutaLogError, "MASTER", false, LOG_LEVEL_ERROR);
+	logInfo = log_create(rutaLogInfo, "MASTER", false, LOG_LEVEL_INFO);
+*/
 
 
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/master/error.log");
@@ -61,19 +100,28 @@ int main(int argc, char* argv[]) {
 	printf("Archivo a reducir Path: %s\n",rutaArchivoAReducir);
 	printf("Resultado Path: %s\n",rutaResultado);
 
+
+	log_info(logInfo,"Transformador Path: %s\n",rutaTransformador);
+	log_info(logInfo,"Reductor Path: %s\n",rutaReductor);
+	log_info(logInfo,"Archivo a reducir Path: %s\n",rutaArchivoAReducir);
+	log_info(logInfo,"Resultado Path: %s\n",rutaResultado);
+
 	char buffInicio[100];
 
-	time(&metricasJob->horaInicio);
-	strftime (buffInicio, 100, "%Y-%m-%d %H:%M:%S.000", localtime (&metricasJob->horaInicio));
-	printf ("Hora de inicio del job: %s\n", buffInicio);
+	time(&horaInicio);
+	strftime (buffInicio, 100, "%Y-%m-%d %H:%M:%S.000", localtime (&horaInicio));
+	log_info(logInfo,"Hora de inicio del job: %s\n", buffInicio);
 
 	sockYama = conectarAServidor(master->ipYama, master->puertoYama);
-
+	if(sockYama < 0){
+		logErrorAndExit("error al conectarse a yama");
+	}
 	if((cantidadBytesEnviados = enviarHeader(sockYama, head))<0){
-		printf("Error enviar header");
+		logErrorAndExit("error enviar header ayama");
+
 	}
 
-	puts("Enviamos a YAMA las rutas a reducir y almacenar");
+	//puts("Enviamos a YAMA las rutas a reducir y almacenar");
 
 
 
@@ -85,15 +133,8 @@ int main(int argc, char* argv[]) {
 		puts("no se pudo enviar Path del aresultado a YAMA. ");
 		return  FALLO_SEND;
 	}
-	puts("#envio1");
-	//recibo id.
-	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
-	/*stat=recv(sockYama, &headRcv, HEAD_SIZE, 0);
 
-	if(headRcv.tipo_de_proceso==YAMA && head->tipo_de_mensaje==NUEVOID){
-		myId = recibirValor(sockYama);
-		printf("Recibi mi id : %d\n",myId);
-	}*/
+	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
 
 	headTmp.tipo_de_proceso = MASTER;
 	headTmp.tipo_de_mensaje = PATH_FILE_TOREDUCE ;
@@ -105,19 +146,10 @@ int main(int argc, char* argv[]) {
 	}
 
 
-
-
-	puts("#envio2");
-
-
-
-
-
-
 	while ((stat=recv(sockYama, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 
-		//puts("Recibimos un paquete de YAMA");
+		log_info(logInfo,"Recibimos un paquete de YAMA");
 
 		TpackInfoBloque *infoBloque;
 		TreduccionLocal *infoReduccionLocal;
@@ -126,7 +158,7 @@ int main(int argc, char* argv[]) {
 		switch (headRcv.tipo_de_mensaje) {
 
 		case (INFOBLOQUE):
-			puts("Nos llega info de un bloque");
+		log_info(logInfo,"Nos llega info de un bloque");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -139,7 +171,7 @@ int main(int argc, char* argv[]) {
 
 
 		case (INFOULTIMOBLOQUE):
-			puts("Nos llega info del ultimo bloque relacionado con el archivo a reducir");
+		log_info(logInfo,"Nos llega info del ultimo bloque relacionado con el archivo a reducir");
 
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
@@ -147,20 +179,24 @@ int main(int argc, char* argv[]) {
 			}
 
 			list_add(bloquesTransformacion,infoBloque);
-			printf("Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
+			log_info(logInfo,"Ya nos llego toda la info relacionada al archivo a transformar. Cantidad de bloques a leer: %d\n",list_size(bloquesTransformacion));
 
 			stat = conectarseAWorkersTransformacion(bloquesTransformacion,sockYama);
-
+			if(stat <0 ){
+				puts("error conectarse workers transformacion");
+			}
 
 			break;
 		case(INFOBLOQUEREPLANIFICADO):
-		//	puts("nos llega info de un bloque a replanificar");
+			log_info(logInfo,"nos llega info de un bloque a replanificar");
 			if((infoBloque=recibirInfoBloque(sockYama))==NULL){
 				puts("Error no pudimos recibir la info bloque. se cierra");
 				return FALLO_CONEXION;
 			}
 			stat = conectarseAWorkerParaReplanificarTransformacion(infoBloque,sockYama);
-
+			if(stat < 0){
+				puts("error conectarse a workers xra transformacion replanificada");
+			}
 
 
 		break;
@@ -172,6 +208,9 @@ int main(int argc, char* argv[]) {
 				}
 
 			stat = conectarseAWorkerParaReduccionLocal(infoReduccionLocal,sockYama);
+			if(stat < 0){
+				puts("error conectarse a worker para redu local");
+			}
 		break;
 		case(INFOREDUCCIONGLOBAL):
 				if((infoReduccionGlobal=recibirInfoReduccionGlobal(sockYama))==NULL){
@@ -180,6 +219,9 @@ int main(int argc, char* argv[]) {
 				}
 
 			stat = conectarseAWorkerParaReduccionGlobal(infoReduccionGlobal,sockYama);
+			if(stat < 0){
+				puts("error conectarse a worker para reduccion global");
+			}
 		break;
 		case(INFOALMACENADOFINAL):
 			if((infoAlmacenado=recibirInfoAlmacenadoFinal(sockYama))==NULL){
@@ -188,20 +230,31 @@ int main(int argc, char* argv[]) {
 			}
 
 			stat = conectarseAWorkerParaAlmacenamientoFinal(infoAlmacenado,sockYama);
+			if(stat<0){
+				puts("error conectarse a worker para almacenamietno final");
+			}
 			break;
 		case(ARCH_NO_VALIDO):
 			puts("yama nos avisa q el archivo no es valido. fin deol proceso");
 			close(sockYama);
 			return 0;
 			break;
+		case FINJOB_ERRORREPLANIFICACION:
+
+
+			mostrarMetricasJob();
+			puts("\n\n #####yama nos avisa q termino el job x error de replanificadion######");
+			log_info(logInfo,"yama nos avisa q terminoe l job x error de replanificaicion");
+			return EXIT_SUCCESS;
 		default:
-			printf("Proceso: %d \n", headTmp.tipo_de_proceso);
-			printf("Mensaje: %d \n", headTmp.tipo_de_mensaje);
+			log_info(logInfo,"Proceso: %d \n", headTmp.tipo_de_proceso);
+			log_info(logInfo,"Mensaje: %d \n", headTmp.tipo_de_mensaje);
 			break;
 		}
 
 	}
-
+	puts("fin conexion con yama");
+	log_info(logInfo,"fin conexcion c yama");
 	free(head);
 	freeAndNULL((void **) &buffer);
 	return EXIT_SUCCESS;
@@ -221,10 +274,10 @@ TpackInfoBloque *recibirInfoBloque(int sockYama){
 		puts("Fallo deserializacion de Bytes del path_res_file");
 		return NULL;
 	}
-//	printf("Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
-//	printf("Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
-//	printf("%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
-//			infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
+	log_info(logInfo,"Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
+	log_info(logInfo,"Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
+	log_info(logInfo,"%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
+			infoBloque->bytesOcupados,infoBloque->nombreTemporal,infoBloque->idTarea);
 
 	return infoBloque;
 }
@@ -242,17 +295,17 @@ TreduccionLocal *recibirInfoReduccionLocal(int sockYama){
 		return NULL;
 	}
 
-//	printf("Nos llego la info reduccion local de %s",infoReduccion->nombreNodo);
-//	printf("job idtarea nombre nodo ipnodo puertonodo tempReductor tempTransf\n");
-//	printf("%d\n%d\n%s\n%s\n%s\n%s\n",infoReduccion->job,infoReduccion->idTarea,infoReduccion->nombreNodo,
-//			infoReduccion->ipNodo,infoReduccion->puertoNodo,infoReduccion->tempRed);
-//	printf("list size %d\n",infoReduccion->listaSize);
+	log_info(logInfo,"Nos llego la info reduccion local de %s",infoReduccion->nombreNodo);
+	log_info(logInfo,"job idtarea nombre nodo ipnodo puertonodo tempReductor tempTransf\n");
+	log_info(logInfo,"%d\n%d\n%s\n%s\n%s\n%s\n",infoReduccion->job,infoReduccion->idTarea,infoReduccion->nombreNodo,
+			infoReduccion->ipNodo,infoReduccion->puertoNodo,infoReduccion->tempRed);
+	log_info(logInfo,"list size %d\n",infoReduccion->listaSize);
 
-//	int i;
-//	for(i=0;i<list_size(infoReduccion->listaTemporalesTransformacion);i++){
-//		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporalesTransformacion,i);
-//	//	printf(" nombre temp transformacion: %s \n",infoAux->nombreTemporal);
-//	}
+	int i;
+	for(i=0;i<list_size(infoReduccion->listaTemporalesTransformacion);i++){
+		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporalesTransformacion,i);
+		log_info(logInfo," nombre temp transformacion: %s \n",infoAux->nombreTemporal);
+	}
 
 	return infoReduccion;
 }
@@ -270,19 +323,19 @@ TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama){
 		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
 		return NULL;
 	}
-	printf("llego la info apra la reduccion global\n");
-	printf("job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
+	log_info(logInfo,"llego la info apra la reduccion global\n");
+	log_info(logInfo,"job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
 
-	printf("list size %d\n",infoReduccionGlobal->listaNodosSize);
+	log_info(logInfo,"list size %d\n",infoReduccionGlobal->listaNodosSize);
 
 	int i;
 	for(i=0;i<list_size(infoReduccionGlobal->listaNodos);i++){
 		TinfoNodoReduccionGlobal *infoNodo = list_get(infoReduccionGlobal->listaNodos,i);
-		printf(" nombre nodo: %s \n",infoNodo->nombreNodo);
-		printf(" ip nodo: %s \n",infoNodo->ipNodo);
-		printf(" peurto: %s \n",infoNodo->puertoNodo);
-		printf(" temp red loc: %s \n",infoNodo->temporalReduccion);
-		printf(" encargado: %d \n",infoNodo->nodoEncargado);
+		log_info(logInfo," nombre nodo: %s \n",infoNodo->nombreNodo);
+		log_info(logInfo," ip nodo: %s \n",infoNodo->ipNodo);
+		log_info(logInfo," peurto: %s \n",infoNodo->puertoNodo);
+		log_info(logInfo," temp red loc: %s \n",infoNodo->temporalReduccion);
+		log_info(logInfo," encargado: %d \n",infoNodo->nodoEncargado);
 	}
 
 	return infoReduccionGlobal;
@@ -302,9 +355,9 @@ TinfoAlmacenadoFinal *recibirInfoAlmacenadoFinal(int sockYama){
 		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
 		return NULL;
 	}
-	printf("llego la info apra el almacenado final\n");
-	printf("job %d\n id %d\n tempred %s\n",infoAlmacenado->job,infoAlmacenado->idTarea,infoAlmacenado->nombreTempReduccion);
-	printf(" ip nodo: %s \n",infoAlmacenado->ipNodo);
-	printf(" peurto: %s \n",infoAlmacenado->puertoNodo);
+	log_info(logInfo,"llego la info apra el almacenado final\n");
+	log_info(logInfo,"job %d\n id %d\n tempred %s\n",infoAlmacenado->job,infoAlmacenado->idTarea,infoAlmacenado->nombreTempReduccion);
+	log_info(logInfo," ip nodo: %s \n",infoAlmacenado->ipNodo);
+	log_info(logInfo," peurto: %s \n",infoAlmacenado->puertoNodo);
 	return infoAlmacenado;
 }

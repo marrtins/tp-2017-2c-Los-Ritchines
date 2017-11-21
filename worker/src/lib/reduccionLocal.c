@@ -23,35 +23,41 @@ int realizarReduccionLocal(int client_sock){
 	char * lineaDeEjecucionReduccion;
 	char * lineaDeEjecucionApareo;
 
-	int status;
+	int stat;
 	pid_t pidRed;
 	Theader *headEnvio  = malloc(sizeof (Theader));
 	puts("Llego solicitud de inicio para reduccion local");
-
+	log_info(logInfo,"llego sol d inic para RL");
 
 	if ((bufferReduccion = recvGenericWFlags(client_sock,0)) == NULL){
 		puts("Fallo recepcion de datos de la reduccion local");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
+		enviarHeader(client_sock,headEnvio);
 		return FALLO_RECV;
 	}
 
 	if ((infoReduccion = deserializarInfoReduccionLocalMasterWorker(bufferReduccion)) == NULL){
 		puts("Fallo deserializacion de Bytes de los datos de la reduccion local");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
+		enviarHeader(client_sock,headEnvio);
 		return FALLO_GRAL;
 	}
 
 
-	//printf("\n\n\n esta es la info q  me llego");
-	//printf("Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
+	log_info(logInfo,"\n\n\n esta es la info q  me llego");
+	log_info(logInfo,"Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
 
 	int i;
 
-	//printf("LIST SIZE %d\n",infoReduccion->listaSize);
+	log_info(logInfo,"LIST SIZE %d\n",infoReduccion->listaSize);
 	lineaDeEjecucionApareo=string_new();
 	string_append(&lineaDeEjecucionApareo,"sort -m");
 
 	for(i=0;i<infoReduccion->listaSize;i++){
 		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporales,i);
-		//printf("Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
+		log_info(logInfo,"Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
 		string_append(&lineaDeEjecucionApareo," /home/utnso/");
 		string_append(&lineaDeEjecucionApareo,infoAux->nombreTemporal);
 
@@ -66,9 +72,17 @@ int realizarReduccionLocal(int client_sock){
 	string_append(&lineaDeEjecucionApareo," > ");
 	string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
 
-	//printf("linea de ejec apareo %s \n",lineaDeEjecucionApareo);
-	system(lineaDeEjecucionApareo);
-	//puts("Ahora recibo el script reductor");
+	log_info(logInfo,"linea de ejec apareo %s \n",lineaDeEjecucionApareo);
+	stat = system(lineaDeEjecucionApareo);
+	if(stat != 0){
+		puts("fallo apareo local ");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
+		enviarHeader(client_sock,headEnvio);
+		log_info(logInfo,"stat apareo local: %d",stat);
+		return FALLO_GRAL;
+	}
+	log_info(logInfo,"Ahora recibo el script reductor");
 
 
 	nombreScriptReductor=string_new();
@@ -82,8 +96,14 @@ int realizarReduccionLocal(int client_sock){
 	string_append(&rutaScriptReductor,nombreScriptReductor);
 
 
-	status = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
-
+	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
+	if(stat < 0){
+		puts("fallo recibir script");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
+		enviarHeader(client_sock,headEnvio);
+		return FALLO_GRAL;
+	}
 
 
 
@@ -113,19 +133,25 @@ int realizarReduccionLocal(int client_sock){
 		string_append(&rutaResultadoReduccion,infoReduccion->nombreTempReduccion);
 		string_append(&lineaDeEjecucionReduccion,rutaResultadoReduccion);
 
-		//printf("linea de eecucion %s\n",lineaDeEjecucionReduccion);
-		//printf("Ruta resutlado reduccion %s\n",rutaResultadoReduccion);
+		log_info(logInfo,"linea de eecucion %s\n",lineaDeEjecucionReduccion);
+		log_info(logInfo,"Ruta resutlado reduccion %s\n",rutaResultadoReduccion);
 
 
 
-		status = system(lineaDeEjecucionReduccion);
-		//printf("Stat lineaDeEjecucion :%d \n",stat);
-
-		headEnvio->tipo_de_proceso = WORKER;
-		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALOK;
-
-		//puts("Envio header. fin reduccion ok");
-		enviarHeader(client_sock,headEnvio);
+		stat = system(lineaDeEjecucionReduccion);
+		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",stat);
+		if(stat !=0){
+			puts("fallo linea de ejecucion de la reduccion");
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
+			enviarHeader(client_sock,headEnvio);
+		}else{
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALOK;
+			enviarHeader(client_sock,headEnvio);
+			log_info(logInfo,"Envio header. fin reduccion ok");
+			puts("fin rl ok");
+		}
 		remove(rutaScriptReductor);
 		//close(client_sock);
 		exit(0);

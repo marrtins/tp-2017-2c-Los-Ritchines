@@ -15,9 +15,11 @@ void manejarFinReduccionLocalOK(int sockMaster){
 	int idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
 	printf("REDUCCION LOCAL OK de la tarea %d\n",idTareaFinalizada);
-	puts("actuializo tbala de estados");
+	log_info(logInfo,"rl ok de la tarea %d",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
 
 	moverAListaFinalizadosOK(idTareaFinalizada);
+	//liberarCargaNodos(idTareaFinalizada);
 
 	if(sePuedeComenzarReduccionGlobal(idTareaFinalizada)){
 		comenzarReduccionGlobal(idTareaFinalizada,sockMaster);
@@ -32,10 +34,12 @@ void manejarFinReduccionLocalFail(int sockMaster){
 	int idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
 	printf("FIN REDUCCION LOCAL FAIL de la tarea%d\n",idTareaFinalizada);
-	puts("actuializo tbala de estados");
+	log_info(logInfo,"fin rl fail de la tarea %d",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
 	moverAListaError(idTareaFinalizada);
-	printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
-	puts("Se da x terminado el job");
+	log_info(logInfo,"La tarea %d no se puede replanificar ",idTareaFinalizada);
+	log_info(logInfo,"Se da x terminado el job");
+	printf("la tareas %d no se puede repla. se da x temrinado el job\n",idTareaFinalizada);
 	headEnvio->tipo_de_proceso=YAMA;
 	headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 	enviarHeader(sockMaster,headEnvio);
@@ -57,7 +61,7 @@ void manejarFinReduccionLocalFail(int sockMaster){
 
 int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 
-
+	log_info(logInfo,"en comenzar RL");
 	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 	TjobMaster *job = getJobPorNroJob(tareaFinalizada->job);
 	char * buffer;
@@ -114,12 +118,12 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 
 	packSize=0;
 	buffer=serializeInfoReduccionLocal(head,infoReduccion,&packSize);
-	printf("Info de la reduccion local serializado, total %d bytes\n",packSize);
+	log_info(logInfo,"Info de la reduccion local serializado, total %d bytes\n",packSize);
 	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar info dede la reduccion local ");
 		return  FALLO_SEND;
 	}
-	printf("se enviaron %d bytes de la info de la reduccion local\n",stat);
+	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion local\n",stat);
 
 	char * bloquesReducidos = string_new();
 	string_append(&bloquesReducidos,"[");
@@ -129,6 +133,8 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 
 	}
 	string_append(&bloquesReducidos,"]");
+
+	log_info(logInfo,"bloques a reducir rl %s",bloquesReducidos);
 
 	agregarReduccionLocalAListaEnProceso(infoReduccion,bloquesReducidos,job);
 

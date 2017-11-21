@@ -6,7 +6,18 @@
 Tmaster * obtenerConfiguracionMaster(char * ruta);
 void mostrarConfiguracion(Tmaster *master);
 
+void inicioEjecucionTransformacion(int id);
+void finEjecucionTransformacion(int id,int segundosDuracion);
+void inicioEjecucionRL(int id);
+void finEjecucionRL(int id,int segundosDuracion);
+void removerTransformacionDeLista(int id);
+void removerReduccionDeLista(int id);
+void removerTransformacionFallida(int id);
 
+void mostrarMetricasJob();
+
+double getPromedioTransformaciones();
+double getPromedioRL();
 
 TpackInfoBloque *recibirInfoBloque(int sockYama);
 int enviarScript(char * rutaScript,int sockDestino);

@@ -11,8 +11,8 @@ extern int idTareaGlobal;
 void manejarFinAlmacenamientoOK(int sockMaster){
 	int idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
-	printf("Almacenamiento final de la tarea %d\n",idTareaFinalizada);
-	puts("actuializo tbala de estados");
+	log_info(logInfo,"Almacenamiento final de la tarea %d\n",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
 	moverAListaFinalizadosOK(idTareaFinalizada);
 	liberarCargaNodos(idTareaFinalizada);
 }
@@ -22,11 +22,11 @@ void manejarFinAlmacenamientoFail(int sockMaster){
 	Theader *headEnvio = malloc(sizeof(Theader));
 	int idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
-	puts("fin almacenamiento local fail");
-	puts("actuializo tbala de estados");
+	log_info(logInfo,"fin almacenamiento local fail");
+	log_info(logInfo,"actuializo tbala de estados");
 	moverAListaError(idTareaFinalizada);
-	printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
-	puts("Se da x terminado el job");
+	log_info(logInfo,"La tarea %d no se puede replanificar ",idTareaFinalizada);
+	log_info(logInfo,"Se da x terminado el job");
 	headEnvio->tipo_de_proceso=YAMA;
 	headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 	enviarHeader(sockMaster,headEnvio);
@@ -50,7 +50,7 @@ int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster){
 	TjobMaster *job = getJobPorNroJob(tareaFinalizada->job);
 
 	int idTareaActual = idTareaGlobal++;
-
+	log_info(logInfo,"comenzar almacenafo final del job %d",job->nroJob);
 
 	TinfoAlmacenadoFinal *infoAlmacenado = malloc(sizeof(TinfoAlmacenadoFinal));
 	infoAlmacenado->idTarea=idTareaActual;
@@ -76,12 +76,12 @@ int comenzarAlmacenadoFinal(int idTareaFinalizada,int sockMaster){
 	int stat;
 	packSize=0;
 	buffer=serializeInfoAlmacenadoFinal(head,infoAlmacenado,&packSize);
-	printf("Info del almacenado final serializado, total %d bytes\n",packSize);
+	log_info(logInfo,"Info del almacenado final serializado, total %d bytes\n",packSize);
 	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar info del almacenado final. ");
 		return  FALLO_SEND;
 	}
-	printf("se enviaron %d bytes de la info del almacenado final\n",stat);
+	log_info(logInfo,"se enviaron %d bytes de la info del almacenado final\n",stat);
 
 	free(buffer);
 

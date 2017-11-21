@@ -8,6 +8,9 @@
 
 #include "funcionesMS.h"
 extern char * rutaResultado;
+extern double duracionAlmacenado;
+extern pthread_mutex_t mux_cantFallos;
+extern int cantFallos;
 void hiloWorkerAlmacenamientoFinal(void *info){
 	TatributosHiloAlmacenamientoFinal *atributos = (TatributosHiloAlmacenamientoFinal *)info;
 
@@ -21,12 +24,19 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	int packSize;
 
 	bool finCorrecto = false;
-
+	bool finDesconexion=true;
 
 	idTarea=atributos->infoAlmacenamiento.idTarea;
+	time_t horaInicio;
+	time_t horaFin;
+	time(&horaInicio);
 
-	printf("\n\n\n HILO de Almacenamiento FinaL\n");
-	printf("ID tarea%d\n",idTarea);
+
+
+	log_info(logInfo,"HILO de Almacenamiento Final");
+	log_info(logInfo,"ID tarea%d\n",idTarea);
+
+	printf("hilo almac final tarea %d\n",idTarea);
 
 
 	//enviamos la misma info que yama nos mando al worker. para que se conecte a todos los nodos.
@@ -44,15 +54,23 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	infoMW->nombreTempReduccionLen=strlen(infoMW->nombreTempReduccion)+1;
 
 	sockWorker=conectarAServidor(atributos->infoAlmacenamiento.ipNodo,atributos->infoAlmacenamiento.puertoNodo);
+	Theader headASerializar;
 
 	packSize=0;
 	buffer=serializeInfoAlmacenadoFinalMasterWorker(head,infoMW,&packSize);
-	printf("Info del almacenamiento final serializada. total %d bytes\n",packSize);
+	log_info(logInfo,"Info del almacenamiento final serializada. total %d bytes\n",packSize);
 	if ((stat = send(sockWorker, buffer, packSize, 0)) == -1){
-		puts("no se pudo enviar info de la reduccion global. ");
+		puts("No pudo conectarse a worker para el almacenado final");
+		log_info(logInfo,"no pudo conectarse a wk para el almca final");
+		headASerializar.tipo_de_proceso=MASTER;
+		headASerializar.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
+		enviarHeaderYValor(headASerializar,idTarea,sockYama);
+		MUX_LOCK(&mux_cantFallos);
+		cantFallos++;
+		MUX_UNLOCK(&mux_cantFallos);
 		return;
 	}
-	printf("se enviaron %d bytes de la info de la reduccion global a worker\n",stat);
+	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion global a worker\n",stat);
 
 
 
@@ -61,7 +79,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 	//envio el script de reduccion
 
-	puts("al while");
+	log_info(logInfo,"al while");
 
 	while ((stat=recv(sockWorker, &headRcv, HEAD_SIZE, 0)) > 0) {
 
@@ -69,6 +87,14 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 		case(FIN_ALMACENAMIENTOFINALOK):
 			finCorrecto = true;
+		finDesconexion=false;
+			close(sockWorker);
+			break;
+		case(FIN_ALMACENAMIENTOFINALFAIL):
+			puts("worker nos avisa q finalizo el almacenamiento de manera fallida");
+			log_info(logInfo,"wkr nos avisa q finalizo el almac de manera fallida");
+			finCorrecto=false;
+			finDesconexion=false;
 			close(sockWorker);
 			break;
 		default:
@@ -77,23 +103,43 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 
 	}
+	time(&horaFin);
+	duracionAlmacenado = difftime(horaFin, horaInicio);
+
 	if(finCorrecto){
 		puts("Termina la conexion con worker..  almac final salio OK. Le avisamos a yama ");
+		log_info(logInfo,"termina la conexcion c worker. almacn final ok. aivsamos");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 		enviarHeaderYValor(head,idTarea,sockYama);
 
 
-	}else{
-		puts("termino la conexion con worker de manera inesperada. almac finalfallo. Le avisamos a yama");
+	}else if(!finDesconexion){
+		puts("almac finalfallo. Le avisamos a yama");
+		log_info(logInfo,"almac finalfallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
 		enviarHeaderYValor(head,idTarea,sockYama);
+		MUX_LOCK(&mux_cantFallos);
+		cantFallos++;
+		MUX_UNLOCK(&mux_cantFallos);
 
+	}else{
+		puts(" se termino la conexion de forma inesperada. se cayo worker .almac finalfallo. Le avisamos a yama");
+		log_info(logInfo," se termino la conexion de forma inesperada. se cayo worker .almac finalfallo. Le avisamos a yama");
+		head.tipo_de_proceso=MASTER;
+		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
+		enviarHeaderYValor(head,idTarea,sockYama);
+		MUX_LOCK(&mux_cantFallos);
+		cantFallos++;
+		MUX_UNLOCK(&mux_cantFallos);
 	}
-	printf("fin thread de almacenamiento final del job %d \n",atributos->infoAlmacenamiento.job);
-	puts("fin conexion c yaama");
-	close(sockYama);
+	log_info(logInfo,"fin thread de almacenamiento final del job %d \n",atributos->infoAlmacenamiento.job);
+	log_info(logInfo,"fin conexion c yaama");
+	//close(sockYama);
+	mostrarMetricasJob();
+	printf("\n\n\n ####### FIN JOB OK ###### \n\n");
+	exit(1);
 }
 
 

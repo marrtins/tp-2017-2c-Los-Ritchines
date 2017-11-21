@@ -1,7 +1,7 @@
 #include "funcionesWK.h"
 #include <commons/config.h>
 extern char * archivoMapeado;
-extern Tworker *worker;
+
 int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 
 	char * lineaPermisoEjecucion;
@@ -16,7 +16,7 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	/*file size */
 	recv(client_sock, buffer, sizeof(int), 0);
 	file_size = atoi(buffer);
-	fprintf(stdout, "\nFile size : %d\n", file_size);
+	//fprintf(stdout, "\nFile size : %d\n", file_size);
 
 	scriptFile = fopen(rutaAAlmacenar, "w");
 	if (scriptFile == NULL){
@@ -25,28 +25,35 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	}
 
 	remain_data = file_size;
-
+	log_info(logInfo,"en recv script");
 	while (remain_data > 0){//todo:cheq
+		log_info(logInfo,"adentro recv script");
 		len = recv(client_sock, buffer, 1024, 0);
 		fwrite(buffer, sizeof(char), len, scriptFile);
 		remain_data -= len;
-		fprintf(stdout, "Recibidos %d bytes y espero :- %d bytes\n", len, remain_data);
+		//fprintf(stdout, "Recibidos %d bytes y espero :- %d bytes\n", len, remain_data);
 		//if(len<0) break;
 	}
 	fclose(scriptFile);
+	log_info(logInfo,"pase recv script");
 
-	//puts("recibi archivo");
-	//printf("Ruta Script  %s\n",rutaAAlmacenar);
+	log_info(logInfo,"recibi archivo");
+	log_info(logInfo,"Ruta Script  %s\n",rutaAAlmacenar);
 
 
 
 	lineaPermisoEjecucion=string_new();
 	string_append(&lineaPermisoEjecucion,"chmod +x ");
 	string_append(&lineaPermisoEjecucion,rutaAAlmacenar);
-	printf("%s \n",lineaPermisoEjecucion);
+	log_info(logInfo,"%s \n",lineaPermisoEjecucion);
 	stat=system(lineaPermisoEjecucion);
-	//printf("Stat lineaPermisoEjecucion :%d \n",stat);
-	//puts("Permisos de ejecucion otorgados al script recibido");
+
+	if(stat != 0){
+		puts("error al dar chmod +x");
+		return -1;
+	}
+	log_info(logInfo,"Stat lineaPermisoEjecucion :%d \n",stat);
+	log_info(logInfo,"Permisos de ejecucion otorgados al script recibido");
 
 	return 0;
 
@@ -68,7 +75,7 @@ int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar){
 
 	/*file size */
 	stat=recv(client_sock, buffer, sizeof(long)*2, 0);
-	printf("size rec stat %d\n",stat);
+	log_info(logInfo,"size rec stat %d\n",stat);
 	file_size2=strtol(buffer,&ptr,10);
 	fprintf(stdout, "\nFile size : %lu\n", file_size2);
 
@@ -89,8 +96,8 @@ int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar){
 	}
 	fclose(scriptFile);
 
-	//puts("recibi archivo");
-	//printf("Ruta archivo  %s\n",rutaAAlmacenar);
+	log_info(logInfo,"recibi archivo");
+	log_info(logInfo,"Ruta archivo  %s\n",rutaAAlmacenar);
 
 
 
@@ -209,7 +216,7 @@ Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * co
 
 char * getBloqueWorker(int posicion){
 	//todo: revisar esta funcion
-	FILE * archivo = fopen(worker->ruta_databin, "rb");
+	/*FILE * archivo = fopen(worker->ruta_databin, "rb");
 
 	int fd;
 
@@ -220,7 +227,7 @@ char * getBloqueWorker(int posicion){
 	}
 	fclose(archivo);
 	close(fd);
-
+*/
 
 	char * bloque= malloc(BLOQUE_SIZE);
 	memcpy(bloque, archivoMapeado + posicion*BLOQUE_SIZE,BLOQUE_SIZE);

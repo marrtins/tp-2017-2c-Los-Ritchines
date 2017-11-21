@@ -340,7 +340,7 @@ char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int b
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-	printf("Pack size info transf master worker: %d\n",*pack_size);
+	//printf("Pack size info transf master worker: %d\n",*pack_size);
 	return bytes_serial;
 }
 
@@ -698,7 +698,7 @@ char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalRe
 	}
 	espaciosVariables += sizeof(int)*sizeLista;
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioListSize+espacioNombreTemporalLen+nombreTemporalReduccionLen+espaciosVariables;
-	printf("Espacio a mallocar: %d\n",espacioAMallocar);
+	//printf("Espacio a mallocar: %d\n",espacioAMallocar);
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
@@ -734,7 +734,7 @@ char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalRe
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-	printf("Pack size:serializarInfoReduccionLocalMasterWorker2 %d\n",*pack_size);
+	//printf("Pack size:serializarInfoReduccionLocalMasterWorker2 %d\n",*pack_size);
 	return bytes_serial;
 }
 
@@ -902,7 +902,7 @@ char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccio
 
 	int espaciosVariables = infoReduccionGlobal->tempRedGlobalLen;
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espacioLista+espaciosVariables;
-	printf("Espacio a mallocar %d \n",espacioAMallocar);
+	//printf("Espacio a mallocar %d \n",espacioAMallocar);
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
 		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
 		return NULL;
@@ -963,7 +963,7 @@ char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccio
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-	printf("Serializados %d bytes \n",*pack_size);
+	//printf("Serializados %d bytes \n",*pack_size);
 
 	return bytes_serial;
 }

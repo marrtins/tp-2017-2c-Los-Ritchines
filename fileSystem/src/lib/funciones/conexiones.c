@@ -220,6 +220,10 @@ void conexionesDatanode(void * estructura){
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
 								free(rutaATemporal);*/
+								head->tipo_de_proceso=FILESYSTEM;
+								head->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
+								enviarHeader(fileDescriptor,head);
+								//todo: revisar
 
 								break;
 							default:

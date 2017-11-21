@@ -40,10 +40,22 @@ int main(int argc, char* argv[]){
 	fclose(archivo);
 	close(fd);
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/worker/error.log");
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/worker/info.log");
-	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/error.log", "WORKER", false, LOG_LEVEL_ERROR);
-	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/worker/info.log", "WORKER", false, LOG_LEVEL_INFO);
+
+
+	char * rutaLogInfo = string_new();
+	char * rutaLogError=string_new();
+	string_append(&rutaLogInfo,"/home/utnso/tp-2017-2c-Los-Ritchines/worker/");
+	string_append(&rutaLogInfo,worker->nombre_nodo);
+	string_append(&rutaLogInfo,"-info.log");
+
+	string_append(&rutaLogError,"/home/utnso/tp-2017-2c-Los-Ritchines/worker/");
+	string_append(&rutaLogError,worker->nombre_nodo);
+	string_append(&rutaLogError,"-error.log");
+	inicializarArchivoDeLogs(rutaLogError);
+	inicializarArchivoDeLogs(rutaLogInfo);
+
+	logError = log_create(rutaLogError, "WORKER", false, LOG_LEVEL_ERROR);
+	logInfo = log_create(rutaLogInfo, "WORKER", false, LOG_LEVEL_INFO);
 
 
 	listaTemporalesAsociadosAJob=list_create();
@@ -57,9 +69,9 @@ int main(int argc, char* argv[]){
 	}
 
 	//acepta y escucha
-	///puts("esperando comunicaciones entrantes...");
+	log_info(logInfo,"esperando comunicaciones entrantes...");
 	while((client_sock = accept(listenSock, (struct sockaddr*) &client, (socklen_t*) &clientSize)) != -1){
-		//puts("Conexion aceptada");
+		log_info(logInfo,"Conexion aceptada");
 		while ((estado = recv(client_sock, head, sizeof(Theader), 0)) < 0){
 			log_error(logError,"Error en la recepcion del header.");
 		}
@@ -70,12 +82,12 @@ int main(int argc, char* argv[]){
 		switch(head->tipo_de_proceso){
 
 		case MASTER:
-			//puts("Es master");
+			log_info(logInfo,"Es master");
 			manejarConexionMaster(head,client_sock);
 
 			break;
 		case WORKER:
-			//puts("es worker");
+			log_info(logInfo,"es worker");
 			manejarConexionWorker(head,client_sock);
 			break;
 		default:
@@ -86,13 +98,13 @@ int main(int argc, char* argv[]){
 
 	// Si salio del ciclo es porque fallo el accept()
 
-	//perror("Fallo el accept(). error");
-
-	//liberarConfiguracionYama();
+	log_info(logInfo,"Fallo el accept(). error");
 
 
 
-	//free(head);
+
+
+	free(head);
 
 	return 0;
 }

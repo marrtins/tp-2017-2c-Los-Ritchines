@@ -17,7 +17,9 @@ void manejarFinReduccionGlobalOK(int sockMaster){
 	int idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
 	printf("REDUCCION GLOBAL OK de la tarea %d\n",idTareaFinalizada);
-	puts("actuializo tbala de estados");
+	log_info(logInfo,"rg ok de la tarea %d",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
+	//liberarCargaNodos(idTareaFinalizada);
 
 	moverAListaFinalizadosOK(idTareaFinalizada);
 
@@ -32,11 +34,13 @@ void manejarFinReduccionGlobalFail(int sockMaster){
 	Theader *headEnvio=malloc(sizeof(Theader));
 	int idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
-	puts("fin reduccion global fail");
-	puts("actuializo tbala de estados");
+	printf("fin reduccion global fail id tarea %d \n",idTareaFinalizada);
+	log_info(logInfo,"fin rg global fail de la tarea %d",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
 	moverAListaError(idTareaFinalizada);
 	printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
 	puts("Se da x terminado el job");
+	log_info(logInfo,"la tarea %d no se puede replanificar. se da x temrinado el job",idTareaFinalizada);
 	headEnvio->tipo_de_proceso=YAMA;
 	headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
 	enviarHeader(sockMaster,headEnvio);
@@ -55,6 +59,7 @@ void manejarFinReduccionGlobalFail(int sockMaster){
 
 int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
+	log_info(logInfo,"comenzar red glob");
 	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 	TjobMaster *job = getJobPorNroJob(tareaFinalizada->job);
 	int i,packSize,stat;
@@ -121,7 +126,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	aux->nodoEncargado=1;
 
 
-	printf("Nodo encargado: %s. menor carga: %d \n",getNodoElegido(listaInformacionNodos),menorCarga);
+	log_info(logInfo,"Nodo encargado: %s. menor carga: %d \n",getNodoElegido(listaInformacionNodos),menorCarga);
 
 
 
@@ -136,12 +141,12 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
 	packSize=0;
 	buffer=serializeInfoReduccionGlobal(head,nuevaReduccion,&packSize);
-	printf("Info de la reduccion global serializado, total %d bytes\n",packSize);
+	log_info(logInfo,"Info de la reduccion global serializado, total %d bytes\n",packSize);
 	if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 		puts("no se pudo enviar info de la reduccion global. ");
 		return  FALLO_SEND;
 	}
-	printf("se enviaron %d bytes de la info de la reduccion global\n",stat);
+	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion global\n",stat);
 
 
 	char * bloquesReducidos = string_new();
@@ -153,7 +158,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	}
 	string_append(&bloquesReducidos,"}");
 
-
+	log_info(logInfo,"bloques de la RG: %s",bloquesReducidos);
 
 	agregarReduccionGlobalAListaEnProceso(nuevaReduccion,bloquesReducidos,job);
 
@@ -185,6 +190,9 @@ bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada){
 			return false;
 		}
 	}
+
+
+
 
 
 		return true;

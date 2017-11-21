@@ -42,6 +42,7 @@ int getMayorCargaAllWorkers();
 void asignarNodoElegido(t_list * listaReduccionGlobal);
 
 int moverAListaFinalizadosOK(int idTareaFinalizada);
+int moverFinalizadaAListaError(int idTarea);
 int moverAListaError(int idTareaFinalizada);
 char  * getNombreEtapa(int etapaEnum);
 void mostrarTablaDeEstados();
@@ -84,6 +85,8 @@ char * recibirPathArchivo(int sockMaster);
 int responderTransformacion(TjobMaster *job);
 void iniciarNuevoJob(int sockMaster,int socketFS);
 void manejarFinTransformacionOK(int sockMaster);
+void manejarFinTransformacionFailDesconexion(int sockMaster);
+
 void manejarFinTransformacionFail(int sockMaster);
 void manejarFinReduccionLocalOK(int sockMaster);
 void manejarFinReduccionLocalFail(int sockMaster);

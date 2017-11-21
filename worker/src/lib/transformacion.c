@@ -27,19 +27,27 @@ int realizarTransformacion(int client_sock){
 	pid_t pid;
 
 	puts("llego solicitud para nueva transformacion. recibimos bloque cant bytes y nombre temporal..");
-
+	log_info(logInfo,"llego sol para neuva transf. recibimos daots");
 	if ((buff = recvGenericWFlags(client_sock,0)) == NULL){
 		puts("Fallo recepcion de datos de la transformacion");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
+		enviarHeader(client_sock,headEnvio);
 		return FALLO_RECV;
 	}
 
 	if ((datosTransf = deserializarInfoTransformacionMasterWorker(buff)) == NULL){
 		puts("Fallo deserializacion de Bytes de los datos de la transformacion");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
+		enviarHeader(client_sock,headEnvio);
 		return FALLO_GRAL;
 	}
 
-	printf("Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
+	log_info(logInfo,"Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
 			datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
+	printf("Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
+				datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
 
 	//Recibimos el script
 
@@ -54,9 +62,16 @@ int realizarTransformacion(int client_sock){
 	string_append(&nombreScriptTransformador,".sh");
 	string_append(&rutaScriptTransformador,nombreScriptTransformador);
 
-
+	log_info(logInfo,"recibimos el script");
 	status = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
+	if(status < 0){
+		puts("fallo recibir y almac script");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
+		enviarHeader(client_sock,headEnvio);
+		return FALLO_GRAL;
 
+	}
 
 	char *input1 = getBloqueWorker(datosTransf->nroBloque);
 	char * input2=malloc(BLOQUE_SIZE);
@@ -64,7 +79,7 @@ int realizarTransformacion(int client_sock){
 
 
 
-	//printf("linea  %s \n",input2);
+	//log_info(logInfo,"linea  %s \n",input2);
 
 	FILE *bloqueSTD;
 	char * rutaBloque = string_new();
@@ -99,20 +114,28 @@ int realizarTransformacion(int client_sock){
 		string_append(&rutaResultadoTransformacion,datosTransf->nombreTemporal);
 		string_append(&lineaDeEjecucionTransformacion,rutaResultadoTransformacion);
 
-		printf("linea de eecucion %s\n",lineaDeEjecucionTransformacion);
-		printf("Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
+		log_info(logInfo,"linea de eecucion %s\n",lineaDeEjecucionTransformacion);
+		log_info(logInfo,"Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
 
 
 
 		status = system(lineaDeEjecucionTransformacion);
-		printf("Stat lineaDeEjecucion :%d \n",status);
+		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",status);
+		if(status!=0){
+			puts("fallo linea de ejecucion transformacion");
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
+			enviarHeader(client_sock,headEnvio);
 
-		headEnvio->tipo_de_proceso = WORKER;
-		headEnvio->tipo_de_mensaje = FIN_LOCALTRANSF;
+		}else{
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_LOCALTRANSF;
 
-		puts("Envio header. fin transfo ok");
-		enviarHeader(client_sock,headEnvio);
 
+			enviarHeader(client_sock,headEnvio);
+			log_info(logInfo,"Envio header. fin transfo ok");
+			puts("fin transf ok");
+		}
 		remove(rutaBloque);
 		remove(rutaScriptTransformador);
 

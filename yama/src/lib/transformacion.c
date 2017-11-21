@@ -6,7 +6,7 @@
  */
 
 #include "funcionesYM.h"
-extern t_list * listaJobFinalizados,*listaJobsMaster;
+extern t_list * listaJobFinalizados,*listaJobsMaster,*listaEstadoFinalizadoOK;
 extern float retardoPlanificacionSegs;
 extern int idTareaGlobal,idJobGlobal,idMasterGlobal;
 
@@ -16,12 +16,14 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 
 	TjobMaster *nuevoJob=malloc(sizeof(TjobMaster));
 	puts("Master quiere iniciar un nuevo JOB");
+	log_info(logInfo,"master quiere inicar u nvo job");
 	idJobGlobal++;
 	idMasterGlobal++;
 	nuevoJob->fdMaster=sockMaster;
 	nuevoJob->nroJob=idJobGlobal;
 	nuevoJob->masterId=idMasterGlobal;
 	printf("Id del nuevo job: %d, master id:%d, fdMaster :%d \n",idJobGlobal,idMasterGlobal,sockMaster);
+	log_info(logInfo,"Id del nuevo job: %d, master id:%d, fdMaster :%d \n",idJobGlobal,idMasterGlobal,sockMaster);
 	char * pathResultado = recibirPathArchivo(sockMaster);
 	nuevoJob->pathResultado=pathResultado;
 
@@ -33,8 +35,9 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	char * pathArchivoAReducir;
 	if(stat>0 && head.tipo_de_mensaje==PATH_FILE_TOREDUCE){
 
-		printf("llega path file to reduce del job :%d. ID master: %d\n",nuevoJob->nroJob,nuevoJob->masterId);
+		log_info(logInfo,"llega path file to reduce del job :%d. ID master: %d\n",nuevoJob->nroJob,nuevoJob->masterId);
 		pathArchivoAReducir  = recibirPathArchivo(sockMaster);
+		log_info(logInfo,"patha rch a red %s",pathArchivoAReducir);
 	}
 
 	//todo: aca pido info a filesystem sobre el archivo.
@@ -59,49 +62,52 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 		puts("no se pudo enviar Path del aresultado a YAMA. ");
 		return  ;
 	}
-		puts("#envio1");
+
 
 
 
 		TinfoNodosFSYama *infoNodos;
 		TinfoArchivoFSYama *infoArchivo;
 	stat = recv(socketFS, &head, sizeof(Theader), 0);
-	printf("stat %d \n",stat);
+	log_info(logInfo,"stat redv foscket fs %d \n",stat);
 	if (head.tipo_de_mensaje == ARCH_NO_VALIDO) {
 		puts("El archivo no es valido");
+		log_info(logInfo,"el ach no es valido");
 		headEnvio->tipo_de_proceso=YAMA;
 		headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO;
 		enviarHeader(sockMaster,headEnvio);
 		return;
 	} else if (head.tipo_de_mensaje == INFO_ARCHIVO) {
 		puts("FS nos quiere mandar la info del archivo que pedi");
-
+		log_info(logInfo,"Fs nos manda la info del archivo pedid");
 		buffer3 = recvGeneric(socketFS);
 		infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
 
 		stat = recv(socketFS, &head, sizeof(Theader), 0);
 		if(head.tipo_de_mensaje==INFO_NODO){
 			puts("ahora recibimos info de los nodos");
+			log_info(logInfo,"ahora info de los nods");
 			buffer3 = recvGeneric(socketFS);
 			 infoNodos= deserializarInfoNodosFSYama(buffer3);
-			puts("ya recibi todo");
+			 log_info(logInfo,"ya recibi todo");
 		}else{
-			puts("error al recibir info nodos");
+			log_info(logInfo,"error al recibir info nodos");
+			puts("error al recibir info de los nodos");
 		}
 
 
 		int i;
 		for(i=0;i<infoArchivo->listaSize;i++){
 			TpackageUbicacionBloques *bloqueAux = list_get((infoArchivo->listaBloques),i);
-			printf("bloque %d ; nodoc1 %s ;bloquec1 %d;nodoc2 %s;bloquec2 %d;finbloque %d\n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->bloqueC1,bloqueAux->nombreNodoC2, bloqueAux->bloqueC2,bloqueAux->finBloque);
+			log_info(logInfo,"bloque %d ; nodoc1 %s ;bloquec1 %d;nodoc2 %s;bloquec2 %d;finbloque %d\n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->bloqueC1,bloqueAux->nombreNodoC2, bloqueAux->bloqueC2,bloqueAux->finBloque);
 		}
 		for(i=0;i<infoNodos->listaSize;i++){
 			TpackageInfoNodo *nodoAux=list_get((infoNodos->listaNodos),i);
-			printf("nombre nodo %s ipnodo %s puerto nodo %s\n",nodoAux->nombreNodo,nodoAux->ipNodo,nodoAux->puertoWorker);
+			log_info(logInfo,"nombre nodo %s ipnodo %s puerto nodo %s\n",nodoAux->nombreNodo,nodoAux->ipNodo,nodoAux->puertoWorker);
 		}
 
 	}
-	puts("pongo en nevo job");
+	log_info(logInfo,"pongo en nevo job");
 	nuevoJob->listaComposicionArchivo=list_create();
 	nuevoJob->listaComposicionArchivo=infoArchivo->listaBloques;
 	nuevoJob->listaNodosArchivo=list_create();
@@ -130,6 +136,13 @@ int responderTransformacion(TjobMaster *job){
 
 	t_list *listaBloquesPlanificados=planificar(job);
 
+
+	log_info(logInfo,"lista blqoes planificados job%d",job->nroJob);
+	int k;
+	for(k=0;k<list_size(listaBloquesPlanificados);k++){
+		TpackInfoBloque *bloqueAux = list_get(listaBloquesPlanificados,k);
+		log_info(logInfo,"blArch %d blData %d bytsOcup %d idTarea %d ipW %s pWork %s nombreNo %s nTemp %s",bloqueAux->bloqueDelArchivo,bloqueAux->bloqueDelDatabin,bloqueAux->bytesOcupados,bloqueAux->idTarea,bloqueAux->ipWorker,bloqueAux->puertoWorker,bloqueAux->nombreNodo,bloqueAux->nombreTemporal);
+	}
 	/*if((stat=responderSolicTransf(sockMaster,listaBloquesPlanificados,job))<0){
 		puts("No se pudo responder la solicitud de transferencia");
 		return -1;
@@ -143,7 +156,7 @@ int responderTransformacion(TjobMaster *job){
 	int packSize;
 	char * buffer;
 
-	printf("Cantidad de paquetes con info de bloques a enviar: %d\n",list_size(listaBloquesPlanificados));
+	log_info(logInfo,"Cantidad de paquetes con info de bloques a enviar: %d\n",list_size(listaBloquesPlanificados));
 	for (i=0;i<list_size(listaBloquesPlanificados);i++){
 		if(i+1<list_size(listaBloquesPlanificados)){
 			head.tipo_de_mensaje=INFOBLOQUE;
@@ -157,20 +170,20 @@ int responderTransformacion(TjobMaster *job){
 
 		buffer=serializeInfoBloque(head,bloqueAEnviar,&packSize);
 
-		printf("Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloqueDelArchivo);
+		log_info(logInfo,"Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloqueDelArchivo);
 
 		if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 			puts("no se pudo enviar info del bloque. ");
 			return  FALLO_SEND;
 		}
-		printf("se enviaron %d bytes de la info del bloque\n",stat);
+		log_info(logInfo,"se enviaron %d bytes de la info del bloque\n",stat);
 
 		agregarTransformacionAListaEnProceso(job,bloqueAEnviar);
 
 
 	}
 
-	puts("Se envio la info de todos los bloques.");
+	log_info(logInfo,"Se envio la info de todos los bloques.");
 
 
 return 0;
@@ -183,14 +196,111 @@ void manejarFinTransformacionOK(int sockMaster){
 	idTareaFinalizada = recibirValor(sockMaster);
 	sleep(retardoPlanificacionSegs);
 	printf("FINTRANSFORMACIONLOCAL OK de la tarea%d\n",idTareaFinalizada);
-	puts("actuializo tbala de estados");
+	log_info(logInfo,"fin TL OK de la tarea %d",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
 	moverAListaFinalizadosOK(idTareaFinalizada);
 
+	//liberarCargaNodos(idTareaFinalizada);
+	//liberarCargaEn()
 
 	if(sePuedeComenzarReduccionLocal(idTareaFinalizada)){
+		log_info(logInfo,"se pued comenzar RL");
 		comenzarReduccionLocal(idTareaFinalizada,sockMaster);
 	}
 
+
+}
+
+void manejarFinTransformacionFailDesconexion(int sockMaster){
+	int idTareaFinalizada,stat;
+	Theader *headEnvio=malloc(sizeof(Theader));
+
+	idTareaFinalizada = recibirValor(sockMaster);
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+
+
+	TjobMaster *jobFinalizado = getJobPorNroJob(tareaFinalizada->job);
+
+	sleep(retardoPlanificacionSegs);
+	printf("FINTRANSFORMACIONLOCAL FAIL x desconexion del %s de la tarea%d\n",tareaFinalizada->nodo,idTareaFinalizada);
+	log_info(logInfo,"fin TL fail x desco del %s . tarea %d",tareaFinalizada->nodo,idTareaFinalizada);
+	puts("actuializo tbala de estados y reasigno todos los temporales ok a otros nodos");
+	log_info(logInfo,"actuializo tbala de estados y reasigno todos los temporales ok a otros nodos");
+
+	moverAListaError(idTareaFinalizada);
+
+
+	if(sePuedeReplanificar(idTareaFinalizada,jobFinalizado->listaComposicionArchivo)){
+			log_info(logInfo,"se peude replanificar");
+			stat = replanificar(idTareaFinalizada,sockMaster,jobFinalizado->listaComposicionArchivo);
+
+			if(stat<0){
+				//esto no deberia pasar nunca.. lo dejo aca para que no rompa tod
+				printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+				puts("Se da x terminado el job");
+				log_info(logInfo,"al final no se podia");
+				headEnvio->tipo_de_proceso=YAMA;
+				headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+				enviarHeader(sockMaster,headEnvio);
+
+				if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+					TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+					TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+					job->nroJob = tareaFinalizada->job;
+					job->finCorrecto=false;
+					list_add(listaJobFinalizados,job);
+				}
+
+			}
+		}else{
+
+			printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+			puts("Se da x terminado el job");
+			log_info(logInfo,"%d no se puede repla. se da x temrinado eljobn",idTareaFinalizada);
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+			enviarHeader(sockMaster,headEnvio);
+			liberarCargaNodos(idTareaFinalizada);
+
+			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+				TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+				TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+				job->nroJob = tareaFinalizada->job;
+				job->finCorrecto=false;
+				list_add(listaJobFinalizados,job);
+			}
+
+		}
+
+
+
+	int i;
+	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+		TpackTablaEstados *aux = list_get(listaEstadoFinalizadoOK,i);
+		if(string_equals_ignore_case(aux->nodo,tareaFinalizada->nodo) && tareaFinalizada->etapa==TRANSFORMACION && tareaFinalizada->job == aux->job){
+			moverFinalizadaAListaError(aux->idTarea);
+			//list_remove(listaEstadoFinalizadoOK,i);
+			if(sePuedeReplanificar(aux->idTarea,jobFinalizado->listaComposicionArchivo)){
+				replanificar(aux->idTarea,sockMaster,jobFinalizado->listaComposicionArchivo);
+			}else{
+				printf("La tarea %d no se puede replanificar ",aux->idTarea);
+				puts("Se da x terminado el job");
+				log_info(logInfo,"la tarea %d no se puede repla. se da x termiando el job",aux->idTarea);
+				headEnvio->tipo_de_proceso=YAMA;
+				headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+				enviarHeader(sockMaster,headEnvio);
+				liberarCargaNodos(aux->idTarea);
+
+				if(!yaFueAgregadoAlistaJobFinalizados(aux->idTarea)){
+					TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+					TpackTablaEstados *tareaFinalizada=getTareaPorId(aux->idTarea);
+					job->nroJob = tareaFinalizada->job;
+					job->finCorrecto=false;
+					list_add(listaJobFinalizados,job);
+				}
+			}
+		}
+	}
 
 }
 
@@ -205,108 +315,54 @@ void manejarFinTransformacionFail(int sockMaster){
 	TjobMaster *jobFinalizado = getJobPorNroJob(tareaFinalizada->job);
 
 	sleep(retardoPlanificacionSegs);
-				printf("FINTRANSFORMACIONLOCAL FAIL de la tarea%d\n",idTareaFinalizada);
-				puts("actuializo tbala de estados");
-
-				moverAListaError(idTareaFinalizada);
-
-				if(sePuedeReplanificar(idTareaFinalizada,jobFinalizado->listaComposicionArchivo)){
-
-					stat = replanificar(idTareaFinalizada,sockMaster,jobFinalizado->listaComposicionArchivo);
-
-					if(stat<0){
-						//esto no deberia pasar nunca.. lo dejo aca para que no rompa tod
-						printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
-						puts("Se da x terminado el job");
-						headEnvio->tipo_de_proceso=YAMA;
-						headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
-						enviarHeader(sockMaster,headEnvio);
-
-						if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-							TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
-							TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
-							job->nroJob = tareaFinalizada->job;
-							job->finCorrecto=false;
-							list_add(listaJobFinalizados,job);
-						}
-
-					}
-				}else{
-
-					printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
-					puts("Se da x terminado el job");
-					headEnvio->tipo_de_proceso=YAMA;
-					headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
-					enviarHeader(sockMaster,headEnvio);
-					liberarCargaNodos(idTareaFinalizada);
-
-					if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
-						TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
-						TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
-						job->nroJob = tareaFinalizada->job;
-						job->finCorrecto=false;
-						list_add(listaJobFinalizados,job);
-					}
-
-				}
-
-}
+	printf("FINTRANSFORMACIONLOCAL FAIL de la tarea%d\n",idTareaFinalizada);
+	log_info(logInfo,"fin transf fail de la tarea %d ",idTareaFinalizada);
+	log_info(logInfo,"actuializo tbala de estados");
 
 
-int responderSolicTransf(int sockMaster,t_list * listaBloques,TjobMaster *job){
+	moverAListaError(idTareaFinalizada);
 
+	if(sePuedeReplanificar(idTareaFinalizada,jobFinalizado->listaComposicionArchivo)){
+		log_info(logInfo,"se peude replanificar");
+		stat = replanificar(idTareaFinalizada,sockMaster,jobFinalizado->listaComposicionArchivo);
 
-	//aca planifico, pido la inf del archivo,etcetc
+		if(stat<0){
+			//esto no deberia pasar nunca.. lo dejo aca para que no rompa tod
+			printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+			puts("Se da x terminado el job");
+			log_info(logInfo,"al final no se podia");
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+			enviarHeader(sockMaster,headEnvio);
 
-	//x ahora envio una rta hardcodeada pero siguiendo el formato
-	int i,packSize,stat;
-	char *buffer;
+			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+				TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+				TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+				job->nroJob = tareaFinalizada->job;
+				job->finCorrecto=false;
+				list_add(listaJobFinalizados,job);
+			}
 
-
-
-
-
-
-	Theader head;
-	head.tipo_de_proceso=YAMA;
-
-
-
-	printf("Cantidad de paquetes con info de bloques a enviar: %d\n",list_size(listaBloques));
-	for (i=0;i<list_size(listaBloques);i++){
-		if(i<=list_size(listaBloques)-2){
-			head.tipo_de_mensaje=INFOBLOQUE;
-		}else{
-			head.tipo_de_mensaje=INFOULTIMOBLOQUE;
 		}
-		packSize=0;
-		TpackInfoBloque *bloqueAEnviar = list_get(listaBloques,i);
+	}else{
 
-		bloqueAEnviar->idTarea = idTareaGlobal++;
+		printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+		puts("Se da x terminado el job");
+		log_info(logInfo,"%d no se puede repla. se da x temrinado eljobn",idTareaFinalizada);
+		headEnvio->tipo_de_proceso=YAMA;
+		headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+		enviarHeader(sockMaster,headEnvio);
+		liberarCargaNodos(idTareaFinalizada);
 
-		buffer=serializeInfoBloque(head,bloqueAEnviar,&packSize);
-
-		printf("Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloqueDelArchivo);
-
-		if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
-			puts("no se pudo enviar info del bloque. ");
-			return  FALLO_SEND;
+		if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+			TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+			TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+			job->nroJob = tareaFinalizada->job;
+			job->finCorrecto=false;
+			list_add(listaJobFinalizados,job);
 		}
-		printf("se enviaron %d bytes de la info del bloque\n",stat);
-
-		agregarTransformacionAListaEnProceso(job,bloqueAEnviar);
-
 
 	}
-
-	puts("Se envio la info de todos los bloques.");
-
-
-
-
-
-	return 0;
-
 
 }
 

@@ -84,7 +84,7 @@ int conectarAFS(Tyama *yama){
 		logErrorAndExit(mensaje);
 	}
 
-	printf("Se enviaron: %d bytes a FS del handshake \n", estado);
+	log_info(logInfo,"Se enviaron: %d bytes a FS del handshake \n", estado);
 	free(mensaje);
 	free(head);
 	return socketFS;
@@ -113,7 +113,7 @@ TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
 	if ((estado = recv(socketFS, &infoBloque->tamanioNombre, sizeof(int), 0)) == -1) {
 		logErrorAndExit("Error al recibir el tamanio del nombre del nodo");
 		}
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+	log_info(logInfo,"Para el tamaño del nombre recibi %d bytes\n", estado);
 	nombreNodo = malloc(infoBloque->tamanioNombre);
 
 	//Recibo el nombre del nodo
@@ -121,13 +121,13 @@ TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
 		logErrorAndExit("Error al recibir el nombre del nodo");
 		}
 
-	printf("Para el nombre del nodo recibi %d bytes\n", estado);
+	log_info(logInfo,"Para el nombre del nodo recibi %d bytes\n", estado);
 
 	//Recibo el tamanio de la ip del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioIp, sizeof(int), 0)) == -1) {
 		logErrorAndExit("Error al recibir el tamanio del ip del nodo");
 		}
-	printf("Para el tamaño de la ip recibi %d bytes\n", estado);
+	log_info(logInfo,"Para el tamaño de la ip recibi %d bytes\n", estado);
 
 	ipNodo = malloc(infoBloque->tamanioIp);
 
@@ -136,13 +136,13 @@ TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
 		logErrorAndExit("Error al recibir el ip del nodo");
 		}
 
-	printf("Para el la ip recibi %d bytes\n", estado);
+	log_info(logInfo,"Para el la ip recibi %d bytes\n", estado);
 
 	//Recibo el tamanio del puerto del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioPuerto, sizeof(int), 0)) == -1) {
 		logErrorAndExit("Error al recibir el tamanio del puerto del nodo");
 		}
-	printf("Para el tamaño del puerto recibi %d bytes\n", estado);
+	log_info(logInfo,"Para el tamaño del puerto recibi %d bytes\n", estado);
 
 	puertoNodo = malloc(infoBloque->tamanioPuerto);
 
@@ -156,7 +156,7 @@ TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS){
 		logErrorAndExit("Error al recibir el tamanio del databin");
 		}
 
-	printf("Para el tamanio del databin recibi %d bytes\n", estado);
+	log_info(logInfo,"Para el tamanio del databin recibi %d bytes\n", estado);
 
 	infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
 	free(nombreNodo);
@@ -174,7 +174,7 @@ char * recibirPathArchivo(int sockMaster){
 	//stat = recv(sockMaster, &head, sizeof(Theader), 0);
 
 
-	puts("Nos llega el path del archivo");
+	log_info(logInfo,"Nos llega el path del archivo");
 
 	if ((buffer = recvGeneric(sockMaster)) == NULL){
 		puts("Fallo recepcion de PATH_FILE_TOREDUCE");
@@ -186,7 +186,7 @@ char * recibirPathArchivo(int sockMaster){
 		return NULL;
 	}
 
-	printf("Path archivo: %s\n",pathArchivo->bytes);
+	log_info(logInfo,"Path archivo: %s\n",pathArchivo->bytes);
 
 	return pathArchivo->bytes;
 }
