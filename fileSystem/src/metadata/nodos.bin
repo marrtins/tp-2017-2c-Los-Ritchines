@@ -1,9 +1,7 @@
-Nodo3Libre=79
-TAMANIO=240
-NODOS=[Nodo1,Nodo2,Nodo3]
-Nodo3Total=80
-Nodo1Libre=78
-Nodo2Libre=79
+TAMANIO=160
+NODOS=[Nodo1,Nodo2]
+Nodo1Libre=75
+Nodo2Libre=75
 Nodo1Total=80
-LIBRE=236
+LIBRE=150
 Nodo2Total=80

@@ -222,9 +222,11 @@ void conexionesDatanode(void * estructura){
 								}
 								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
 
+
+
 								rutasParaCpfrom[0] = strdup("cpfrom");
 								rutasParaCpfrom[1] = strdup(rutaATemporal);
-								rutasParaCpfrom[2] = strdup(estructuraArchivoFinal->rutaArchivo);
+								rutasParaCpfrom[2] = strdup(directorioACrear);
 								rutasParaCpfrom[3] = NULL;
 								log_info(logInfo, "Se creo un archivo temporal del archivo final.");
 
