@@ -182,15 +182,15 @@ void conexionesDatanode(void * estructura){
 								//todo hay que probar esto
 								char * directorioACrear = obtenerRutaSinArchivo(estructuraArchivoFinal->rutaArchivo);
 								if(existeDirectorio(directorioACrear)){
-									log_info("El directorio para el almacenamiento final, ya existe.");
+									log_info(logInfo, "El directorio para el almacenamiento final, ya existe.");
 								}
 								else{
-									log_info("El directorio para el almacenamiento final no existe, creando.");
+									log_info(logInfo, "El directorio para el almacenamiento final no existe, creando.");
 									if(crearDirectorio(directorioACrear)>=0){
 										persistirTablaDeDirectorios();
 									}
 									else{
-										log_error("No se pudo crear el directorio del almacenamiento final.");
+										log_error(logError,"No se pudo crear el directorio del almacenamiento final.");
 									}
 								}
 								//todo hay que probar esto de arriba

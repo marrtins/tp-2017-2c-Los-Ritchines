@@ -59,29 +59,6 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	 if ((estado = send(nodo2->fd, buffer2->buffer , buffer2->tamanio, 0)) == -1){
 		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
 	 }
-	/*double obtenerProporcionDeDisponibilidad(Tnodo* nodo){
-		if(nodo->cantidadBloquesLibres == 0) return 1;
-		double bloquesOcupados = nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
-		return bloquesOcupados / nodo->cantidadBloquesTotal;
-	}*/
-	/*
-	double p1 = obtenerProporcionDeDisponibilidad(nodo1);
-	double p2 = obtenerProporcionDeDisponibilidad(nodo2);
-	double p3 = obtenerProporcionDeDisponibilidad(nodo3);
-	double p4 = obtenerProporcionDeDisponibilidad(nodo4);
-	FILE * archivoDeSeguimiento = fopen("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/envioBloques.txt","a");
-	fseek(archivoDeSeguimiento,0,SEEK_END);
-	fprintf(archivoDeSeguimiento, "%s %d \n","Bloque nro: ", bloque->numeroDeBloque);
-	fprintf(archivoDeSeguimiento, "%s\n%f\n%f\n%f\n%f\n", "proporciones: ",p1,p2,p3,p4);
-	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo1->cantidadBloquesTotal,nodo1->cantidadBloquesLibres,nodo1->cantidadBloquesTotal);
-	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo2->cantidadBloquesTotal,nodo2->cantidadBloquesLibres,nodo2->cantidadBloquesTotal);
-	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo3->cantidadBloquesTotal,nodo3->cantidadBloquesLibres,nodo3->cantidadBloquesTotal);
-	fprintf(archivoDeSeguimiento, "%s (%d - %d) / %d\n","operacion:",nodo4->cantidadBloquesTotal,nodo4->cantidadBloquesLibres,nodo4->cantidadBloquesTotal);
-	fwrite(nodo1->nombre, strlen(nodo1->nombre), 1, archivoDeSeguimiento);
-	fputs("\n",archivoDeSeguimiento);
-	fwrite(nodo2->nombre, strlen(nodo2->nombre), 1, archivoDeSeguimiento);
-	fputs("\n",archivoDeSeguimiento);
-	*/
 
 	almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
 	free(head);
