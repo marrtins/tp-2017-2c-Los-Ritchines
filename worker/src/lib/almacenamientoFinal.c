@@ -44,6 +44,8 @@ int realizarAlmacenamientoFinal(client_sock){
 		enviarHeader(client_sock,headEnvio);
 		return FALLO_GRAL;
 	}
+
+	free(buffer);
 	printf("llego la info apra almacenamientofinal\n");
 	log_info(logInfo,"llego la info para almac final");
 	log_info(logInfo,"nombre resultante %s\n tempred %s\n",infoAlmacenado->nombreResultante,infoAlmacenado->nombreTempReduccion);
@@ -103,6 +105,8 @@ int realizarAlmacenamientoFinal(client_sock){
 	free(contenidoArchivoFinal);
 
 
+
+
 //puts aca envio a filesystem
 
 	//sleep(2);
@@ -134,6 +138,20 @@ int realizarAlmacenamientoFinal(client_sock){
 
 	}
 
+
+	free(head);
+	free(header);
+	free(headEnvio);
+	log_info(logInfo,"32");
+	free(infoAlmacenado->nombreResultante);
+	log_info(logInfo,"33");
+	free(infoAlmacenado->nombreTempReduccion);
+	log_info(logInfo,"34");
+	free(infoAlmacenado);
+	log_info(logInfo,"35");
+
+
+	close(sockFS);
 
 
 

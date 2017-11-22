@@ -18,8 +18,6 @@ extern int cont;
 int realizarTransformacion(int client_sock){
 	TpackDatosTransformacion *datosTransf;
 	char * buff;
-	char * lineaDeEjecucionTransformacion;
-	char * rutaResultadoTransformacion;
 	char * nombreScriptTransformador;
 	char * rutaScriptTransformador ;
 	Theader *headEnvio  = malloc(sizeof (Theader));
@@ -44,6 +42,8 @@ int realizarTransformacion(int client_sock){
 		return FALLO_GRAL;
 	}
 
+	free(buff);
+
 	log_info(logInfo,"Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
 			datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
 	printf("Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
@@ -57,7 +57,8 @@ int realizarTransformacion(int client_sock){
 	string_append(&rutaScriptTransformador,"/home/utnso/");
 	string_append(&nombreScriptTransformador,"transformador");
 	cont++;
-	string_append(&nombreScriptTransformador,string_itoa(cont));
+	string_append_with_format(&nombreScriptTransformador,"%d",cont);
+	//string_append(&nombreScriptTransformador,string_itoa(cont));
 	string_append(&nombreScriptTransformador,worker->nombre_nodo);
 	string_append(&nombreScriptTransformador,".sh");
 	string_append(&rutaScriptTransformador,nombreScriptTransformador);
@@ -77,7 +78,9 @@ int realizarTransformacion(int client_sock){
 	char * input2=malloc(BLOQUE_SIZE);
 	memcpy(input2,input1,datosTransf->bytesOcupadosBloque);
 
-
+	log_info(logInfo,"asd1");
+	free(input1);
+	log_info(logInfo,"2");
 
 	//log_info(logInfo,"linea  %s \n",input2);
 
@@ -85,24 +88,26 @@ int realizarTransformacion(int client_sock){
 	char * rutaBloque = string_new();
 	string_append(&rutaBloque,"/home/utnso/tmp/tmpbl-");
 	cont++;
-	string_append(&rutaBloque,string_itoa(cont));
+	string_append_with_format(&rutaBloque,"%d",cont);
+	//string_append(&rutaBloque,string_itoa(cont));
 	string_append(&rutaBloque,"-");
 	string_append(&rutaBloque,worker->nombre_nodo);
 	bloqueSTD = fopen(rutaBloque, "w");
 
 	fwrite(input2, sizeof(char), datosTransf->bytesOcupadosBloque, bloqueSTD);
-
+	log_info(logInfo,"2.1");
+	free(input2);
+	log_info(logInfo,"3");
 	fclose(bloqueSTD);
 
 
 	if ( (pid=fork()) == 0 )
 	{ /* hijo */
+		char * lineaDeEjecucionTransformacion;
+		char * rutaResultadoTransformacion;
 
 		lineaDeEjecucionTransformacion = string_new();
 		rutaResultadoTransformacion=string_new();
-
-
-
 
 
 		string_append(&lineaDeEjecucionTransformacion,"cat ");
@@ -133,11 +138,16 @@ int realizarTransformacion(int client_sock){
 
 
 			enviarHeader(client_sock,headEnvio);
-			log_info(logInfo,"Envio header. fin transfo ok");
+			log_info(logInfo,"Envio header. fin transfo oky");
 			puts("fin transf ok");
 		}
 		remove(rutaBloque);
 		remove(rutaScriptTransformador);
+		free(lineaDeEjecucionTransformacion);
+		free(rutaResultadoTransformacion);
+		/*free(nombreScriptTransformador);
+		free(rutaScriptTransformador);*/
+		log_info(logInfo,"fin fork t");
 
 		exit(0);
 
@@ -150,8 +160,25 @@ int realizarTransformacion(int client_sock){
 	}
 	//printf("Cierro fd %d\n",client_sock);
 	//close(client_sock);
-	free(input1);
+
+
+	log_info(logInfo,"4");
 	free(headEnvio);
+	log_info(logInfo,"5");
+	free(datosTransf->nombreTemporal);
+	log_info(logInfo,"6");
+	free(datosTransf);
+	log_info(logInfo,"7");
+	//free(lineaDeEjecucionTransformacion);
+	log_info(logInfo,"8");
+	//free(rutaResultadoTransformacion);
+	log_info(logInfo,"9");
+	free(nombreScriptTransformador);
+	log_info(logInfo,"10");
+	free(rutaScriptTransformador);
+	log_info(logInfo,"11");
+	free(rutaBloque);
+	log_info(logInfo,"12");
 	return 0;
 }
 

@@ -87,6 +87,10 @@ void iniciarNuevoJob(int sockMaster,int socketFS);
 void manejarFinTransformacionOK(int sockMaster);
 void manejarFinTransformacionFailDesconexion(int sockMaster);
 
+void liberarBloquesPlanificados(void * info);
+void liberarWorkersPlanificacion(void * info);
+
+
 void manejarFinTransformacionFail(int sockMaster);
 void manejarFinReduccionLocalOK(int sockMaster);
 void manejarFinReduccionLocalFail(int sockMaster);

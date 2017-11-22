@@ -17,7 +17,9 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	recv(client_sock, buffer, sizeof(int), 0);
 	file_size = atoi(buffer);
 	//fprintf(stdout, "\nFile size : %d\n", file_size);
-
+	log_info(logInfo,"50");
+	//free(buffer);
+	log_info(logInfo,"51");
 	scriptFile = fopen(rutaAAlmacenar, "w");
 	if (scriptFile == NULL){
 		fprintf(stderr, "Fallo open script file --> %s\n", strerror(errno));
@@ -31,6 +33,9 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 		len = recv(client_sock, buffer, 1024, 0);
 		fwrite(buffer, sizeof(char), len, scriptFile);
 		remain_data -= len;
+		log_info(logInfo,"52");
+		//free(buffer);
+		log_info(logInfo,"53");
 		//fprintf(stdout, "Recibidos %d bytes y espero :- %d bytes\n", len, remain_data);
 		//if(len<0) break;
 	}
@@ -47,7 +52,9 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	string_append(&lineaPermisoEjecucion,rutaAAlmacenar);
 	log_info(logInfo,"%s \n",lineaPermisoEjecucion);
 	stat=system(lineaPermisoEjecucion);
-
+	log_info(logInfo,"54");
+	free(lineaPermisoEjecucion);
+	log_info(logInfo,"55");
 	if(stat != 0){
 		puts("error al dar chmod +x");
 		return -1;
@@ -152,7 +159,8 @@ int enviarArchivo(char * rutaArchivo,int sockDestino){
 }
 
 Tworker *obtenerConfiguracionWorker(char* ruta){
-	printf("Ruta del archivo de configuracion: %s\n", ruta);
+	//printf("Ruta del archivo de configuracion: %s\n", ruta);
+
 	Tworker *worker = malloc(sizeof(Tworker));
 
 	worker->ip_filesystem       =    malloc(MAXIMA_LONGITUD_IP);
@@ -174,24 +182,36 @@ Tworker *obtenerConfiguracionWorker(char* ruta){
 	strcpy(worker->puerto_filesystem, config_get_string_value(workerConfig, "PUERTO_FILESYSTEM"));
 	strcpy(worker->ruta_databin, config_get_string_value(workerConfig, "RUTA_DATABIN"));
 	strcpy(worker->nombre_nodo, config_get_string_value(workerConfig, "NOMBRE_NODO"));
-	worker->tamanio_databin_mb = config_get_int_value(workerConfig,"TAMANIO_DATABIN_MB");
+	worker->tamanio_databin_mb = config_get_int_value(workerConfig, "TAMANIO_DATABIN_MB");
 
 	config_destroy(workerConfig);
 	return worker;
 }
 
+void liberarConfiguracionWorker(Tworker *worker){
+	free(worker->ip_filesystem);
+	free(worker->ip_nodo);
+	free(worker->puerto_entrada);
+	free(worker->puerto_master);
+	free(worker->puerto_filesystem);
+	free(worker->puerto_datanode);
+	free(worker->ruta_databin);
+	free(worker->nombre_nodo);
+	free(worker);
+}
+
 void mostrarConfiguracion(Tworker *worker){
 
 	printf("Puerto Entrada: %s\n",  worker->puerto_entrada);
-		printf("IP Filesystem %s\n",    worker->ip_filesystem);
-		printf("IP Nodo %s\n",    worker->ip_nodo);
-		printf("Puerto Master: %s\n",       worker->puerto_master);
-		printf("Puerto Filesystem: %s\n", worker->puerto_filesystem);
-		printf("Puerto Worker: %s\n", worker->puerto_datanode);
-		printf("Ruta Databin: %s\n", worker->ruta_databin);
-		printf("Nombre Nodo: %s\n", worker->nombre_nodo);
-		printf("Tamanio databin en MB: %d\n", worker->tamanio_databin_mb);
-		printf("Tipo de proceso: %d\n", worker->tipo_de_proceso);
+	printf("IP Filesystem %s\n",    worker->ip_filesystem);
+	printf("IP Nodo %s\n",    worker->ip_nodo);
+	printf("Puerto Master: %s\n",       worker->puerto_master);
+	printf("Puerto Filesystem: %s\n", worker->puerto_filesystem);
+	printf("Puerto Worker: %s\n", worker->puerto_datanode);
+	printf("Ruta Databin: %s\n", worker->ruta_databin);
+	printf("Nombre Nodo: %s\n", worker->nombre_nodo);
+	printf("Tamanio databin en MB: %d\n", worker->tamanio_databin_mb);
+	printf("Tipo de proceso: %d\n", worker->tipo_de_proceso);
 }
 
 Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * contenidoArchivo, unsigned long long tamanioArchivoFinal){

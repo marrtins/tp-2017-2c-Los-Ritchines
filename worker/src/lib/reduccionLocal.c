@@ -45,6 +45,7 @@ int realizarReduccionLocal(int client_sock){
 		return FALLO_GRAL;
 	}
 
+	free(bufferReduccion);
 
 	log_info(logInfo,"\n\n\n esta es la info q  me llego");
 	log_info(logInfo,"Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
@@ -153,6 +154,9 @@ int realizarReduccionLocal(int client_sock){
 			puts("fin rl ok");
 		}
 		remove(rutaScriptReductor);
+		free(rutaResultadoReduccion);
+		free(lineaDeEjecucionReduccion);
+		log_info(logInfo,"fin fork rl");
 		//close(client_sock);
 		exit(0);
 
@@ -162,6 +166,34 @@ int realizarReduccionLocal(int client_sock){
 
 	}
 
-	//free(headEnvio);
+	log_info(logInfo,"20");
+	free(headEnvio);
+	log_info(logInfo,"21");
+	free(infoReduccion->nombreTempReduccion);
+	log_info(logInfo,"22");
+	list_destroy_and_destroy_elements(infoReduccion->listaTemporales,liberarListaTemporales);
+	log_info(logInfo,"23");
+	//free(infoReduccion->listaTemporales);
+	log_info(logInfo,"23.1");
+	free(infoReduccion);
+	log_info(logInfo,"24");
+	free(nombreScriptReductor);
+	log_info(logInfo,"25");
+	free(rutaScriptReductor);
+	log_info(logInfo,"26");
+	free(rutaTemporalesApareados);
+	log_info(logInfo,"27");
+	free(lineaDeEjecucionApareo);
+	log_info(logInfo,"28");
+
 	return 0;
 }
+
+void liberarListaTemporales(void * info){
+	log_info(logInfo,"free lista temp list");
+	TreduccionLista * infoLista = (TreduccionLista*) info;
+	free(infoLista->nombreTemporal);
+	free(infoLista);
+	log_info(logInfo,"pase listsa temp list");
+}
+

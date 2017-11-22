@@ -40,7 +40,7 @@ int main(int argc, char* argv[]){
 	fclose(archivo);
 	close(fd);
 
-
+	mkdir("/home/utnso/tmp/", 0777);
 
 	char * rutaLogInfo = string_new();
 	char * rutaLogError=string_new();
@@ -85,6 +85,7 @@ int main(int argc, char* argv[]){
 			log_info(logInfo,"Es master");
 			manejarConexionMaster(head,client_sock);
 
+
 			break;
 		case WORKER:
 			log_info(logInfo,"es worker");
@@ -101,7 +102,7 @@ int main(int argc, char* argv[]){
 	log_info(logInfo,"Fallo el accept(). error");
 
 
-
+	liberarConfiguracionWorker(worker);
 
 
 	free(head);

@@ -32,12 +32,13 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			puts("Fallo deserializacion de Bytes del path arch a reducir");
 			return FALLO_GRAL;
 		}
+		free(buffer);
 
 		log_info(logInfo,"Path archivo que vamos a enviarle: %s\n",pathArchivoTemporal->bytes);
 		FILE * fdTempFilePropio;
 		fdTempFilePropio = fopen((pathArchivoTemporal->bytes),"r");
 
-		char * buffer;
+
 		int packSize=0;
 		Theader headEnvio;
 
@@ -58,6 +59,11 @@ int manejarConexionWorker(Theader *head, int client_sock){
 								puts("no se pudo enviar path del archivo temporal que necesitamos. ");
 								return FALLO_SEND ;
 							}
+							log_info(logInfo,"41");
+							free(buffer);
+							log_info(logInfo,"42");
+							//free(lineaAux);
+							log_info(logInfo,"43");
 						}else{
 							head->tipo_de_mensaje=EOF_TEMPORAL;
 							head->tipo_de_proceso=WORKER;
@@ -75,5 +81,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 	log_info(logInfo,"free linea axu");
 	free(lineaAux);
 	log_info(logInfo,"pase free linea aux wh");
+	free(pathArchivoTemporal->bytes);
+	free(pathArchivoTemporal);
 	return 0;
 }

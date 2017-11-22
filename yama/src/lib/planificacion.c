@@ -66,8 +66,6 @@ t_list * planificar(TjobMaster *job){
 		TpackInfoBloque *bloque = asignarBloque(bloqueAux,listaWorkersPlanificacion,job);
 		log_info(logInfo,"asigne al bloque %d, el nodo %s. bloque databin %d \n",bloque->bloqueDelArchivo,bloque->nombreNodo,bloque->bloqueDelDatabin);
 		list_add(listaPlanificada,bloque);
-
-
 	}
 
 	int q;
@@ -76,6 +74,9 @@ t_list * planificar(TjobMaster *job){
 		log_info(logInfo,"b arch %d  bdata %d %d %s\n",aux->bloqueDelArchivo,aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
 	}
 
+	//list_destroy_and_destroy_elements(listaPlanificada,liberarBloquesPlanificados);
+
+	//list_destroy_and_destroy_elements(listaWorkersPlanificacion,liberarWorkersPlanificacion);
 
 	return listaPlanificada;
 }
@@ -852,7 +853,15 @@ void mostrarTablaDeEstados(){
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
+		log_info(logInfo,"1asd");
 		//free(etapa);
+		log_info(logInfo,"2");
+		//free(bloque);
+		log_info(logInfo,"3");
+		//free(nodo);
+		log_info(logInfo,"4");
+		//free(archivoTemporal);
+		log_info(logInfo,"5");
 	}
 
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
@@ -871,7 +880,15 @@ void mostrarTablaDeEstados(){
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 
+		log_info(logInfo,"6");
 		//free(etapa);
+		log_info(logInfo,"7");
+		//free(bloque);
+		log_info(logInfo,"8");
+		//free(nodo);
+		log_info(logInfo,"9");
+		//free(archivoTemporal);
+		log_info(logInfo,"10");
 	}
 
 	for(i=0;i<list_size(listaEstadoError);i++){
@@ -890,7 +907,15 @@ void mostrarTablaDeEstados(){
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 
+		log_info(logInfo,"11");
 		//free(etapa);
+		log_info(logInfo,"12");
+		//free(bloque);
+		log_info(logInfo,"13");
+		//free(nodo);
+		log_info(logInfo,"14");
+		//free(archivoTemporal);
+		log_info(logInfo,"15");
 	}
 
 	printf("\n\n\n");
@@ -1108,9 +1133,11 @@ char *  generarNombreTemporal(int idMaster){
 	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");
-	string_append(&temp,string_itoa(idMaster));
+	string_append_with_format(&temp,"%d",idMaster);
+	//string_append(&temp,string_itoa(idMaster));
 	string_append(&temp,"-temp");
-	string_append(&temp,string_itoa(idTempName++));
+	string_append_with_format(&temp,"%d",idTempName++);
+	//string_append(&temp,string_itoa(idTempName++));
 
 
 	return temp;
@@ -1121,7 +1148,8 @@ char *  generarNombreReductorTemporal(char * nombreNodo,int idMaster){
 	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");
-	string_append(&temp,string_itoa(idMaster));
+	string_append_with_format(&temp,"%d",idMaster);
+	//string_append(&temp,string_itoa(idMaster));
 	string_append(&temp,"-");
 	string_append(&temp,nombreNodo);
 
@@ -1135,7 +1163,8 @@ char *  generarNombreReduccionGlobalTemporal(int idMaster){
 	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");
-	string_append(&temp,string_itoa(idMaster));
+	string_append_with_format(&temp,"%d",idMaster);
+	//string_append(&temp,string_itoa(idMaster));
 	string_append(&temp,"-final");
 
 

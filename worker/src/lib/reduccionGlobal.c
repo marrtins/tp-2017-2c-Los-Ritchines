@@ -34,6 +34,9 @@ int realizarReduccionGlobal(client_sock){
 		enviarHeader(client_sock,head);
 		return FALLO_GRAL;
 	}
+	free(buffer);
+
+
 	printf("llego la info apra la reduccion global\n");
 	log_info(logInfo," llego info para la redu global job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
 
@@ -145,7 +148,10 @@ int realizarReduccionGlobal(client_sock){
 		puts("fin rg ok");
 		}
 		remove(rutaScriptReductor);
+		free(lineaDeEjecucionReduccionGlobal);
+		free(rutaResultadoReduccionGlobal);
 		//close(client_sock);
+		log_info(logInfo,"fin fork rg");
 		exit(0);
 
 	}
@@ -155,6 +161,30 @@ int realizarReduccionGlobal(client_sock){
 		//	printf("%d\n",cont);
 		//waitpid(pid,pidStat,0);
 	}
+	log_info(logInfo,"free head");
+	free(head);
+	log_info(logInfo,"free headpase");
+	log_info(logInfo,"free temp red glo");
+	free(infoReduccionGlobal->tempRedGlobal);
+	log_info(logInfo,"free trglo pase");
+	log_info(logInfo,"free ldestro");
+	list_destroy_and_destroy_elements(infoReduccionGlobal->listaNodos,liberarInfoNodos);
+	log_info(logInfo,"free ldstro pase");
+	log_info(logInfo,"free irg");
+	free(infoReduccionGlobal);
+	log_info(logInfo,"free irg pase");
+
+
+	log_info(logInfo,"free onmbre script red");
+	free(nombreScriptReductor);
+	log_info(logInfo,"free pase nsr");
+	log_info(logInfo,"free rsr");
+	free(rutaScriptReductor);
+	log_info(logInfo,"free rsr pase");
+	log_info(logInfo,"free rar");
+	free(rutaApareoFinal);
+	log_info(logInfo,"free rar pase");
+
 	return 0;
 
 }
@@ -198,6 +228,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			infoWorker1->eofTemporal=false;
 			infoWorker1->encargado=false;
 			list_add(listaFds,infoWorker1);
+			free(buffer2);
 		}else{
 
 
@@ -225,11 +256,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	TpackBytes *siguienteLinea;
 
 
-	/*//puts("pongo listafsds");
-	for(i=0;i<list_size(listaFds);i++){
-		TinfoApareoGlobal *infoWorker3 = list_get(listaFds,i);
-		//printf("fd %d\n",infoWorker3->fdWorker);
-	}*/
+
 
 
 	char * lineaAux=malloc(MAXSIZELINEA);
@@ -239,8 +266,9 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	//puts("pido la primer linea");
 	//int fdWorker;
 	//pido la primer linea a cada worker y leo la mia:
-	for(i=0;i<list_size(listaFds);i++){
-		TinfoApareoGlobal *infoWorker4 = list_get(listaFds,i);
+	int size=list_size(listaFds);
+	for(i=0;i<size;i++){
+		TinfoApareoGlobal *infoWorker4 =(TinfoApareoGlobal *) list_get(listaFds,i);
 		//puts("pase infow");
 		//printf("fdw %d\n ",infoWorker4->fdWorker);
 		fdWorker = infoWorker4->fdWorker;
@@ -272,17 +300,35 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 					puts("Fallo apareo global. deser");
 					return FALLO_GRAL;
 				}
+				log_info(logInfo,"free buffer");
+					free(buffer);
+					log_info(logInfo,"pase free buff");
 				//puts("pase sig linea");
 				log_info(logInfo,"Linea Recibida: %s\n",siguienteLinea->bytes);
 				strcpy(lineas[i],siguienteLinea->bytes);
+
+				log_info(logInfo,"free sig linea");
+				free(siguienteLinea->bytes);
+				log_info(logInfo,"pase free sig linea");
+				free(siguienteLinea);
+				log_info(logInfo,"pase free sig linea2");
 			}
 		}else{
 			log_info(logInfo,"hago fscanf");
 			//printf("FD:%d\n",fdTempFilePropio);
 			fscanf (fdTempFilePropio, "%s", lineaAux);
 			strcpy(lineas[i],lineaAux);
+
+
+
 			log_info(logInfo,"linea:");
 			log_info(logInfo,lineaAux);
+
+
+			log_info(logInfo,"free linea aux asd");
+			free(lineaAux);
+			log_info(logInfo,"pase free linea aux");
+
 		}
 	}
 	//puts("tengo estas lineas x el momento");
@@ -298,6 +344,11 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			mayorIndice = compararLineas(cantArch,lineas);
 			lineaAux=lineas[mayorIndice];
 			fprintf(fdArchivoResultado,"%s\n",lineaAux);
+			//puts("asd");
+			log_info(logInfo,"free linea aux asd2");
+			//free(lineaAux);
+			log_info(logInfo,"pase free linea aux2");
+
 			//lineaAux=pedirSiguienteLineaA(mayorIndice);
 
 			log_info(logInfo,"pido siguiente linea al mayor indice (el punteor q avanzo");
@@ -330,6 +381,11 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 					log_info(logInfo,"Linea Recibida: %s\n",siguienteLinea->bytes);
 					strcpy(lineas[mayorIndice],siguienteLinea->bytes);
 
+					log_info(logInfo,"free2");
+					free(buffer);
+					free(siguienteLinea->bytes);
+					free(siguienteLinea);
+					log_info(logInfo,"pase free2");
 
 				}else if(head->tipo_de_mensaje==EOF_TEMPORAL){
 					strcpy(lineas[mayorIndice],"@@EOF@NULL!@@");//hrdc
@@ -355,11 +411,55 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 		}
 	}
 	free(head);
-	//log_info(logInfo,"free linea aux");
-	//free(lineaAux);
-	//log_info(logInfo,"pase free linea aux");
+	log_info(logInfo,"free lista fds");
+	list_destroy_and_destroy_elements(listaFds,liberarInfoApareoGlobal);
+	log_info(logInfo,"pase free lista fds");
+
+	//log_info(logInfo,"free buffer2");
+	//free(buffer2);
+	//log_info(logInfo,"pase free buff 2");
+
+
+	/*log_info(logInfo,"free buffer");
+	free(buffer);
+	log_info(logInfo,"pase free buff");
+	*/
+	/*log_info(logInfo,"free sig linea");
+	free(siguienteLinea);
+	log_info(logInfo,"pase free sig linea");
+	*/
+
+	log_info(logInfo,"free rmt");
+	free(rutaMiTemporal);
+	log_info(logInfo,"pase rmt");
+
+
+/*
+	log_info(logInfo,"free lineas");
+	free(lineas);
+	log_info(logInfo,"pase free lineas");
+
+*///todo:chequear free
+
 
 	return 0;
+}
+void liberarInfoApareoGlobal(void * info){
+	log_info(logInfo,"free info apa gl");
+	TinfoApareoGlobal * infoApareo = (TinfoApareoGlobal*) info;
+	free(infoApareo);
+	log_info(logInfo,"pase free info apa gl");
+}
+
+void liberarInfoNodos(void * info){
+	log_info(logInfo,"free info nodo list");
+	TinfoNodoReduccionGlobal * infoNodo = (TinfoNodoReduccionGlobal*) info;
+	free(infoNodo->ipNodo);
+	free(infoNodo->nombreNodo);
+	free(infoNodo->puertoNodo);
+	free(infoNodo->temporalReduccion);
+	free(infoNodo);
+	log_info(logInfo,"pase free info nodo list");
 }
 
 

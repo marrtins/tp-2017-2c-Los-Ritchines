@@ -374,7 +374,7 @@ int getMD5(char* rutaYamafs){
 	string_append(&comando, rutaTmp);
 	system(comando);
 
-	remove(rutaTmp);
+	//remove(rutaTmp);
 	free(comando);
 	free(rutaTmp);
 	free(rutaLocal);

@@ -4,6 +4,7 @@
 #include "estructurasWK.h"
 
 Tworker *obtenerConfiguracionWorker(char* ruta);
+void liberarConfiguracionWorker(Tworker *worker);
 void mostrarConfiguracion(Tworker *worker);
 char * getBloqueWorker(int nroBloque);
 int manejarConexionMaster(Theader *header,int client_sock);
@@ -19,4 +20,7 @@ int enviarArchivo(char * rutaArchivo,int sockDestino);
 int realizarAlmacenamientoFinal(int client_sock);
 int compararLineas(int cantArchivos,char arrayLineas[cantArchivos][MAXSIZELINEA]);
 Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * contenidoArchivo, unsigned long long tamanioArchivoFinal);
+void liberarInfoApareoGlobal(void * info);
+void liberarInfoNodos(void * info);
+void liberarListaTemporales(void * info);
 #endif
