@@ -241,9 +241,7 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 	Tbuffer *buffer = malloc(sizeof(Tbuffer));
 	buffer->tamanio = (HEAD_SIZE + sizeof(int) + sizeof(unsigned long long) + bloque->tamanio);
 	buffer->buffer = malloc(buffer->tamanio);
-	puts("voy a obtener el bloque disponible");
 	int primerBloqueLibre = obtenerBloqueDisponible(nodo);
-	printf("bloque libre obtenido: %d", primerBloqueLibre);
 
 	char * p = buffer->buffer;
 	memcpy(p, head, sizeof(*head));
