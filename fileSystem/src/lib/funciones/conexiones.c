@@ -178,6 +178,24 @@ void conexionesDatanode(void * estructura){
 								log_info(logInfo,"Es worker y quiere almacenar el archivo final en yamafs.");
 								rutaATemporal = malloc(250);
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
+
+								//todo hay que probar esto
+								char * directorioACrear = obtenerRutaSinArchivo(estructuraArchivoFinal->rutaArchivo);
+								if(existeDirectorio(directorioACrear)){
+									log_info("El directorio para el almacenamiento final, ya existe.");
+								}
+								else{
+									log_info("El directorio para el almacenamiento final no existe, creando.");
+									if(crearDirectorio(directorioACrear)>=0){
+										persistirTablaDeDirectorios();
+									}
+									else{
+										log_error("No se pudo crear el directorio del almacenamiento final.");
+									}
+								}
+								//todo hay que probar esto de arriba
+
+
 								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
 								nombreDeArchivoFinalConExtension = obtenerNombreDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
 								extensionArchivoFinal = obtenerExtensionDeArchivoDeUnaRuta(rutaLocalArchivoFinal);
@@ -222,6 +240,7 @@ void conexionesDatanode(void * estructura){
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
 								free(rutaATemporal);
+								free(directorioACrear);
 								head->tipo_de_proceso=FILESYSTEM;
 								head->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 								enviarHeader(fileDescriptor,head);
