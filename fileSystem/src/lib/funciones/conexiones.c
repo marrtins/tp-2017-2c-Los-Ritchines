@@ -7,7 +7,7 @@ void conexionesDatanode(void * estructura){
 	char * archivoFinalMapeado;
 	char * nombreDeArchivoFinalConExtension;
 	char * rutaATemporal;
-	char ** rutasParaCpfrom = malloc(sizeof(char *) * 3);
+	char ** rutasParaCpfrom = malloc(sizeof(char *) * 4);
 	int socketDeEscuchaDatanodes;
 	int fileDescriptorMax = -1;
 	int cantModificados = 0;
@@ -207,19 +207,21 @@ void conexionesDatanode(void * estructura){
 								rutasParaCpfrom[0] = strdup("cpfrom");
 								rutasParaCpfrom[1] = strdup(rutaATemporal);
 								rutasParaCpfrom[2] = strdup(estructuraArchivoFinal->rutaArchivo);
+								rutasParaCpfrom[3] = NULL;
 								log_info(logInfo, "Se creo un archivo temporal del archivo final.");
 
 								if(almacenarArchivo(rutasParaCpfrom) == -1){
 									log_error(logError, "Error al guardar el archivo final en yamafs.");
 								}
 								log_info(logInfo, "Se guardo el archivo final correctamente.");
-							//todo rompe aca	liberarPunteroDePunterosAChar(rutasParaCpfrom);
-								/*liberarEstructuraArchivoFinal(estructuraArchivoFinal);
+
+								liberarPunteroDePunterosAChar(rutasParaCpfrom);
 								free(rutasParaCpfrom);
+								liberarEstructuraArchivoFinal(estructuraArchivoFinal);
 								free(rutaLocalArchivoFinal);
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
-								free(rutaATemporal);*/
+								free(rutaATemporal);
 								head->tipo_de_proceso=FILESYSTEM;
 								head->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 								enviarHeader(fileDescriptor,head);
