@@ -39,7 +39,8 @@ int main(int argc, char* argv[]){
 	}
 	fclose(archivo);
 	close(fd);
-
+	int asd=system("export LC_ALL=C");
+	printf("Hice LC_ALL. stat: %d\n",asd);
 	mkdir("/home/utnso/tmp/", 0777);
 
 	char * rutaLogInfo = string_new();

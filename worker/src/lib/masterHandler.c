@@ -14,10 +14,9 @@ int manejarConexionMaster(Theader *head, int client_sock){
 
 	int stat;
 
-
+	Theader *header = malloc(sizeof (Theader));
 
 	if(head->tipo_de_mensaje==NUEVATRANSFORMACION){
-
 		if((stat = realizarTransformacion(client_sock))<0){
 			puts("Fallo en la transformacion");
 		}

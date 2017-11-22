@@ -204,7 +204,7 @@ int main(int argc, char* argv[]){
 
 		}
 
-	log_error(logError, "Fallo el accept de master.");
+	//log_error(logError, "Fallo el accept de master.");
 
 
 

@@ -77,7 +77,7 @@ int realizarReduccionGlobal(client_sock){
 	}
 	log_info(logInfo,"recibi");
 	//le pido a todos los workers que me pasen sus reducciones locales.
-
+	puts("pido a los wk q me vatan pasando lineas y apreo");
 	char * rutaApareoFinal=string_new();
 	//puts("str new");
 	string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
@@ -266,6 +266,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	//puts("pido la primer linea");
 	//int fdWorker;
 	//pido la primer linea a cada worker y leo la mia:
+	log_info(logInfo,"pido la 1 linea de todos y leo la mia");
 	int size=list_size(listaFds);
 	for(i=0;i<size;i++){
 		TinfoApareoGlobal *infoWorker4 =(TinfoApareoGlobal *) list_get(listaFds,i);
@@ -316,8 +317,12 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 		}else{
 			log_info(logInfo,"hago fscanf");
 			//printf("FD:%d\n",fdTempFilePropio);
-			fscanf (fdTempFilePropio, "%s", lineaAux);
-			strcpy(lineas[i],lineaAux);
+			//fscanf (fdTempFilePropio, "%s", lineaAux);
+			if(fgets(lineaAux, 1024*1024,fdTempFilePropio) !=NULL){
+				strcpy(lineas[i],lineaAux);
+			}else{
+				strcpy(lineas[i],"@@EOF@NULL!@@");
+			}
 
 
 
@@ -331,9 +336,11 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 
 		}
 	}
-	//puts("tengo estas lineas x el momento");
+	puts("tengo estas lineas x el momento (las primeras4)");
+	log_info(logInfo,"tengo estas lineas x el momento(las primeras 4)");
 	for(i=0;i<list_size(listaInfoNodos);i++){
-		//printf("%s\n",lineas[i]);
+		printf("%s\n",lineas[i]);
+		log_info(logInfo,"%s\n",lineas[i]);
 	}
 
 	int mayorIndice;
@@ -343,7 +350,17 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	while(cantEofRecibidos<eofTotal){
 			mayorIndice = compararLineas(cantArch,lineas);
 			lineaAux=lineas[mayorIndice];
-			fprintf(fdArchivoResultado,"%s\n",lineaAux);
+			fprintf(fdArchivoResultado,"%s",lineaAux);
+
+			log_info(logInfo,"de todas las lineas que tengo:");
+			puts(" de todas las q tengo.  ");
+			for(i=0;i<list_size(listaInfoNodos);i++){
+				printf("%s",lineas[i]);
+				log_info(logInfo,"%s",lineas[i]);
+			}
+			log_info(logInfo,"la mayor es %s",lineaAux);
+			printf("la mayor es %s",lineaAux);
+
 			//puts("asd");
 			log_info(logInfo,"free linea aux asd2");
 			//free(lineaAux);
@@ -352,6 +369,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			//lineaAux=pedirSiguienteLineaA(mayorIndice);
 
 			log_info(logInfo,"pido siguiente linea al mayor indice (el punteor q avanzo");
+			puts("pido siguiente linea al mayor indice (el punteor q avanzo");
 
 			TinfoApareoGlobal *infoWorker = list_get(listaFds,mayorIndice);
 
@@ -360,13 +378,16 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 				head->tipo_de_mensaje=GIVE_NEXTLINE;
 
 				enviarHeader(infoWorker->fdWorker,head);
-
+				printf("pido sig a %d\n",infoWorker->fdWorker);
+				log_info(logInfo,"pido la prox a fd %d",infoWorker->fdWorker);
 				if ((stat = recv(infoWorker->fdWorker, head, sizeof(Theader), 0)) < 0){
 					puts("fallo conexion c worker");
 
 					log_error(logError,"Error en la recepcion del header.");
 					return FALLO_CONEXION;
 				}
+				log_info(logInfo,"llego la rta de  fd %d",infoWorker->fdWorker);
+				printf("llego la rta de  fd %d",infoWorker->fdWorker);
 				if(head->tipo_de_mensaje==TAKE_NEXTLINE){
 					if ((buffer = recvGeneric(infoWorker->fdWorker)) == NULL){
 						puts("Fallo recepcion de nextline. fallo apareo global");
@@ -379,6 +400,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 					}
 
 					log_info(logInfo,"Linea Recibida: %s\n",siguienteLinea->bytes);
+					printf("Linea Recibida: %s\n",siguienteLinea->bytes);
 					strcpy(lineas[mayorIndice],siguienteLinea->bytes);
 
 					log_info(logInfo,"free2");
@@ -388,19 +410,26 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 					log_info(logInfo,"pase free2");
 
 				}else if(head->tipo_de_mensaje==EOF_TEMPORAL){
+					log_info(logInfo,"mando eof fd %d",infoWorker->fdWorker);
+					printf("mando eof fd %d",infoWorker->fdWorker);
 					strcpy(lineas[mayorIndice],"@@EOF@NULL!@@");//hrdc
 					cantEofRecibidos++;
 				}
 			}else{
-				if((stat=fscanf (fdTempFilePropio, "%s", lineaAux))!=-1){
+				log_info(logInfo,"soy el mayor. saco mi linea");
+				printf("soy el mayor. saco mi linea");
+				if((stat=fgets(lineaAux, 1024*1024,fdTempFilePropio) !=NULL)){
 					strcpy(lineas[mayorIndice],lineaAux);
 				}else{
+					puts("llegue a eof propoi");
 					strcpy(lineas[mayorIndice],"@@EOF@NULL!@@");//hrdc
 					cantEofRecibidos++;
 				}
+				log_info(logInfo,"saque mi linea");
 
 			}
 	}
+	puts("fin apareo grloabl");
 	log_info(logInfo,"fin apareo global");
 	fclose(fdTempFilePropio);
 	fclose(fdArchivoResultado);
@@ -468,15 +497,28 @@ int compararLineas(int cantArchivos,char arrayLineas[cantArchivos][MAXSIZELINEA]
 	int indiceMenor=0;
 	char *lineaMenor;
 	int contadorEOF=0;
-
-	for(i=0;i<cantArchivos;i++){
+	int k=0;
+	lineaMenor=arrayLineas[0];
+	while(string_equals_ignore_case(lineaMenor,"@@EOF@NULL!@@")){
+		lineaMenor=arrayLineas[k];
+		indiceMenor=k;
+		k++;
+		if(k>cantArchivos+5) return -1;
+	}
+	/*for(i=0;i<cantArchivos;i++){
 		if(!string_equals_ignore_case(arrayLineas[i],"@@EOF@NULL!@@")){
-			lineaMenor=arrayLineas[0];
+			//lineaMenor=arrayLineas[0];
+			while(string_equals_ignore_case(lineaMenor,"@@EOF@NULL!@@")){
+				k++;
+				lineaMenor=arrayLineas[k];
+				indiceMenor=k;
+				if(k>cantArchivos+5) return -1;
+			}
 			i=cantArchivos;
 		}else{
 			contadorEOF++;
 		}
-	}
+	}*/
 
 	if(contadorEOF==cantArchivos){
 		return -1;
