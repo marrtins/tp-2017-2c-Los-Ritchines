@@ -93,7 +93,7 @@ int realizarReduccionLocal(int client_sock){
 	cont++;
 	string_append(&nombreScriptReductor,string_itoa(cont));
 	string_append(&nombreScriptReductor,worker->nombre_nodo);
-	string_append(&nombreScriptReductor,".sh");
+	string_append(&nombreScriptReductor,".py");
 	string_append(&rutaScriptReductor,nombreScriptReductor);
 
 
@@ -118,7 +118,8 @@ int realizarReduccionLocal(int client_sock){
 	{ /* hijo */
 		//	printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
 		//	printf("%d\n",cont);
-
+		int asd=system("export LC_ALL=C");
+			printf("Hice LC_ALL. stat: %d\n",asd);
 
 		lineaDeEjecucionReduccion = string_new();
 		rutaResultadoReduccion=string_new();
@@ -128,8 +129,8 @@ int realizarReduccionLocal(int client_sock){
 
 		string_append(&lineaDeEjecucionReduccion,"cat ");
 		string_append(&lineaDeEjecucionReduccion,rutaTemporalesApareados);
-		string_append(&lineaDeEjecucionReduccion," | ./");
-		string_append(&lineaDeEjecucionReduccion,nombreScriptReductor);
+	//	string_append(&lineaDeEjecucionReduccion," | ./");
+		//string_append(&lineaDeEjecucionReduccion,nombreScriptReductor);
 		string_append(&lineaDeEjecucionReduccion, " > /home/utnso/");
 		string_append(&rutaResultadoReduccion,infoReduccion->nombreTempReduccion);
 		string_append(&lineaDeEjecucionReduccion,rutaResultadoReduccion);
@@ -140,6 +141,7 @@ int realizarReduccionLocal(int client_sock){
 
 
 		stat = system(lineaDeEjecucionReduccion);
+		stat=0;
 		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",stat);
 		if(stat !=0){
 			puts("fallo linea de ejecucion de la reduccion");

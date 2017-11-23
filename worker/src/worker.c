@@ -85,8 +85,6 @@ int main(int argc, char* argv[]){
 		case MASTER:
 			log_info(logInfo,"Es master");
 			manejarConexionMaster(head,client_sock);
-
-
 			break;
 		case WORKER:
 			log_info(logInfo,"es worker");

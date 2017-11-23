@@ -236,14 +236,14 @@ void conexionesDatanode(void * estructura){
 								log_info(logInfo, "Se guardo el archivo final correctamente.");
 
 								liberarPunteroDePunterosAChar(rutasParaCpfrom);
-								free(rutasParaCpfrom);
+								/*free(rutasParaCpfrom);
 								liberarEstructuraArchivoFinal(estructuraArchivoFinal);
 								free(rutaLocalArchivoFinal);
 								free(extensionArchivoFinal);
 								free(estructuraArchivoFinal);
 								free(rutaATemporal);
 								free(directorioACrear);
-								head->tipo_de_proceso=FILESYSTEM;
+								*/head->tipo_de_proceso=FILESYSTEM;
 								head->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 								enviarHeader(fileDescriptor,head);
 								//todo: revisar

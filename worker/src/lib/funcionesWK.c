@@ -48,7 +48,7 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 
 
 	lineaPermisoEjecucion=string_new();
-	string_append(&lineaPermisoEjecucion,"chmod +x ");
+	string_append(&lineaPermisoEjecucion,"chmod 777 ");
 	string_append(&lineaPermisoEjecucion,rutaAAlmacenar);
 	log_info(logInfo,"%s \n",lineaPermisoEjecucion);
 	stat=system(lineaPermisoEjecucion);
@@ -56,7 +56,7 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	free(lineaPermisoEjecucion);
 	log_info(logInfo,"55");
 	if(stat != 0){
-		puts("error al dar chmod +x");
+		puts("error al dar chmod 777");
 		return -1;
 	}
 	log_info(logInfo,"Stat lineaPermisoEjecucion :%d \n",stat);

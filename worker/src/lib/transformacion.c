@@ -57,10 +57,10 @@ int realizarTransformacion(int client_sock){
 	string_append(&rutaScriptTransformador,"/home/utnso/");
 	string_append(&nombreScriptTransformador,"transformador");
 	cont++;
-	string_append_with_format(&nombreScriptTransformador,"%d",cont);
-	//string_append(&nombreScriptTransformador,string_itoa(cont));
+	//string_append_with_format(&nombreScriptTransformador,"%d",cont);
+	string_append(&nombreScriptTransformador,string_itoa(cont));
 	string_append(&nombreScriptTransformador,worker->nombre_nodo);
-	string_append(&nombreScriptTransformador,".sh");
+	string_append(&nombreScriptTransformador,".py");
 	string_append(&rutaScriptTransformador,nombreScriptTransformador);
 
 	log_info(logInfo,"recibimos el script");
@@ -88,8 +88,8 @@ int realizarTransformacion(int client_sock){
 	char * rutaBloque = string_new();
 	string_append(&rutaBloque,"/home/utnso/tmp/tmpbl-");
 	cont++;
-	string_append_with_format(&rutaBloque,"%d",cont);
-	//string_append(&rutaBloque,string_itoa(cont));
+	//string_append_with_format(&rutaBloque,"%d",cont);
+	string_append(&rutaBloque,string_itoa(cont));
 	string_append(&rutaBloque,"-");
 	string_append(&rutaBloque,worker->nombre_nodo);
 	bloqueSTD = fopen(rutaBloque, "w");
@@ -108,7 +108,8 @@ int realizarTransformacion(int client_sock){
 
 		lineaDeEjecucionTransformacion = string_new();
 		rutaResultadoTransformacion=string_new();
-
+		int asd=system("export LC_ALL=C");
+		printf("Hice LC_ALL. stat: %d\n",asd);
 
 		string_append(&lineaDeEjecucionTransformacion,"cat ");
 		string_append(&lineaDeEjecucionTransformacion,rutaBloque);
