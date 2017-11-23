@@ -44,8 +44,24 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
-	Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
-	Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
+	Tnodo * nodo1 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
+	Tnodo * nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
+	if(nodo1 == NULL || nodo2 == NULL){
+		if(nodo1 == NULL){
+			//significa que, todos los nodos estan en 1
+			setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
+			nodo1 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
+			nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
+		}
+		else{
+			//hay uno solo en cero
+			setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
+			nodo1->estadoParaEnviarBloque = 1;
+			nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
+		}
+	}
+	//Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
+	//Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
 	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
@@ -302,6 +318,7 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
+	nuevoNodo->estadoParaEnviarBloque = 0;
 	return nuevoNodo;
 }
 

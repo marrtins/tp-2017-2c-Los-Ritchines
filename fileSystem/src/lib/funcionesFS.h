@@ -96,6 +96,7 @@ TinfoNodo * buscarInfoNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
 void borrarNodoPorNombre(t_list * lista, char * nombre);
+Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos);
 
 
 //Directorios
@@ -164,6 +165,7 @@ void* buscarNodoPorFD(t_list * lista, int fd);
 int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
+void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor);
 
 
 
