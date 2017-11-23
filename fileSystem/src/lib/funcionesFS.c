@@ -399,6 +399,8 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 			return -1;
 		}
 
+
+
 		//pthread_cond_init(&bloqueCond, NULL);
 		pthread_mutex_init(&bloqueMutex,NULL);
 		pthread_mutex_lock(&bloqueMutex);
@@ -411,6 +413,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 		puts("pase el mutex, voy a copiar un bloque");
 		Tbuffer* bloque = malloc(sizeof(Tbuffer));
+
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
 			puts("Error al copiar bloque recibido. Intentelo de nuevo");
 			log_error(logError,"Error al copiar bloque recibido");
@@ -472,6 +475,8 @@ int copiarArchivo(char ** palabras){
 
 int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 	Tbloques* tBloque = &tablaArchivo->bloques[nroBloque];
+	//TcopiaNodo * copiaNodo=list_get(tBloque.copia,0);
+
 	Tnodo * nodo;
 	int i = 0;
 	TcopiaNodo * copiaNodo;
@@ -483,7 +488,8 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 		copiaNodo = (TcopiaNodo *)list_get(tBloque->copia,i);
 		nodo = buscarNodoPorNombre(listaDeNodos, copiaNodo->nombreDeNodo);
 		if(nodo != NULL){
-			buffer = empaquetarPeticionBloque(header, nroBloque, tBloque->bytes);
+			buffer = empaquetarPeticionBloque(header, copiaNodo->numeroBloqueDeNodo, tBloque->bytes);
+			//buffer = empaquetarPeticionBloque(header, nroBloque, tBloque->bytes);
 			if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 				free(header);
 				liberarEstructuraBuffer(buffer);

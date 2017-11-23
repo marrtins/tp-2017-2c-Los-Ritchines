@@ -853,15 +853,15 @@ void mostrarTablaDeEstados(){
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
-		log_info(logInfo,"1asd");
+		//log_info(logInfo,"1asd");
 		//free(etapa);
-		log_info(logInfo,"2");
+		//log_info(logInfo,"2");
 		//free(bloque);
-		log_info(logInfo,"3");
+		//log_info(logInfo,"3");
 		//free(nodo);
-		log_info(logInfo,"4");
+		//log_info(logInfo,"4");
 		//free(archivoTemporal);
-		log_info(logInfo,"5");
+		//log_info(logInfo,"5");
 	}
 
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
@@ -880,15 +880,15 @@ void mostrarTablaDeEstados(){
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 
-		log_info(logInfo,"6");
+		//log_info(logInfo,"6");
 		//free(etapa);
-		log_info(logInfo,"7");
+		//log_info(logInfo,"7");
 		//free(bloque);
-		log_info(logInfo,"8");
+		//log_info(logInfo,"8");
 		//free(nodo);
-		log_info(logInfo,"9");
+		//log_info(logInfo,"9");
 		//free(archivoTemporal);
-		log_info(logInfo,"10");
+		//log_info(logInfo,"10");
 	}
 
 	for(i=0;i<list_size(listaEstadoError);i++){
@@ -907,15 +907,15 @@ void mostrarTablaDeEstados(){
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 
-		log_info(logInfo,"11");
+		//log_info(logInfo,"11");
 		//free(etapa);
-		log_info(logInfo,"12");
+		//log_info(logInfo,"12");
 		//free(bloque);
-		log_info(logInfo,"13");
+		//log_info(logInfo,"13");
 		//free(nodo);
-		log_info(logInfo,"14");
+		//log_info(logInfo,"14");
 		//free(archivoTemporal);
-		log_info(logInfo,"15");
+		//log_info(logInfo,"15");
 	}
 
 	printf("\n\n\n");

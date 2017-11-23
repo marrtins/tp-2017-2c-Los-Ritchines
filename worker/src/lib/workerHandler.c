@@ -20,6 +20,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 
 	if(head->tipo_de_mensaje==GIVE_TMPREDUCCIONLOCAL){
 		puts("Se conecto nodo encargado para hacer el apareo global");
+		puts("realizando apareo..");
 		log_info(logInfo,"Nos llega el path del archivo temporal que precisa");
 
 
@@ -54,7 +55,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 						headEnvio.tipo_de_mensaje=TAKE_NEXTLINE;
 						if(fgets(lineaAux, 1024*1024,fdTempFilePropio) !=NULL){
 							//log_info(logInfo,"Envio: %s\n",lineaAux);
-							printf("Envio: %s\n",lineaAux);
+							//printf("Envio: %s\n",lineaAux);
 							buffer=serializeBytes(headEnvio,lineaAux,strlen(lineaAux)+1,&packSize);
 							if ((stat = send(client_sock, buffer, packSize, 0)) == -1){
 								puts("no se pudo enviar path del archivo temporal que necesitamos. ");
@@ -68,7 +69,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 						}else{
 							head->tipo_de_mensaje=EOF_TEMPORAL;
 							head->tipo_de_proceso=WORKER;
-							puts("le mando eof");
+							//puts("le mando eof");
 							enviarHeader(client_sock,head);
 							fclose(fdTempFilePropio);
 						}

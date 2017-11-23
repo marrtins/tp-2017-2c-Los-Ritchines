@@ -108,8 +108,8 @@ int realizarTransformacion(int client_sock){
 
 		lineaDeEjecucionTransformacion = string_new();
 		rutaResultadoTransformacion=string_new();
-		int asd=system("export LC_ALL=C");
-		printf("Hice LC_ALL. stat: %d\n",asd);
+		//int asd=system("export LC_ALL=C");
+		//printf("Hice LC_ALL. stat: %d\n",asd);
 
 		string_append(&lineaDeEjecucionTransformacion,"cat ");
 		string_append(&lineaDeEjecucionTransformacion,rutaBloque);

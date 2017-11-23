@@ -114,8 +114,8 @@ int realizarReduccionGlobal(client_sock){
 		lineaDeEjecucionReduccionGlobal = string_new();
 		rutaResultadoReduccionGlobal=string_new();
 
-		int asd=system("export LC_ALL=C");
-			printf("Hice LC_ALL. stat: %d\n",asd);
+		//int asd=system("export LC_ALL=C");
+		//	printf("Hice LC_ALL. stat: %d\n",asd);
 
 
 		string_append(&lineaDeEjecucionReduccionGlobal,"cat ");
@@ -302,21 +302,21 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 					puts("Fallo apareo global. deser");
 					return FALLO_GRAL;
 				}
-				log_info(logInfo,"free buffer");
+			//	log_info(logInfo,"free buffer");
 					free(buffer);
-					log_info(logInfo,"pase free buff");
+				//	log_info(logInfo,"pase free buff");
 				//puts("pase sig linea");
-				log_info(logInfo,"Linea Recibida: %s\n",siguienteLinea->bytes);
+			//	log_info(logInfo,"Linea Recibida: %s\n",siguienteLinea->bytes);
 				strcpy(lineas[i],siguienteLinea->bytes);
 
-				log_info(logInfo,"free sig linea");
+		//		log_info(logInfo,"free sig linea");
 				free(siguienteLinea->bytes);
-				log_info(logInfo,"pase free sig linea");
+			//	log_info(logInfo,"pase free sig linea");
 				free(siguienteLinea);
-				log_info(logInfo,"pase free sig linea2");
+				///log_info(logInfo,"pase free sig linea2");
 			}
 		}else{
-			log_info(logInfo,"hago fscanf");
+			//log_info(logInfo,"hago fscanf");
 			//printf("FD:%d\n",fdTempFilePropio);
 			//fscanf (fdTempFilePropio, "%s", lineaAux);
 			if(fgets(lineaAux, 1024*1024,fdTempFilePropio) !=NULL){
@@ -327,13 +327,13 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 
 
 
-			log_info(logInfo,"linea:");
-			log_info(logInfo,lineaAux);
+			//log_info(logInfo,"linea:");
+			//log_info(logInfo,lineaAux);
 
 
-			log_info(logInfo,"free linea aux asd");
+			//log_info(logInfo,"free linea aux asd");
 			free(lineaAux);
-			log_info(logInfo,"pase free linea aux");
+			//log_info(logInfo,"pase free linea aux");
 
 		}
 	}
@@ -363,9 +363,9 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			printf("la mayor es %s",lineaAux);
 */
 			//puts("asd");
-			log_info(logInfo,"free linea aux asd2");
+			//log_info(logInfo,"free linea aux asd2");
 			//free(lineaAux);
-			log_info(logInfo,"pase free linea aux2");
+			//log_info(logInfo,"pase free linea aux2");
 
 			//lineaAux=pedirSiguienteLineaA(mayorIndice);
 
@@ -441,9 +441,9 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 		}
 	}
 	free(head);
-	log_info(logInfo,"free lista fds");
+	//log_info(logInfo,"free lista fds");
 	list_destroy_and_destroy_elements(listaFds,liberarInfoApareoGlobal);
-	log_info(logInfo,"pase free lista fds");
+	//log_info(logInfo,"pase free lista fds");
 
 	//log_info(logInfo,"free buffer2");
 	//free(buffer2);
@@ -459,9 +459,9 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	log_info(logInfo,"pase free sig linea");
 	*/
 
-	log_info(logInfo,"free rmt");
+	//log_info(logInfo,"free rmt");
 	free(rutaMiTemporal);
-	log_info(logInfo,"pase rmt");
+	//log_info(logInfo,"pase rmt");
 
 
 /*
@@ -475,21 +475,21 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	return 0;
 }
 void liberarInfoApareoGlobal(void * info){
-	log_info(logInfo,"free info apa gl");
+	//log_info(logInfo,"free info apa gl");
 	TinfoApareoGlobal * infoApareo = (TinfoApareoGlobal*) info;
 	free(infoApareo);
-	log_info(logInfo,"pase free info apa gl");
+	//log_info(logInfo,"pase free info apa gl");
 }
 
 void liberarInfoNodos(void * info){
-	log_info(logInfo,"free info nodo list");
+	//log_info(logInfo,"free info nodo list");
 	TinfoNodoReduccionGlobal * infoNodo = (TinfoNodoReduccionGlobal*) info;
 	free(infoNodo->ipNodo);
 	free(infoNodo->nombreNodo);
 	free(infoNodo->puertoNodo);
 	free(infoNodo->temporalReduccion);
 	free(infoNodo);
-	log_info(logInfo,"pase free info nodo list");
+	//log_info(logInfo,"pase free info nodo list");
 }
 
 

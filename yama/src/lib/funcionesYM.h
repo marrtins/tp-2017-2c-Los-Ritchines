@@ -8,6 +8,7 @@ void mostrarConfiguracion(Tyama *yama);
 char * getAlgoritmoBalanceo(int algoritmo);
 
 void sigusr1Handler(void);
+void recargarConfiguracion(void);
 void setRetardoPlanificacion();
 int conectarAFS(Tyama *yama);
 void masterHandler(void *client_sock);

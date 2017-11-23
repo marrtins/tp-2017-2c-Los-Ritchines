@@ -6,5 +6,5 @@
 #include <netinet/in.h>
 #include <commons/collections/list.h>
 #include <signal.h>
-
+#include <semaphore.h>
 #endif

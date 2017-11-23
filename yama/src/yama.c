@@ -5,9 +5,10 @@ float retardoPlanificacionSegs;
 t_list *listaJobsMaster,*listaJobFinalizados,* listaHistoricaTareas,*listaCargaGlobal,* listaEstadoEnProceso,*listaEstadoError,*listaEstadoFinalizadoOK;
 pthread_mutex_t mux_listaJobFinalizados,mux_idTareaGlobal,mux_listaHistorica,mux_listaCargaGlobal,mux_idGlobal,mux_listaEnProceso,mux_listaError,mux_listaFinalizado,mux_jobIdGlobal;
 Tyama *yama;
+sem_t semSig;
 int main(int argc, char* argv[]){
 	int estado;
-	signal(SIGUSR1, (void*)sigusr1Handler);
+	//signal(SIGUSR1, (void*)sigusr1Handler);
 
 	//pthread_t master_thread;
 
@@ -15,7 +16,9 @@ int main(int argc, char* argv[]){
 	pthread_attr_init(&attr_ondemand);
 	pthread_attr_setdetachstate(&attr_ondemand, PTHREAD_CREATE_DETACHED);
 
-
+	pthread_t sigHandlerTread;
+	sem_init(&semSig,  0, 0);
+	crearHilo(&sigHandlerTread, (void *)sigusr1Handler, NULL);
 
 	//Theader head;
 
@@ -96,9 +99,9 @@ int main(int argc, char* argv[]){
 		readFD = masterFD;
 
 		if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
-			puts("fallo el select");
+		//	puts("fallo el select");
 
-			logErrorAndExit("Fallo el select.");
+			//logErrorAndExit("Fallo el select.");
 
 		}
 
@@ -209,14 +212,23 @@ int main(int argc, char* argv[]){
 
 
 	}
-
+sem_post(&semSig);
 free(head);
 return 0;
 }
 
 void sigusr1Handler(void){
 
-	log_info(logInfo,"Señal SIGUSR1 detectada");
+	signal(SIGUSR1, (void*)recargarConfiguracion);
+	sem_wait(&semSig);
+}
+
+
+
+void recargarConfiguracion(void){
+
+
+	//log_info(logInfo,"Señal SIGUSR1 detectada");
 
 
 
