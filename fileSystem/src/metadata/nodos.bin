@@ -1,11 +1,23 @@
 Nodo4Total=150
+<<<<<<< HEAD
 Nodo3Libre=125
+=======
+Nodo3Libre=144
+>>>>>>> d1b3a9561b95148748a13bdba69a51d9fe8061be
 TAMANIO=450
-NODOS=[Nodo1,Nodo2,Nodo3,Nodo4]
+NODOS=[Nodo4,Nodo1,Nodo2,Nodo3]
 Nodo3Total=150
+<<<<<<< HEAD
 Nodo4Libre=125
 Nodo1Libre=35
 Nodo2Libre=65
 Nodo1Total=60
 LIBRE=350
+=======
+Nodo4Libre=144
+Nodo1Libre=54
+Nodo2Libre=84
+Nodo1Total=60
+LIBRE=426
+>>>>>>> d1b3a9561b95148748a13bdba69a51d9fe8061be
 Nodo2Total=90
