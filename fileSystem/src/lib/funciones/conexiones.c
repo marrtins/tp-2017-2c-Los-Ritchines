@@ -222,8 +222,6 @@ void conexionesDatanode(void * estructura){
 								}
 								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
 
-
-
 								rutasParaCpfrom[0] = strdup("cpfrom");
 								rutasParaCpfrom[1] = strdup(rutaATemporal);
 								rutasParaCpfrom[2] = strdup(directorioACrear);
@@ -234,6 +232,8 @@ void conexionesDatanode(void * estructura){
 									log_error(logError, "Error al guardar el archivo final en yamafs.");
 								}
 								log_info(logInfo, "Se guardo el archivo final correctamente.");
+
+								remove(rutaATemporal);
 
 								liberarPunteroDePunterosAChar(rutasParaCpfrom);
 								/*free(rutasParaCpfrom);
