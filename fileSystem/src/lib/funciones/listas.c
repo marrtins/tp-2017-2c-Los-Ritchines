@@ -211,3 +211,25 @@ void vaciarLista(){
 		list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
 	}
 }
+
+Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos){
+	bool esNodoDisponibleParaEnviar(void * nodo){
+		Tnodo * nodoAEnviar = (Tnodo*) nodo;
+		return nodoAEnviar->estadoParaEnviarBloque == 0;
+	}
+	Tnodo * nodo = (Tnodo*)list_find(listaDeNodos, esNodoDisponibleParaEnviar);
+	if(nodo != NULL){
+		nodo->estadoParaEnviarBloque = 1;
+	}
+	return nodo;
+}
+
+void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor){
+	int i = 0;
+	Tnodo * nodo;
+	while(i < list_size(listaDeNodos)){
+		nodo = list_get(listaDeNodos, i);
+		nodo->estadoParaEnviarBloque = valor;
+		i++;
+	}
+}
