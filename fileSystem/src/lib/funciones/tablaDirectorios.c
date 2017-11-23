@@ -348,9 +348,10 @@ int obtenerIndexDeUnaRuta(char * rutaDestino){
 	char ** palabras = string_split(rutaDestino, "/");
 	int cant = contarPunteroDePunteros(palabras);
 	char * directorio = obtenerUltimoElementoDeUnSplit(palabras);
+	//
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
-	if(cant == 1){ //todo:revisar esto
+	if(cant == 1){
 		indice = 0;
 	}else{
 		indice = buscarIndexPorNombreDeDirectorio(directorio);
@@ -817,7 +818,8 @@ void moverArchivo(char* ruta1, char* ruta2){
 	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 	char * archivoMapeado;
 	char * archivoAMoverMapeado;
-	int index = obtenerIndexDeUnaRuta(ruta2);
+	char * rutaSinArchivo = obtenerRutaSinArchivo(ruta2);
+	int index = obtenerIndexDeUnaRuta(rutaSinArchivo);
 	char* rutaLocalDirectorio = malloc(200);
 	FILE * archivo;
 	if(strcmp(extension, "csv") == 0){

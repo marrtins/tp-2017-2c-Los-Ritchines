@@ -94,6 +94,7 @@ int realizarReduccionGlobal(client_sock){
 	}
 
 	log_info(logInfo,"hago reduccion global\n");
+	puts("hago reduccion global");
 
 
 

@@ -16,7 +16,8 @@ int manejarConexionWorker(Theader *head, int client_sock){
 	char * buffer;
 	TpackBytes *pathArchivoTemporal;
 	char * lineaAux = malloc(MAXSIZELINEA);//todo revisar
-
+	int p=0;
+	int k=0;
 
 	if(head->tipo_de_mensaje==GIVE_TMPREDUCCIONLOCAL){
 		puts("Se conecto nodo encargado para hacer el apareo global");
@@ -51,6 +52,12 @@ int manejarConexionWorker(Theader *head, int client_sock){
 
 			case(GIVE_NEXTLINE):
 				//log_info(logInfo,"give next");
+						p++;
+						if(p==3000){
+							p=0;
+							k++;
+							printf("realizando el apareo global (%d)\n",k);
+						}
 						headEnvio.tipo_de_proceso=WORKER;
 						headEnvio.tipo_de_mensaje=TAKE_NEXTLINE;
 						if(fgets(lineaAux, 1024*1024,fdTempFilePropio) !=NULL){
