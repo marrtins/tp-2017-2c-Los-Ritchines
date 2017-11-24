@@ -140,9 +140,6 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 			infoBloque->tamanio = bytesACopiar;
 		}
 		bytesFaltantesPorEnviar-=bytesACopiar;
-		//TODO
-		//freir infoBloque->contenido en enviarBloque;
-		//los tamaños varian según la posición del \n;
 		printf("bloque a enviar %d\n",infoBloque->numeroDeBloque);
 		enviarBloque(infoBloque, archivoAAlmacenar);
 		punteroInicioBloque+=bytesACopiar;
