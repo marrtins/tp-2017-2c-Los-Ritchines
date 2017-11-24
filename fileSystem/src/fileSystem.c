@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 			case INICIO_YAMA:
 				log_info(logInfo,"Se conecto YAMA por primera vez");
 				if (cantNodosPorConectar == 0) {
-					log_info("FileSystem estable, ya se conectaron todos los nodos.");
+					log_info(logInfo, "FileSystem estable, ya se conectaron todos los nodos.");
 				}
 			break;
 
@@ -126,6 +126,7 @@ int main(int argc, char* argv[]) {
 					liberarTablaDeArchivo(archivo);
 					free(ruta);
 					free(buffer2);
+					//todo, verificar que es ésta linea comentada
 					//list_destroy_and_destroy_elements(infoSend->listaBloques, liberarTpackageUbicacionBloques);
 
 				}else {
