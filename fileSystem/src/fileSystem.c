@@ -69,8 +69,6 @@ int main(int argc, char* argv[]) {
 
 	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
 
-
-
 		sem_wait(&yama);
 
 		log_info(logInfo,"Paso el mutex de YAMA");

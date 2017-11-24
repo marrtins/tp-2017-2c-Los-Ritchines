@@ -18,19 +18,21 @@ int main(int argc, char* argv[]) {
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log");
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log");
 	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log", "dataNode", false, LOG_LEVEL_ERROR);
-	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", false, LOG_LEVEL_INFO);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", true, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
+	log_info(logInfo,"Se abre el databin.");
 
 	if(archivo == NULL){
 		log_info(logInfo,"No se encontro el databin en la ruta especificada, se procedera a crear el mismo");
-		puts("No se encontro el databin en la ruta especificada, se procedera a crear el mismo");
+
 		archivo = fopen(dataNode->ruta_databin, "wb");
 		truncate(dataNode->ruta_databin, dataNode->tamanio_databin_mb * BLOQUE_SIZE);
 		fclose(archivo);
 		archivo = fopen(dataNode->ruta_databin, "rb+");
+		log_info(logInfo,"Se creo el databin");
 	}
 
 	fd = fileno(archivo);
@@ -40,22 +42,22 @@ int main(int argc, char* argv[]) {
 	fclose(archivo);
 	close(fd);
 
-	puts("Intentando conectar con file system");
+	log_info(logInfo,"Intentando conectar con file system");
 
 	socketFS = conectarAServidor(dataNode->ip_filesystem,dataNode->puerto_filesystem);
 
-	puts("Conectado con file system");
+	log_info(logInfo,"Conectado con file system");
 
 	//manda el nombre la ip y el puerto del nodo
 
 	estado = enviarInfoNodo(socketFS, dataNode);
-	printf("Envie %d bytes con la informacion del nodo\n",estado);
+	log_info(logInfo,"Envie %d bytes con la informacion del nodo.",estado);	;
 	log_info(logInfo,"Se envio la informacion del nodo a FILESYSTEM");
 
 	while (1) {
 
 		if ((estado = recv(socketFS, head, sizeof(Theader), 0)) == -1) {
-			logErrorAndExit("Error al recibir informacion");
+			log_error(logError,"Error al recibir informacion");
 			break;
 
 		} else if (estado == 0) {
@@ -69,10 +71,10 @@ int main(int argc, char* argv[]) {
 			switch (head->tipo_de_mensaje) {
 				case ALMACENAR_BLOQUE:
 					log_info(logInfo,"Es FileSystem y quiere almacenar un bloque");
-					puts("Es FileSystem y quiere almacenar un bloque");
 
 					bloque = recvBloque(socketFS);
-					puts("voy a almacenar el bloque");
+					log_info(logInfo,"Voy a almacenar el bloque.");
+					puts();
 					setBloque(bloque->nroBloque, bloque);
 					puts("Bloque almacenado");
 					log_info(logInfo,"Bloque almacenado");
@@ -81,30 +83,19 @@ int main(int argc, char* argv[]) {
 					free(bloque);
 
 					break;
-				case OBTENER_BLOQUE_Y_NRO:
-					puts("Es fileSystem y quiere un bloque con su nro");
-					int nroBloque;
-
-					if ((estado = recv(socketFS, &nroBloque, sizeof(int), 0)) == -1) {
-						logErrorAndExit("Error al recibir el numero de bloque");
-					}
-					printf("El numero de bloque de mi data bin que quiere FS es %d\n",nroBloque);
-					enviarBloqueAFS(nroBloque, socketFS);
-					break;
 				case OBTENER_BLOQUE:
-					puts("Es fileSystem y quiere un bloque");
+					log_info(logInfo,"Es fileSystem y quiere un bloque");
 					log_info(logInfo,"Es FileSystem y quiere obtener un bloque");
 					int nroBloque_;
 					unsigned long long int tamanioBloque_;
 					if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {
-						logErrorAndExit("Error al recibir el numero do bloque");
+						log_info(logInfo,"Error al recibir el numero do bloque");
 					}
 					if (recv(socketFS, &tamanioBloque_, sizeof(unsigned long long int),0) == -1){
-						logErrorAndExit("Error al recibir el tamanio del bloque");
+						log_info(logInfo,"Error al recibir el tamanio del bloque");
 					}
 					enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
 					log_info(logInfo,"Se envio el bloque a FILESYSTEM");
-					puts("Envie el bloque a FS");
 					break;
 				default:
 					break;
