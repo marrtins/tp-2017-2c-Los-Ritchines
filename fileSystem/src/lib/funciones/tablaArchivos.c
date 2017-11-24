@@ -364,6 +364,7 @@ int todosLosBloquesTienenDosCopias(Tarchivo *  archivo){
 
 			return 0;
 		}
+		nroBloque++;
 	}
 	return 1;
 }
