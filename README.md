@@ -5,20 +5,28 @@
 *una vez clonado todo:*
     
 
-        
+     git clone https://github.com/sisoputnfrba/so-commons-library.git
+     cd so-commons-library/
+     make all
+     sudo make install
+     
+     cd
      sudo apt-get install libreadline6 libreadline6-dev  
     
-    cd tp-2017-2c-Los-Richines/compartidas/tiposDatos
+     cd tp-2017-2c-Los-Richines/compartidas/tiposDatos
     
-    sudo make install
+     sudo make install
   
-    cd ..
+     cd ..
   
-    cd funcionesCompartidas
+     cd funcionesCompartidas
     
-    make all
+     make all
     
-    sudo make install
+     sudo make install
+     
+     //antes de ejecutar worker
+     export LC_ALL=C
   
   
   
