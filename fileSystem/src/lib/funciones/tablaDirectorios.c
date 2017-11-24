@@ -52,7 +52,7 @@ void levantarTablasDirectorios(){
 		tDirectorio->index = atoi(directorio[0]);
 		strcpy(tDirectorio->nombre, directorio[1]);
 		tDirectorio->padre = atoi(directorio[2]);
-		printf("%d \t %s \t %d\n",tDirectorio->index,tDirectorio->nombre,tDirectorio->padre);
+		//printf("%d \t %s \t %d\n",tDirectorio->index,tDirectorio->nombre,tDirectorio->padre);
 		list_add(listaTablaDirectorios, tDirectorio);
 		liberarPunteroDePunterosAChar(directorio);
 		free(directorio);

@@ -57,10 +57,11 @@ int main(int argc, char* argv[]) {
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
 		log_error(logError,"Fallo al escuchar el socket servidor de file system.");
-		puts("Reintentamos...");
 	}
+
 		socketYama = aceptarCliente(socketDeEscuchaYama);
-		puts("SE CONECTO YAMAAAAAAAAAA");
+		puts("SE ACEPTO A YAMA");
+
 
 	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
 		pthread_mutex_init(&yamaMutex,NULL);
@@ -70,7 +71,6 @@ int main(int argc, char* argv[]) {
 		puts("PASO EL MUTEX");
 
 	while(1){
-		puts("Recibiendo...");
 
 		estado = recv(socketYama, head, sizeof(Theader), 0);
 

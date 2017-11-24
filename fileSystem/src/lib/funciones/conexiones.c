@@ -29,7 +29,6 @@ void conexionesDatanode(void * estructura){
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
-	mostrarConfiguracion(fileSystem);
 	socketDeEscuchaDatanodes = crearSocketDeEscucha(fileSystem->puerto_datanode);
 	fileDescriptorMax = MAXIMO(socketDeEscuchaDatanodes, fileDescriptorMax);
 
@@ -40,18 +39,13 @@ void conexionesDatanode(void * estructura){
 	FD_SET(socketDeEscuchaDatanodes, &masterFD);
 	while(1){
 
-			printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
-
-			puts("Entre al while");
 			readFD = masterFD;
 			if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
 				logErrorAndExit("Fallo el select de los datanodes.");
 			}
 
 			for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
-				printf("Entre al for con el fd: %d\n", fileDescriptor);
 				if(FD_ISSET(fileDescriptor, &readFD)){
-					printf("Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
 
 					if(fileDescriptor == socketDeEscuchaDatanodes){
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
@@ -59,8 +53,6 @@ void conexionesDatanode(void * estructura){
 						fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 						break;
 					}
-
-					puts("Recibiendo...");
 
 					estado = recv(fileDescriptor, head, sizeof(Theader), 0);
 
