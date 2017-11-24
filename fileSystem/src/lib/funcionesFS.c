@@ -14,7 +14,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	int bloqueAOcupar = obtenerBloqueDisponible(nodo1);
 	copia0->numeroBloqueDeNodo = bloqueAOcupar;
 	ocuparBloque(nodo1, bloqueAOcupar);
-	mostrarBitmap(nodo1->bitmap);
 
 	list_add(tBloque->copia, copia0);
 
@@ -25,7 +24,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	bloqueAOcupar = obtenerBloqueDisponible(nodo2);
 	copia1->numeroBloqueDeNodo = bloqueAOcupar;
 	ocuparBloque(nodo2, bloqueAOcupar);
-	mostrarBitmap(nodo2->bitmap);
 
 	tBloque->bytes = bloque->tamanio;
 
@@ -140,7 +138,6 @@ void procesarArchivoCsv(Tarchivo * archivoAAlmacenar, char * archivoMapeado, Tbl
 			infoBloque->tamanio = bytesACopiar;
 		}
 		bytesFaltantesPorEnviar-=bytesACopiar;
-		printf("bloque a enviar %d\n",infoBloque->numeroDeBloque);
 		enviarBloque(infoBloque, archivoAAlmacenar);
 		punteroInicioBloque+=bytesACopiar;
 		infoBloque->numeroDeBloque++;

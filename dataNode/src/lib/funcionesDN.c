@@ -1,7 +1,6 @@
 #include "funcionesDN.h"
 
 TdataNode *obtenerConfiguracionDN(char* ruta){
-	printf("Ruta del archivo de configuracion: %s\n", ruta);
 	TdataNode *pDataNode = malloc(sizeof(TdataNode));
 
 	pDataNode->ip_filesystem       =    malloc(MAXIMA_LONGITUD_IP);
@@ -52,8 +51,8 @@ void setBloque(int posicion, Tbloque * bloque){
 	memcpy(aux += posicion* bloqueSize, bloque->contenido,bloque->tamanioContenido);
 
 	if (msync((void *)archivoMapeado, bloque->tamanioContenido, MS_SYNC) < 0) {
-				logErrorAndExit("Error al hacer msync");
-		}
+		logErrorAndExit("Error al hacer msync, al setear bloque.");
+	}
 }
 
 char * getBloque(int posicion){

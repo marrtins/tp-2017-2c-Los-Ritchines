@@ -42,7 +42,6 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 		i++;
 	}
 	fclose(archivo);
-	mostrarListaDeNodos(listaDeNodosDesconectados);
 	free(rutaArchivo);
 }
 
