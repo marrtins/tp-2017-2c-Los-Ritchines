@@ -25,7 +25,7 @@ void conexionesDatanode(void * estructura){
 	TpackInfoBloqueDN * infoNodo;
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	Theader * head = malloc(sizeof(Theader));
-	TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
+	TarchivoFinal * estructuraArchivoFinal;
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	FD_ZERO(&masterFD);
@@ -141,6 +141,7 @@ void conexionesDatanode(void * estructura){
 								log_info(logInfo,"Es worker y quiere almacenar el archivo final en yamafs.");
 								rutaATemporal = malloc(250);
 								rutasParaCpfrom = malloc(sizeof(char *) * 4);
+								estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 
 								if(verificarDisponibilidadDeEspacioEnNodos(estructuraArchivoFinal->tamanioContenido ) == 0 ){
