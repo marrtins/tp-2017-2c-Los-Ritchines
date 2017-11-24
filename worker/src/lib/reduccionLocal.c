@@ -129,8 +129,8 @@ int realizarReduccionLocal(int client_sock){
 
 		string_append(&lineaDeEjecucionReduccion,"cat ");
 		string_append(&lineaDeEjecucionReduccion,rutaTemporalesApareados);
-	//	string_append(&lineaDeEjecucionReduccion," | ./");
-		//string_append(&lineaDeEjecucionReduccion,nombreScriptReductor);
+		string_append(&lineaDeEjecucionReduccion," | ./");
+		string_append(&lineaDeEjecucionReduccion,nombreScriptReductor);
 		string_append(&lineaDeEjecucionReduccion, " > /home/utnso/");
 		string_append(&rutaResultadoReduccion,infoReduccion->nombreTempReduccion);
 		string_append(&lineaDeEjecucionReduccion,rutaResultadoReduccion);
