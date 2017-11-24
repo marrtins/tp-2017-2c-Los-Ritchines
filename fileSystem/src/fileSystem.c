@@ -60,7 +60,8 @@ int main(int argc, char* argv[]) {
 		log_error(logError,"Fallo al escuchar el socket servidor de file system.");
 		puts("Reintentamos...");
 	}
-		socketYama = aceptarCliente(socketDeEscuchaYama);
+
+	socketYama = aceptarCliente(socketDeEscuchaYama);
 
 	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
 
