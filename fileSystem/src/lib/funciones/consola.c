@@ -236,10 +236,8 @@ void consolaCpfrom(char** palabras, int cantidad){
 
 void consolaMd5(char** palabras, int cantidad){
 	if (cantidad == 1){
-		if(esRutaYamafs(palabras[1])){
+		if(verificarRutaArchivo(palabras[1])){
 			getMD5(palabras[1]);
-		} else{
-			puts("Falta la referencia a yamafs:/.");
 		}
 	}
 	else {

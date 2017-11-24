@@ -14,7 +14,6 @@ void conexionesDatanode(void * estructura){
 	int cantModificados = 0;
 	int	nuevoFileDescriptor;
 	int fileDescriptor;
-	int	cantNodosPorConectar;
 	int	estado;
 	int fileDescriptorArchivoFinal;
 	fd_set readFD, masterFD;
@@ -84,9 +83,12 @@ void conexionesDatanode(void * estructura){
 										nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
 										list_add(listaInfoNodo,infoNodoNuevo);
 										list_add(listaDeNodos, nuevoNodo);
-										cantNodosPorConectar--;
 										almacenarBitmap(nuevoNodo);
 										agregarNodoATablaDeNodos(nuevoNodo);
+										if(list_size(listaDeNodos)==cantNodosPorConectar){
+											pthread_mutex_unlock(&yamaMutex);
+											puts("FILE SYSTEM ESTABLE");
+										}
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -104,6 +106,7 @@ void conexionesDatanode(void * estructura){
 									clearAndClose(fileDescriptor, &masterFD);
 									log_error(logError, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
+
 								liberarTPackInfoBloqueDN(infoNodo);
 								break;
 
