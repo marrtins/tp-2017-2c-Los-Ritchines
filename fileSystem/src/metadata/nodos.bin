@@ -1,7 +1,3 @@
-TAMANIO=170
-NODOS=[Nodo1,Nodo2]
-Nodo1Libre=80
-Nodo2Libre=90
-Nodo1Total=80
-LIBRE=170
-Nodo2Total=90
+TAMANIO=0
+NODOS=[]
+LIBRE=0

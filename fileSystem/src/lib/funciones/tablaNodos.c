@@ -186,7 +186,9 @@ void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, cha
 
 int losNodosConectadosSonLosQueEstabanAntes(){
 	if(list_size(listaDeNodosDesconectados)== 0){
+		puts("Los nodos conectados son los que estaban antes");
 		return 1;
 	}
+	puts("Los nodos conectados no son los que estaban antes");
 	return 0;
 }

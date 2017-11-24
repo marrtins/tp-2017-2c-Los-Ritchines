@@ -13,6 +13,8 @@ int main(int argc, char* argv[]) {
 
 	fd_set readFD, masterFD;
 
+	sem_init(&yama,0,0);
+
 	Theader *head = malloc(sizeof(Theader));
 	char * mensaje = malloc(100);
 	char * rutaArchivo;
@@ -66,9 +68,10 @@ int main(int argc, char* argv[]) {
 
 
 	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
-		pthread_mutex_init(&yamaMutex,NULL);
-		pthread_mutex_lock(&yamaMutex);
-		pthread_mutex_lock(&yamaMutex);
+
+
+
+		sem_wait(&yama);
 
 		log_info(logInfo,"Paso el mutex de YAMA");
 		puts("PASO EL MUTEX");

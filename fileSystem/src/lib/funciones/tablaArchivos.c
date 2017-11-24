@@ -402,6 +402,7 @@ int todosLosArchivosTienenCopias(){
 	free(directorios);
 	liberarPunteroDePunterosAChar(archivos);
 	free(archivos);
+	puts("Todos los archivos tiene 2 copias");
 	return 1;
 }
 

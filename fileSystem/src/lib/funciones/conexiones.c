@@ -267,11 +267,11 @@ void verificarSiEsEstable(int cantNodosPorConectar) {
 	if (list_size(listaDeNodos) == cantNodosPorConectar) {
 		if (esEstadoRecuperado) {
 			if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes()) {
-				pthread_mutex_unlock(&yamaMutex);
+				sem_post(&yama);
 				puts("FILE SYSTEM ESTABLE");
 			}
 		} else {
-			pthread_mutex_unlock(&yamaMutex);
+			sem_post(&yama);
 			puts("FILE SYSTEM ESTABLE");
 		}
 	}
