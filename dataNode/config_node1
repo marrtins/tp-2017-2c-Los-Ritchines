@@ -12,6 +12,6 @@ PUERTO_MASTER=5004
 RUTA_DATABIN=/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/data1.bin
 
 
-TAMANIO_DATABIN_MB=60
+TAMANIO_DATABIN_MB=80
 
 

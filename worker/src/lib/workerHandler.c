@@ -46,6 +46,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 
 		int stat;
 		Theader headRcv = {.tipo_de_proceso = WORKER, .tipo_de_mensaje = 0};
+		puts("comienza el apreo global");
 		while ((stat=recv(client_sock, &headRcv, HEAD_SIZE, 0)) > 0) {
 
 			switch (headRcv.tipo_de_mensaje) {
@@ -53,7 +54,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			case(GIVE_NEXTLINE):
 				//log_info(logInfo,"give next");
 						p++;
-						if(p==3000){
+						if(p==30000){
 							p=0;
 							k++;
 							printf("realizando el apareo global (%d)\n",k);

@@ -805,7 +805,7 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char *
 	mostrarTablaDeEstados();
 }
 
-void agregarTransformacionAListaEnProceso(TjobMaster *job, TpackInfoBloque *bloque){
+void agregarTransformacionAListaEnProceso(TjobMaster *job, TpackInfoBloque *bloque,bool mostrarTabla){
 
 
 	TpackTablaEstados * estado = malloc(sizeof (TpackTablaEstados));
@@ -821,7 +821,7 @@ void agregarTransformacionAListaEnProceso(TjobMaster *job, TpackInfoBloque *bloq
 	estado->fueReplanificada=false;
 	list_add(listaEstadoEnProceso,estado);
 
-	mostrarTablaDeEstados();
+	//mostrarTablaDeEstados();
 
 }
 
@@ -1111,8 +1111,8 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 				return  FALLO_SEND;
 			}
 			log_info(logInfo,"se enviaron %d bytes de la info del bloque\n",stat);
-
-			agregarTransformacionAListaEnProceso(job,bloqueRet);
+			bool mostrarTabla=true;
+			agregarTransformacionAListaEnProceso(job,bloqueRet,mostrarTabla);
 			actualizarCargaWorkerEn(tareaAReplanificar->nodo,1);
 			aumentarHistoricoEn(bloqueRet->nombreNodo,1);
 			free(buffer);

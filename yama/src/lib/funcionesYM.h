@@ -61,7 +61,7 @@ bool sePuedeComenzarReduccionLocal(int idTareaFinalizada);
 int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster);
 
 void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char * bloquesReducidos,TjobMaster *job);
-void agregarTransformacionAListaEnProceso(TjobMaster *job, TpackInfoBloque *bloque);
+void agregarTransformacionAListaEnProceso(TjobMaster *job, TpackInfoBloque *bloque,bool mostrarTabla);
 void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion,char * bloquesReducidos,TjobMaster *job);
 void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo,char * bloquesReducidos,TjobMaster *job);
 

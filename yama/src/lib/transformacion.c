@@ -155,13 +155,16 @@ int responderTransformacion(TjobMaster *job){
 	int i;
 	int packSize;
 	char * buffer;
+	bool mostrarTabla = false;
 
 	log_info(logInfo,"Cantidad de paquetes con info de bloques a enviar: %d\n",list_size(listaBloquesPlanificados));
 	for (i=0;i<list_size(listaBloquesPlanificados);i++){
 		if(i+1<list_size(listaBloquesPlanificados)){
 			head.tipo_de_mensaje=INFOBLOQUE;
+			mostrarTabla=false;
 		}else{
 			head.tipo_de_mensaje=INFOULTIMOBLOQUE;
+			mostrarTabla=true;
 		}
 		packSize=0;
 		TpackInfoBloque *bloqueAEnviar = list_get(listaBloquesPlanificados,i);
@@ -178,7 +181,7 @@ int responderTransformacion(TjobMaster *job){
 		}
 		log_info(logInfo,"se enviaron %d bytes de la info del bloque\n",stat);
 
-		agregarTransformacionAListaEnProceso(job,bloqueAEnviar);
+		agregarTransformacionAListaEnProceso(job,bloqueAEnviar,mostrarTabla);
 
 
 	}

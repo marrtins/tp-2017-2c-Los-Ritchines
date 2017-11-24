@@ -215,7 +215,7 @@ void vaciarLista(){
 Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos){
 	bool esNodoDisponibleParaEnviar(void * nodo){
 		Tnodo * nodoAEnviar = (Tnodo*) nodo;
-		return nodoAEnviar->estadoParaEnviarBloque == 0;
+		return nodoAEnviar->estadoParaEnviarBloque == 0 && nodoAEnviar->cantidadBloquesLibres > 0;
 	}
 	Tnodo * nodo = (Tnodo*)list_find(listaDeNodos, esNodoDisponibleParaEnviar);
 	if(nodo != NULL){
