@@ -361,7 +361,8 @@ int todosLosBloquesTienenDosCopias(Tarchivo *  archivo){
 
 	while(nroBloque < cantBloques){
 		if(archivo->bloques[nroBloque].cantidadCopias!=2){
-
+			//TODO agregar la copia que falta
+			printf("El bloque numero %d del archivo %s no tiene copias\n", nroBloque, archivo->nombreArchivoSinExtension);
 			return 0;
 		}
 		nroBloque++;
@@ -373,7 +374,7 @@ int todosLosArchivosTienenCopias(){
 
 	char ** directorios;
 	char ** archivos;
-	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+	Tarchivo * archivo;
 	int i = 0;
 	int j;
 	directorios = buscarDirectorios("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
@@ -382,6 +383,7 @@ int todosLosArchivosTienenCopias(){
 		archivos = buscarArchivos(directorios[i]);
 		j = 0;
 		while (archivos[j] != NULL) {
+			archivo = malloc(sizeof(Tarchivo));
 			levantarTablaArchivo(archivo,archivos[j]);
 			if(!todosLosBloquesTienenDosCopias(archivo)){
 				liberarPunteroDePunterosAChar(directorios);
