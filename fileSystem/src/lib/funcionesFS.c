@@ -8,8 +8,7 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	copia0->nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	strcpy(copia0->nombreDeNodo, nodo1->nombre);
 	copia0->nroDeCopia = 0;
-	printf("El nombre de nodo es %s\n", copia0->nombreDeNodo);
-	
+
 	tBloque->copia = list_create();
 
 	int bloqueAOcupar = obtenerBloqueDisponible(nodo1);
@@ -22,7 +21,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	copia1->nombreDeNodo = malloc(TAMANIO_NOMBRE_NODO);
 	strcpy(copia1->nombreDeNodo, nodo2->nombre);
 	copia1->nroDeCopia = 1;
-	printf("El nombre de nodo es %s\n", copia1->nombreDeNodo);
 
 	bloqueAOcupar = obtenerBloqueDisponible(nodo2);
 	copia1->numeroBloqueDeNodo = bloqueAOcupar;
@@ -30,7 +28,6 @@ void almacenarBloquesEnEstructuraArchivo(Tarchivo * estructuraArchivoAAlmacenar,
 	mostrarBitmap(nodo2->bitmap);
 
 	tBloque->bytes = bloque->tamanio;
-	printf("El tamaño del bloque en bytes es: %llu\n", tBloque->bytes);
 
 	list_add(tBloque->copia, copia1);
 	tBloque->cantidadCopias = 2;
@@ -64,16 +61,13 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	//Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
 
-	printf("Numero de bloque %d , Tamanio de bloque %llu\n", bloque->numeroDeBloque,bloque->tamanio);
-	printf("Tamanio del buffer que se va a enviar %llu \n", buffer1->tamanio);
 	 if ((estado = send(nodo1->fd, buffer1->buffer , buffer1->tamanio, 0)) == -1){
-		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar.");
 	 }
 
 	buffer2 = empaquetarBloque(head,bloque,nodo2);
-	printf("Se envio bloque a Nodo1 %d bytes\n", estado);
 	 if ((estado = send(nodo2->fd, buffer2->buffer , buffer2->tamanio, 0)) == -1){
-		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+		 logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar.");
 	 }
 
 	almacenarBloquesEnEstructuraArchivo(estructuraArchivoAAlmacenar, nodo1, nodo2, bloque);
@@ -196,17 +190,15 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	infoBloque->numeroDeBloque = 0;
 	infoBloque->contenido = malloc(BLOQUE_SIZE);
 
-	printf("El tamaño del archivo es: %llu\n", tamanio);
-
 	if(tamanio == 0){
-		puts("Error al almacenar archivo, está vacío");
-		log_error(logError, "Error al almacenar archivo, está vacío");
+		puts("Error al almacenar archivo, está vacío.");
+		log_error(logError, "Error al almacenar archivo, está vacío.");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
 
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED, fd, 0)) == MAP_FAILED) {
-		logErrorAndExit("Error al hacer mmap");
+		logErrorAndExit("Error al hacer mmap del archivo a copiar.");
 	}
 
 	fclose(archivoOrigen);
@@ -214,11 +206,9 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 
 	archivoAAlmacenar->bloques = malloc(sizeof(Tbloques) * cantidadDeBloquesDeUnArchivo(tamanio));
 
-	printf("La cantidad de bloquees es: %d \n", cantidadDeBloquesDeUnArchivo(tamanio));
-
 	if(list_size(listaDeNodos) <= 1){
 		puts("No hay nodos conectados, imposible realizar la operacion.");
-		log_error(logError, "Los nodos no están conectados, en error en realizar la operación de almacenar en yamafs.");
+		log_error(logError, "Los nodos no están conectados, error en realizar la operación de almacenar en yamafs.");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
@@ -226,7 +216,6 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == 0){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_error(logError, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
-		puts("voy a violar el segmento");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
@@ -251,11 +240,12 @@ int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs)
 	string_append(&rutaArchivoYamafs,nombreArchivo);
 	int index = obtenerIndexDeUnaRuta(rutaDestinoYamafs);
 	if(existeArchivo(index,rutaArchivoYamafs)){
-		puts("Epa, parece que existe el archivo en la ubicacion que pusiste");
+		puts("El archivo ya existe en esta ubicacion.");
 		puts("Desea sobreescribirlo? s / n");
 		scanf(" %c",&input);
 		while (input != 's' && input != 'n' && input != 'S' && input != 'N'){
-			puts("dale boludo, pone s ó n");
+			puts("Caracter incorrecto.");
+			puts("Desea sobreescribirlo? s / n");
 			scanf("%c", &input);
 		}
 		if (input == 'n' || input == 'N'){
@@ -263,7 +253,6 @@ int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs)
 			free(nombreArchivo);
 			return 0;
 		}
-		puts("Bueno, procederemos a sobreescribir el archivo");
 		removerArchivo(rutaArchivoYamafs);
 	}
 	free(rutaArchivoYamafs);
@@ -276,7 +265,6 @@ int almacenarArchivo(char **palabras){
 	//palabras[2] --> ruta de nuestro directorio
 	char ** splitDeRuta = string_split(palabras[1], "/");
 	char * nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(splitDeRuta);
-	printf("El archivo a guardar es: %s\n", nombreArchivoConExtension);
 
 	Tarchivo * archivoAAlmacenar = malloc(sizeof(Tarchivo));
 	archivoAAlmacenar->nombreArchivoSinExtension = obtenerNombreDeArchivoSinExtension(nombreArchivoConExtension);
@@ -331,52 +319,44 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	//Recibo el tamaño del nombre del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioNombre, sizeof(int), 0)) == -1) {
-		logErrorAndExit("Error al recibir el tamanio del nombre del nodo");
-		}
-	printf("Para el tamaño del nombre recibi %d bytes\n", estado);
+		logErrorAndExit("Error al recibir el tamanio del nombre del nodo.");
+	}
+
 	nombreNodo = malloc(infoBloque->tamanioNombre);
 
 	//Recibo el nombre del nodo
 	if ((estado = recv(socketFS, nombreNodo, infoBloque->tamanioNombre, 0)) == -1) {
-		logErrorAndExit("Error al recibir el nombre del nodo");
-		}
-
-	printf("Para el nombre del nodo recibi %d bytes\n", estado);
+		logErrorAndExit("Error al recibir el nombre del nodo.");
+	}
 
 	//Recibo el tamanio de la ip del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioIp, sizeof(int), 0)) == -1) {
-		logErrorAndExit("Error al recibir el tamanio del ip del nodo");
-		}
-	printf("Para el tamaño de la ip recibi %d bytes\n", estado);
+		logErrorAndExit("Error al recibir el tamanio del ip del nodo.");
+	}
 
 	ipNodo = malloc(infoBloque->tamanioIp);
 
 	//Recibo la ip del nodo
 	if ((estado = recv(socketFS, ipNodo, infoBloque->tamanioIp, 0)) == -1) {
-		logErrorAndExit("Error al recibir el ip del nodo");
-		}
-
-	printf("Para el la ip recibi %d bytes\n", estado);
+		logErrorAndExit("Error al recibir el ip del nodo.");
+	}
 
 	//Recibo el tamanio del puerto del nodo
 	if ((estado = recv(socketFS, &infoBloque->tamanioPuerto, sizeof(int), 0)) == -1) {
-		logErrorAndExit("Error al recibir el tamanio del puerto del nodo");
-		}
-	printf("Para el tamaño del puerto recibi %d bytes\n", estado);
+		logErrorAndExit("Error al recibir el tamanio del puerto del nodo.");
+	}
 
 	puertoNodo = malloc(infoBloque->tamanioPuerto);
 
 	//Recibo el puerto del nodo
 	if ((estado = recv(socketFS, puertoNodo, infoBloque->tamanioPuerto, 0)) == -1) {
-		logErrorAndExit("Error al recibir el puerto del nodo");
-		}
+		logErrorAndExit("Error al recibir el puerto del nodo.");
+	}
 
 	//Recibo el databin en MB
 	if ((estado = recv(socketFS, &infoBloque->databinEnMB, sizeof(int), 0)) == -1) {
-		logErrorAndExit("Error al recibir el tamanio del databin");
-		}
-
-	printf("Para el tamanio del databin recibi %d bytes\n", estado);
+		logErrorAndExit("Error al recibir el tamanio del databin.");
+	}
 
 	infoBloque = desempaquetarInfoNodo(infoBloque, nombreNodo, ipNodo, puertoNodo);
 	free(nombreNodo);
@@ -385,8 +365,6 @@ TpackInfoBloqueDN * recvInfoNodo(int socketFS){
 
 	return infoBloque;
 }
-
-
 
 int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	int cantBloques, nroBloque=0;
@@ -400,7 +378,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	ftruncate(fd, tablaArchivo->tamanioTotal);
 
 	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
-		log_error(logError,"Error al hacer mmap");
+		log_error(logError, "Error al hacer mmap al levantar el archivo.");
 		return -1;
 	}
 
@@ -411,11 +389,9 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	while(nroBloque < cantBloques){
 
 		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
-			log_error(logError,"No se encontraron los nodos con las copias del bloque.");
+			log_error(logError, "No se encontraron los nodos con las copias del bloque.");
 			return -1;
 		}
-
-
 
 		//pthread_cond_init(&bloqueCond, NULL);
 		pthread_mutex_init(&bloqueMutex,NULL);
@@ -435,13 +411,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 		Tbuffer* bloque = malloc(sizeof(Tbuffer));
 
-		if(copiarBloque(bloqueACopiar, bloque) == -1){
-			log_error(logError,"Error al copiar bloque recibido");
-			liberarEstructuraBuffer(bloque);
-			liberarEstructuraBuffer(bloqueACopiar);
-		//TODO borrar archivo
-			return -1;
-		}
+		copiarBloque(bloqueACopiar, bloque);
 		memcpy(p,bloque->buffer,bloque->tamanio);
 		p += bloque->tamanio;
 		liberarEstructuraBuffer(bloque);
@@ -450,10 +420,9 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	}
 
 	if (msync((void *)archivoMapeado, tablaArchivo->tamanioTotal, MS_SYNC) < 0) {
-		log_error(logError,"Error al hacer msync");
+		log_error(logError, "Error al hacer msync, al levantar el archivo.");
 		return -1;
 	}
-	puts("Achivo copiado con éxito");
 
 	munmap(archivoMapeado,tablaArchivo->tamanioTotal);
 	return 1;
@@ -470,7 +439,6 @@ int copiarArchivo(char ** palabras){
 	rutaTablaArchivo = obtenerRutaLocalDeArchivo(palabras[1]);
 
 	levantarTablaArchivo(archivo,rutaTablaArchivo);
-	puts("levante la tabla");
 	nombreArchivo = obtenerNombreDeArchivoDeUnaRuta(palabras[1]);
 	strcpy(rutaDirectorio,palabras[2]);
 
@@ -478,12 +446,10 @@ int copiarArchivo(char ** palabras){
 		string_append(&rutaDirectorio,"/");
 	}
 	string_append(&rutaDirectorio,nombreArchivo);
-	puts("vot a levantar archivo");
 	if(levantarArchivo(archivo,rutaDirectorio) == -1){
 		puts("Error al levantar archivo");
 		return -1;
 	}
-	puts("ya levante archivo");
 
 	liberarTablaDeArchivo(archivo);
 	free(rutaTablaArchivo);
@@ -508,7 +474,6 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 		nodo = buscarNodoPorNombre(listaDeNodos, copiaNodo->nombreDeNodo);
 		if(nodo != NULL){
 			buffer = empaquetarPeticionBloque(header, copiaNodo->numeroBloqueDeNodo, tBloque->bytes);
-			//buffer = empaquetarPeticionBloque(header, nroBloque, tBloque->bytes);
 			if ((send(nodo->fd, buffer->buffer , buffer->tamanio, 0)) == -1){
 				free(header);
 				liberarEstructuraBuffer(buffer);
@@ -522,9 +487,8 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 			i++;
 		}
 	}
-	log_error(logError,"No se encontraron nodos donde realizar la petición.");
+	log_error(logError, "No se encontraron nodos donde realizar la petición.");
 	free(header);
-	//liberarEstructuraBuffer(buffer);
 	return -1;
 }
 
