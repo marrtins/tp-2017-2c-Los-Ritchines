@@ -11,7 +11,7 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -74,94 +74,90 @@ char *serializeInfoBloque(Theader head, TpackInfoBloque * infoBloque, int *pack_
 TpackInfoBloque *deserializeInfoBloque(char *bytes_serial){
 
 	int off;
-		TpackInfoBloque *infoBloque;
+	TpackInfoBloque *infoBloque;
+	char * mensaje = malloc(200);
 
-		if ((infoBloque = malloc(sizeof (TpackInfoBloque))) == NULL){
-			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
-			return NULL;
-		}
+	if ((infoBloque = malloc(sizeof(TpackInfoBloque))) == NULL) {
+		log_error(logError,	"No se pudo mallocar espacio para paquete de bytes.");
+		return NULL;
+	}
 
-		off = 0;
+	off = 0;
 
-		memcpy(&infoBloque->idTarea, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
+	memcpy(&infoBloque->idTarea, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
-		memcpy(&infoBloque->tamanioNombre, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
+	memcpy(&infoBloque->tamanioNombre, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
-		if ((infoBloque->nombreNodo = malloc(infoBloque->tamanioNombre)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->tamanioNombre);
-			return NULL;
-		}
+	if ((infoBloque->nombreNodo = malloc(infoBloque->tamanioNombre)) == NULL) {
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoBloque->tamanioNombre);
+		log_error(logError, mensaje);
+		free(mensaje);
+		return NULL;
+	}
 
-		memcpy(infoBloque->nombreNodo, bytes_serial + off, infoBloque->tamanioNombre);
-		off += infoBloque->tamanioNombre;
+	memcpy(infoBloque->nombreNodo, bytes_serial + off, infoBloque->tamanioNombre);
+	off += infoBloque->tamanioNombre;
 
+	memcpy(&infoBloque->tamanioIp, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
+	if ((infoBloque->ipWorker = malloc(infoBloque->tamanioIp)) == NULL) {
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoBloque->tamanioIp);
+		log_error(logError, mensaje);
+		free(mensaje);
+		return NULL;
+	}
 
-		memcpy(&infoBloque->tamanioIp, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
+	memcpy(infoBloque->ipWorker, bytes_serial + off, infoBloque->tamanioIp);
+	off += infoBloque->tamanioIp;
 
-		if ((infoBloque->ipWorker = malloc(infoBloque->tamanioIp)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->tamanioIp);
-			return NULL;
-		}
+	memcpy(&infoBloque->tamanioPuerto, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
-		memcpy(infoBloque->ipWorker, bytes_serial + off, infoBloque->tamanioIp);
-		off += infoBloque->tamanioIp;
+	if ((infoBloque->puertoWorker = malloc(infoBloque->tamanioPuerto)) == NULL) {
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoBloque->tamanioPuerto);
+		log_error(logError, mensaje);
+		free(mensaje);
+		return NULL;
+	}
 
+	memcpy(infoBloque->puertoWorker, bytes_serial + off, infoBloque->tamanioPuerto);
+	off += infoBloque->tamanioPuerto;
 
+	memcpy(&infoBloque->bloqueDelArchivo, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
+	memcpy(&infoBloque->bloqueDelDatabin, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
+	memcpy(&infoBloque->bytesOcupados, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
-		memcpy(&infoBloque->tamanioPuerto, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
+	memcpy(&infoBloque->nombreTemporalLen, bytes_serial + off, sizeof(int));
+	off += sizeof(int);
 
-		if ((infoBloque->puertoWorker = malloc(infoBloque->tamanioPuerto)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->tamanioPuerto);
-			return NULL;
-		}
+	if ((infoBloque->nombreTemporal = malloc(infoBloque->nombreTemporalLen)) == NULL) {
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoBloque->nombreTemporalLen);
+		log_error(logError, mensaje);
+		free(mensaje);
+		return NULL;
+	}
 
-		memcpy(infoBloque->puertoWorker, bytes_serial + off, infoBloque->tamanioPuerto);
-		off += infoBloque->tamanioPuerto;
+	memcpy(infoBloque->nombreTemporal, bytes_serial + off, infoBloque->nombreTemporalLen);
+	off += infoBloque->tamanioNombre;
 
-
-
-
-		memcpy(&infoBloque->bloqueDelArchivo, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
-
-		memcpy(&infoBloque->bloqueDelDatabin, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
-
-
-
-		memcpy(&infoBloque->bytesOcupados, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
-
-
-
-		memcpy(&infoBloque->nombreTemporalLen, bytes_serial + off, sizeof (int));
-		off += sizeof (int);
-
-		if ((infoBloque->nombreTemporal = malloc(infoBloque->nombreTemporalLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoBloque->nombreTemporalLen);
-			return NULL;
-		}
-
-		memcpy(infoBloque->nombreTemporal, bytes_serial + off, infoBloque->nombreTemporalLen);
-		off += infoBloque->tamanioNombre;
-
-		return infoBloque;
+	return infoBloque;
 }
-
-
 
 char *serializeBytes(Theader head, char* buffer, int buffer_size, int *pack_size){
 
 	char *bytes_serial;
+	char * mensaje = malloc(200);
 	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int) + buffer_size)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes");
+		free(mensaje);
 		return NULL;
 	}
 
@@ -187,9 +183,11 @@ TpackBytes *deserializeBytes(char *bytes_serial){
 
 	int off;
 	TpackBytes *pbytes;
+	char * mensaje = malloc(200);
 
 	if ((pbytes = malloc(sizeof (TpackBytes))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
+		free(mensaje);
 		return NULL;
 	}
 
@@ -198,7 +196,9 @@ TpackBytes *deserializeBytes(char *bytes_serial){
 	off += sizeof (int);
 
 	if ((pbytes->bytes = malloc(pbytes->bytelen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", pbytes->bytelen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", pbytes->bytelen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
@@ -216,7 +216,6 @@ TpackSrcCode *readFileIntoPack(Tproceso sender, char* ruta){
 	src_code->head.tipo_de_mensaje = SRC_CODE;
 
 	unsigned long fileSize = fsize(file) + 1 ; // + 1 para el '\0'
-	printf("fsize es: %lu",fileSize);
 	src_code->bytelen = fileSize;
 	src_code->bytes = malloc(src_code->bytelen);
 	fread(src_code->bytes, src_code->bytelen, 1, file);
@@ -258,11 +257,6 @@ Tbuffer *empaquetarBloque(Theader * head, TbloqueAEnviar* bloque, Tnodo* nodo){
 }
 
 Tbuffer * empaquetarInfoNodo(TpackInfoBloqueDN * infoBloque){
-
-
-
-
-
 
 		Tbuffer *buffer = malloc(sizeof(Tbuffer));
 		int espacioEnteros = sizeof(int) * 4;
@@ -311,7 +305,7 @@ char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int b
 
 	char *bytes_serial;
 	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int)*3 + nombreTemporalLen)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -328,8 +322,6 @@ char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int b
 	memcpy(bytes_serial + *pack_size, &bytesOcupadosBloque, sizeof (int));
 	*pack_size += sizeof (int);
 
-
-
 	memcpy(bytes_serial + *pack_size, &nombreTemporalLen, sizeof (int));
 	*pack_size += sizeof (int);
 
@@ -338,7 +330,6 @@ char *serializarInfoTransformacionMasterWorker(Theader head,int nroBloque, int b
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-	//printf("Pack size info transf master worker: %d\n",*pack_size);
 	return bytes_serial;
 }
 
@@ -347,9 +338,10 @@ TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes
 
 	int off;
 	TpackDatosTransformacion *datosTransf;
+	char * mensaje = malloc(200);
 
 	if ((datosTransf = malloc(sizeof (TpackDatosTransformacion))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete datos transf\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete datos transf.");
 		return NULL;
 	}
 
@@ -364,15 +356,14 @@ TpackDatosTransformacion *deserializarInfoTransformacionMasterWorker(char *bytes
 	off += sizeof (int);
 
 	if ((datosTransf->nombreTemporal = malloc(datosTransf->nombreTemporalLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", datosTransf->nombreTemporalLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", datosTransf->nombreTemporalLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
 	memcpy(datosTransf->nombreTemporal, bytes_serial + off, datosTransf->nombreTemporalLen);
 	off += datosTransf->nombreTemporalLen;
-
-
-
 
 	return datosTransf;
 }
@@ -383,7 +374,7 @@ int enviarHeaderYValor(Theader head, int valorAEnviar,int socketDestino){
 	int pack_size;
 	int estado;
 	if ((bytes_serial = malloc(HEAD_SIZE + sizeof(int) + sizeof(int))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return -1;
 	}
 
@@ -401,9 +392,8 @@ int enviarHeaderYValor(Theader head, int valorAEnviar,int socketDestino){
 	memcpy(bytes_serial + HEAD_SIZE, &pack_size, sizeof(int));
 
 	if ((estado = send(socketDestino, bytes_serial, pack_size, 0)) == -1){
-		logErrorAndExit("Fallo al enviar el header");
+		logErrorAndExit("Fallo al enviar el header.");
 	}
-
 
 	return estado;
 }
@@ -436,7 +426,7 @@ char *serializeInfoReduccionLocal(Theader head, TreduccionLocal * infoReduccion,
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -453,33 +443,25 @@ char *serializeInfoReduccionLocal(Theader head, TreduccionLocal * infoReduccion,
 	memcpy(bytes_serial + *pack_size, &infoReduccion->idTarea, sizeof(int));
 	*pack_size += sizeof(int);
 
-
 	memcpy(bytes_serial + *pack_size, &infoReduccion->nombreNodoLen, sizeof(int));
 	*pack_size += sizeof(int);
 	memcpy(bytes_serial + *pack_size, infoReduccion->nombreNodo, infoReduccion->nombreNodoLen);
 	*pack_size += infoReduccion->nombreNodoLen;
-
-
 
 	memcpy(bytes_serial + *pack_size, &infoReduccion->ipLen, sizeof(int));
 	*pack_size += sizeof(int);
 	memcpy(bytes_serial + *pack_size, infoReduccion->ipNodo, infoReduccion->ipLen);
 	*pack_size += infoReduccion->ipLen;
 
-
-
 	memcpy(bytes_serial + *pack_size, &infoReduccion->puertoLen, sizeof(int));
 	*pack_size += sizeof(int);
 	memcpy(bytes_serial + *pack_size, infoReduccion->puertoNodo, infoReduccion->puertoLen);
 	*pack_size += infoReduccion->puertoLen;
 
-
-
 	memcpy(bytes_serial + *pack_size, &infoReduccion->tempRedLen, sizeof(int));
 	*pack_size += sizeof(int);
 	memcpy(bytes_serial + *pack_size, infoReduccion->tempRed, infoReduccion->tempRedLen);
 	*pack_size += infoReduccion->tempRedLen;
-
 
 	memcpy(bytes_serial + *pack_size, &infoReduccion->listaSize, sizeof(int));
 	*pack_size += sizeof(int);
@@ -502,9 +484,10 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 
 	int off;
 	TreduccionLocal *infoReduccion;
+	char * mensaje = malloc(200);
 
 	if ((infoReduccion = malloc(sizeof (TreduccionLocal))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -520,7 +503,9 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 	off += sizeof (int);
 
 	if ((infoReduccion->nombreNodo = malloc(infoReduccion->nombreNodoLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->nombreNodoLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoReduccion->nombreNodoLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
@@ -533,7 +518,9 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 	off += sizeof (int);
 
 	if ((infoReduccion->ipNodo = malloc(infoReduccion->ipLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->ipLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoReduccion->ipLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
@@ -541,14 +528,13 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 	off += infoReduccion->ipLen;
 
 
-
-
-
 	memcpy(&infoReduccion->puertoLen, bytes_serial + off, sizeof (int));
 	off += sizeof (int);
 
 	if ((infoReduccion->puertoNodo = malloc(infoReduccion->puertoLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->puertoLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoReduccion->puertoLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
@@ -562,7 +548,9 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 	off += sizeof (int);
 
 	if ((infoReduccion->tempRed = malloc(infoReduccion->tempRedLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccion->tempRedLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoReduccion->tempRedLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
@@ -583,7 +571,9 @@ TreduccionLocal *deserializeInfoReduccionLocal(char *bytes_serial){
 		off += sizeof (int);
 
 		if ((aux->nombreTemporal = malloc(aux->nombreTemporalLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", aux->nombreTemporalLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", aux->nombreTemporalLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
@@ -615,7 +605,7 @@ char * serializarListaNombresTemporales(Theader head,t_list * listaNombres,int *
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioListSize+espacioEnteros+espaciosVariables;
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -649,6 +639,7 @@ t_list * deserializarListaNombresTemporales(char * bytes_serial){
 	int off;
 	off = 0;
 	int listaSize;
+	char * mensaje = malloc(200);
 
 	memcpy(&listaSize, bytes_serial + off, sizeof (int));
 	off += sizeof (int);
@@ -662,7 +653,9 @@ t_list * deserializarListaNombresTemporales(char * bytes_serial){
 
 
 		if ((aux->nombreTemporal = malloc(aux->nombreTemporalLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", aux->nombreTemporalLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", aux->nombreTemporalLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
@@ -699,7 +692,7 @@ char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalRe
 	//printf("Espacio a mallocar: %d\n",espacioAMallocar);
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -741,9 +734,10 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 
 	int off;
 	TinfoReduccionLocalMasterWorker *datosReduccion;
+	char * mensaje = malloc(200);
 
 	if ((datosReduccion = malloc(sizeof (TinfoReduccionLocalMasterWorker))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete datos reduccion\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete datos reduccion.");
 		return NULL;
 	}
 
@@ -752,7 +746,9 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 	off += sizeof (int);
 
 	if ((datosReduccion->nombreTempReduccion = malloc(datosReduccion->nombreTempReduccionLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", datosReduccion->nombreTempReduccionLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", datosReduccion->nombreTempReduccionLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 
@@ -775,7 +771,9 @@ TinfoReduccionLocalMasterWorker *deserializarInfoReduccionLocalMasterWorker(char
 
 
 		if ((aux->nombreTemporal = malloc(aux->nombreTemporalLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", aux->nombreTemporalLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", aux->nombreTemporalLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
@@ -902,7 +900,7 @@ char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccio
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espacioLista+espaciosVariables;
 	//printf("Espacio a mallocar %d \n",espacioAMallocar);
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -961,7 +959,6 @@ char *serializeInfoReduccionGlobal(Theader head, TreduccionGlobal * infoReduccio
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-	//printf("Serializados %d bytes \n",*pack_size);
 
 	return bytes_serial;
 }
@@ -970,9 +967,10 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 
 	int off;
 	TreduccionGlobal *infoReduccionGlobal;
+	char * mensaje = malloc(200);
 
 	if ((infoReduccionGlobal = malloc(sizeof (TreduccionGlobal))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -988,7 +986,9 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 	off += sizeof (int);
 
 	if ((infoReduccionGlobal->tempRedGlobal = malloc(infoReduccionGlobal->tempRedGlobalLen)) == NULL){
-		printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccionGlobal->tempRedGlobalLen);
+		sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoReduccionGlobal->tempRedGlobalLen);
+		log_error(logError, mensaje);
+		free(mensaje);
 		return NULL;
 	}
 	memcpy(infoReduccionGlobal->tempRedGlobal, bytes_serial + off, infoReduccionGlobal->tempRedGlobalLen);
@@ -1009,20 +1009,21 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 		memcpy(&infoAux->nombreNodoLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 		if ((infoAux->nombreNodo = malloc(infoAux->nombreNodoLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->nombreNodoLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAux->nombreNodoLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(infoAux->nombreNodo, bytes_serial + off, infoAux->nombreNodoLen);
 		off += infoAux->nombreNodoLen;
 
 
-
-
-
 		memcpy(&infoAux->ipNodoLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 		if ((infoAux->ipNodo = malloc(infoAux->ipNodoLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->ipNodoLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAux->ipNodoLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(infoAux->ipNodo, bytes_serial + off, infoAux->ipNodoLen);
@@ -1033,7 +1034,9 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 		memcpy(&infoAux->puertoNodoLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 		if ((infoAux->puertoNodo = malloc(infoAux->puertoNodoLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->puertoNodoLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAux->puertoNodoLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(infoAux->puertoNodo, bytes_serial + off, infoAux->puertoNodoLen);
@@ -1045,19 +1048,16 @@ TreduccionGlobal *deserializeInfoReduccionGlobal(char *bytes_serial){
 		memcpy(&infoAux->temporalReduccionLen, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
 		if ((infoAux->temporalReduccion = malloc(infoAux->temporalReduccionLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAux->temporalReduccionLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAux->temporalReduccionLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(infoAux->temporalReduccion, bytes_serial + off, infoAux->temporalReduccionLen);
 		off += infoAux->temporalReduccionLen;
 
-
-
-
 		memcpy(&infoAux->nodoEncargado, bytes_serial + off, sizeof (int));
 		off += sizeof (int);
-
-
 
 		list_add(listaInfoNodos,infoAux);
 	}
@@ -1079,7 +1079,7 @@ char *serializeInfoAlmacenadoFinal(Theader head, TinfoAlmacenadoFinal * infoAlma
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -1129,9 +1129,10 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial){
 
 	int off;
 	TinfoAlmacenadoFinal *infoAlmacenado;
+	char * mensaje = malloc(200);
 
 		if ((infoAlmacenado = malloc(sizeof (TinfoAlmacenadoFinal))) == NULL){
-			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+			log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 			return NULL;
 		}
 
@@ -1147,7 +1148,9 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial){
 		off += sizeof (int);
 
 		if ((infoAlmacenado->ipNodo = malloc(infoAlmacenado->ipNodoLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->ipNodoLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAlmacenado->ipNodoLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
@@ -1160,7 +1163,9 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial){
 		off += sizeof (int);
 
 		if ((infoAlmacenado->puertoNodo = malloc(infoAlmacenado->puertoNodoLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->puertoNodoLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAlmacenado->puertoNodoLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
@@ -1175,17 +1180,14 @@ TinfoAlmacenadoFinal *deserializeInfoAlmacenadoFinal(char *bytes_serial){
 		off += sizeof (int);
 
 		if ((infoAlmacenado->nombreTempReduccion = malloc(infoAlmacenado->nombreTempReduccionLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->nombreTempReduccionLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAlmacenado->nombreTempReduccionLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
 		memcpy(infoAlmacenado->nombreTempReduccion, bytes_serial + off, infoAlmacenado->nombreTempReduccionLen);
 		off += infoAlmacenado->nombreTempReduccionLen;
-
-
-
-
-
 
 		return infoAlmacenado;
 }
@@ -1200,7 +1202,7 @@ char *serializeInfoAlmacenadoFinalMasterWorker(Theader head, TinfoAlmacenadoMast
 	int espacioAMallocar = HEAD_SIZE + espacioPackSize+espacioEnteros+espaciosVariables;
 
 	if ((bytes_serial = malloc(espacioAMallocar)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -1234,11 +1236,12 @@ char *serializeInfoAlmacenadoFinalMasterWorker(Theader head, TinfoAlmacenadoMast
 
 TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_serial){
 
+	char * mensaje = malloc(200);
 	int off;
 	TinfoAlmacenadoMasterWorker *infoAlmacenado;
 
 		if ((infoAlmacenado = malloc(sizeof (TinfoAlmacenadoMasterWorker))) == NULL){
-			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+			log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 			return NULL;
 		}
 
@@ -1249,7 +1252,9 @@ TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_s
 		off += sizeof (int);
 
 		if ((infoAlmacenado->nombreTempReduccion = malloc(infoAlmacenado->nombreTempReduccionLen)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", infoAlmacenado->nombreTempReduccionLen);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", infoAlmacenado->nombreTempReduccionLen);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 
@@ -1267,13 +1272,10 @@ TinfoAlmacenadoMasterWorker *deserializeInfoAlmacenadoMasterWorker(char *bytes_s
 		memcpy(infoAlmacenado->nombreResultante, bytes_serial + off, infoAlmacenado->nombreResultanteLen);
 		off += infoAlmacenado->nombreResultanteLen;
 
-
-
 		return infoAlmacenado;
 }
 
 char * serializarInfoArchivoYamaFS(Theader head,TinfoArchivoFSYama *infoArchivo,int *pack_size){
-
 
 		char *bytes_serial;
 
@@ -1291,7 +1293,7 @@ char * serializarInfoArchivoYamaFS(Theader head,TinfoArchivoFSYama *infoArchivo,
 
 
 		if ((bytes_serial = malloc(espacioMalloc)) == NULL){
-			fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+			log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 			return NULL;
 		}
 
@@ -1337,11 +1339,12 @@ return bytes_serial;
 }
 
 TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer){
+	char * mensaje = malloc(200);
 	int off;
 	TinfoArchivoFSYama *infoArchivo;
 
 	if ((infoArchivo = malloc(sizeof (TinfoArchivoFSYama))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -1364,7 +1367,9 @@ TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer){
 		memcpy(&bloqueAux->nombreNodoC1Len, buffer + off, sizeof (int));
 		off += sizeof (int);
 		if ((bloqueAux->nombreNodoC1 = malloc(bloqueAux->nombreNodoC1Len)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", bloqueAux->nombreNodoC1Len);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", bloqueAux->nombreNodoC1Len);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(bloqueAux->nombreNodoC1, buffer + off, bloqueAux->nombreNodoC1Len);
@@ -1376,7 +1381,9 @@ TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer){
 		memcpy(&bloqueAux->nombreNodoC2Len, buffer + off, sizeof (int));
 		off += sizeof (int);
 		if ((bloqueAux->nombreNodoC2 = malloc(bloqueAux->nombreNodoC2Len)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", bloqueAux->nombreNodoC2Len);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", bloqueAux->nombreNodoC2Len);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(bloqueAux->nombreNodoC2, buffer + off, bloqueAux->nombreNodoC2Len);
@@ -1412,7 +1419,7 @@ char * serializarInfoNodosYamaFS(Theader head,TinfoNodosFSYama *infoNodos,int *p
 
 
 	if ((bytes_serial = malloc(espacioMalloc)) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -1451,8 +1458,6 @@ char * serializarInfoNodosYamaFS(Theader head,TinfoNodosFSYama *infoNodos,int *p
 
 	memcpy(bytes_serial + HEAD_SIZE, pack_size, sizeof(int));
 
-
-
 	return bytes_serial;
 
 
@@ -1460,12 +1465,12 @@ char * serializarInfoNodosYamaFS(Theader head,TinfoNodosFSYama *infoNodos,int *p
 
 TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer){
 
-
+	char * mensaje = malloc(200);
 	int off;
 	TinfoNodosFSYama *infoNodos;
 
 	if ((infoNodos = malloc(sizeof (TinfoArchivoFSYama))) == NULL){
-		fprintf(stderr, "No se pudo mallocar espacio para paquete de bytes\n");
+		log_error(logError, "No se pudo mallocar espacio para paquete de bytes.");
 		return NULL;
 	}
 
@@ -1485,7 +1490,9 @@ TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer){
 		memcpy(&nodoAux->tamanioNombre, buffer + off, sizeof (int));
 		off += sizeof (int);
 		if ((nodoAux->nombreNodo = malloc(nodoAux->tamanioNombre)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioNombre);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", nodoAux->tamanioNombre);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(nodoAux->nombreNodo, buffer + off, nodoAux->tamanioNombre);
@@ -1494,7 +1501,9 @@ TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer){
 		memcpy(&nodoAux->tamanioIp, buffer + off, sizeof (int));
 		off += sizeof (int);
 		if ((nodoAux->ipNodo = malloc(nodoAux->tamanioIp)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioIp);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes.", nodoAux->tamanioIp);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(nodoAux->ipNodo, buffer + off, nodoAux->tamanioIp);
@@ -1504,7 +1513,9 @@ TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer){
 		memcpy(&nodoAux->tamanioPuerto, buffer + off, sizeof (int));
 		off += sizeof (int);
 		if ((nodoAux->puertoWorker = malloc(nodoAux->tamanioPuerto)) == NULL){
-			printf("No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioPuerto);
+			sprintf(mensaje, "No se pudieron mallocar %d bytes al Paquete De Bytes\n", nodoAux->tamanioPuerto);
+			log_error(logError, mensaje);
+			free(mensaje);
 			return NULL;
 		}
 		memcpy(nodoAux->puertoWorker, buffer + off, nodoAux->tamanioPuerto);
@@ -1515,8 +1526,4 @@ TinfoNodosFSYama * deserializarInfoNodosFSYama(char * buffer){
 	infoNodos->listaNodos=listaInfoNodos;
 
 	return infoNodos;
-
-
-
-
 }
