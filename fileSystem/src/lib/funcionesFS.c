@@ -422,7 +422,10 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		pthread_mutex_init(&bloqueMutex,NULL);
 		pthread_mutex_lock(&bloqueMutex);
 		printf("Voy a pedir el bloque %d\n",nroBloque);
-		pedirBloque(tablaArchivo, nroBloque);
+		if(pedirBloque(tablaArchivo, nroBloque) == -1){
+			puts("Error al levantar archivo");
+			return -1;
+		}
 
 		pthread_mutex_lock(&bloqueMutex);
 		//pthread_cond_wait(&bloqueCond, &bloqueMutex);
@@ -432,11 +435,10 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		Tbuffer* bloque = malloc(sizeof(Tbuffer));
 
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
-			puts("Error al copiar bloque recibido. Intentelo de nuevo");
 			log_error(logError,"Error al copiar bloque recibido");
 			liberarEstructuraBuffer(bloque);
 			liberarEstructuraBuffer(bloqueACopiar);
-		//borrar archivo
+		//TODO borrar archivo
 			return -1;
 		}
 		memcpy(p,bloque->buffer,bloque->tamanio);

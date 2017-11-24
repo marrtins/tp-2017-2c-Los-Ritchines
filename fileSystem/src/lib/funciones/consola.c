@@ -369,7 +369,11 @@ int getMD5(char* rutaYamafs){
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/", 0777);
 	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
 	string_append(&rutaTmp, nombreArchivoConExtension);
-	levantarArchivo(archivo,rutaTmp);
+	if(levantarArchivo(archivo,rutaTmp) == -1){
+		puts("Error al obtener el MD5");
+		log_error(logError, "Error al levantar el archivo, dentro de la operacion getMD5");
+		return -1;
+	}
 	char* comando = string_duplicate("md5sum ");
 	string_append(&comando, rutaTmp);
 	system(comando);
