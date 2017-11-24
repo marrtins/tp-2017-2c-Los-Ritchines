@@ -33,27 +33,21 @@ void conexionesDatanode(void * estructura){
 	mostrarConfiguracion(fileSystem);
 	socketDeEscuchaDatanodes = crearSocketDeEscucha(fileSystem->puerto_datanode);
 	fileDescriptorMax = MAXIMO(socketDeEscuchaDatanodes, fileDescriptorMax);
-	puts("antes de entrar al while");
 
 	while (listen(socketDeEscuchaDatanodes, BACKLOG) == -1){
-				log_error(logError, "Fallo al escuchar el socket servidor de file system.");
-				puts("Reintentamos...");
+				log_error(logError, "Fallo al escuchar el socket servidor de file system, reintentando.");
 	}
 
 	FD_SET(socketDeEscuchaDatanodes, &masterFD);
-	printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 	while(1){
 
 			printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 
 			puts("Entre al while");
 			readFD = masterFD;
-			puts("Voy a usar el select");
 			if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
-				logErrorAndExit("Fallo el select.");
+				logErrorAndExit("Fallo el select de los datanodes.");
 			}
-			printf("Cantidad de fd modificados: %d \n", cantModificados);
-			puts("pude usar el select");
 
 			for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
 				printf("Entre al for con el fd: %d\n", fileDescriptor);
@@ -62,34 +56,33 @@ void conexionesDatanode(void * estructura){
 
 					if(fileDescriptor == socketDeEscuchaDatanodes){
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
-						printf("Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
 						log_info(logInfo,"Nuevo nodo conectado.");
 						fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
-						printf("El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 						break;
 					}
-						puts("Recibiendo...");
 
-						estado = recv(fileDescriptor, head, sizeof(Theader), 0);
+					puts("Recibiendo...");
 
-						if(estado == -1){
-							log_error(logError, "Error al recibir información de un cliente.");
-							break;
-						}
-						else if( estado == 0){
-							nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
-							list_add(listaDeNodosDesconectados, nodoEncontrado);
-							borrarNodoPorFD(fileDescriptor);
-							sprintf(mensaje, "Se desconecto el cliente de fd: %d.", fileDescriptor);
-							log_error(logError, mensaje);
-							clearAndClose(fileDescriptor, &masterFD);
-							break;
-						}
+					estado = recv(fileDescriptor, head, sizeof(Theader), 0);
+
+					if(estado == -1){
+						log_error(logError, "Error al recibir información de un datanode.");
+						break;
+					}
+					else if( estado == 0){
+						nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
+						list_add(listaDeNodosDesconectados, nodoEncontrado);
+						borrarNodoPorFD(fileDescriptor);
+						sprintf(mensaje, "Se desconecto un datanode de fd: %d.", fileDescriptor);
+						log_error(logError, mensaje);
+						clearAndClose(fileDescriptor, &masterFD);
+						break;
+					}
+
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
-								log_info(logInfo,"Recibiendo la informacion de datanode.");
-								puts("Es datanode y quiere mandar la información del nodo");
+								log_info(logInfo,"Recibiendo la informacion de datanode (IP, TAMANIO, ETC).");
 								infoNodo = recvInfoNodo(fileDescriptor);
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
 									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
@@ -106,70 +99,45 @@ void conexionesDatanode(void * estructura){
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
 										//se reconecta
-										log_info(logInfo,"Es datanode y quiere reconectarse.");
+										log_info(logInfo,"Un datanode quiere reconectarse.");
 										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
 										nuevoNodo->fd = fileDescriptor;
 										list_add(listaDeNodos, nuevoNodo);
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
-										log_error(logError, "Nodo que se habia caído, se reconecto.");
+										log_info(logInfo, "Nodo que se habia caído, se reconecto.");
 									}
 								}
 								else {
-									puts("Un nodo ya conectado, se esta volviendo a conectar");
 									clearAndClose(fileDescriptor, &masterFD);
 									log_error(logError, "Un nodo ya conectado, se esta volviendo a conectar");
 								}
 								liberarTPackInfoBloqueDN(infoNodo);
 								break;
 
-							case OBTENER_BLOQUE_Y_NRO:
-								puts("Es datanode y nos manda un bloque con su numero");
-								int tamanio,nroBloque;
-								char * bloque;
-
-								if ((estado = recv(fileDescriptor, &nroBloque, sizeof(int), 0)) == -1) {
-										logErrorAndExit("Error al recibir el nroBloque");
-										}
-
-								if ((estado = recv(fileDescriptor, &tamanio, sizeof(int), 0)) == -1) {
-										logErrorAndExit("Error al recibir el tamanio do bloque");
-										}
-								bloque = malloc(tamanio);
-								if ((estado = recv(fileDescriptor, bloque, sizeof(int), 0)) == -1) {
-										logErrorAndExit("Error al recibir el contenido do bloque");
-										}
-
-								break;
 							case OBTENER_BLOQUE:
-								puts("Es datanode y nos mando un bloque");
-								log_info(logInfo,"Es datanode y mando un bloque.");
+								log_info(logInfo,"Un datanode nos mando un bloque.");
 								bloqueACopiar = malloc(sizeof(Tbuffer));
 								int nroBloqueRecibido;
 								if(recv(fileDescriptor, &bloqueACopiar->tamanio, sizeof(unsigned long long), 0) == -1){
 									logErrorAndExit("Error al recibir el tamanio del bloque");
 								}
-								puts("voy a copiar el bloque");
 								bloqueACopiar->buffer = malloc(bloqueACopiar->tamanio);
 								if(recv(fileDescriptor, bloqueACopiar->buffer, bloqueACopiar->tamanio, MSG_WAITALL) == -1){
-									logErrorAndExit("Error al recibir el contenido del bloque");
+									logErrorAndExit("Error al recibir el contenido del bloque de datanode.");
 								}
 								if(recv(fileDescriptor, &nroBloqueRecibido,sizeof(int),0) == -1){
-									logErrorAndExit("Error al recibir el numero del bloque");
+									logErrorAndExit("Error al recibir el numero del bloque de datanode.");
 								}
 
 								pthread_mutex_unlock(&bloqueMutex);
 
 								break;
 							default:
-								puts("Tipo de Mensaje no encontrado en el protocolo");
 								log_error(logError, "LLego un tipo de mensaje, no especificado en el protocolo de filesystem.");
 								break;
 					}
 
-					printf("Recibi %d bytes\n",estado);
-					printf("el proceso es %d\n", head->tipo_de_proceso);
-					printf("el mensaje es %d\n", head->tipo_de_mensaje);
 					break;
 
 				}
@@ -273,7 +241,7 @@ void conexionesDatanode(void * estructura){
 
 		} // termina el while
 
-	//POR ACA VA UN SIGNAL PARA INDICAR QUE FS YA TIENE TODOS LOS NODOS CONECTADOS.
+	//todo POR ACA VA UN SIGNAL PARA INDICAR QUE FS YA TIENE TODOS LOS NODOS CONECTADOS.
 }
 
 int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){

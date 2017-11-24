@@ -2,10 +2,7 @@
 
 t_bitarray* crearBitmap(unsigned int tamanioDatabin){
 	int tamanioEnBytes = ceil(tamanioDatabin/8.0);
-	printf("tamanioEnBytes %d", tamanioEnBytes);
-	puts("voy a romper");
 	char * bitarray = calloc(tamanioEnBytes,sizeof(char));
-	puts("no pase");
 	t_bitarray* bitmap = bitarray_create_with_mode(bitarray,tamanioEnBytes,LSB_FIRST);
 	return bitmap;
 }
@@ -40,7 +37,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 			bitarray_clean_bit(nodo->bitmap, i);
 		}
 		else{
-			logErrorAndExit("Hubo un error turbio al leer un bit del archivo bitmap.");
+			logErrorAndExit("Hubo un error turbio al leer un bit del archivo bitmap, cuando se intento levantar el bitmap de un nodo.");
 		}
 		i++;
 	}
