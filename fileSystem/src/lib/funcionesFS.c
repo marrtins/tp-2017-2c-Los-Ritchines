@@ -401,18 +401,17 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 	if ((archivoMapeado = mmap(NULL, tablaArchivo->tamanioTotal, PROT_WRITE, MAP_SHARED,fd, 0)) == MAP_FAILED) {
 		log_error(logError,"Error al hacer mmap");
-		puts("Error al hacer mmap");
 		return -1;
 	}
 
 	close(fd);
 	fclose(archivo);
-
+	char* mensajePeticionBloque;
 	char * p = archivoMapeado;
 	while(nroBloque < cantBloques){
 
 		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
-			puts("No se encontraron los nodos con las copias del bloque");
+			log_error(logError,"No se encontraron los nodos con las copias del bloque.");
 			return -1;
 		}
 
@@ -421,9 +420,12 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		//pthread_cond_init(&bloqueCond, NULL);
 		pthread_mutex_init(&bloqueMutex,NULL);
 		pthread_mutex_lock(&bloqueMutex);
-		printf("Voy a pedir el bloque %d\n",nroBloque);
+		mensajePeticionBloque = malloc(25);
+		sprintf(mensajePeticionBloque,"Voy a pedir el bloque %d.",nroBloque);
+		log_info(logInfo,mensajePeticionBloque);
+		free(mensajePeticionBloque);
 		if(pedirBloque(tablaArchivo, nroBloque) == -1){
-			puts("Error al levantar archivo");
+			log_error(logError,"Error al levantar archivo.");
 			return -1;
 		}
 
@@ -431,7 +433,6 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		//pthread_cond_wait(&bloqueCond, &bloqueMutex);
 		//pthread_mutex_unlock(&bloqueMutex);
 
-		puts("pase el mutex, voy a copiar un bloque");
 		Tbuffer* bloque = malloc(sizeof(Tbuffer));
 
 		if(copiarBloque(bloqueACopiar, bloque) == -1){
@@ -450,7 +451,6 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 
 	if (msync((void *)archivoMapeado, tablaArchivo->tamanioTotal, MS_SYNC) < 0) {
 		log_error(logError,"Error al hacer msync");
-		puts("Error al hacer msync");
 		return -1;
 	}
 	puts("Achivo copiado con éxito");
@@ -522,9 +522,9 @@ int pedirBloque(Tarchivo* tablaArchivo, int nroBloque){
 			i++;
 		}
 	}
-	puts("No se encontraron nodos donde realizar la petición");
+	log_error(logError,"No se encontraron nodos donde realizar la petición.");
 	free(header);
-	liberarEstructuraBuffer(buffer);
+	//liberarEstructuraBuffer(buffer);
 	return -1;
 }
 
