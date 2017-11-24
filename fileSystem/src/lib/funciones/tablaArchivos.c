@@ -338,6 +338,7 @@ char ** obtenerNodosDeUnArchivo(Tarchivo * archivo){
 
 	while(i < cantBloques){
 		cantCopias = archivo->bloques[i].cantidadCopias;
+		j = 0;
 		while(j < cantCopias){
 			copia = list_get(archivo->bloques[i].copia,j);
 
@@ -347,7 +348,6 @@ char ** obtenerNodosDeUnArchivo(Tarchivo * archivo){
 			}
 			j++;
 		}
-		j=0; //todo: revisar
 		i++;
 	}
 
