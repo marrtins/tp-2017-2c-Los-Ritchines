@@ -13,6 +13,7 @@ void conexionesDatanode(void * estructura){
 	int fileDescriptorMax = -1;
 	int cantModificados = 0;
 	int	nuevoFileDescriptor;
+	int cantNodosPorConectar;
 	int fileDescriptor;
 	int	estado;
 	int fileDescriptorArchivoFinal;
@@ -85,10 +86,8 @@ void conexionesDatanode(void * estructura){
 										list_add(listaDeNodos, nuevoNodo);
 										almacenarBitmap(nuevoNodo);
 										agregarNodoATablaDeNodos(nuevoNodo);
-										if(list_size(listaDeNodos)==cantNodosPorConectar){
-											pthread_mutex_unlock(&yamaMutex);
-											puts("FILE SYSTEM ESTABLE");
-										}
+										verificarSiEsEstable(cantNodosPorConectar);
+
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -262,3 +261,19 @@ void formatearNodos(t_list * lista){
 		i++;
 	}
 }
+
+void verificarSiEsEstable(int cantNodosPorConectar) {
+
+	if (list_size(listaDeNodos) == cantNodosPorConectar) {
+		if (esEstadoRecuperado) {
+			if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes()) {
+				pthread_mutex_unlock(&yamaMutex);
+				puts("FILE SYSTEM ESTABLE");
+			}
+		} else {
+			pthread_mutex_unlock(&yamaMutex);
+			puts("FILE SYSTEM ESTABLE");
+		}
+	}
+}
+

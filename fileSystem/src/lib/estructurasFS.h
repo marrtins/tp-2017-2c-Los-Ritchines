@@ -70,9 +70,6 @@ Tbuffer* bloqueACopiar;
 pthread_mutex_t bloqueMutex;
 pthread_mutex_t yamaMutex;
 
-int cantNodosPorConectar;
-
-//bool
-int estable;
+int esEstadoRecuperado;
 
 #endif

@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
 		socketDeEscuchaYama,
 		socketYama;
 
-	estable = 0;
+	esEstadoRecuperado = 1;
 	TfileSystem * fileSystem;
 	pthread_t consolaThread, datanodesThread;
 
@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
 		if(string_equals_ignore_case(argv[1],flag)){
 			inicializarTablaDirectorios();
 			inicializarBitmaps();
+			esEstadoRecuperado = 0;
 		}else{
 			puts("La flag ingresada no es válida");
 			return EXIT_FAILURE;
@@ -44,7 +45,7 @@ int main(int argc, char* argv[]) {
 	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/info.log", "FileSystem", false, LOG_LEVEL_INFO);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
-	cantNodosPorConectar = fileSystem->cant_nodos;
+	//cantNodosPorConectar = fileSystem->cant_nodos;
 
 	inicializarTablaDeNodos();
 	levantarTablasDirectorios();
@@ -61,6 +62,7 @@ int main(int argc, char* argv[]) {
 
 		socketYama = aceptarCliente(socketDeEscuchaYama);
 		puts("SE ACEPTO A YAMA");
+		log_info(logInfo,"Se acepto a YAMA");
 
 
 	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
@@ -68,6 +70,7 @@ int main(int argc, char* argv[]) {
 		pthread_mutex_lock(&yamaMutex);
 		pthread_mutex_lock(&yamaMutex);
 
+		log_info(logInfo,"Paso el mutex de YAMA");
 		puts("PASO EL MUTEX");
 
 	while(1){
@@ -88,9 +91,6 @@ int main(int argc, char* argv[]) {
 			case INICIO_YAMA:
 				puts("SE CONECTO YAMA POR PRIMERA VEZ");
 				log_info(logInfo,"Se conecto YAMA por primera vez.");
-				if (cantNodosPorConectar == 0) {
-					log_info(logInfo, "FileSystem estable, ya se conectaron todos los nodos.");
-				}
 			break;
 
 			case INFO_ARCHIVO:

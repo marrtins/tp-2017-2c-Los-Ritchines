@@ -353,3 +353,52 @@ char ** obtenerNodosDeUnArchivo(Tarchivo * archivo){
 
 	return nodos;
 }
+
+int todosLosBloquesTienenDosCopias(Tarchivo *  archivo){
+	int cantBloques;
+	int nroBloque = 0;
+	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+
+	while(nroBloque < cantBloques){
+		if(archivo->bloques[nroBloque].cantidadCopias!=2){
+
+			return 0;
+		}
+	}
+	return 1;
+}
+
+int todosLosArchivosTienenCopias(){
+
+	char ** directorios;
+	char ** archivos;
+	Tarchivo * archivo = malloc(sizeof(Tarchivo));
+	int i = 0;
+	int j;
+	directorios = buscarDirectorios("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+
+	while (directorios[i] != NULL) {
+		archivos = buscarArchivos(directorios[i]);
+		j = 0;
+		while (archivos[j] != NULL) {
+			levantarTablaArchivo(archivo,archivos[j]);
+			if(!todosLosBloquesTienenDosCopias(archivo)){
+				liberarPunteroDePunterosAChar(directorios);
+				free(directorios);
+				liberarPunteroDePunterosAChar(archivos);
+				free(archivos);
+				liberarTablaDeArchivo(archivo);
+				return 0;
+			}
+			liberarTablaDeArchivo(archivo);
+			j++;
+		}
+		i++;
+	}
+	liberarPunteroDePunterosAChar(directorios);
+	free(directorios);
+	liberarPunteroDePunterosAChar(archivos);
+	free(archivos);
+	return 1;
+}
+

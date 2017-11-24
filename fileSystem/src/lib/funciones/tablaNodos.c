@@ -183,3 +183,10 @@ void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, cha
 	liberarPunteroDePunterosAChar(elementos);
 	free(elementos);
 }
+
+int losNodosConectadosSonLosQueEstabanAntes(){
+	if(list_size(listaDeNodosDesconectados)== 0){
+		return 1;
+	}
+	return 0;
+}

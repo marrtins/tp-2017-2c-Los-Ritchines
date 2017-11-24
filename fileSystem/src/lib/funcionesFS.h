@@ -19,6 +19,8 @@ int punteroDeStringsContieneString(char ** punteroDeString ,char * string);
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 
+int todosLosArchivosTienenCopias();
+
 //Consola
 void procesarCpblock(char ** palabras);
 void procesarInput(char * linea);
@@ -36,10 +38,12 @@ void consolaInfo(char**palabras, int cantidadParametros);
 
 
 //Conexiones
+void verificarSiEsEstable(int cantNodosPorConectar);
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);
 void formatearNodos();
+
 
 //Tablas
 void persistirTablaDeDirectorios();
@@ -166,7 +170,7 @@ int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor);
-
+int losNodosConectadosSonLosQueEstabanAntes();
 
 
 //Archivos
@@ -177,6 +181,8 @@ int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
 int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
 int getMD5(char* ruta);
+int todosLosBloquesTienenDosCopias(Tarchivo *  archivo);
+
 
 //Liberar
 void liberarEstructuraBuffer(Tbuffer * buffer);
