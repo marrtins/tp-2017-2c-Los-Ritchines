@@ -5,8 +5,7 @@ int main(int argc, char* argv[]) {
 
 	int estado,
 		socketDeEscuchaYama,
-		socketYama,
-		cantNodosPorConectar;
+		socketYama;
 
 	estable = 0;
 	TfileSystem * fileSystem;
@@ -61,8 +60,14 @@ int main(int argc, char* argv[]) {
 		puts("Reintentamos...");
 	}
 		socketYama = aceptarCliente(socketDeEscuchaYama);
+		puts("SE CONECTO YAMAAAAAAAAAA");
 
 	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
+		pthread_mutex_init(&yamaMutex,NULL);
+		pthread_mutex_lock(&yamaMutex);
+		pthread_mutex_lock(&yamaMutex);
+
+		puts("PASO EL MUTEX");
 
 	while(1){
 		puts("Recibiendo...");
@@ -81,6 +86,7 @@ int main(int argc, char* argv[]) {
 		if(head->tipo_de_proceso == YAMA){
 		switch(head->tipo_de_mensaje){
 			case INICIO_YAMA:
+				puts("SE CONECTO YAMA POR PRIMERA VEZ");
 				log_info(logInfo,"Se conecto YAMA por primera vez.");
 				if (cantNodosPorConectar == 0) {
 					log_info(logInfo, "FileSystem estable, ya se conectaron todos los nodos.");
