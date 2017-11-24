@@ -385,23 +385,37 @@ int getMD5(char* rutaYamafs){
 	return 0;
 }
 
-void consolaMove(char ** palabras, int cantidad){
-	if(cantidad==2){
+void consolaMove(char ** palabras, int cantidad) {
+	if (cantidad == 2) {
 		char** carpetas1 = string_split(palabras[1], "/");
 		char** carpetas2 = string_split(palabras[2], "/");
-		if(strcmp(carpetas1[0], "yamafs:") || strcmp(carpetas2[0], "yamafs:")){
+		if (strcmp(carpetas1[0], "yamafs:")	|| strcmp(carpetas2[0], "yamafs:")) {
 			puts("Falta la referencia a yamafs:/ en alguna de las rutas.");
-		} else if(verificarRutaArchivo(palabras[1])){
-			moverArchivo(palabras[1], palabras[2]);
+		} else {
+			if(!esRutaDeUnArchivo(palabras[2])){
+			if (esRutaDeUnArchivo(palabras[1])) {
+				puts("Se quiere mover un archivo");
+				if (verificarRutaArchivo(palabras[1])) {
+					moverArchivo(palabras[1], palabras[2]);
+				}else{
+					puts("El archivo no existe");
+				}
+			}else {
+				puts("Se quiere mover un directorio");
+				moverDirectorio(palabras[1],palabras[2]);
+			}
 		} else{
-			puts("Hubo un error y no se pudo mover el archivo. Verifique los parametros.");
+			puts("El segundo parametro tiene que ser una ruta de directorio, no de archivo");
 		}
-
-		liberarPunteroDePunterosAChar(carpetas1);
-		free(carpetas1);
-		liberarPunteroDePunterosAChar(carpetas2);
-		free(carpetas2);
-	}else{
-		puts("Error en la cantidad de parametros.");
 	}
+
+	liberarPunteroDePunterosAChar(carpetas1);
+	free(carpetas1);
+	liberarPunteroDePunterosAChar(carpetas2);
+	free(carpetas2);
 }
+else {
+	puts("Error en la cantidad de parametros.");
+}
+}
+

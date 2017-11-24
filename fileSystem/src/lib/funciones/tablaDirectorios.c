@@ -719,7 +719,7 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs){
 	return 0;
 }
 
-int validarQueLaRutaTengaElNombreDelArchivo(char * ruta){
+int esRutaDeUnArchivo(char * ruta){
 	char ** carpetas = string_split(ruta,"/");
 	char * archivo;
 	int valor;
@@ -738,7 +738,7 @@ int verificarRutaArchivo(char * rutaYamafs){
 
 	int indice;
 	char * rutaSinArchivo;
-	if(validarQueLaRutaTengaElNombreDelArchivo(rutaYamafs)){
+	if(esRutaDeUnArchivo(rutaYamafs)){
 		rutaSinArchivo =  obtenerRutaSinArchivo(rutaYamafs);
 		if(existeDirectorio(rutaSinArchivo)){
 			indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
@@ -804,15 +804,15 @@ void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapead
 	memcpy(archivoMapeado, archivoAMoverMapeado, tamanio);
 }
 
-void moverArchivo(char* ruta1, char* ruta2){
-	char* rutaLocalArchivo = obtenerRutaLocalDeArchivo(ruta1);
+void moverArchivo(char* rutaConArchivo, char* rutaDirectorioDestino){
+	char* rutaLocalArchivo = obtenerRutaLocalDeArchivo(rutaConArchivo);
 	char** palabras = string_split(rutaLocalArchivo, "/");
 	char* nombreArchivoConExtension = obtenerUltimoElementoDeUnSplit(palabras);
 	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 	char * archivoMapeado;
 	char * archivoAMoverMapeado;
-	char * rutaSinArchivo = obtenerRutaSinArchivo(ruta2);
-	int index = obtenerIndexDeUnaRuta(rutaSinArchivo);
+	//char * rutaSinArchivo = obtenerRutaSinArchivo(rutaDirectorioDestino);
+	int index = obtenerIndexDeUnaRuta(rutaDirectorioDestino);
 	char* rutaLocalDirectorio = malloc(200);
 	FILE * archivo;
 	if(strcmp(extension, "csv") == 0){
@@ -879,6 +879,34 @@ void moverArchivo(char* ruta1, char* ruta2){
 	free(extension);
 
 	puts("Se movio el archivo correctamente.");
+}
+
+void moverDirectorio(char*rutaDirectorioOrigen, char*rutaDirectorioFinal){
+	Tdirectorio* directorioOriginal;
+	Tdirectorio* directorioFinal;
+	char ** split1 = string_split(rutaDirectorioOrigen,"/");
+	char * nombreDirectorioOriginal = obtenerUltimoElementoDeUnSplit(split1);
+	directorioOriginal = buscarPorNombreDeDirectorio(nombreDirectorioOriginal);
+
+	char ** split2 = string_split(rutaDirectorioFinal,"/");
+	char * nombreDirectorioFinal = obtenerUltimoElementoDeUnSplit(split2);
+	directorioFinal = buscarPorNombreDeDirectorio(nombreDirectorioFinal);
+
+	if(directorioFinal->padre == directorioOriginal->index){
+		//TODO hacer la recursividad para verdificar si es abuelo tatarabuelo
+		printf("No se puede mover porque el directorio %s esta dentro del directorio %s.\n", directorioFinal->nombre,directorioOriginal->nombre);
+	}
+	else{
+		directorioOriginal->padre = directorioFinal->index;
+		persistirTablaDeDirectorios();
+		puts("Directorio movido.");
+	}
+	liberarPunteroDePunterosAChar(split1);
+	free(split1);
+	liberarPunteroDePunterosAChar(split2);
+	free(split2);
+	free(nombreDirectorioOriginal);
+	free(nombreDirectorioFinal);
 }
 
 void removerDirectorio(char* ruta){
