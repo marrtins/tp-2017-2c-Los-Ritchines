@@ -7,7 +7,7 @@ void conexionesDatanode(void * estructura){
 	char * archivoFinalMapeado;
 	char * nombreDeArchivoFinalConExtension;
 	char * rutaATemporal;
-	char ** rutasParaCpfrom = malloc(sizeof(char *) * 4);
+	char ** rutasParaCpfrom;
 	char * directorioACrear;
 	int socketDeEscuchaDatanodes;
 	int fileDescriptorMax = -1;
@@ -25,7 +25,7 @@ void conexionesDatanode(void * estructura){
 	TpackInfoBloqueDN * infoNodo;
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	Theader * head = malloc(sizeof(Theader));
-	TarchivoFinal * estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
+	TarchivoFinal * estructuraArchivoFinal;
 	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	FD_ZERO(&masterFD);
@@ -50,7 +50,7 @@ void conexionesDatanode(void * estructura){
 
 					if(fileDescriptor == socketDeEscuchaDatanodes){
 						nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
-						log_info(logInfo,"Nuevo nodo conectado.");
+						log_info(logInfo,"Nuevo cliente conectado (nodo o worker).");
 						fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 						break;
 					}
@@ -140,6 +140,8 @@ void conexionesDatanode(void * estructura){
 							case ALMACENAR_ARCHIVO:
 								log_info(logInfo,"Es worker y quiere almacenar el archivo final en yamafs.");
 								rutaATemporal = malloc(250);
+								rutasParaCpfrom = malloc(sizeof(char *) * 4);
+								estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 
 								if(verificarDisponibilidadDeEspacioEnNodos(estructuraArchivoFinal->tamanioContenido ) == 0 ){
