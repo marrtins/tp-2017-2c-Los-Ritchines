@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log");
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log");
 	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log", "dataNode", false, LOG_LEVEL_ERROR);
-	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", false, LOG_LEVEL_INFO);
+	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", true, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
 
