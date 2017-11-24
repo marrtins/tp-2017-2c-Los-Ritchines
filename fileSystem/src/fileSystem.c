@@ -102,6 +102,7 @@ int main(int argc, char* argv[]) {
 				Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
 				rutaArchivo = recvRutaArchivo(socketYama);
+				log_info(logInfo, "Recibi la ruta %s.", rutaArchivo);
 
 				//verifico que la ruta que me manda yama sea valida
 				if(verificarRutaArchivo(rutaArchivo)){
@@ -116,11 +117,14 @@ int main(int argc, char* argv[]) {
 
 					int packSize;
 
+					log_info(logInfo, "Serializando info del archivo");
 					char * buffer2 = serializarInfoArchivoYamaFS(*head,infoSend,&packSize);
+					log_info(logInfo, "Info de archivo serializada.");
 
 					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
 						logErrorAndExit("Fallo al enviar la informacion de un archivo");
 					}
+					log_info(logInfo, "Enviando info a yama.");
 
 					//envio la info del nodo
 
