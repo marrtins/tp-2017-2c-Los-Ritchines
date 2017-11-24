@@ -24,11 +24,6 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 	listaInfoNodo = list_create();
 
-	/*if(argc != 1){
-		puts("Error en la cantidad de parametros.");
-		return EXIT_FAILURE;
-	}
-	*/
 	if(argc == 2){
 		char * flag = malloc(10);
 		strcpy(flag,"--clean");
@@ -86,7 +81,7 @@ int main(int argc, char* argv[]) {
 		if(head->tipo_de_proceso == YAMA){
 		switch(head->tipo_de_mensaje){
 			case INICIO_YAMA:
-				log_info(logInfo,"Se conecto YAMA por primera vez");
+				log_info(logInfo,"Se conecto YAMA por primera vez.");
 				if (cantNodosPorConectar == 0) {
 					log_info(logInfo, "FileSystem estable, ya se conectaron todos los nodos.");
 				}
@@ -131,8 +126,7 @@ int main(int argc, char* argv[]) {
 
 				}else {
 					//si no es valida se manda esto
-					puts("La ruta no es valida");
-					log_info(logInfo,"La ruta del archivo que mando yama NO es valida");
+					log_error(logError,"La ruta del archivo que solicito yama NO es valida.");
 
 					head->tipo_de_proceso = FILESYSTEM;
 					head->tipo_de_mensaje=ARCH_NO_VALIDO;
