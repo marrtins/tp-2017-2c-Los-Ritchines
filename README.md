@@ -25,6 +25,9 @@
     
      sudo make install
      
+     //scripts
+     git clone https://github.com/iago64/SO-Nombres-Dataset.git
+     
      //antes de ejecutar worker
      export LC_ALL=C
   
