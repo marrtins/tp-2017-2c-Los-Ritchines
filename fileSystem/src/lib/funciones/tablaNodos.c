@@ -76,7 +76,6 @@ void agregarNodoATablaDeNodos(Tnodo * nuevoNodo){
 
 	//agregar Nodos Dinamicamente
 	char * nodoTotalAString = string_new();
-	printf("nombreDeNodo %s", nuevoNodo->nombre);
 	string_append_with_format(&nodoTotalAString,"%sTotal", nuevoNodo->nombre);
 	char * bloquesTotalString = string_itoa(nuevoNodo->cantidadBloquesTotal);
 	config_set_value(tablaDeNodos, nodoTotalAString, bloquesTotalString);
@@ -143,12 +142,8 @@ void levantarTablaNodos(Tnodos * tablaNodos){
 	tablaNodos->cantBloquesTotal = config_get_int_value(archivoNodos,"TAMANIO");
 	tablaNodos->cantLibresTotal = config_get_int_value(archivoNodos,"LIBRE");
 
-	printf("Cantidad bloques totales %d\n", tablaNodos->cantBloquesTotal);
-	printf("Cantidad bloques libres %d\n", tablaNodos->cantLibresTotal);
-
 	tablaNodos->nodos = config_get_array_value(archivoNodos,"NODOS");
-	printf("nombre nodo 1: %s\n", tablaNodos->nodos[0]);
-	printf("nombre nodo 2: %s\n", tablaNodos->nodos[1]);
+
 	while(tablaNodos->nodos[j] != NULL){
 		j++;
 	}
