@@ -71,7 +71,10 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 		return;
 	}
 	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion global a worker\n",stat);
-
+	free(buffer);
+	//free(infoMW->nombreResultante);
+	//free(infoMW->nombreTempReduccion);
+	//free(infoMW);
 
 
 	Theader headRcv = {.tipo_de_proceso = MASTER, .tipo_de_mensaje = 0};
@@ -139,6 +142,10 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	//close(sockYama);
 	mostrarMetricasJob();
 	printf("\n\n\n ####### FIN JOB OK ###### \n\n");
+	free(atributos->infoAlmacenamiento.ipNodo);
+	free(atributos->infoAlmacenamiento.nombreTempReduccion);
+	free(atributos->infoAlmacenamiento.puertoNodo);
+	free(atributos);
 	exit(1);
 }
 

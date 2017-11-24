@@ -21,6 +21,10 @@ void generarListaBloquesHardcode(t_list *listaBloques);
 void generarListaComposicionArchivoHardcode(t_list * listaInfo);
 void generarListaInfoNodos();
 
+void liberarInfoArchivo(void * info);
+void liberarInfoNodos(void * info);
+
+
 
 TpackInfoBloqueDN * recvInfoNodoYAMA(int socketFS);
 
@@ -88,9 +92,9 @@ void iniciarNuevoJob(int sockMaster,int socketFS);
 void manejarFinTransformacionOK(int sockMaster);
 void manejarFinTransformacionFailDesconexion(int sockMaster);
 
-void liberarBloquesPlanificados(void * info);
-void liberarWorkersPlanificacion(void * info);
 
+void liberarWorkersPlanificacion(void * info);
+void liberarBloquesPlanificados(void * info);
 
 void manejarFinTransformacionFail(int sockMaster);
 void manejarFinReduccionLocalOK(int sockMaster);

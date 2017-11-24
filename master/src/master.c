@@ -185,6 +185,8 @@ int main(int argc, char* argv[]) {
 			if(stat <0 ){
 				puts("error conectarse workers transformacion");
 			}
+			list_destroy(bloquesTransformacion);
+
 
 			break;
 		case(INFOBLOQUEREPLANIFICADO):
@@ -274,6 +276,7 @@ TpackInfoBloque *recibirInfoBloque(int sockYama){
 		puts("Fallo deserializacion de Bytes del path_res_file");
 		return NULL;
 	}
+	free(buffer);
 	log_info(logInfo,"Nos llego info del bloque del archivo %d, en el databin %d \n",infoBloque->bloqueDelArchivo,infoBloque->bloqueDelDatabin);
 	log_info(logInfo,"Nombre nodo;IPNodo;PuertoNodo;Bloque;BytesOcupados;NombreArchivotemporal;IDTAREA\n");
 	log_info(logInfo,"%s,%s:%s,%d,%d,%s,%d\n",infoBloque->nombreNodo,infoBloque->ipWorker,infoBloque->puertoWorker,infoBloque->bloqueDelDatabin,
@@ -294,7 +297,7 @@ TreduccionLocal *recibirInfoReduccionLocal(int sockYama){
 		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
 		return NULL;
 	}
-
+	free(buffer);
 	log_info(logInfo,"Nos llego la info reduccion local de %s",infoReduccion->nombreNodo);
 	log_info(logInfo,"job idtarea nombre nodo ipnodo puertonodo tempReductor tempTransf\n");
 	log_info(logInfo,"%d\n%d\n%s\n%s\n%s\n%s\n",infoReduccion->job,infoReduccion->idTarea,infoReduccion->nombreNodo,
@@ -323,6 +326,7 @@ TreduccionGlobal *recibirInfoReduccionGlobal(int sockYama){
 		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
 		return NULL;
 	}
+	free(buffer);
 	log_info(logInfo,"llego la info apra la reduccion global\n");
 	log_info(logInfo,"job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
 
@@ -355,6 +359,7 @@ TinfoAlmacenadoFinal *recibirInfoAlmacenadoFinal(int sockYama){
 		puts("Fallo deserializacion de Bytes del deserializar info reduccion local");
 		return NULL;
 	}
+	free(buffer);
 	log_info(logInfo,"llego la info apra el almacenado final\n");
 	log_info(logInfo,"job %d\n id %d\n tempred %s\n",infoAlmacenado->job,infoAlmacenado->idTarea,infoAlmacenado->nombreTempReduccion);
 	log_info(logInfo," ip nodo: %s \n",infoAlmacenado->ipNodo);

@@ -56,7 +56,7 @@ int main(int argc, char* argv[]){
 	yama=obtenerConfiguracionYama("/home/utnso/tp-2017-2c-Los-Ritchines/yama/config_yama");
 	mostrarConfiguracion(yama);
 
-
+puts("ASDDDDDDDDDDDDDDDDDDDDDDDDDD");
 
 	Theader * head = malloc(sizeof(Theader));
 

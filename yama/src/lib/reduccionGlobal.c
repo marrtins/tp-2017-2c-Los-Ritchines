@@ -148,7 +148,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	}
 	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion global\n",stat);
 
-
+	free(buffer);
 	char * bloquesReducidos = string_new();
 	string_append(&bloquesReducidos,"{");
 	for(i=0;i<list_size(bloques);i++){

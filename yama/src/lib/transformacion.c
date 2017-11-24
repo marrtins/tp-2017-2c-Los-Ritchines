@@ -82,7 +82,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 		log_info(logInfo,"Fs nos manda la info del archivo pedid");
 		buffer3 = recvGeneric(socketFS);
 		infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
-
+		free(buffer3);
 		stat = recv(socketFS, &head, sizeof(Theader), 0);
 		if(head.tipo_de_mensaje==INFO_NODO){
 			puts("ahora recibimos info de los nodos");
@@ -90,6 +90,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 			buffer3 = recvGeneric(socketFS);
 			 infoNodos= deserializarInfoNodosFSYama(buffer3);
 			 log_info(logInfo,"ya recibi todo");
+			 free(buffer3);
 		}else{
 			log_info(logInfo,"error al recibir info nodos");
 			puts("error al recibir info de los nodos");
@@ -112,10 +113,36 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	nuevoJob->listaComposicionArchivo=infoArchivo->listaBloques;
 	nuevoJob->listaNodosArchivo=list_create();
 	nuevoJob->listaNodosArchivo=infoNodos->listaNodos;
+	//list_destroy_and_destroy_elements(infoArchivo->listaBloques,liberarInfoArchivo);
+	//list_destroy_and_destroy_elements(infoNodos->listaNodos,liberarInfoNodos);
+
+	free(infoArchivo);
+	free(infoNodos);
 
 	responderTransformacion(nuevoJob);
 }
 
+void liberarInfoArchivo(void * info){
+	log_info(logInfo,"free info archi ");
+	TpackageUbicacionBloques * bloque = (TpackageUbicacionBloques*) info;
+	log_info(logInfo,"1");
+	free(bloque->nombreNodoC1);
+	free(bloque->nombreNodoC2);
+	free(bloque);
+	log_info(logInfo,"pase free   info archi");
+}
+
+
+void liberarInfoNodos(void * info){
+	log_info(logInfo,"free info nodos");
+	TpackageInfoNodo * nodo = (TpackageInfoNodo*) info;
+	log_info(logInfo,"1");
+	free(nodo->ipNodo);
+	free(nodo->nombreNodo);
+	free(nodo->puertoWorker);
+	free(nodo);
+	log_info(logInfo,"pase free info nodosl");
+}
 
 
 
@@ -180,16 +207,36 @@ int responderTransformacion(TjobMaster *job){
 			return  FALLO_SEND;
 		}
 		log_info(logInfo,"se enviaron %d bytes de la info del bloque\n",stat);
-
+		free(buffer);
 		agregarTransformacionAListaEnProceso(job,bloqueAEnviar,mostrarTabla);
 
 
 	}
+	list_destroy(listaBloquesPlanificados);
+	//list_destroy_and_destroy_elements(listaBloquesPlanificados,liberarBloquesPlanificados);
+
 
 	log_info(logInfo,"Se envio la info de todos los bloques.");
 
 
 return 0;
+}
+
+void liberarBloquesPlanificados(void * info){
+	log_info(logInfo,"free info bl pl");
+	TpackInfoBloque * infoBloque = (TpackInfoBloque*) info;
+	log_info(logInfo,"1");
+	free(infoBloque->ipWorker);
+	log_info(logInfo,"2");
+	free(infoBloque->nombreNodo);
+	log_info(logInfo,"3");
+	free(infoBloque->nombreTemporal);
+	log_info(logInfo,"4");
+	free(infoBloque->puertoWorker);
+	log_info(logInfo,"5");
+	free(infoBloque);
+	log_info(logInfo,"6");
+	log_info(logInfo,"pase free info bl pl");
 }
 
 void manejarFinTransformacionOK(int sockMaster){

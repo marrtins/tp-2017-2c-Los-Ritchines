@@ -95,6 +95,11 @@ void hiloWorkerReduccionGlobal(void *info){
 		MUX_UNLOCK(&mux_cantFallos);
 		return;
 	}
+	free(buffer);
+	list_destroy_and_destroy_elements(infoReduccionAEnviar->listaNodos,limpiarListaNodos);
+
+	free(infoReduccionAEnviar->tempRedGlobal);
+
 	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion global a worker\n",stat);
 
 
@@ -175,6 +180,19 @@ void hiloWorkerReduccionGlobal(void *info){
 	}
 
 	log_info(logInfo,"fin thread de reduccion global del job %d \n",atributos->infoReduccionGlobal.job);
+	//free(atributos->infoReduccionGlobal.tempRedGlobal);
+	//list_destroy_and_destroy_elements(atributos->infoReduccionGlobal.listaNodos,limpiarListaNodos);
+	free(atributos);
+}
+void limpiarListaNodos(void * info){
+	log_info(logInfo,"free lista temp list");
+	TinfoNodoReduccionGlobal * infoNodo = (TinfoNodoReduccionGlobal*) info;
+	free(infoNodo->ipNodo);
+	free(infoNodo->nombreNodo);
+	free(infoNodo->puertoNodo);
+	free(infoNodo->temporalReduccion);
+	free(infoNodo);
+	log_info(logInfo,"pase listsa temp list");
 }
 
 

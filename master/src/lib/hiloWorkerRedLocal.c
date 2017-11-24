@@ -85,6 +85,7 @@ void hiloWorkerReduccionLocal(void *info){
 		MUX_UNLOCK(&mux_cantFallos);
 		return;
 	}
+	free(buffer);
 	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion\n",stat);
 
 
@@ -160,6 +161,20 @@ void hiloWorkerReduccionLocal(void *info){
 		MUX_UNLOCK(&mux_cantFallos);
 	}
 	log_info(logInfo,"fin thread de reduccion local del nodo %s \n",atributos->infoReduccion.nombreNodo);
+	free(atributos->infoReduccion.ipNodo);
+	free(atributos->infoReduccion.nombreNodo);
+	free(atributos->infoReduccion.puertoNodo);
+	free(atributos->infoReduccion.tempRed);
+	list_destroy_and_destroy_elements(atributos->infoReduccion.listaTemporalesTransformacion,limpiarTemporales);
+	free(atributos);
+}
+
+void limpiarTemporales(void * info){
+	log_info(logInfo,"free lista temp list");
+	TreduccionLista * infoLista = (TreduccionLista*) info;
+	free(infoLista->nombreTemporal);
+	free(infoLista);
+	log_info(logInfo,"pase listsa temp list");
 }
 
 

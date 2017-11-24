@@ -124,7 +124,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 		return  FALLO_SEND;
 	}
 	log_info(logInfo,"se enviaron %d bytes de la info de la reduccion local\n",stat);
-
+	free(buffer);
 	char * bloquesReducidos = string_new();
 	string_append(&bloquesReducidos,"[");
 	for(i=0;i<list_size(bloques);i++){
@@ -137,7 +137,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	log_info(logInfo,"bloques a reducir rl %s",bloquesReducidos);
 
 	agregarReduccionLocalAListaEnProceso(infoReduccion,bloquesReducidos,job);
-
+	//free(bloquesReducidos);
 	actualizarCargaWorkerEn(infoReduccion->nombreNodo,1);
 	aumentarHistoricoEn(infoReduccion->nombreNodo,1);
 	return 0;

@@ -85,6 +85,7 @@ void hiloWorkerTransformacion(void *info){
 
 		return;
 	}
+	free(buffer);
 	log_info(logInfo,"se enviaron %d bytes de la info de la transformacion\n",stat);
 
 
@@ -162,6 +163,12 @@ void hiloWorkerTransformacion(void *info){
 	}
 	//printf("fin thread de transfo del bloque del databin %d (bloque deol archivo :%d). noodo: %s\n",atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bloqueDelArchivo,atributos->infoBloque.nombreNodo);
 	log_info(logInfo,"fin thread de transfo del bloque del databin %d (bloque deol archivo :%d). noodo: %s\n",atributos->infoBloque.bloqueDelDatabin,atributos->infoBloque.bloqueDelArchivo,atributos->infoBloque.nombreNodo);
+
+	free(atributos->infoBloque.ipWorker);
+	free(atributos->infoBloque.nombreNodo);
+	free(atributos->infoBloque.nombreTemporal);
+	free(atributos->infoBloque.puertoWorker);
+	free(atributos);
 }
 
 
@@ -215,16 +222,16 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama
 		atributos->infoBloque.bloqueDelDatabin = infoBloque->bloqueDelDatabin;
 		atributos->infoBloque.bloqueDelArchivo=infoBloque->bloqueDelArchivo;
 		atributos->infoBloque.bytesOcupados = infoBloque->bytesOcupados;
-		atributos->infoBloque.ipWorker=malloc(MAXIMA_LONGITUD_IP);
+		atributos->infoBloque.ipWorker=malloc(strlen(infoBloque->ipWorker)+1);
 		atributos->infoBloque.ipWorker = infoBloque->ipWorker;
 		atributos->infoBloque.tamanioIp = infoBloque->tamanioIp;
-		atributos->infoBloque.nombreNodo =malloc( TAMANIO_NOMBRE_NODO);
+		atributos->infoBloque.nombreNodo =malloc(strlen(infoBloque->nombreNodo)+1);
 		atributos->infoBloque.nombreNodo = infoBloque->nombreNodo;
 		atributos->infoBloque.tamanioNombre = infoBloque->tamanioNombre;
-		atributos->infoBloque.nombreTemporal =malloc(TAMANIO_NOMBRE_TEMPORAL);
+		atributos->infoBloque.nombreTemporal =malloc(strlen(infoBloque->nombreTemporal)+1);
 		atributos->infoBloque.nombreTemporal=infoBloque->nombreTemporal;
 		atributos->infoBloque.nombreTemporalLen = infoBloque->nombreTemporalLen;
-		atributos->infoBloque.puertoWorker = malloc(MAXIMA_LONGITUD_PUERTO);
+		atributos->infoBloque.puertoWorker = malloc(strlen(infoBloque->puertoWorker)+1);
 		atributos->infoBloque.puertoWorker = infoBloque->puertoWorker;
 		atributos->infoBloque.tamanioPuerto = infoBloque->tamanioPuerto;
 		atributos->sockYama=sockYama;

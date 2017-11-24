@@ -71,7 +71,7 @@ t_list * planificar(TjobMaster *job){
 	int q;
 	for(q=0;q<list_size(listaPlanificada);q++){
 		TpackInfoBloque *aux = list_get(listaPlanificada,q);
-		log_info(logInfo,"b arch %d  bdata %d %d %s\n",aux->bloqueDelArchivo,aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
+		log_info(logInfo,"b arch %d  bdata %d %d %s",aux->bloqueDelArchivo,aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
 	}
 
 	//list_destroy_and_destroy_elements(listaPlanificada,liberarBloquesPlanificados);
@@ -848,14 +848,31 @@ void mostrarTablaDeEstados(){
 		}else{
 			bloque = aux->bloquesReducidos;
 		}
-		etapa=getNombreEtapa(aux->etapa);
+
+
+		etapa=string_new();
+		if(aux->etapa==TRANSFORMACION){
+			string_append(&etapa,"TR");
+		}else if(aux->etapa==REDUCCIONGLOBAL){
+			string_append(&etapa,"RGL");
+		}else if(aux->etapa==REDUCCIONLOCAL){
+			string_append(&etapa,"RL");
+		}else if(aux->etapa==ALMACENAMIENTOFINAL){
+			string_append(&etapa,"A F");
+		}else{
+			string_append(&etapa,"");
+		}
+
+
+
+		//etapa=getNombreEtapa(aux->etapa);
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
-		//log_info(logInfo,"1asd");
-		//free(etapa);
-		//log_info(logInfo,"2");
+		log_info(logInfo,"1asd");
+		free(etapa);
+		log_info(logInfo,"2");
 		//free(bloque);
 		//log_info(logInfo,"3");
 		//free(nodo);
@@ -874,15 +891,30 @@ void mostrarTablaDeEstados(){
 		}else{
 			bloque = aux->bloquesReducidos;
 		}
-		etapa=getNombreEtapa(aux->etapa);
+
+		etapa=string_new();
+		if(aux->etapa==TRANSFORMACION){
+			string_append(&etapa,"TR");
+		}else if(aux->etapa==REDUCCIONGLOBAL){
+			string_append(&etapa,"RGL");
+		}else if(aux->etapa==REDUCCIONLOCAL){
+			string_append(&etapa,"RL");
+		}else if(aux->etapa==ALMACENAMIENTOFINAL){
+			string_append(&etapa,"A F");
+		}else{
+			string_append(&etapa,"");
+		}
+
+
+		//etapa=getNombreEtapa(aux->etapa);
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 
-		//log_info(logInfo,"6");
-		//free(etapa);
-		//log_info(logInfo,"7");
+		log_info(logInfo,"6");
+		free(etapa);
+		log_info(logInfo,"7");
 		//free(bloque);
 		//log_info(logInfo,"8");
 		//free(nodo);
@@ -901,15 +933,27 @@ void mostrarTablaDeEstados(){
 		}else{
 			bloque = aux->bloquesReducidos;
 		}
-		etapa=getNombreEtapa(aux->etapa);
+		etapa=string_new();
+		if(aux->etapa==TRANSFORMACION){
+			string_append(&etapa,"TR");
+		}else if(aux->etapa==REDUCCIONGLOBAL){
+			string_append(&etapa,"RGL");
+		}else if(aux->etapa==REDUCCIONLOCAL){
+			string_append(&etapa,"RL");
+		}else if(aux->etapa==ALMACENAMIENTOFINAL){
+			string_append(&etapa,"A F");
+		}else{
+			string_append(&etapa,"");
+		}
+		//etapa=getNombreEtapa(aux->etapa);
 		nodo = aux->nodo;
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 
-		//log_info(logInfo,"11");
-		//free(etapa);
-		//log_info(logInfo,"12");
+		log_info(logInfo,"11");
+		free(etapa);
+		log_info(logInfo,"12");
 		//free(bloque);
 		//log_info(logInfo,"13");
 		//free(nodo);

@@ -14,6 +14,8 @@ void removerTransformacionDeLista(int id);
 void removerReduccionDeLista(int id);
 void removerTransformacionFallida(int id);
 
+void limpiarTemporales(void * info);
+void limpiarListaNodos(void * info);
 void mostrarMetricasJob();
 
 double getPromedioTransformaciones();
