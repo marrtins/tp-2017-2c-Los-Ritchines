@@ -245,8 +245,8 @@ void mostrarCsv(char * rutaLocal){
 		leido += mostrarlineaDeUnMMap(archivoMapeado, tamanio, leido, tamanioLineas);
 		if(entrada == 's'){
 			puts("Presione (s) para mostrar mas lineas.");
-			puts("Presione (n) si desea terminar.");
 			puts("Presione (a) si quiere mostrar todo.");
+			puts("Presione cualquier otra tecla si desea terminar.");
 			scanf(" %c", &entrada);
 		}
 
@@ -277,8 +277,8 @@ void mostrarBinario(char * rutaLocal){
 		}
 		if(entrada == 's'){
 			puts("Presione (s) para mostrar mas lineas.");
-			puts("Presione (n) si desea terminar.");
 			puts("Presione (a) si quiere mostrar todo.");
+			puts("Presione cualquier otra tecla si desea terminar.");
 			scanf(" %c", &entrada);
 		}
 	}

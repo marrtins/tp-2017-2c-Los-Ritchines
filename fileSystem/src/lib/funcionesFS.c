@@ -181,9 +181,9 @@ int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivo
 	int sumaSinMaximo = sumarBloquesLibresDeNodoSinElMaximo(nodoMaximo);
 	int capacidadEnMB = capacidadDeAlmacenamientoDeFileSystem(nodoMaximo, sumaSinMaximo);
 	if(tamanioEnMBArchivo > capacidadEnMB){
-		return -1;
+		return 0;
 	}
-	return 0;
+	return 1;
 }
 
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo){
@@ -223,7 +223,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		return -1;
 	}
 
-	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == -1){
+	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == 0){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_error(logError, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		puts("voy a violar el segmento");

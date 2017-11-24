@@ -8,6 +8,7 @@ void conexionesDatanode(void * estructura){
 	char * nombreDeArchivoFinalConExtension;
 	char * rutaATemporal;
 	char ** rutasParaCpfrom = malloc(sizeof(char *) * 4);
+	char * directorioACrear;
 	int socketDeEscuchaDatanodes;
 	int fileDescriptorMax = -1;
 	int cantModificados = 0;
@@ -179,8 +180,16 @@ void conexionesDatanode(void * estructura){
 								rutaATemporal = malloc(250);
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 
+								if(verificarDisponibilidadDeEspacioEnNodos(estructuraArchivoFinal->tamanioContenido ) == 0 ){
+									free(rutasParaCpfrom);
+									liberarEstructuraArchivoFinal(estructuraArchivoFinal);
+									free(rutaATemporal);
+									log_error(logError, "No hay suficiente espacio en los nodos, para almacenar el archivo final.");
+									break;
+								}
+
 								//todo hay que probar esto
-								char * directorioACrear = obtenerRutaSinArchivo(estructuraArchivoFinal->rutaArchivo);
+								directorioACrear = obtenerRutaSinArchivo(estructuraArchivoFinal->rutaArchivo);
 								if(existeDirectorio(directorioACrear)){
 									log_info(logInfo, "El directorio para el almacenamiento final, ya existe.");
 								}
@@ -210,7 +219,7 @@ void conexionesDatanode(void * estructura){
 								fileDescriptorArchivoFinal = fileno(archivoFinal);
 
 								if ((archivoFinalMapeado = mmap(NULL, estructuraArchivoFinal->tamanioContenido, PROT_WRITE, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
-									logErrorAndExit("Error al hacer mmap");
+									logErrorAndExit("Error al hacer mmap para el archivo final.");
 								}
 
 								pasarInfoDeUnArchivoAOtro(estructuraArchivoFinal->contenidoArchivo, archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
@@ -218,7 +227,7 @@ void conexionesDatanode(void * estructura){
 								close(fileDescriptorArchivoFinal);
 								fclose(archivoFinal);
 								if (msync(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido, MS_SYNC) < 0) {
-									logErrorAndExit("Sucedio lo imposible, fallo el msync");
+									logErrorAndExit("Fallo el msync para actualizar el archivo final en disco.");
 								}
 								munmap(archivoFinalMapeado, estructuraArchivoFinal->tamanioContenido);
 
@@ -236,18 +245,16 @@ void conexionesDatanode(void * estructura){
 								remove(rutaATemporal);
 
 								liberarPunteroDePunterosAChar(rutasParaCpfrom);
-								/*free(rutasParaCpfrom);
+								free(rutasParaCpfrom);
 								liberarEstructuraArchivoFinal(estructuraArchivoFinal);
 								free(rutaLocalArchivoFinal);
 								free(extensionArchivoFinal);
-								free(estructuraArchivoFinal);
 								free(rutaATemporal);
 								free(directorioACrear);
-								*/head->tipo_de_proceso=FILESYSTEM;
+								head->tipo_de_proceso=FILESYSTEM;
 								head->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 								enviarHeader(fileDescriptor,head);
 								//todo: revisar
-
 								break;
 							default:
 								log_error(logError, "Tipo de mensaje no encontrado en el protocolo.");
