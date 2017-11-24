@@ -24,11 +24,6 @@ int main(int argc, char* argv[]) {
 	listaTablaDirectorios = list_create();
 	listaInfoNodo = list_create();
 
-	/*if(argc != 1){
-		puts("Error en la cantidad de parametros.");
-		return EXIT_FAILURE;
-	}
-	*/
 	if(argc == 2){
 		char * flag = malloc(10);
 		strcpy(flag,"--clean");
@@ -86,26 +81,21 @@ int main(int argc, char* argv[]) {
 		if(head->tipo_de_proceso == YAMA){
 		switch(head->tipo_de_mensaje){
 			case INICIO_YAMA:
-				puts("Es yama");
-				log_info(logInfo,"Se conecto YAMA por primera vez");
+				log_info(logInfo,"Se conecto YAMA por primera vez.");
 				if (cantNodosPorConectar == 0) {
-					puts("Filesystem estable");
+					log_info(logInfo, "FileSystem estable, ya se conectaron todos los nodos.");
 				}
 			break;
 
 			case INFO_ARCHIVO:
-				puts("Es yama y quiere informacion sobre un archivo");
-				log_info(logInfo,"Es YAMA y quiere información sobre un archivo");
+				log_info(logInfo,"Recibiendo peticion de yama, de la informacion del archivo al que se le va a aplicar la transformacion.");
 				char * ruta;
 				Tarchivo * archivo = malloc(sizeof(Tarchivo));
 
 				rutaArchivo = recvRutaArchivo(socketYama);
 
-				puts(rutaArchivo);
 				//verifico que la ruta que me manda yama sea valida
 				if(verificarRutaArchivo(rutaArchivo)){
-					puts("La ruta del archivo que mando yama es valida");
-					log_info(logInfo,"La ruta yamafs del archivo que envió YAMA es válida");
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
 
@@ -115,35 +105,28 @@ int main(int argc, char* argv[]) {
 					head->tipo_de_proceso=FILESYSTEM;
 					head->tipo_de_mensaje=INFO_ARCHIVO;
 
-
-					puts("voy a serializar la info del archivo");
 					int packSize;
 
 					char * buffer2 = serializarInfoArchivoYamaFS(*head,infoSend,&packSize);
-
-					puts("Serialice la info del archivo");
 
 					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
 						logErrorAndExit("Fallo al enviar la informacion de un archivo");
 					}
 
-					log_info(logInfo,"Se envió a YAMA la información del archivo que pidió");
-					puts("Envie info del archivo");
 					//envio la info del nodo
 
 					enviarInfoNodoAYama(socketYama, archivo);
-					log_info(logInfo,"Se envió a YAMA la información de los nodos en los que está almacenado el archivo");
-					puts("Envie info del nodo");
+					log_info(logInfo,"Se envió a yama, la información del archivo que solicito.");
 
-					//liberarTablaDeArchivo(archivo);
-					//free(ruta);
-					//free(buffer2);
+					liberarTablaDeArchivo(archivo);
+					free(ruta);
+					free(buffer2);
+					//todo, verificar que es ésta linea comentada
 					//list_destroy_and_destroy_elements(infoSend->listaBloques, liberarTpackageUbicacionBloques);
 
 				}else {
 					//si no es valida se manda esto
-					puts("La ruta no es valida");
-					log_info(logInfo,"La ruta del archivo que mando yama NO es valida");
+					log_error(logError,"La ruta del archivo que solicito yama NO es valida.");
 
 					head->tipo_de_proceso = FILESYSTEM;
 					head->tipo_de_mensaje=ARCH_NO_VALIDO;

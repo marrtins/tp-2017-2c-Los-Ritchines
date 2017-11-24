@@ -1,45 +1,5 @@
 #include "../funcionesFS.h"
 
-void buscarLosDosNodosConMasDisponibilidad(t_list * lista, Tnodo * nodo1, Tnodo * nodo2){
-	int cantidadElementos = list_size(lista);
-	int i = 0;
-	int maximo = 0;
-	int maximo2 = 0;
-	Tnodo * auxiliar = NULL;
-	nodo1 = NULL;
-	nodo2 = NULL;
-	while(i != cantidadElementos){
-		puts("voy a romper");
-		auxiliar = (Tnodo * ) list_get(lista, i);
-		puts("antes");
-		printf("%p\n", auxiliar);
-		printf("%p\n", nodo1);
-		printf("%p\n", nodo2);
-		if(auxiliar->cantidadBloquesLibres >= maximo){
-			nodo2 = nodo1;
-			nodo1 = auxiliar;
-			maximo2 = maximo;
-			maximo = auxiliar->cantidadBloquesLibres;
-		}
-		else if(auxiliar->cantidadBloquesLibres >= maximo2){
-			nodo2 = auxiliar;
-			maximo2 = auxiliar->cantidadBloquesLibres;
-		}
-		i++;
-		printf("%p\n", auxiliar);
-		printf("%p\n", nodo1);
-		printf("%p\n", nodo2);
-	}
-	printf("nombre: %s\n", nodo1->nombre);
-	printf("libres: %d\n", nodo1->cantidadBloquesLibres);
-	printf("total: %d\n", nodo1->cantidadBloquesTotal);
-	printf("fd: %d\n", nodo1->fd);
-	printf("nombre: %s\n", nodo2->nombre);
-	printf("libres: %d\n", nodo2->cantidadBloquesLibres);
-	printf("total: %d\n", nodo2->cantidadBloquesTotal);
-	printf("fd: %d\n", nodo2->fd);
-}
-
 int bloquesOcupadosDeNodo(Tnodo * nodo){
 	return nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
 }
@@ -131,7 +91,6 @@ int sumarListasPorTamanioDatabin(){
 		i++;
 		cantidadDeElementos--;
 	}
-	printf("La cantidad de MB disponibles en los datanodes es: %d", tamanioTotalDisponible);
 	return tamanioTotalDisponible;
 
 }

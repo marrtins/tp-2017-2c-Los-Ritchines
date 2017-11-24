@@ -38,8 +38,7 @@ void levantarTablasDirectorios(){
 	char ** directorios;
 
 	if ((archivoMapeado = mmap(NULL,tam, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		puts("Error al hacer mmap");
-		logErrorAndExit("Error al hacer mmap al levantar tabla de directorios. Error irreparable.");
+		logErrorAndExit("Error al hacer mmap al levantar tabla de directorios.");
 	}
 	fclose(archivoDirectorios);
 	close(fd);
@@ -62,10 +61,6 @@ void levantarTablasDirectorios(){
 	liberarPunteroDePunterosAChar(directorios);
 	free(directorios);
 	munmap(archivoMapeado,tam);
-}
-
-void mostrarDirectorios(){
-
 }
 
 int crearDirectorio(char * ruta) {
@@ -175,7 +170,6 @@ void formatearTablaDeNodos(){
 }
 
 void formatearFS(){
-	//eliminarArchivosMetadata();
 	inicializarTablaDirectorios();
 	formatearTablaDeNodos();
 	formatearNodos(listaDeNodos);
@@ -203,7 +197,6 @@ char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal){
 	return extension;
 }
 
-//no se si funciona, verificar
 void mostrarNCaracteresDeUnMMap(char * archivoMapeado, unsigned long long tamanio, unsigned long long desde, unsigned long long hasta){
 	unsigned long long incrementador = desde;
 	while(incrementador < tamanio && incrementador <= hasta){
@@ -233,8 +226,8 @@ void mostrarCsv(char * rutaLocal){
 	char * archivoMapeado;
 	int fd = fileno(archivo);
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
-		log_error(logError, "No se pudo abrir el archivo especificado.");
-		puts("No se pudo abrir el archivo especificado.");
+		log_error(logError, "No se pudo abrir el archivo csv.");
+		puts("No se pudo abrir el archivo especificado csv.");
 		return;
 	}
 	fclose(archivo);
@@ -282,7 +275,7 @@ void mostrarBinario(char * rutaLocal){
 			scanf(" %c", &entrada);
 		}
 	}
-	puts("Finalizado.");
+	puts("Finalizado, archivo leido.");
 	close(fd);
 }
 
@@ -444,14 +437,14 @@ void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
 				string_append(&nuevaRuta, nombre);
 
 				if (rename(rutaLocal, nuevaRuta) == 0) {
-					puts("Se renombro el archivo");
+					puts("Se renombro el archivo exitosamente.");
 				} else {
-					puts("La ruta especificada no concuerda con la ruta del archivo a renombrar");
+					puts("La ruta especificada no concuerda con la ruta del archivo a renombrar.");
 				}
 				free(rutaLocal);
 				free(nuevaRuta);
 			} else {
-				puts("La extension tiene que ser la misma que la del archivo orginal");
+				puts("La extension tiene que ser la misma que la del archivo orginal.");
 			}
 			free(extensionNueva);
 			free(extensionOriginal);
@@ -462,7 +455,7 @@ void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
 		directorio = buscarPorNombreDeDirectorio(ultimoElemento);
 		strcpy(directorio->nombre, nombre);
 		persistirTablaDeDirectorios();
-		puts("Se renombro el directorio");
+		puts("Se renombro el directorio exitosamente.");
 	}
 
 	liberarPunteroDePunterosAChar(split);
@@ -503,7 +496,7 @@ char** buscarDirectorios(char * ruta){
 
 	  if (directorioActual == NULL){
 		  puts("No pudo abrir el directorio");
-		  log_error(logError,"No se pudo abrir el directorio, hubo un error.");
+		  log_error(logError,"No se pudo abrir el directorio.");
 	  }
 	  else{
 		  // Leo uno por uno los directorios que estan adentro del directorio actual
@@ -544,8 +537,8 @@ char** buscarArchivos(char * ruta){
 	  directorioActual = opendir(ruta);
 
 	  if (directorioActual == NULL){
-	    puts("No puedo abrir el directorio.");
-	    log_error(logError,"No se pudo abrir el directorio, hubo un error.");
+	    puts("No se pudo abrir el directorio.");
+	    log_error(logError,"No se pudo abrir el directorio.");
 
 	  }else{
 	  // Leo uno por uno los archivos que estan adentro del directorio actual
@@ -638,7 +631,7 @@ void listarArchivos(char* ruta){
 			free(rutaArchivosDirectorio);
 		}
 		else {
-			printf("El directorio de ruta %s no tiene archivos\n", ruta);
+			printf("El directorio de ruta %s no tiene archivos.\n", ruta);
 			log_error(logError,"El directorio no tiene archivos.");
 			free(archivos);
 			free(rutaArchivosDirectorio);

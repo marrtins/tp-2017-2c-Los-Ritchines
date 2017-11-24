@@ -16,8 +16,6 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
 	fileSystem->cant_nodos = config_get_int_value(fsConfig, "CANT_NODOS");
 
-	printf("Cant de nodos %d\n", fileSystem->cant_nodos);
-
 	fileSystem->tipo_de_proceso = FILESYSTEM;
 
 	config_destroy(fsConfig);
