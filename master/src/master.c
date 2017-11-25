@@ -247,6 +247,7 @@ int main(int argc, char* argv[]) {
 			mostrarMetricasJob();
 			puts("\n\n #####yama nos avisa q termino el job x error de replanificadion######");
 			log_info(logInfo,"yama nos avisa q terminoe l job x error de replanificaicion");
+			close(sockYama);
 			return EXIT_SUCCESS;
 		default:
 			log_info(logInfo,"Proceso: %d \n", headTmp.tipo_de_proceso);

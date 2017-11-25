@@ -37,7 +37,7 @@ int realizarReduccionGlobal(client_sock){
 	free(buffer);
 
 
-	printf("llego la info apra la reduccion global\n");
+	printf("Nueva RG %s\n",infoReduccionGlobal->tempRedGlobal);
 	log_info(logInfo," llego info para la redu global job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
 
 	log_info(logInfo,"list size %d\n",infoReduccionGlobal->listaNodosSize);
@@ -77,7 +77,7 @@ int realizarReduccionGlobal(client_sock){
 	}
 	log_info(logInfo,"recibi");
 	//le pido a todos los workers que me pasen sus reducciones locales.
-	puts("pido a los wk q me vatan pasando lineas y apreo");
+	puts("Soy el worker encargado. Inicio apareo global...");
 	char * rutaApareoFinal=string_new();
 	//puts("str new");
 	string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
@@ -94,7 +94,8 @@ int realizarReduccionGlobal(client_sock){
 	}
 
 	log_info(logInfo,"hago reduccion global\n");
-	puts("hago reduccion global");
+
+	printf("Inicio RG %s\n",infoReduccionGlobal->tempRedGlobal);
 
 
 
@@ -116,7 +117,7 @@ int realizarReduccionGlobal(client_sock){
 		rutaResultadoReduccionGlobal=string_new();
 
 		//int asd=system("export LC_ALL=C");
-		//	printf("Hice LC_ALL. stat: %d\n",asd);
+		//printf("Hice LC_ALL. stat: %d\n",asd);
 
 
 		string_append(&lineaDeEjecucionReduccionGlobal,"cat ");
@@ -142,11 +143,12 @@ int realizarReduccionGlobal(client_sock){
 			enviarHeader(client_sock,head);
 
 		}else{
+		printf("FIN RG %s OK\n",infoReduccionGlobal->tempRedGlobal);
 		head->tipo_de_proceso = WORKER;
 		head->tipo_de_mensaje = FIN_REDUCCIONGLOBALOK;
 		enviarHeader(client_sock,head);
 		log_info(logInfo,"Envio header. fin reduccion global ok");
-		puts("fin rg ok");
+
 		}
 		remove(rutaScriptReductor);
 		free(lineaDeEjecucionReduccionGlobal);
@@ -162,29 +164,29 @@ int realizarReduccionGlobal(client_sock){
 		//	printf("%d\n",cont);
 		//waitpid(pid,pidStat,0);
 	}
-	log_info(logInfo,"free head");
+	//log_info(logInfo,"free head");
 	free(head);
-	log_info(logInfo,"free headpase");
-	log_info(logInfo,"free temp red glo");
+	//log_info(logInfo,"free headpase");
+	//log_info(logInfo,"free temp red glo");
 	free(infoReduccionGlobal->tempRedGlobal);
-	log_info(logInfo,"free trglo pase");
-	log_info(logInfo,"free ldestro");
+	//log_info(logInfo,"free trglo pase");
+	//log_info(logInfo,"free ldestro");
 	list_destroy_and_destroy_elements(infoReduccionGlobal->listaNodos,liberarInfoNodos);
-	log_info(logInfo,"free ldstro pase");
-	log_info(logInfo,"free irg");
+	//log_info(logInfo,"free ldstro pase");
+	//log_info(logInfo,"free irg");
 	free(infoReduccionGlobal);
-	log_info(logInfo,"free irg pase");
+	//log_info(logInfo,"free irg pase");
 
 
-	log_info(logInfo,"free onmbre script red");
+	//log_info(logInfo,"free onmbre script red");
 	free(nombreScriptReductor);
-	log_info(logInfo,"free pase nsr");
-	log_info(logInfo,"free rsr");
+	//log_info(logInfo,"free pase nsr");
+	//log_info(logInfo,"free rsr");
 	free(rutaScriptReductor);
-	log_info(logInfo,"free rsr pase");
-	log_info(logInfo,"free rar");
+	//log_info(logInfo,"free rsr pase");
+	//log_info(logInfo,"free rar");
 	free(rutaApareoFinal);
-	log_info(logInfo,"free rar pase");
+	//log_info(logInfo,"free rar pase");
 
 	return 0;
 
@@ -200,8 +202,8 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 	int i,stat;
 
 
-	int asd=system("export LC_ALL=C");
-		printf("Hice LC_ALL. stat: %d\n",asd);
+	//int asd=system("export LC_ALL=C");
+	//printf("Hice LC_ALL. stat: %d\n",asd);
 	int packSize2;
 	Theader headEnvio;
 	headEnvio.tipo_de_proceso=WORKER;
@@ -431,7 +433,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 
 			}
 	}
-	puts("fin apareo grloabl");
+	puts("Fin apareo global");
 	log_info(logInfo,"fin apareo global");
 	fclose(fdTempFilePropio);
 	fclose(fdArchivoResultado);

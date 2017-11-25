@@ -24,7 +24,7 @@ int realizarTransformacion(int client_sock){
 	int status;
 	pid_t pid;
 
-	puts("llego solicitud para nueva transformacion. recibimos bloque cant bytes y nombre temporal..");
+	//puts("llego solicitud para nueva transformacion. recibimos bloque cant bytes y nombre temporal..");
 	log_info(logInfo,"llego sol para neuva transf. recibimos daots");
 	if ((buff = recvGenericWFlags(client_sock,0)) == NULL){
 		puts("Fallo recepcion de datos de la transformacion");
@@ -46,9 +46,10 @@ int realizarTransformacion(int client_sock){
 
 	log_info(logInfo,"Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
 			datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
-	printf("Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
+	/*printf("Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
 				datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
-
+	*/
+	printf("Nueva Transformacion bloque %d\n",datosTransf->nroBloque);
 	//Recibimos el script
 
 
@@ -137,10 +138,10 @@ int realizarTransformacion(int client_sock){
 			headEnvio->tipo_de_proceso = WORKER;
 			headEnvio->tipo_de_mensaje = FIN_LOCALTRANSF;
 
-
+			printf("Fin Transformacion %d OK\n",datosTransf->nroBloque);
 			enviarHeader(client_sock,headEnvio);
 			log_info(logInfo,"Envio header. fin transfo oky");
-			puts("fin transf ok");
+
 		}
 		remove(rutaBloque);
 		remove(rutaScriptTransformador);
@@ -163,23 +164,23 @@ int realizarTransformacion(int client_sock){
 	//close(client_sock);
 
 
-	log_info(logInfo,"4");
+	//log_info(logInfo,"4");
 	free(headEnvio);
-	log_info(logInfo,"5");
+	//log_info(logInfo,"5");
 	free(datosTransf->nombreTemporal);
-	log_info(logInfo,"6");
+	//log_info(logInfo,"6");
 	free(datosTransf);
-	log_info(logInfo,"7");
+	//log_info(logInfo,"7");
 	//free(lineaDeEjecucionTransformacion);
-	log_info(logInfo,"8");
+	//log_info(logInfo,"8");
 	//free(rutaResultadoTransformacion);
-	log_info(logInfo,"9");
+	//log_info(logInfo,"9");
 	free(nombreScriptTransformador);
-	log_info(logInfo,"10");
+	//log_info(logInfo,"10");
 	free(rutaScriptTransformador);
-	log_info(logInfo,"11");
+	//log_info(logInfo,"11");
 	free(rutaBloque);
-	log_info(logInfo,"12");
+	//log_info(logInfo,"12");
 	return 0;
 }
 

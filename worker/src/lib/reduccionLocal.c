@@ -26,7 +26,7 @@ int realizarReduccionLocal(int client_sock){
 	int stat;
 	pid_t pidRed;
 	Theader *headEnvio  = malloc(sizeof (Theader));
-	puts("Llego solicitud de inicio para reduccion local");
+
 	log_info(logInfo,"llego sol d inic para RL");
 
 	if ((bufferReduccion = recvGenericWFlags(client_sock,0)) == NULL){
@@ -46,7 +46,7 @@ int realizarReduccionLocal(int client_sock){
 	}
 
 	free(bufferReduccion);
-
+	printf("Nueva RL -> %s\n",infoReduccion->nombreTempReduccion);
 	log_info(logInfo,"\n\n\n esta es la info q  me llego");
 	log_info(logInfo,"Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
 
@@ -118,8 +118,8 @@ int realizarReduccionLocal(int client_sock){
 	{ /* hijo */
 		//	printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
 		//	printf("%d\n",cont);
-		int asd=system("export LC_ALL=C");
-			printf("Hice LC_ALL. stat: %d\n",asd);
+		//int asd=system("export LC_ALL=C");
+		//printf("Hice LC_ALL. stat: %d\n",asd);
 
 		lineaDeEjecucionReduccion = string_new();
 		rutaResultadoReduccion=string_new();
@@ -149,11 +149,12 @@ int realizarReduccionLocal(int client_sock){
 			headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
 			enviarHeader(client_sock,headEnvio);
 		}else{
+			printf("Fin RL %s ok\n",infoReduccion->nombreTempReduccion);
 			headEnvio->tipo_de_proceso = WORKER;
 			headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALOK;
 			enviarHeader(client_sock,headEnvio);
 			log_info(logInfo,"Envio header. fin reduccion ok");
-			puts("fin rl ok");
+
 		}
 		remove(rutaScriptReductor);
 		free(rutaResultadoReduccion);
@@ -168,25 +169,25 @@ int realizarReduccionLocal(int client_sock){
 
 	}
 
-	log_info(logInfo,"20");
+	//log_info(logInfo,"20");
 	free(headEnvio);
-	log_info(logInfo,"21");
+	//log_info(logInfo,"21");
 	free(infoReduccion->nombreTempReduccion);
-	log_info(logInfo,"22");
+	//log_info(logInfo,"22");
 	list_destroy_and_destroy_elements(infoReduccion->listaTemporales,liberarListaTemporales);
-	log_info(logInfo,"23");
+	//log_info(logInfo,"23");
 	//free(infoReduccion->listaTemporales);
-	log_info(logInfo,"23.1");
+	//log_info(logInfo,"23.1");
 	free(infoReduccion);
-	log_info(logInfo,"24");
+	//log_info(logInfo,"24");
 	free(nombreScriptReductor);
-	log_info(logInfo,"25");
+	//log_info(logInfo,"25");
 	free(rutaScriptReductor);
-	log_info(logInfo,"26");
+	//log_info(logInfo,"26");
 	free(rutaTemporalesApareados);
-	log_info(logInfo,"27");
+	//log_info(logInfo,"27");
 	free(lineaDeEjecucionApareo);
-	log_info(logInfo,"28");
+	//log_info(logInfo,"28");
 
 	return 0;
 }

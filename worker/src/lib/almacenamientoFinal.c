@@ -46,7 +46,8 @@ int realizarAlmacenamientoFinal(client_sock){
 	}
 
 	free(buffer);
-	printf("llego la info apra almacenamientofinal\n");
+	//printf("llego la info apra almacenamientofinal\n");
+	printf("Inicio almacenamiento final %s\n",infoAlmacenado->nombreResultante);
 	log_info(logInfo,"llego la info para almac final");
 	log_info(logInfo,"nombre resultante %s\n tempred %s\n",infoAlmacenado->nombreResultante,infoAlmacenado->nombreTempReduccion);
 
@@ -122,16 +123,18 @@ int realizarAlmacenamientoFinal(client_sock){
 		enviarHeader(client_sock,headEnvio);
 		return -1;
 	}
-	puts("llego la rta de FS");
+	log_info(logInfo,"llego la rta de FS");
 
 	if(head->tipo_de_proceso==FILESYSTEM && head->tipo_de_mensaje==FIN_ALMACENAMIENTOFINALOK){
-		puts("fin almac final ok");
+		puts("Fin AlmFi ok");
+		log_info(logInfo,"fin almac final ok");
 		headEnvio->tipo_de_proceso=WORKER;
 		headEnvio->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
 		enviarHeader(client_sock,headEnvio);
 
 	}else{
 		puts("fin lmacenamiento final fail");
+		log_info(logInfo,"fin lmacenamiento final fail");
 		headEnvio->tipo_de_proceso=WORKER;
 		headEnvio->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
 		enviarHeader(client_sock,headEnvio);
@@ -142,13 +145,13 @@ int realizarAlmacenamientoFinal(client_sock){
 	free(head);
 	free(header);
 	free(headEnvio);
-	log_info(logInfo,"32");
+	//log_info(logInfo,"32");
 	free(infoAlmacenado->nombreResultante);
-	log_info(logInfo,"33");
+	//log_info(logInfo,"33");
 	free(infoAlmacenado->nombreTempReduccion);
-	log_info(logInfo,"34");
+	//log_info(logInfo,"34");
 	free(infoAlmacenado);
-	log_info(logInfo,"35");
+	//log_info(logInfo,"35");
 
 
 	close(sockFS);

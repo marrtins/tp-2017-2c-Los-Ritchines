@@ -38,7 +38,7 @@ void hiloWorkerTransformacion(void *info){
 	idTarea=atributos->infoBloque.idTarea;
 	inicioEjecucionTransformacion(idTarea);
 
-	printf("Hilo del bloque del archivo %d. id Tarea%d\n",bloqueDelArchivo,idTarea);
+	printf("Inicio Transf bloque %d\n",bloqueDelArchivo);
 	log_info(logInfo,"Hilo del bloque del archivo %d. id Tarea%d\n",bloqueDelArchivo,idTarea);
 
 	log_info(logInfo,"Nombre nodo %s\n ip nodo %s\n puerto nodo %s\n Nombre tempo %s\n",atributos->infoBloque.nombreNodo,atributos->infoBloque.ipWorker,atributos->infoBloque.puertoWorker,atributos->infoBloque.nombreTemporal);
@@ -112,13 +112,13 @@ void hiloWorkerTransformacion(void *info){
 
 		switch (headRcv.tipo_de_mensaje) {
 		case(FIN_LOCALTRANSF):
-			printf("Worker me avisa que termino de transformar el bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
+			printf("FIN transf OK bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
 			log_info(logInfo,"Worker me avisa que termino de transformar el bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
 			finCorrecto = true;
 			close(sockWorker);
 		break;
 		case FIN_LOCALTRANSFFAIL:
-			printf("Worker me avisa que hubo un error en la transformacion del bloque %d. avisamos a yama para q replanifique\n",atributos->infoBloque.bloqueDelArchivo);
+			printf("Fin Fail Transf bloque %d\n",atributos->infoBloque.bloqueDelArchivo);
 			log_info(logInfo,"Worker me avisa que hubo un error en la transformacion del bloque %d. avisamos a yama para q replanifique\n",atributos->infoBloque.bloqueDelArchivo);
 			finCorrecto = false;
 			finDesconexion=false;
@@ -133,7 +133,7 @@ void hiloWorkerTransformacion(void *info){
 	time(&horaFin);
 	double diferencia = difftime(horaFin, horaInicio);
 	if(finCorrecto){
-		puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
+		//puts("Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
 		log_info(logInfo,"Termina la conexion con worker.. La transformacion salio OK. Le avisamos a yama ");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONOK;
@@ -141,7 +141,7 @@ void hiloWorkerTransformacion(void *info){
 		finEjecucionTransformacion(idTarea,diferencia);
 
 	}else if(finDesconexion){
-		puts("termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
+		puts("TransformacionFallo. Nodo desconectado");
 		log_info(logInfo,"termino la conexion con worker de manera inesperada. Transformacion fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONFAILDESCONEXION;
@@ -151,7 +151,7 @@ void hiloWorkerTransformacion(void *info){
 		MUX_UNLOCK(&mux_cantFallos);
 		removerTransformacionFallida(idTarea);
 	}else{
-		puts("termino la conexion con worker que nosaviso q la Transformacion fallo. Le avisamos a yama");
+		//puts("termino la conexion con worker que nosaviso q la Transformacion fallo. Le avisamos a yama");
 		log_info(logInfo,"termino la conexion con worker que nosaviso q la Transformacion fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONFAIL;
