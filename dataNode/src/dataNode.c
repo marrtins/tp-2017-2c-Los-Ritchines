@@ -74,9 +74,9 @@ int main(int argc, char* argv[]) {
 
 					bloque = recvBloque(socketFS);
 					log_info(logInfo,"Voy a almacenar el bloque.");
-					//puts();
+
 					setBloque(bloque->nroBloque, bloque);
-					puts("Bloque almacenado");
+
 					log_info(logInfo,"Bloque almacenado");
 
 					free(bloque->contenido);
@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
 					log_info(logInfo,"Se envio el bloque a FILESYSTEM");
 					break;
 				default:
+					log_error(logError,"Se recibio un mensaje que no esta incluido en el protocolo");
 					break;
 				}
 			}

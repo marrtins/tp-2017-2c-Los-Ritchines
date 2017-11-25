@@ -117,18 +117,16 @@ void crearHilo(pthread_t * nombreHilo, void * nombreFuncion, void * parametros){
 
 int aceptarCliente(int fileDescriptor){
 	int socketAceptado;
-	char * mensaje = malloc(50);
 	struct sockaddr direccionDeCliente;
 	socklen_t tamanioDeCliente = sizeof(direccionDeCliente);
 
 
 	if((socketAceptado = accept(fileDescriptor, (struct sockaddr*) &direccionDeCliente, &tamanioDeCliente)) == -1){
-		sprintf(mensaje, "Fallo la aceptacion del cliente, del FD servidor (fileSystem): %d", fileDescriptor);
-		logErrorAndExit(mensaje);
+		log_error(logError, "Fallo la aceptacion del cliente, del FD servidor (fileSystem): %d", fileDescriptor);
+		logErrorAndExit("Fallo la aceptacion del cliente, del FD servidor (fileSystem)");
 	}
 
-	printf("el socket acceptado es: %d", socketAceptado);
-	free(mensaje);
+	log_info(logInfo,"el socket acceptado es: %d", socketAceptado);
 	return socketAceptado;
 }
 
