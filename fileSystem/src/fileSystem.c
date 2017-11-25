@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
 		free(flag);
 	}else {
 		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
-		log_info(logInfo,"Se levanto estado anterior de la tabla de nodos");
 	}
 
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/error.log");
