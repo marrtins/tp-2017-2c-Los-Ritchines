@@ -6,6 +6,14 @@ metadata/archivos/
 Release/
 Debug/
 *.log
+*.dat
+yama/config_yama
+filesystem/config_filesystem
+datanode/config_node1
+datanode/config_node2
+datanode/config_node3
+datanode/config_node4
+master/config_master
 yama/yama.log
 
 # Prerequisites
