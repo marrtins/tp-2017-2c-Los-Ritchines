@@ -34,11 +34,13 @@ int main(int argc, char* argv[]) {
 			esEstadoRecuperado = 0;
 		}else{
 			puts("La flag ingresada no es válida");
+			log_error(logError,"La flag ingresada no es válida");
 			return EXIT_FAILURE;
 		}
 		free(flag);
 	}else {
 		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
+		log_info(logInfo,"Se levanto estado anterior de la tabla de nodos");
 	}
 
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/error.log");
@@ -47,10 +49,11 @@ int main(int argc, char* argv[]) {
 	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/info.log", "FileSystem", false, LOG_LEVEL_INFO);
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
-	//cantNodosPorConectar = fileSystem->cant_nodos;
 
 	inicializarTablaDeNodos();
+	log_info(logInfo,"Se inicializa la tabla de nodos");
 	levantarTablasDirectorios();
+	log_info(logInfo,"Se levanta la tabla de directorios");
 	crearDirectorioTemporal();
 
 	FD_ZERO(&masterFD);
@@ -63,11 +66,9 @@ int main(int argc, char* argv[]) {
 	}
 
 		socketYama = aceptarCliente(socketDeEscuchaYama);
-		puts("SE ACEPTO A YAMA");
 		log_info(logInfo,"Se acepto a YAMA");
 
-
-	//ACA VA UN WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
+	// WAIT PARA QUE NO EMPIECE HASTA QUE FS ESTE ESTABLE
 
 		sem_wait(&yama);
 
@@ -79,18 +80,16 @@ int main(int argc, char* argv[]) {
 		estado = recv(socketYama, head, sizeof(Theader), 0);
 
 		if(estado == -1){
-			log_error(logError, "Error al recibir información de un cliente.");
+			log_error(logError, "Error al recibir el header de YAMA.");
 			break;
 		}
 		else if( estado == 0){
-			sprintf(mensaje, "Se desconecto YAMA fd: %d.", socketYama);
-			log_error(logError, mensaje);
+			log_error(logError, "Se desconecto YAMA con fd: %d.", socketYama);
 			break;
 		}
 		if(head->tipo_de_proceso == YAMA){
 		switch(head->tipo_de_mensaje){
 			case INICIO_YAMA:
-				puts("SE CONECTO YAMA POR PRIMERA VEZ");
 				log_info(logInfo,"Se conecto YAMA por primera vez.");
 			break;
 
@@ -156,12 +155,13 @@ int main(int argc, char* argv[]) {
 			break;
 				}
 		}
+		//esto no iria aca
 		if(head->tipo_de_proceso == WORKER){
 			switch(head->tipo_de_mensaje){
 			default:
 				break;
 			}
-			//NO está manejada la conexion con worker
+
 		}
 
 	}
