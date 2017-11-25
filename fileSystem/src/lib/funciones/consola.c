@@ -271,7 +271,6 @@ void consolaInfo(char**palabras, int cantidad){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 				levantarTablaArchivo(tablaArchivo, rutaLocal);
-				mostrarTablaArchivo(tablaArchivo);
 				liberarTablaDeArchivo(tablaArchivo);
 				free(rutaLocal);
 			}

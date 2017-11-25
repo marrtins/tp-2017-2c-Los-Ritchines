@@ -48,7 +48,6 @@ void levantarEstadoAnteriorDeLaTablaDeNodos(t_list * desconectados){
 		nodo->cantidadBloquesTotal = config_get_int_value(archivo, nodoNTotal);
 		nodo->bitmap = crearBitmap(nodo->cantidadBloquesTotal);
 		nodo->estadoParaEnviarBloque = 0;
-		mostrarBitmap(nodo->bitmap);
 		levantarBitmapDeUnNodo(nodo);
 		nodo->fd = -1;
 		list_add(desconectados, nodo);
