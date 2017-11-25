@@ -63,7 +63,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 						headEnvio.tipo_de_mensaje=TAKE_NEXTLINE;
 						if(fgets(lineaAux, 1024*1024,fdTempFilePropio) !=NULL){
 							//log_info(logInfo,"Envio: %s\n",lineaAux);
-							printf("Envio: %s\n",lineaAux);
+							//printf("Envio: %s\n",lineaAux);
 							buffer=serializeBytes(headEnvio,lineaAux,strlen(lineaAux)+1,&packSize);
 							if ((stat = send(client_sock, buffer, packSize, 0)) == -1){
 								puts("no se pudo enviar path del archivo temporal que necesitamos. ");

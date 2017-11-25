@@ -38,7 +38,7 @@ void hiloWorkerReduccionGlobal(void *info){
 	log_info(logInfo,"Hora de inicio RG: %s\n", buffInicio);
 
 	log_info(logInfo,"ID tarea%d\n",idTarea);
-	printf("hilo RG de la tarea %d",idTarea);
+	printf("Inicio RG %s",atributos->infoReduccionGlobal.tempRedGlobal);
 
 	int i;
 	TreduccionGlobal * infoReduccionAEnviar=malloc(sizeof(TreduccionGlobal));
@@ -132,7 +132,7 @@ void hiloWorkerReduccionGlobal(void *info){
 			close(sockWorker);
 			break;
 		case(FIN_REDUCCIONGLOBALFAIL):
-			puts("worker nos avisa q hubo un error en la redu global");
+			puts("Error en la reduccion global");
 		log_info(logInfo,"fin rg fail wk");
 			finDesconexion=false;
 			finCorrecto=false;
@@ -150,7 +150,7 @@ void hiloWorkerReduccionGlobal(void *info){
 	free(buffInicio);
 
 	if(finCorrecto){
-		puts("Termina la conexion con worker.. La reduccion Global salio OK. Le avisamos a yama ");
+		puts("La reduccion Global salio OK");
 		log_info(logInfo,"Termina la conexion con worker.. La reduccion Global salio OK. Le avisamos a yama ");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_REDUCCIONGLOBALOK;
@@ -158,7 +158,7 @@ void hiloWorkerReduccionGlobal(void *info){
 
 
 	}else if(finDesconexion){
-		puts("termino la conexion con worker de manera inesperada. reduccion global fallo. Le avisamos a yama");
+		puts("Reduccion global fallo.(nodo desconectado)");
 		log_info(logInfo,"termino la conexion con worker de manera inesperada. reduccion global fallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_REDUCCIONGLOBALFAIL;
@@ -168,7 +168,7 @@ void hiloWorkerReduccionGlobal(void *info){
 		MUX_UNLOCK(&mux_cantFallos);
 
 	}else{
-		puts("reduccion global fallo. Le avisamos a yama");
+		puts("Reduccion global fallo.");
 		log_info(logInfo,"reduccion global fallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_REDUCCIONGLOBALFAIL;

@@ -36,8 +36,8 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	log_info(logInfo,"HILO de Almacenamiento Final");
 	log_info(logInfo,"ID tarea%d\n",idTarea);
 
-	printf("hilo almac final tarea %d\n",idTarea);
-
+	//printf("hilo almac final tarea %d\n",idTarea);
+	printf("Inicio AlmFinal %s",atributos->infoAlmacenamiento.nombreTempReduccion);
 
 	//enviamos la misma info que yama nos mando al worker. para que se conecte a todos los nodos.
 	Theader head;
@@ -94,7 +94,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 			close(sockWorker);
 			break;
 		case(FIN_ALMACENAMIENTOFINALFAIL):
-			puts("worker nos avisa q finalizo el almacenamiento de manera fallida");
+			puts("El almacenamiento final falló");
 			log_info(logInfo,"wkr nos avisa q finalizo el almac de manera fallida");
 			finCorrecto=false;
 			finDesconexion=false;
@@ -110,7 +110,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	duracionAlmacenado = difftime(horaFin, horaInicio);
 
 	if(finCorrecto){
-		puts("Termina la conexion con worker..  almac final salio OK. Le avisamos a yama ");
+		puts("Fin AF OK ");
 		log_info(logInfo,"termina la conexcion c worker. almacn final ok. aivsamos");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALOK;
@@ -118,7 +118,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 
 	}else if(!finDesconexion){
-		puts("almac finalfallo. Le avisamos a yama");
+		puts("Fin AF Fail");
 		log_info(logInfo,"almac finalfallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
@@ -128,7 +128,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 		MUX_UNLOCK(&mux_cantFallos);
 
 	}else{
-		puts(" se termino la conexion de forma inesperada. se cayo worker .almac finalfallo. Le avisamos a yama");
+		puts("Fin AF Fail, nodo desconectado");
 		log_info(logInfo," se termino la conexion de forma inesperada. se cayo worker .almac finalfallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
@@ -141,7 +141,10 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 	log_info(logInfo,"fin conexion c yaama");
 	//close(sockYama);
 	mostrarMetricasJob();
-	printf("\n\n\n ####### FIN JOB OK ###### \n\n");
+	if(finCorrecto){
+		printf("\n\n\n ####### FIN JOB OK ###### \n\n");
+
+	}
 	free(atributos->infoAlmacenamiento.ipNodo);
 	free(atributos->infoAlmacenamiento.nombreTempReduccion);
 	free(atributos->infoAlmacenamiento.puertoNodo);

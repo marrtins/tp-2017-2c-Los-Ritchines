@@ -30,7 +30,7 @@ void hiloWorkerReduccionLocal(void *info){
 	time(&horaInicio);
 	inicioEjecucionRL(idTarea);
 
-	printf("hilo reductor del %s. id tarea %d",atributos->infoReduccion.nombreNodo,idTarea);
+	printf("Innicio RL de %s",atributos->infoReduccion.nombreNodo);
 
 	log_info(logInfo,"HILO REDUCTOR del %s",atributos->infoReduccion.nombreNodo);
 	log_info(logInfo,"ID tarea%d\n",idTarea);
@@ -112,7 +112,7 @@ void hiloWorkerReduccionLocal(void *info){
 
 		case(FIN_REDUCCIONLOCALOK):
 		log_info(logInfo,"fin RL OK");
-		puts("worker avisa q la rl salio ok");
+		printf("Fin RL %s OK\n",atributos->infoReduccion.nombreNodo);
 		finCorrecto = true;
 		finDesconexion=false;
 			close(sockWorker);
@@ -121,7 +121,7 @@ void hiloWorkerReduccionLocal(void *info){
 		log_info(logInfo,"fin RL FAIL");
 					finCorrecto=false;
 			finDesconexion=false;
-			puts("worker nos avisa q la RL fallo.");
+			printf("RL %s Fallo",atributos->infoReduccion.nombreNodo);
 			break;
 		default:
 			break;
@@ -133,7 +133,7 @@ void hiloWorkerReduccionLocal(void *info){
 	double diferencia = difftime(horaFin, horaInicio);
 
 	if(finCorrecto){
-		puts("Termina la conexion con worker.. La reduccion local salio OK. Le avisamos a yama ");
+		//puts("Termina la conexion con worker.. La reduccion local salio OK. Le avisamos a yama ");
 		log_info(logInfo,"Termina la conexion con worker.. La reduccion local salio OK. Le avisamos a yama ");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FIN_REDUCCIONLOCALOK;
@@ -142,7 +142,7 @@ void hiloWorkerReduccionLocal(void *info){
 
 
 	}else if(finDesconexion){
-		puts("termino la conexion con worker de manera inesperada. reduccion local fallo. Le avisamos a yama");
+		puts("RL FALLO. worker desconectado");
 		log_info(logInfo,"termino la conexion con worker de manera inesperada. reduccion local fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FIN_REDUCCIONLOCALFAIL;
@@ -151,7 +151,7 @@ void hiloWorkerReduccionLocal(void *info){
 		cantFallos++;
 		MUX_UNLOCK(&mux_cantFallos);
 	}else{
-		puts("reduccion local fallo. Le avisamos a yama");
+		//puts("reduccion local fallo. Le avisamos a yama");
 		log_info(logInfo,"reduccion local fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FIN_REDUCCIONLOCALFAIL;
