@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 
 					bloque = recvBloque(socketFS);
 					log_info(logInfo,"Voy a almacenar el bloque.");
-					puts();
+					//puts();
 					setBloque(bloque->nroBloque, bloque);
 					puts("Bloque almacenado");
 					log_info(logInfo,"Bloque almacenado");
