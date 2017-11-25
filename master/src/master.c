@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 			if(stat <0 ){
 				puts("error conectarse workers transformacion");
 			}
-			list_destroy(bloquesTransformacion);
+			list_destroy_and_destroy_elements(bloquesTransformacion,limpiarBloquesTransf);
 
 
 			break;
@@ -213,6 +213,7 @@ int main(int argc, char* argv[]) {
 			if(stat < 0){
 				puts("error conectarse a worker para redu local");
 			}
+
 		break;
 		case(INFOREDUCCIONGLOBAL):
 				if((infoReduccionGlobal=recibirInfoReduccionGlobal(sockYama))==NULL){
@@ -242,8 +243,6 @@ int main(int argc, char* argv[]) {
 			return 0;
 			break;
 		case FINJOB_ERRORREPLANIFICACION:
-
-
 			mostrarMetricasJob();
 			puts("\n\n #####yama nos avisa q termino el job x error de replanificadion######");
 			log_info(logInfo,"yama nos avisa q terminoe l job x error de replanificaicion");
@@ -261,6 +260,19 @@ int main(int argc, char* argv[]) {
 	free(head);
 	freeAndNULL((void **) &buffer);
 	return EXIT_SUCCESS;
+}
+
+void limpiarBloquesTransf(void *info){
+
+	TpackInfoBloque * infoBloque = (TpackInfoBloque*) info;
+		free(infoBloque->ipWorker);
+		free(infoBloque->nombreNodo);
+		free(infoBloque->nombreTemporal);
+		free(infoBloque->puertoWorker);
+		free(infoBloque);
+
+
+
 }
 
 

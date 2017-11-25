@@ -126,11 +126,13 @@ int main(int argc, char* argv[]) {
 					enviarInfoNodoAYama(socketYama, archivo);
 					log_info(logInfo,"Se envió a yama, la información del archivo que solicito.");
 
-					//liberarTablaDeArchivo(archivo);
-					//free(ruta);
-					//free(buffer2);
-					//todo, verificar que es ésta linea comentada
-					//list_destroy_and_destroy_elements(infoSend->listaBloques, liberarTpackageUbicacionBloques);
+					liberarTablaDeArchivo(archivo);
+					free(ruta);
+
+					//todo: Free(infoSend)
+
+					free(buffer2);
+
 
 				}else {
 					//si no es valida se manda esto
@@ -145,6 +147,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				free(rutaArchivo);
+
 
 
 

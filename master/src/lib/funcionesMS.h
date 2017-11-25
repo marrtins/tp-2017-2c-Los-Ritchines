@@ -13,7 +13,7 @@ void finEjecucionRL(int id,int segundosDuracion);
 void removerTransformacionDeLista(int id);
 void removerReduccionDeLista(int id);
 void removerTransformacionFallida(int id);
-
+void limpiarBloquesTransf(void *info);
 void limpiarTemporales(void * info);
 void limpiarListaNodos(void * info);
 void mostrarMetricasJob();

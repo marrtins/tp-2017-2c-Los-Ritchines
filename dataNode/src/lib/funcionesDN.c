@@ -151,4 +151,8 @@ void enviarBloque(int nroBloque, unsigned long long int tamanio, int socketFS){
 	if (send(socketFS, buffer->buffer, buffer->tamanio, 0) <= 0){
 		logErrorAndExit("Fallo al enviar a FS el bloque que pidio");
 	}
+	free(bloque);
+	free(head);
+	free(buffer->buffer);
+	free(buffer);
 }
