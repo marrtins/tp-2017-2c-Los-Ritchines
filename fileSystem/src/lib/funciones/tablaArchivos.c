@@ -363,6 +363,8 @@ int todosLosBloquesTienenDosCopias(Tarchivo *  archivo){
 		if(archivo->bloques[nroBloque].cantidadCopias!=2){
 			//TODO agregar la copia que falta
 			printf("El bloque numero %d del archivo %s no tiene copias\n", nroBloque, archivo->nombreArchivoSinExtension);
+			puts("Agregar la copia que falta");
+			log_info(logInfo,"El bloque numero %d del archivo %s no tiene copias\n", nroBloque, archivo->nombreArchivoSinExtension);
 			return 0;
 		}
 		nroBloque++;
@@ -402,7 +404,7 @@ int todosLosArchivosTienenCopias(){
 	free(directorios);
 	liberarPunteroDePunterosAChar(archivos);
 	free(archivos);
-	puts("Todos los archivos tiene 2 copias");
+	log_info(logInfo,"Todos los archivos tiene 2 copias");
 	return 1;
 }
 

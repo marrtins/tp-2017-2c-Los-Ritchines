@@ -1,5 +1,5 @@
 TAMANIO=170
-NODOS=[Nodo1,Nodo2]
+NODOS=[Nodo2,Nodo1]
 Nodo1Libre=80
 Nodo2Libre=90
 Nodo1Total=80

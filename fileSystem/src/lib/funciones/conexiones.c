@@ -34,7 +34,7 @@ void conexionesDatanode(void * estructura){
 	fileDescriptorMax = MAXIMO(socketDeEscuchaDatanodes, fileDescriptorMax);
 
 	while (listen(socketDeEscuchaDatanodes, BACKLOG) == -1){
-				log_error(logError, "Fallo al escuchar el socket servidor de file system, reintentando.");
+		log_error(logError, "Fallo al escuchar el socket servidor de file system, reintentando.");
 	}
 
 	FD_SET(socketDeEscuchaDatanodes, &masterFD);
@@ -161,6 +161,7 @@ void conexionesDatanode(void * estructura){
 									log_info(logInfo, "El directorio para el almacenamiento final no existe, creando.");
 									if(crearDirectorio(directorioACrear)>=0){
 										persistirTablaDeDirectorios();
+										log_info(logInfo, "Directorio creado");
 									}
 									else{
 										log_error(logError,"No se pudo crear el directorio del almacenamiento final.");
@@ -236,8 +237,6 @@ void conexionesDatanode(void * estructura){
 			} //termine el for
 
 		} // termina el while
-
-	//todo POR ACA VA UN SIGNAL PARA INDICAR QUE FS YA TIENE TODOS LOS NODOS CONECTADOS.
 }
 
 int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){
@@ -268,13 +267,16 @@ void verificarSiEsEstable(int cantNodosPorConectar) {
 
 	if (list_size(listaDeNodos) == cantNodosPorConectar) {
 		if (esEstadoRecuperado) {
+			//TODO los nodos conectados no se borran de la lista de desconectados!!!
 			if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes()) {
 				sem_post(&yama);
-				puts("FILE SYSTEM ESTABLE");
+				puts("FILESYSTEM ESTABLE");
+				log_info(logInfo,"FILESYSTEM ESTABLE");
 			}
 		} else {
 			sem_post(&yama);
-			puts("FILE SYSTEM ESTABLE");
+			puts("FILESYSTEM ESTABLE");
+			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
 	}
 }

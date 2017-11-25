@@ -184,10 +184,21 @@ void agregarElementoAArrayArchivoConfig(t_config * tablaDeNodos, char * key, cha
 }
 
 int losNodosConectadosSonLosQueEstabanAntes(){
+	int tamanioLista = list_size(listaDeNodosDesconectados);
+	int i = 0;
+	Tnodo * nodo;
+
 	if(list_size(listaDeNodosDesconectados)== 0){
-		puts("Los nodos conectados son los que estaban antes");
+		log_info(logInfo,"Los nodos conectados son los que estaban antes");
 		return 1;
 	}
-	puts("Los nodos conectados no son los que estaban antes");
+	log_info(logInfo,"Faltan conectar nodos para que FS sea estable");
+	puts("Faltan conectar los siguientes nodos para que FS sea estable:");
+
+	while (i<tamanioLista){
+		nodo = list_get(listaDeNodosDesconectados,i);
+		printf("%s\n",nodo->nombre);
+		i++;
+	}
 	return 0;
 }
