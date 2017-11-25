@@ -72,7 +72,6 @@ int main(int argc, char* argv[]) {
 		sem_wait(&yama);
 
 		log_info(logInfo,"Paso el mutex de YAMA");
-		puts("PASO EL MUTEX");
 
 	while(1){
 
