@@ -271,14 +271,11 @@ void verificarSiEsEstable(int cantNodosPorConectar) {
 			//if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes())
 			if(todosLosArchivosTienenCopias()){
 				sem_post(&yama);
-				puts("FILESYSTEM ESTABLE");
 				log_info(logInfo,"FILESYSTEM ESTABLE");
 			}
 		} else {
 			sem_post(&yama);
-			puts("FILESYSTEM ESTABLE");
 			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
 	}
 }
-
