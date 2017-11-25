@@ -268,7 +268,8 @@ void verificarSiEsEstable(int cantNodosPorConectar) {
 	if (list_size(listaDeNodos) == cantNodosPorConectar) {
 		if (esEstadoRecuperado) {
 			//TODO los nodos conectados no se borran de la lista de desconectados!!!
-			if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes()) {
+			//if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes())
+			if(todosLosArchivosTienenCopias()){
 				sem_post(&yama);
 				puts("FILESYSTEM ESTABLE");
 				log_info(logInfo,"FILESYSTEM ESTABLE");
