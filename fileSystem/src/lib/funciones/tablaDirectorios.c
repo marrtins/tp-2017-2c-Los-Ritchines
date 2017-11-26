@@ -881,23 +881,40 @@ void moverArchivo(char* rutaConArchivo, char* rutaDirectorioDestino){
 	puts("Se movio el archivo correctamente.");
 }
 
-void moverDirectorio(char*rutaDirectorioOrigen, char*rutaDirectorioFinal){
-	Tdirectorio* directorioOriginal;
-	Tdirectorio* directorioFinal;
-	char ** split1 = string_split(rutaDirectorioOrigen,"/");
-	char * nombreDirectorioOriginal = obtenerUltimoElementoDeUnSplit(split1);
-	directorioOriginal = buscarPorNombreDeDirectorio(nombreDirectorioOriginal);
+int esHijoDirectoOIndirecto(Tdirectorio * posiblePadre, Tdirectorio * posibleHijo){
+	printf("Padre:\n");
+	printf("%d \t %s \t %d\n", posiblePadre->index, posiblePadre->nombre, posiblePadre->padre);
+	printf("Hijo:\n");
+	printf("%d \t %s \t %d\n", posibleHijo->index, posibleHijo->nombre, posibleHijo->padre);
 
-	char ** split2 = string_split(rutaDirectorioFinal,"/");
-	char * nombreDirectorioFinal = obtenerUltimoElementoDeUnSplit(split2);
-	directorioFinal = buscarPorNombreDeDirectorio(nombreDirectorioFinal);
-
-	if(directorioFinal->padre == directorioOriginal->index){
-		//TODO hacer la recursividad para verdificar si es abuelo tatarabuelo
-		printf("No se puede mover porque el directorio %s esta dentro del directorio %s.\n", directorioFinal->nombre,directorioOriginal->nombre);
+	if(posibleHijo->index == 0){
+		return 0;
+	}
+	if(posiblePadre->index == posibleHijo->padre){
+		return 1;
 	}
 	else{
-		directorioOriginal->padre = directorioFinal->index;
+		return esHijoDirectoOIndirecto(posiblePadre, buscarDirectorioPorIndice(posibleHijo->padre));
+	}
+}
+
+void moverDirectorio(char*rutaDirectorioOrigen, char*rutaDirectorioDestino){
+	Tdirectorio* directorioOrigen;
+	Tdirectorio* directorioDestino;
+	char ** split1 = string_split(rutaDirectorioOrigen,"/");
+	char * nombreDirectorioOriginal = obtenerUltimoElementoDeUnSplit(split1);
+	directorioOrigen = buscarPorNombreDeDirectorio(nombreDirectorioOriginal);
+
+	char ** split2 = string_split(rutaDirectorioDestino,"/");
+	char * nombreDirectorioFinal = obtenerUltimoElementoDeUnSplit(split2);
+	directorioDestino = buscarPorNombreDeDirectorio(nombreDirectorioFinal);
+
+	//if(directorioDestino->padre == directorioOrigen->index){
+	if(esHijoDirectoOIndirecto(directorioOrigen, directorioDestino)){
+		printf("No se puede mover porque el directorio %s esta dentro del directorio %s.\n", directorioDestino->nombre,directorioOrigen->nombre);
+	}
+	else{
+		directorioOrigen->padre = directorioDestino->index;
 		persistirTablaDeDirectorios();
 		puts("Directorio movido.");
 	}

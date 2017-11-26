@@ -165,6 +165,15 @@ Tdirectorio* buscarPorNombreDeDirectorio(char * directorio){
 	return (Tdirectorio*)list_find(listaTablaDirectorios, buscarPorNombreDeDirectorioParaLista);
 }
 
+Tdirectorio * buscarDirectorioPorIndice(int indice){
+	bool buscarPorIndice(void * dir){
+		Tdirectorio * directorio = (Tdirectorio*) dir;
+		return directorio->index == indice;
+	}
+
+	return (Tdirectorio*)list_find(listaTablaDirectorios, buscarPorIndice);
+}
+
 void vaciarLista(){
 	if(!list_is_empty(listaTablaDirectorios)){
 		list_clean_and_destroy_elements(listaTablaDirectorios,liberarTablaDirectorios);
@@ -191,4 +200,13 @@ void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor){
 		nodo->estadoParaEnviarBloque = valor;
 		i++;
 	}
+}
+
+t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre){
+	bool esHijo(void * posibleHijoVoid){
+		Tdirectorio * posibleHijo = (Tdirectorio *) posibleHijoVoid;
+		return posibleHijo->padre == padre->index;
+	}
+	return list_filter(listaTablaDirectorios, esHijo);
+
 }
