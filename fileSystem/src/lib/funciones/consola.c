@@ -37,7 +37,12 @@ void procesarInput(char* linea) {
 	} else if (!strcmp(*palabras, "cpto")) {
 		consolaCpto(palabras,cantidad);
 	} else if (!strcmp(*palabras, "cpblock")) {
-		procesarCpblock(palabras);
+		if(cantidad == 3){
+			procesarCpblock(palabras);
+		}
+		else{
+			puts("Error en la cantidad de parametros");
+		}
 	} else if (!strcmp(*palabras, "md5")) {
 		consolaMd5(palabras,cantidad);
 	} else if (!strcmp(*palabras, "ls")) {
@@ -90,7 +95,6 @@ void procesarCpblock(char ** palabras){
 				liberarTablaDeArchivo(tablaArchivo);
 				pthread_mutex_lock(&bloqueMutex);
 				pthread_mutex_lock(&bloqueMutex);
-				puts("voy a copiar bloque");
 				bloque = malloc(sizeof(Tbuffer));
 				if (copiarBloque(bloqueACopiar, bloque) == -1) {
 					puts("Error al copiar bloque recibido.");
@@ -103,6 +107,7 @@ void procesarCpblock(char ** palabras){
 				if (enviarBloqueA(bloqueAEnviar, palabras[3]) == -1) {
 					puts("Error no se pudo enviar el bloque.");
 					liberarEstructuraBuffer(bloque);
+					liberarEstructuraBloquesAEnviar(bloqueAEnviar);
 					return;
 				}
 				agregarCopiaAtablaArchivo(rutaLocalArchivo,palabras[3],bloqueDN,nroBloque);
