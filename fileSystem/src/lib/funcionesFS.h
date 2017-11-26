@@ -102,7 +102,8 @@ void liberarNodosDeLista(void * nodo);
 void vaciarLista();
 void borrarNodoPorNombre(t_list * lista, char * nombre);
 Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos);
-
+Tdirectorio * buscarDirectorioPorIndice(int indice);
+t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre);
 
 //Directorios
 void crearRoot();
