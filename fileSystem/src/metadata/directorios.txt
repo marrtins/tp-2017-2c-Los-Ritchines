@@ -1,6 +1,1 @@
-4 caro 1
-3 gero 1
-2 juan 5
-1 users 0
 0 root -1
-5 musica 3
