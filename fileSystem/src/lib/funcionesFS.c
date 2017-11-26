@@ -281,6 +281,7 @@ int almacenarArchivo(char **palabras){
 	free(splitDeRuta);
 	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
+	puts("Se ha almacenado el archivo en el yamafs con exito.");
 	return 1;
 }
 

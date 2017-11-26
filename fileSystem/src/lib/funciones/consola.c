@@ -219,6 +219,7 @@ void consolaCpfrom(char** palabras, int cantidad){
 				if(archivoRepetidoEnDirectorio(palabras[1],palabras[2])){
 					almacenarArchivo(palabras);
 				}
+				//que significa este else return? no deberia tirar un mensaje ?? todo
 				else return;
 			}
 			else {
@@ -271,6 +272,7 @@ void consolaInfo(char**palabras, int cantidad){
 				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 				levantarTablaArchivo(tablaArchivo, rutaLocal);
+				mostrarTablaArchivo(tablaArchivo);
 				liberarTablaDeArchivo(tablaArchivo);
 				free(rutaLocal);
 			}
