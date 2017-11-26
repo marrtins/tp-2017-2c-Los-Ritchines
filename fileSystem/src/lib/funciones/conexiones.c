@@ -74,8 +74,9 @@ void conexionesDatanode(void * estructura){
 					if(head->tipo_de_proceso==DATANODE){
 						switch(head->tipo_de_mensaje){
 							case INFO_NODO:
-								log_info(logInfo,"Recibiendo la informacion de datanode (IP, TAMANIO, ETC).");
+								log_info(logInfo,"Recibiendo la informacion de datanode.");
 								infoNodo = recvInfoNodo(fileDescriptor);
+								log_info(logInfo,"Nombre: %s, tamanio databin: %d, IP: %s, puerto: %s",infoNodo->nombreNodo,infoNodo->databinEnMB,infoNodo->ipNodo,infoNodo->puertoNodo);
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
 									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
 										//nodo nuevo;
@@ -94,6 +95,7 @@ void conexionesDatanode(void * estructura){
 										//se reconecta
 										log_info(logInfo,"Un datanode quiere reconectarse.");
 										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
+										log_info(logInfo,"Nombre: %s",nuevoNodo->nombre);
 										nuevoNodo->fd = fileDescriptor;
 										list_add(listaDeNodos, nuevoNodo);
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
@@ -123,7 +125,7 @@ void conexionesDatanode(void * estructura){
 								if(recv(fileDescriptor, &nroBloqueRecibido,sizeof(int),0) == -1){
 									logErrorAndExit("Error al recibir el numero del bloque de datanode.");
 								}
-
+								log_info(logInfo,"Numero de bloque recibido %d.",nroBloqueRecibido);
 								pthread_mutex_unlock(&bloqueMutex);
 
 								break;
@@ -148,7 +150,7 @@ void conexionesDatanode(void * estructura){
 									free(rutasParaCpfrom);
 									liberarEstructuraArchivoFinal(estructuraArchivoFinal);
 									free(rutaATemporal);
-									log_error(logError, "No hay suficiente espacio en los nodos, para almacenar el archivo final.");
+									log_info(logInfo, "No hay suficiente espacio en los nodos, para almacenar el archivo final.");
 									break;
 								}
 
@@ -223,7 +225,6 @@ void conexionesDatanode(void * estructura){
 								break;
 							default:
 								log_error(logError, "Tipo de mensaje no encontrado en el protocolo.");
-								puts("Tipo de mensaje no encontrado en el protocolo.");
 								break;
 						}
 				}

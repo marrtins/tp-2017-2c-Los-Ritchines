@@ -1,7 +1,3 @@
-Nodo4Total=150
-Nodo3Libre=140
-TAMANIO=300
-NODOS=[Nodo4,Nodo3]
-Nodo3Total=150
-Nodo4Libre=140
-LIBRE=280
+TAMANIO=0
+NODOS=[]
+LIBRE=0

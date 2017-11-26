@@ -384,6 +384,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 	while(nroBloque < cantBloques){
 
 		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
+			puts("No se encuentran los nodos con las copias del bloque");
 			log_error(logError, "No se encontraron los nodos con las copias del bloque.");
 			return -1;
 		}

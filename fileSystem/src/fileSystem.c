@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 				log_info(logInfo, "Recibi la ruta %s.", rutaArchivo);
 
 				//verifico que la ruta que me manda yama sea valida
-				if(verificarRutaArchivo(rutaArchivo)){
+				if(verificarRutaArchivoSinPuts(rutaArchivo)){
 					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 					levantarTablaArchivo(archivo,ruta);
 

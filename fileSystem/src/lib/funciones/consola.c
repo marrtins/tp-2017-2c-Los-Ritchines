@@ -35,23 +35,11 @@ void procesarInput(char* linea) {
 	} else if (!strcmp(*palabras, "cpfrom")) {
 		consolaCpfrom(palabras,cantidad);
 	} else if (!strcmp(*palabras, "cpto")) {
-		if (cantidad == 2) {
-			if (verificarRutaArchivo(palabras[1])) {
-				if (copiarArchivo(palabras) != -1) {
-					puts("Se copio el archivo correctamente.");
-					return;
-				} else {
-					puts("No se pudo copiar el archivo.");
-				}
-			}
-		}else {
-			puts("Error en la cantidad de parametros");
-		}
+		consolaCpto(palabras,cantidad);
 	} else if (!strcmp(*palabras, "cpblock")) {
 		procesarCpblock(palabras);
 	} else if (!strcmp(*palabras, "md5")) {
 		consolaMd5(palabras,cantidad);
-
 	} else if (!strcmp(*palabras, "ls")) {
 		consolaLs(palabras,cantidad);
 	} else if (!strcmp(*palabras, "info")) {
@@ -145,6 +133,21 @@ void consolaFormat(char**palabras, int cantidad){
 		puts("Error en la cantidad de parametros.");
 	}
 }
+
+void consolaCpto(char** palabras, int cantidad) {
+	if (cantidad == 2) {
+		if (verificarRutaArchivo(palabras[1])) {
+			if (copiarArchivo(palabras) != -1) {
+				puts("Se copio el archivo correctamente.");
+			} else {
+				puts("No se pudo copiar el archivo.");
+			}
+		}
+	} else {
+		puts("Error en la cantidad de parametros");
+	}
+}
+
 void consolaRename(char** palabras, int cantidad) {
 	if (cantidad == 2) {
 		if (esRutaYamafs(palabras[1])){
@@ -265,42 +268,25 @@ void consolaLs(char**palabras, int cantidad){
 	}
 }
 
-void consolaInfo(char**palabras, int cantidad){
-	if (cantidad == 1){
-		if(esRutaYamafs(palabras[1])){
-			if(verificarRutaArchivo(palabras[1])){
-				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
-				char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
-				levantarTablaArchivo(tablaArchivo, rutaLocal);
-				mostrarTablaArchivo(tablaArchivo);
-				liberarTablaDeArchivo(tablaArchivo);
-				free(rutaLocal);
-			}
-			else{
-				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs.");
-			}
+void consolaInfo(char**palabras, int cantidad) {
+	if (cantidad == 1) {
+		if (verificarRutaArchivo(palabras[1])) {
+			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
+			levantarTablaArchivo(tablaArchivo, rutaLocal);
+			mostrarTablaArchivo(tablaArchivo);
+			liberarTablaDeArchivo(tablaArchivo);
+			free(rutaLocal);
 		}
-		else{
-			puts("Falta la referencia a yamafs.");
-		}
-	}
-	else{
+	} else {
 		puts("Error en la cantidad de parametros.");
 	}
 }
 
 void consolaRemove (char** palabras, int cantidad){
 	if (cantidad == 1){
-		if (esRutaYamafs(palabras[1])){
-			if(verificarRutaArchivo(palabras[1])){
-				removerArchivo(palabras[1]);
-				puts("El archivo se elimino correctamente.");
-			} else{
-				puts("La ruta ingresada, no corresponde a ningún archivo del yamafs.");
-			}
-		}
-		else{
-			puts("Falta la referencia a yamafs.");
+		if(verificarRutaArchivo(palabras[1])){
+			removerArchivo(palabras[1]);
 		}
 	}
 	else if (cantidad ==2){
@@ -329,23 +315,15 @@ void consolaRemove (char** palabras, int cantidad){
 	}
 	else if(cantidad == 4){
 		if (!strcmp(palabras[1], "-b")){
-			if(esRutaYamafs(palabras[2])){
-				if(verificarRutaArchivo(palabras[2])){
-					if(isdigit(*palabras[3]) && isdigit(*palabras[4])){
-						char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[2]);
-						eliminarBloqueDeUnArchivo(rutaLocal, atoi(palabras[3]), atoi(palabras[4]));
-						free(rutaLocal);
-					}
-					else{
-						puts("Ingrese numero de copias y bloques validos.");
-					}
+			if(verificarRutaArchivo(palabras[2])){
+				if(isdigit(*palabras[3]) && isdigit(*palabras[4])){
+					char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[2]);
+					eliminarBloqueDeUnArchivo(rutaLocal, atoi(palabras[3]), atoi(palabras[4]));
+					free(rutaLocal);
 				}
 				else{
-					puts("La ruta ingresada, no corresponde a ningún archivo del yamafs.");
+					puts("Ingrese numero de copias y bloques validos.");
 				}
-			}
-			else{
-				puts("Falta la referencia a yamafs.");
 			}
 		}
 		else{
@@ -390,7 +368,7 @@ void consolaMove(char ** palabras, int cantidad) {
 	if (cantidad == 2) {
 		char** carpetas1 = string_split(palabras[1], "/");
 		char** carpetas2 = string_split(palabras[2], "/");
-		if (strcmp(carpetas1[0], "yamafs:")	|| strcmp(carpetas2[0], "yamafs:")) {
+		if (esRutaYamafs(carpetas1[0])	|| esRutaYamafs(carpetas2[0])) {
 			puts("Falta la referencia a yamafs:/ en alguna de las rutas.");
 		} else {
 			if(!esRutaDeUnArchivo(palabras[2])){
@@ -398,6 +376,7 @@ void consolaMove(char ** palabras, int cantidad) {
 				puts("Se quiere mover un archivo");
 				if (verificarRutaArchivo(palabras[1])) {
 					moverArchivo(palabras[1], palabras[2]);
+
 				}else{
 					puts("El archivo no existe");
 				}

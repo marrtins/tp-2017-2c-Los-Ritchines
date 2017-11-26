@@ -734,7 +734,36 @@ int esRutaDeUnArchivo(char * ruta){
 
 }
 
-int verificarRutaArchivo(char * rutaYamafs){
+int verificarRutaArchivo(char * rutaYamafs) {
+
+	int indice;
+	char * rutaSinArchivo;
+	if (esRutaYamafs(rutaYamafs)) {
+		if (esRutaDeUnArchivo(rutaYamafs)) {
+			rutaSinArchivo = obtenerRutaSinArchivo(rutaYamafs);
+			if (existeDirectorio(rutaSinArchivo)) {
+				indice = obtenerIndexDeUnaRuta(rutaSinArchivo);
+				if (existeArchivo(indice, rutaYamafs)) {
+					free(rutaSinArchivo);
+					return 1;
+				} else {
+					puts("No existe el archivo en yamafs");
+				}
+			} else {
+				puts("No existe el directorio");
+			}
+			free(rutaSinArchivo);
+		} else {
+			puts("La ruta yamafs debe contener el nombre del archivo y la extensión.");
+		}
+	} else {
+		puts("La ruta debe contener la referencia a 'yamafs:'");
+	}
+	return 0;
+
+}
+
+int verificarRutaArchivoSinPuts(char * rutaYamafs){
 
 	int indice;
 	char * rutaSinArchivo;
@@ -748,8 +777,6 @@ int verificarRutaArchivo(char * rutaYamafs){
 			}
 		}
 		free(rutaSinArchivo);
-	}else{
-		puts("La ruta yamafs debe contener el nombre del archivo y la extensión.");
 	}
 	return 0;
 
@@ -798,6 +825,7 @@ void removerArchivo(char* ruta){
 	remove(rutaArchivo);
 	free(rutaArchivo);
 	config_destroy(archivo);
+	puts("El archivo se elimino correctamente.");
 	}
 
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio){
@@ -811,7 +839,7 @@ void moverArchivo(char* rutaConArchivo, char* rutaDirectorioDestino){
 	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 	char * archivoMapeado;
 	char * archivoAMoverMapeado;
-	//char * rutaSinArchivo = obtenerRutaSinArchivo(rutaDirectorioDestino);
+
 	int index = obtenerIndexDeUnaRuta(rutaDirectorioDestino);
 	char* rutaLocalDirectorio = malloc(200);
 	FILE * archivo;
