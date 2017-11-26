@@ -378,7 +378,6 @@ void consolaMove(char ** palabras, int cantidad) {
 		} else {
 			if(!esRutaDeUnArchivo(palabras[2])){
 			if (esRutaDeUnArchivo(palabras[1])) {
-				puts("Se quiere mover un archivo");
 				if (verificarRutaArchivo(palabras[1])) {
 					moverArchivo(palabras[1], palabras[2]);
 
@@ -386,7 +385,6 @@ void consolaMove(char ** palabras, int cantidad) {
 					puts("El archivo no existe");
 				}
 			}else {
-				puts("Se quiere mover un directorio");
 				moverDirectorio(palabras[1],palabras[2]);
 			}
 		} else{

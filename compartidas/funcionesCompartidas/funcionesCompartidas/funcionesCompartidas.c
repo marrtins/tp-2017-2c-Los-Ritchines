@@ -122,7 +122,7 @@ int aceptarCliente(int fileDescriptor){
 
 
 	if((socketAceptado = accept(fileDescriptor, (struct sockaddr*) &direccionDeCliente, &tamanioDeCliente)) == -1){
-		log_error(logError, "Fallo la aceptacion del cliente, del FD servidor (fileSystem): %d", fileDescriptor);
+		log_error(logError, "Fallo la aceptacion del cliente, del FD servidor (fileSystem): %d.", fileDescriptor);
 		logErrorAndExit("Fallo la aceptacion del cliente, del FD servidor (fileSystem)");
 	}
 

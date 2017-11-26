@@ -309,7 +309,6 @@ void agregarCopiaAtablaArchivo(char * rutaLocalArchivo,char * nodo, int bloqueDa
 	char * bloqueNCopiaM;
 	int cantidadDeCopias;
 
-	puts(rutaLocalArchivo);
 	t_config *archivo = config_create(rutaLocalArchivo);
 
 	bloqueNCopias = generarStringBloqueNCopias(nroBloque);
