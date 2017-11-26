@@ -882,11 +882,6 @@ void moverArchivo(char* rutaConArchivo, char* rutaDirectorioDestino){
 }
 
 int esHijoDirectoOIndirecto(Tdirectorio * posiblePadre, Tdirectorio * posibleHijo){
-	printf("Padre:\n");
-	printf("%d \t %s \t %d\n", posiblePadre->index, posiblePadre->nombre, posiblePadre->padre);
-	printf("Hijo:\n");
-	printf("%d \t %s \t %d\n", posibleHijo->index, posibleHijo->nombre, posibleHijo->padre);
-
 	if(posibleHijo->index == 0){
 		return 0;
 	}
