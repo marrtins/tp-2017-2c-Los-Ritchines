@@ -1,3 +1,13 @@
+<<<<<<< HEAD
 TAMANIO=0
 NODOS=[]
 LIBRE=0
+=======
+Nodo3Libre=36
+TAMANIO=240
+NODOS=[Nodo2,Nodo3]
+Nodo3Total=150
+Nodo2Libre=-24
+LIBRE=12
+Nodo2Total=90
+>>>>>>> 96dc32a318a37d0fb506ae3f0f5550e3879f8967

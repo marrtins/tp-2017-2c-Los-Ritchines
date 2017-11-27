@@ -13,7 +13,6 @@ void conexionesDatanode(void * estructura){
 	int fileDescriptorMax = -1;
 	int cantModificados = 0;
 	int	nuevoFileDescriptor;
-	int cantNodosPorConectar;
 	int fileDescriptor;
 	int	estado;
 	int fileDescriptorArchivoFinal;
@@ -21,12 +20,10 @@ void conexionesDatanode(void * estructura){
 	FILE * archivoFinal;
 	Tnodo * nuevoNodo;
 	Tnodo * nodoEncontrado;
-	TinfoNodo * infoNodoNuevo;
 	TpackInfoBloqueDN * infoNodo;
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	Theader * head = malloc(sizeof(Theader));
 	TarchivoFinal * estructuraArchivoFinal;
-	cantNodosPorConectar = fileSystem->cant_nodos;
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
@@ -80,23 +77,23 @@ void conexionesDatanode(void * estructura){
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
 									if((Tnodo*)buscarNodoPorNombre(listaDeNodosDesconectados, infoNodo->nombreNodo) == NULL){
 										//nodo nuevo;
-										if(!esEstadoRecuperado){
-											nuevoNodo = malloc(sizeof(Tnodo));
-											infoNodoNuevo = inicializarInfoNodo(infoNodo);
-											nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
-											list_add(listaInfoNodo,infoNodoNuevo);
-											list_add(listaDeNodos, nuevoNodo);
-											almacenarBitmap(nuevoNodo);
-											agregarNodoATablaDeNodos(nuevoNodo);
-											verificarSiEsEstable(cantNodosPorConectar);
+										log_info(logInfo,"Un nodo nuevo quiere conectarse");
+										if(esEstadoRecuperado){
+											if(cantDeNodosDeEstadoAnterior>=2){
+												clearAndClose(fileDescriptor, &masterFD);
+												log_info(logInfo, "El nodo %s no es valido, no se encontraba en el estado anterior. Se expulsa",infoNodo->nombreNodo);
+											}
+											else {
+												log_info(logInfo,"Como el estado anterior nunca puede llegar a ser estable por la cantidad de nodos. Se permite conectar nodos nuevos.");
+												conectarNuevoNodo(infoNodo,fileDescriptor);
+												verificarSiEsEstable();
+											}
 										}
 										else{
-											clearAndClose(fileDescriptor, &masterFD);
-											log_info(logInfo, "El nodo %s no es valido, no se encontraba en el estado anterior. Se expulsa",infoNodo->nombreNodo);
+											conectarNuevoNodo(infoNodo,fileDescriptor);
 										}
 									}
-									else {//se reconecta;
-										//pensar si hay que volver a inicializarlo al nodo que
+									else {
 										//se reconecta
 										log_info(logInfo,"Un datanode quiere reconectarse.");
 										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
@@ -106,7 +103,7 @@ void conexionesDatanode(void * estructura){
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
 										log_info(logInfo, "Nodo que se habia caído, se reconecto.");
-										verificarSiEsEstable(cantNodosPorConectar);
+										verificarSiEsEstable();
 									}
 								}
 								else {
@@ -270,18 +267,29 @@ void formatearNodos(t_list * lista){
 	}
 }
 
-void verificarSiEsEstable(int cantNodosPorConectar) {
-
-	if (esEstadoRecuperado) {
-		if(todosLosArchivosSePuedenLevantar()){
-			sem_post(&yama);
-			log_info(logInfo,"FILESYSTEM ESTABLE");
-		}
-	} else {
-		if(list_size(listaDeNodos)==cantNodosPorConectar){
+void verificarSiEsEstable() {
+	//por lo menos tiene que haber dos nodos y ademas tienen que poder levantarse todos los archivos
+	if(list_size(listaDeNodos)>=2){
+		if (esEstadoRecuperado) {
+			if(todosLosArchivosSePuedenLevantar()){
+				sem_post(&yama);
+				log_info(logInfo,"FILESYSTEM ESTABLE");
+			}
+		} else {
 			sem_post(&yama);
 			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
 	}
 
+}
+
+void conectarNuevoNodo(TpackInfoBloqueDN * infoNodo, int fileDescriptor){
+	Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
+	TinfoNodo * infoNodoNuevo = inicializarInfoNodo(infoNodo);
+	nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
+	list_add(listaInfoNodo,infoNodoNuevo);
+	list_add(listaDeNodos, nuevoNodo);
+	almacenarBitmap(nuevoNodo);
+	agregarNodoATablaDeNodos(nuevoNodo);
+	log_info(logInfo,"El %s se conecto por primera vez", nuevoNodo->nombre);
 }

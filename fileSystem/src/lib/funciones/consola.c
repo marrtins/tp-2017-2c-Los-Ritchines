@@ -131,7 +131,6 @@ void procesarCpblock(char ** palabras){
 void consolaFormat(char**palabras, int cantidad){
 	if(cantidad == 0){
 		formatearFS();
-		puts("FileSystem formateado.");
 	}
 	else{
 		puts("Error en la cantidad de parametros.");
