@@ -178,6 +178,7 @@ void formatearFS(){
 		levantarTablasDirectorios();
 		sem_post(&yama);
 		log_info(logInfo,"FILESYSTEM ESTABLE");
+		cantDeNodosDeEstadoAnterior = 2;
 		esEstadoRecuperado = 1; //para evitar que se conecten mas nodos
 		puts("Filesystem formateado exitosamente");
 	}

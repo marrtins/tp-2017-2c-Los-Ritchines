@@ -72,5 +72,6 @@ pthread_mutex_t bloqueMutex;
 sem_t yama;
 
 int esEstadoRecuperado;
+int cantDeNodosDeEstadoAnterior;
 
 #endif

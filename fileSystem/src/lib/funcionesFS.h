@@ -39,7 +39,8 @@ void consolaInfo(char**palabras, int cantidadParametros);
 
 
 //Conexiones
-void verificarSiEsEstable(int cantNodosPorConectar);
+void conectarNuevoNodo(TpackInfoBloqueDN * infoNodo, int fileDescriptor);
+void verificarSiEsEstable();
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);

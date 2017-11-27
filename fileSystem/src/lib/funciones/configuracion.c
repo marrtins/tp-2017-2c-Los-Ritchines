@@ -14,7 +14,7 @@ TfileSystem * obtenerConfiguracionFS(char* ruta){
 	strcpy(fileSystem->puerto_datanode, config_get_string_value(fsConfig, "PUERTO_DATANODE"));
 	strcpy(fileSystem->puerto_yama, config_get_string_value(fsConfig, "PUERTO_YAMA"));
 	strcpy(fileSystem->ip_yama, config_get_string_value(fsConfig, "IP_YAMA"));
-	fileSystem->cant_nodos = config_get_int_value(fsConfig, "CANT_NODOS");
+	cantDeNodosDeEstadoAnterior = list_size(listaDeNodosDesconectados);
 
 	fileSystem->tipo_de_proceso = FILESYSTEM;
 
