@@ -51,7 +51,7 @@ t_list * planificar(TjobMaster *job){
 		nodo->pwl=pwl;
 		nodo->availability=nodo->disponibilidadBase+nodo->pwl;
 		nodo->clock=false;
-		log_info(logInfo,"Nodo:%s, ava:%d, clock:%d\n",nodo->infoNodo.nombreNodo,nodo->availability,nodo->clock);
+		log_info(logInfo,"Nodo:%s, ava:%d, clock:%d",nodo->infoNodo.nombreNodo,nodo->availability,nodo->clock);
 		list_add(listaWorkersPlanificacion,nodo);
 	}
 
@@ -482,10 +482,11 @@ int posicionarClock(t_list *listaWorkers){
 int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
 
 	int i;
-	int historico1=-1;
-	int historico2=-1;
-	int indiceAModificar;
-	Tplanificacion *aux;
+
+	Tplanificacion *aux=list_get(listaWorkers,0);
+	int historico1=getHistorico(aux);
+	int historico2=historico1;
+	int indiceAModificar=0;
 	for(i=0;i<list_size(listaWorkers);i++){
 		aux = list_get(listaWorkers,i);
 		log_info(logInfo,"Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
@@ -493,7 +494,7 @@ int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
 			historico1=getHistorico(aux);
 			log_info(logInfo,"historico %s:%d\n,",aux->infoNodo.nombreNodo,historico1);
 		}
-		if(historico1>historico2){ //todo cambio (?????????????)
+		if(historico1<historico2){ //todo cambio (?????????????)
 			log_info(logInfo,"historico de %s:(%d) es el mayor. x ahora lo modifico\n,",aux->infoNodo.nombreNodo,historico1);
 			historico2=historico1;
 			indiceAModificar=i;
@@ -581,7 +582,7 @@ int getCargaReduccionGlobal(int job){
 	TpackTablaEstados * estado;
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 		estado = list_get(listaEstadoFinalizadoOK,i);
-		if(estado->etapa==REDUCCIONLOCAL){
+		if((estado->etapa==REDUCCIONLOCAL) & (estado->job==job)){
 			carga++;
 		}
 	}
@@ -614,7 +615,7 @@ void liberarCargaNodos(int idTareaFinalizada){
 
 	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
 	int jobALiberar = tareaFinalizada->job;
-
+	log_info(logInfo,"libero las cargas del job %d",jobALiberar);
 	//primero me fijo q no haya sido agregado a la lista de job finalizados, en ese caso ya se liberaron las cargas
 
 	if(!yaFueFinalizadoPorErrorDeReplanificacion(jobALiberar)){
@@ -626,26 +627,35 @@ void liberarCargaNodos(int idTareaFinalizada){
 
 		for(i=0;i<list_size(listaEstadoEnProceso);i++){
 			TpackTablaEstados *aux  = list_get(listaEstadoEnProceso,i);
-			if(aux->idTarea==jobALiberar){
+			if(aux->job==jobALiberar){
+				log_info(logInfo,"libero del job %d, idtarea: %d en %s",aux->job,aux->idTarea,aux->nodo);
 				if(aux->etapa==TRANSFORMACION){
+					log_info(logInfo,"libero 1");
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONLOCAL){
+					log_info(logInfo,"libero 1");
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
 					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
+					log_info(logInfo,"libero %d",cargaAReducir);
 					liberarCargaEn(aux->nodo,cargaAReducir);
 				}
 			}
 		}
 		for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 			TpackTablaEstados *aux  = list_get(listaEstadoFinalizadoOK,i);
-			if(aux->idTarea==jobALiberar){
+			if(aux->job==jobALiberar){
+				log_info(logInfo,"libero del job %d, idtarea: %d en %s",aux->job,aux->idTarea,aux->nodo);
 				if(aux->etapa==TRANSFORMACION){
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONLOCAL){
+					log_info(logInfo,"libero 1");
+
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
 					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
+					log_info(logInfo,"libero %d",cargaAReducir);
+
 					liberarCargaEn(aux->nodo,cargaAReducir);
 
 				}
@@ -653,19 +663,25 @@ void liberarCargaNodos(int idTareaFinalizada){
 		}
 		for(i=0;i<list_size(listaEstadoError);i++){
 			TpackTablaEstados *aux  = list_get(listaEstadoError,i);
-			if(aux->idTarea==jobALiberar){
+			if(aux->job==jobALiberar){
+				log_info(logInfo,"libero del job %d, idtarea: %d en %s",aux->job,aux->idTarea,aux->nodo);
 				if(aux->etapa==TRANSFORMACION){
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONLOCAL){
+					log_info(logInfo,"libero 1");
+
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
 					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
+					log_info(logInfo,"libero %d",cargaAReducir);
 					liberarCargaEn(aux->nodo,cargaAReducir);
 				}
 			}
 		}
 
 		mostrarTablaDeEstados();
+		log_info(logInfo,"cargas al terminar el job %d:",jobALiberar);
+		mostrarTablaCargas();
 
 
 	}
@@ -675,8 +691,12 @@ void liberarCargaEn(char * nombreNodo,int cantidad){
 	int i;
 	for(i=0;i<list_size(listaCargaGlobal);i++){
 		TcargaGlobal *cargaNodo = list_get(listaCargaGlobal,i);
-		cargaNodo->cargaGlobal-=cantidad;
-		break;
+		if(string_equals_ignore_case(nombreNodo,cargaNodo->nombreNodo)){
+			cargaNodo->cargaGlobal-=cantidad;
+			break;
+		}
+
+
 	}
 }
 
@@ -870,9 +890,9 @@ void mostrarTablaDeEstados(){
 		archivoTemporal=aux->nombreArchTemporal;
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"E Pr");
-		log_info(logInfo,"1asd");
+		//log_info(logInfo,"1asd");
 		free(etapa);
-		log_info(logInfo,"2");
+		//log_info(logInfo,"2");
 		//free(bloque);
 		//log_info(logInfo,"3");
 		//free(nodo);
@@ -912,9 +932,9 @@ void mostrarTablaDeEstados(){
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"FinOK");
 
-		log_info(logInfo,"6");
+		//log_info(logInfo,"6");
 		free(etapa);
-		log_info(logInfo,"7");
+		//log_info(logInfo,"7");
 		//free(bloque);
 		//log_info(logInfo,"8");
 		//free(nodo);
@@ -951,9 +971,9 @@ void mostrarTablaDeEstados(){
 		printf("%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s\n",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 		log_info(logInfo,"%-4d%-4d%-7d%-7s%-25s%-15s%-40s%-10s",id,job,master,nodo,bloque,etapa,archivoTemporal,"ERR");
 
-		log_info(logInfo,"11");
+		//log_info(logInfo,"11");
 		free(etapa);
-		log_info(logInfo,"12");
+		//log_info(logInfo,"12");
 		//free(bloque);
 		//log_info(logInfo,"13");
 		//free(nodo);

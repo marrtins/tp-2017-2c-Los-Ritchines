@@ -10,6 +10,9 @@ char * getBloqueWorker(int nroBloque);
 int manejarConexionMaster(Theader *header,int client_sock);
 int manejarConexionWorker(Theader *head, int client_sock);
 
+void clearAndClose(int fileDescriptor, fd_set* masterFD);
+int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors);
+
 int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar);
 int realizarReduccionLocal(int client_sock);
 int realizarTransformacion(int client_sock);
@@ -23,4 +26,7 @@ Tbuffer * empaquetarArchivoFinal(Theader * header, char * rutaArchivo, char * co
 void liberarInfoApareoGlobal(void * info);
 void liberarInfoNodos(void * info);
 void liberarListaTemporales(void * info);
+
+FILE * getFDTemporal(int fdWorker);
+void removerFDWorker(int fdWorker);
 #endif

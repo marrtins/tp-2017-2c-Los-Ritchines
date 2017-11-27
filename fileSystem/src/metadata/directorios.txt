@@ -1,6 +1,1 @@
-4 pan 0
-3 pepe 1
-2 pis 0
-1 pelo 0
 0 root -1
-5 queso 0

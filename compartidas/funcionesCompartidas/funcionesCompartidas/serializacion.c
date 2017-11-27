@@ -713,7 +713,7 @@ char *serializarInfoReduccionLocalMasterWorker(Theader head,int nombreTemporalRe
 	memcpy(bytes_serial + *pack_size, &sizeLista, sizeof (int));
 	*pack_size += sizeof (int);
 
-	printf("EN COMPARTIDAS; SIZE LISTA: %d\n",sizeLista);
+	//printf("EN COMPARTIDAS; SIZE LISTA: %d\n",sizeLista);
 	for(i=0;i<sizeLista;i++){
 		TreduccionLista * aux = list_get(listaTemporales,i);
 		memcpy(bytes_serial + *pack_size, &aux->nombreTemporalLen, sizeof(int));

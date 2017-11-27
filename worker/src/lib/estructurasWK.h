@@ -30,4 +30,9 @@ typedef struct{
 	bool encargado;
 }TinfoApareoGlobal;
 
+typedef struct{
+	int fdWorker;
+	FILE * fdTemporal;
+}Tapareo;
+
 #endif

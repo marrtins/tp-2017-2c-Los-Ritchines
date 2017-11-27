@@ -105,8 +105,9 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
 			}
 		}
+	log_info(logInfo,"designo al encargado de la rg");
 
-
+	mostrarTablaCargas();
 
 	TinfoNodoReduccionGlobal *aux = list_get(listaInformacionNodos,0);
 	int indiceElegido = 0;
@@ -126,6 +127,7 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	aux->nodoEncargado=1;
 
 
+	mostrarTablaCargas();
 	log_info(logInfo,"Nodo encargado: %s. menor carga: %d \n",getNodoElegido(listaInformacionNodos),menorCarga);
 
 
@@ -163,9 +165,11 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 	agregarReduccionGlobalAListaEnProceso(nuevaReduccion,bloquesReducidos,job);
 
 	int cargaWorker = divideYRedondea(list_size(job->listaNodosArchivo),2);
-
+	log_info(logInfo,"sumo carga de la rg: %d",cargaWorker);
 	actualizarCargaWorkerEn(getNodoElegido(listaInformacionNodos),cargaWorker);
 	aumentarHistoricoEn(getNodoElegido(listaInformacionNodos),cargaWorker);
+	mostrarTablaCargas();
+
 	list_destroy(bloques);
 	return 0;
 }

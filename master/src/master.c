@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 			if(stat <0 ){
 				puts("error conectarse workers transformacion");
 			}
-			list_destroy_and_destroy_elements(bloquesTransformacion,limpiarBloquesTransf);
+			//list_destroy_and_destroy_elements(bloquesTransformacion,limpiarBloquesTransf);
 
 
 			break;
