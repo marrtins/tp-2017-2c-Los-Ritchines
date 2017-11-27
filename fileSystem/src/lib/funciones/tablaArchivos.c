@@ -182,7 +182,6 @@ void ocuparBloqueEnTablaNodos(char * nombreNodo){
 
 	char * nodoLibreAString = generarStringNodoNLibre(nombreNodo);
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1, restaDeDosNumerosInt);
-
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
 

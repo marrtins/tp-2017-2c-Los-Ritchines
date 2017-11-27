@@ -78,7 +78,7 @@ void conexionesDatanode(void * estructura){
 								infoNodo = recvInfoNodo(fileDescriptor);
 								log_info(logInfo,"Nombre: %s, tamanio databin: %d, IP: %s, puerto: %s",infoNodo->nombreNodo,infoNodo->databinEnMB,infoNodo->ipNodo,infoNodo->puertoNodo);
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
-									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
+									if((Tnodo*)buscarNodoPorNombre(listaDeNodosDesconectados, infoNodo->nombreNodo) == NULL){
 										//nodo nuevo;
 										nuevoNodo = malloc(sizeof(Tnodo));
 										infoNodoNuevo = inicializarInfoNodo(infoNodo);

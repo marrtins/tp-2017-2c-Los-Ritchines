@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 		if(string_equals_ignore_case(argv[1],flag)){
 			inicializarTablaDirectorios();
 			inicializarBitmaps();
+			inicializarTablaDeNodos();
 			esEstadoRecuperado = 0;
 		}else{
 			puts("La flag ingresada no es válida");
@@ -49,7 +50,6 @@ int main(int argc, char* argv[]) {
 	fileSystem = obtenerConfiguracionFS("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/config_filesystem");
 	mostrarConfiguracion(fileSystem);
 
-	inicializarTablaDeNodos();
 	log_info(logInfo,"Se inicializa la tabla de nodos");
 	levantarTablasDirectorios();
 	log_info(logInfo,"Se levanta la tabla de directorios");
