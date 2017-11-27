@@ -16,7 +16,7 @@ extern int cont;
 int realizarReduccionLocal(int client_sock){
 	TinfoReduccionLocalMasterWorker *infoReduccion;
 	char * bufferReduccion;
-
+	cantApareosGlobal++;
 
 
 	int stat;
@@ -99,7 +99,7 @@ int realizarReduccionLocal(int client_sock){
 			string_append(&rutaTemporalesApareados,"/home/utnso/tmp/apareoLocal");
 			string_append(&rutaTemporalesApareados,worker->nombre_nodo);
 			string_append(&rutaTemporalesApareados,"nro");
-			string_append(&rutaTemporalesApareados,string_itoa(cantApareosGlobal++));
+			string_append(&rutaTemporalesApareados,string_itoa(cantApareosGlobal));
 
 			string_append(&lineaDeEjecucionApareo," > ");
 			string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
