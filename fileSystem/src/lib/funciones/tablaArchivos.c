@@ -394,7 +394,7 @@ int todosLosArchivosSePuedenLevantar(){
 	}
 	liberarPunteroDePunterosAChar(directorios);
 	free(directorios);
-	log_info(logInfo,"Todos los archivos tiene 2 copias");
+	log_info(logInfo,"Todos los archivos de yamafs se pueden levantar");
 	return 1;
 }
 

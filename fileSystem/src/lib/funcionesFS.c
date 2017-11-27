@@ -521,8 +521,10 @@ int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque){
 	int i = 0;
 	Tbloques * tBloque = &tablaArchivo->bloques[nroBloque];
 	Tnodo* nodo;
+	TcopiaNodo * copiaNodo;
 	while(i < tBloque->cantidadCopias){
-		nodo = (Tnodo*)list_get(listaDeNodos,i);
+		copiaNodo = (TcopiaNodo*)list_get(tBloque->copia,i);
+		nodo = buscarNodoPorNombre(listaDeNodos, copiaNodo->nombreDeNodo);
 		if(nodo != NULL){
 			return 1;
 		}

@@ -170,11 +170,20 @@ void formatearTablaDeNodos(){
 }
 
 void formatearFS(){
-	inicializarTablaDirectorios();
-	formatearTablaDeNodos();
-	formatearNodos(listaDeNodos);
-	formatearNodos(listaDeNodosDesconectados);
-	levantarTablasDirectorios();
+	if(list_size(listaDeNodos) >= 2){
+		inicializarTablaDirectorios();
+		//formatearTablaDeNodos();
+		formatearNodos(listaDeNodos);
+		formatearNodos(listaDeNodosDesconectados);
+		levantarTablasDirectorios();
+		sem_post(&yama);
+		log_info(logInfo,"FILESYSTEM ESTABLE");
+		esEstadoRecuperado = 1; //para evitar que se conecten mas nodos
+		puts("Filesystem formateado exitosamente");
+	}
+	else{
+		puts("No se puede formatear, conecte al menos dos nodos para pasar a FILESYSTEM ESTABLE");
+	}
 }
 
 char * obtenerNombreDeArchivoDeUnaRuta(char * ruta){

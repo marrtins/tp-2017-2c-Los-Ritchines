@@ -87,7 +87,7 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 
 	int estado, socketDeEscucha;
 	struct addrinfo hints, * infoDelServer;
-	char * mensaje = malloc(50);
+	char * mensaje = malloc(100);
 
 	setupHints(&hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
 
@@ -101,6 +101,7 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 
 	if ((bind(socketDeEscucha, infoDelServer->ai_addr, infoDelServer->ai_addrlen)) == -1){
 		sprintf(mensaje, "Fallo al reservar el puerto %s. Es posible que el puerto este ocupado." , puertoDeEscucha);
+		puts(mensaje);
 		logErrorAndExit(mensaje);
 	}
 

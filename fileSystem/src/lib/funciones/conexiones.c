@@ -88,7 +88,6 @@ void conexionesDatanode(void * estructura){
 											list_add(listaDeNodos, nuevoNodo);
 											almacenarBitmap(nuevoNodo);
 											agregarNodoATablaDeNodos(nuevoNodo);
-											verificarSiEsEstable(cantNodosPorConectar);
 										}
 										else{
 											clearAndClose(fileDescriptor, &masterFD);
@@ -271,14 +270,14 @@ void formatearNodos(t_list * lista){
 }
 
 void verificarSiEsEstable(int cantNodosPorConectar) {
-
-	if (esEstadoRecuperado) {
-		if(todosLosArchivosSePuedenLevantar()){
-			sem_post(&yama);
-			log_info(logInfo,"FILESYSTEM ESTABLE");
-		}
-	} else {
-		if(list_size(listaDeNodos)==cantNodosPorConectar){
+	//por lo menos tiene que haber dos nodos y ademas tienen que poder levantarse todos los archivos
+	if(list_size(listaDeNodos)>=2){
+		if (esEstadoRecuperado) {
+			if(todosLosArchivosSePuedenLevantar()){
+				sem_post(&yama);
+				log_info(logInfo,"FILESYSTEM ESTABLE");
+			}
+		} else {
 			sem_post(&yama);
 			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
