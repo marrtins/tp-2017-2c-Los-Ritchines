@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
 						log_info(logInfo,"Error al recibir el tamanio del bloque");
 					}
 					enviarBloque(nroBloque_ , tamanioBloque_ ,socketFS);
-					log_info(logInfo,"Se envio el bloque a FILESYSTEM");
+					log_info(logInfo,"Se envio el bloque %d a FILESYSTEM",nroBloque_);
 					break;
 				default:
 					log_error(logError,"Se recibio un mensaje que no esta incluido en el protocolo");

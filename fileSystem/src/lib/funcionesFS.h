@@ -19,7 +19,7 @@ int punteroDeStringsContieneString(char ** punteroDeString ,char * string);
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 
-int todosLosArchivosTienenCopias();
+int todosLosArchivosSePuedenLevantar();
 
 //Consola
 void procesarCpblock(char ** palabras);
@@ -186,7 +186,7 @@ int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
 int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
 int getMD5(char* ruta);
-int todosLosBloquesTienenDosCopias(Tarchivo *  archivo);
+
 
 
 //Liberar

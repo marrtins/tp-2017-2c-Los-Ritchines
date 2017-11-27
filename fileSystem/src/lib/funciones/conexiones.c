@@ -78,17 +78,22 @@ void conexionesDatanode(void * estructura){
 								infoNodo = recvInfoNodo(fileDescriptor);
 								log_info(logInfo,"Nombre: %s, tamanio databin: %d, IP: %s, puerto: %s",infoNodo->nombreNodo,infoNodo->databinEnMB,infoNodo->ipNodo,infoNodo->puertoNodo);
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
-									if((Tnodo*)buscarNodoPorFD(listaDeNodosDesconectados, fileDescriptor) == NULL){
+									if((Tnodo*)buscarNodoPorNombre(listaDeNodosDesconectados, infoNodo->nombreNodo) == NULL){
 										//nodo nuevo;
-										nuevoNodo = malloc(sizeof(Tnodo));
-										infoNodoNuevo = inicializarInfoNodo(infoNodo);
-										nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
-										list_add(listaInfoNodo,infoNodoNuevo);
-										list_add(listaDeNodos, nuevoNodo);
-										almacenarBitmap(nuevoNodo);
-										agregarNodoATablaDeNodos(nuevoNodo);
-										verificarSiEsEstable(cantNodosPorConectar);
-
+										if(!esEstadoRecuperado){
+											nuevoNodo = malloc(sizeof(Tnodo));
+											infoNodoNuevo = inicializarInfoNodo(infoNodo);
+											nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
+											list_add(listaInfoNodo,infoNodoNuevo);
+											list_add(listaDeNodos, nuevoNodo);
+											almacenarBitmap(nuevoNodo);
+											agregarNodoATablaDeNodos(nuevoNodo);
+											verificarSiEsEstable(cantNodosPorConectar);
+										}
+										else{
+											clearAndClose(fileDescriptor, &masterFD);
+											log_info(logInfo, "El nodo %s no es valido, no se encontraba en el estado anterior. Se expulsa",infoNodo->nombreNodo);
+										}
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -101,11 +106,12 @@ void conexionesDatanode(void * estructura){
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
 										log_info(logInfo, "Nodo que se habia caído, se reconecto.");
+										verificarSiEsEstable(cantNodosPorConectar);
 									}
 								}
 								else {
 									clearAndClose(fileDescriptor, &masterFD);
-									log_error(logError, "Un nodo ya conectado, se esta volviendo a conectar");
+									log_info(logInfo, "El nodo %s ya esta conectado. Se expulsa",infoNodo->nombreNodo);
 								}
 
 								liberarTPackInfoBloqueDN(infoNodo);
@@ -266,17 +272,16 @@ void formatearNodos(t_list * lista){
 
 void verificarSiEsEstable(int cantNodosPorConectar) {
 
-	if (list_size(listaDeNodos) == cantNodosPorConectar) {
-		if (esEstadoRecuperado) {
-			//TODO los nodos conectados no se borran de la lista de desconectados!!!
-			//if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes())
-			if(todosLosArchivosTienenCopias()){
-				sem_post(&yama);
-				log_info(logInfo,"FILESYSTEM ESTABLE");
-			}
-		} else {
+	if (esEstadoRecuperado) {
+		if(todosLosArchivosSePuedenLevantar()){
+			sem_post(&yama);
+			log_info(logInfo,"FILESYSTEM ESTABLE");
+		}
+	} else {
+		if(list_size(listaDeNodos)==cantNodosPorConectar){
 			sem_post(&yama);
 			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
 	}
+
 }

@@ -182,7 +182,6 @@ void ocuparBloqueEnTablaNodos(char * nombreNodo){
 
 	char * nodoLibreAString = generarStringNodoNLibre(nombreNodo);
 	setearAtributoDeArchivoConfigConInts(tablaDeNodos, nodoLibreAString, 1, restaDeDosNumerosInt);
-
 	config_save(tablaDeNodos);
 	config_destroy(tablaDeNodos);
 
@@ -353,27 +352,14 @@ char ** obtenerNodosDeUnArchivo(Tarchivo * archivo){
 	return nodos;
 }
 
-int todosLosBloquesTienenDosCopias(Tarchivo *  archivo){
-	int cantBloques;
-	int nroBloque = 0;
-	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
 
-	while(nroBloque < cantBloques){
-		if(archivo->bloques[nroBloque].cantidadCopias>=2){
-			//TODO agregar la copia que falta
-			log_info(logInfo,"El bloque numero %d del archivo %s no tiene copias\n", nroBloque, archivo->nombreArchivoSinExtension);
-			return 0;
-		}
-		nroBloque++;
-	}
-	return 1;
-}
-
-int todosLosArchivosTienenCopias(){
+int todosLosArchivosSePuedenLevantar(){
 
 	char ** directorios;
 	char ** archivos;
 	Tarchivo * archivo;
+	int cantBloques;
+	int nroBloque;
 	int i = 0;
 	int j;
 	directorios = buscarDirectorios("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
@@ -384,13 +370,20 @@ int todosLosArchivosTienenCopias(){
 		while (archivos[j] != NULL) {
 			archivo = malloc(sizeof(Tarchivo));
 			levantarTablaArchivo(archivo,archivos[j]);
-			if(!todosLosBloquesTienenDosCopias(archivo)){
-				liberarPunteroDePunterosAChar(directorios);
-				free(directorios);
-				liberarPunteroDePunterosAChar(archivos);
-				free(archivos);
-				liberarTablaDeArchivo(archivo);
-				return 0;
+			cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+			nroBloque = 0;
+			while(nroBloque < cantBloques){
+				if(nodosDisponiblesParaBloqueDeArchivo(archivo, nroBloque) == 0){
+
+					log_info(logInfo, "No se encontraron los nodos con las copias del bloque.");
+					liberarPunteroDePunterosAChar(directorios);
+					free(directorios);
+					liberarPunteroDePunterosAChar(archivos);
+					free(archivos);
+					liberarTablaDeArchivo(archivo);
+					return 0;
+				}
+				nroBloque++;
 			}
 			liberarTablaDeArchivo(archivo);
 			j++;
