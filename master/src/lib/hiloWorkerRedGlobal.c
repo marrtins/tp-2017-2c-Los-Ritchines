@@ -38,7 +38,8 @@ void hiloWorkerReduccionGlobal(void *info){
 	log_info(logInfo,"Hora de inicio RG: %s\n", buffInicio);
 
 	log_info(logInfo,"ID tarea%d\n",idTarea);
-	printf("Inicio RG %s",atributos->infoReduccionGlobal.tempRedGlobal);
+	printf("Inicio RG %s\n",atributos->infoReduccionGlobal.tempRedGlobal);
+
 
 	int i;
 	TreduccionGlobal * infoReduccionAEnviar=malloc(sizeof(TreduccionGlobal));
@@ -61,6 +62,7 @@ void hiloWorkerReduccionGlobal(void *info){
 				MUX_UNLOCK(&mux_cantFallos);
 				return;
 			}
+			printf("El encargado de la RG es %s\n",infoNodo->nombreNodo);
 			log_info(logInfo,"Nos conectamos a %s, el encargado de la reduccion global\n",infoNodo->nombreNodo);
 		}
 		list_add(listaNodos,infoNodo);

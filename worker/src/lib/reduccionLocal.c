@@ -16,12 +16,8 @@ extern int cont;
 int realizarReduccionLocal(int client_sock){
 	TinfoReduccionLocalMasterWorker *infoReduccion;
 	char * bufferReduccion;
-	char * nombreScriptReductor;
-	char * rutaScriptReductor;
-	char  *rutaResultadoReduccion;
-	char  *rutaTemporalesApareados;
-	char * lineaDeEjecucionReduccion;
-	char * lineaDeEjecucionApareo;
+
+
 
 	int stat;
 	pid_t pidRed;
@@ -51,50 +47,19 @@ int realizarReduccionLocal(int client_sock){
 	log_info(logInfo,"Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
 
 	int i;
-
-	log_info(logInfo,"LIST SIZE %d\n",infoReduccion->listaSize);
-	lineaDeEjecucionApareo=string_new();
-	string_append(&lineaDeEjecucionApareo,"sort -m");
-
-	for(i=0;i<infoReduccion->listaSize;i++){
-		TreduccionLista *infoAux = list_get(infoReduccion->listaTemporales,i);
-		log_info(logInfo,"Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
-		string_append(&lineaDeEjecucionApareo," /home/utnso/");
-		string_append(&lineaDeEjecucionApareo,infoAux->nombreTemporal);
-
-	}
-	rutaTemporalesApareados=string_new();
-
-	string_append(&rutaTemporalesApareados,"/home/utnso/tmp/apareoLocal");
-	string_append(&rutaTemporalesApareados,worker->nombre_nodo);
-	string_append(&rutaTemporalesApareados,"nro");
-	string_append(&rutaTemporalesApareados,string_itoa(cantApareosGlobal++));
-
-	string_append(&lineaDeEjecucionApareo," > ");
-	string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
-
-	log_info(logInfo,"linea de ejec apareo %s \n",lineaDeEjecucionApareo);
-	stat = system(lineaDeEjecucionApareo);
-	if(stat != 0){
-		puts("fallo apareo local ");
-		headEnvio->tipo_de_proceso = WORKER;
-		headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
-		enviarHeader(client_sock,headEnvio);
-		log_info(logInfo,"stat apareo local: %d",stat);
-		return FALLO_GRAL;
-	}
-	log_info(logInfo,"Ahora recibo el script reductor");
-
-
+	char * nombreScriptReductor;
+	char * rutaScriptReductor;
 	nombreScriptReductor=string_new();
-	rutaScriptReductor  = string_new();
-	string_append(&rutaScriptReductor,"/home/utnso/");
-	string_append(&nombreScriptReductor,"reductorLocal");
-	cont++;
-	string_append(&nombreScriptReductor,string_itoa(cont));
-	string_append(&nombreScriptReductor,worker->nombre_nodo);
-	string_append(&nombreScriptReductor,".py");
-	string_append(&rutaScriptReductor,nombreScriptReductor);
+				rutaScriptReductor  = string_new();
+				string_append(&rutaScriptReductor,"/home/utnso/");
+				string_append(&nombreScriptReductor,"reductorLocal");
+				cont++;
+				string_append(&nombreScriptReductor,string_itoa(cont));
+				string_append(&nombreScriptReductor,worker->nombre_nodo);
+				string_append(&nombreScriptReductor,".py");
+				string_append(&rutaScriptReductor,nombreScriptReductor);
+
+
 
 
 	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
@@ -107,15 +72,60 @@ int realizarReduccionLocal(int client_sock){
 	}
 
 
-
-
-
-
-
 	//puts("Forkeo");
 
 	if ( (pidRed=fork()) == 0 )
 	{ /* hijo */
+
+		char  *rutaResultadoReduccion;
+		char  *rutaTemporalesApareados;
+		char * lineaDeEjecucionReduccion;
+		char * lineaDeEjecucionApareo;
+
+
+		log_info(logInfo,"LIST SIZE %d\n",infoReduccion->listaSize);
+			lineaDeEjecucionApareo=string_new();
+			string_append(&lineaDeEjecucionApareo,"sort -m");
+
+			for(i=0;i<infoReduccion->listaSize;i++){
+				TreduccionLista *infoAux = list_get(infoReduccion->listaTemporales,i);
+				log_info(logInfo,"Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
+				string_append(&lineaDeEjecucionApareo," /home/utnso/");
+				string_append(&lineaDeEjecucionApareo,infoAux->nombreTemporal);
+
+			}
+			rutaTemporalesApareados=string_new();
+
+			string_append(&rutaTemporalesApareados,"/home/utnso/tmp/apareoLocal");
+			string_append(&rutaTemporalesApareados,worker->nombre_nodo);
+			string_append(&rutaTemporalesApareados,"nro");
+			string_append(&rutaTemporalesApareados,string_itoa(cantApareosGlobal++));
+
+			string_append(&lineaDeEjecucionApareo," > ");
+			string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
+
+			log_info(logInfo,"linea de ejec apareo %s \n",lineaDeEjecucionApareo);
+			stat = system(lineaDeEjecucionApareo);
+			if(stat != 0){
+				puts("fallo apareo local ");
+				headEnvio->tipo_de_proceso = WORKER;
+				headEnvio->tipo_de_mensaje = FIN_REDUCCIONLOCALFAIL;
+				enviarHeader(client_sock,headEnvio);
+				log_info(logInfo,"stat apareo local: %d",stat);
+				return FALLO_GRAL;
+			}
+			log_info(logInfo,"Ahora recibo el script reductor");
+
+
+
+
+
+
+
+
+
+
+
 		//	printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
 		//	printf("%d\n",cont);
 		//int asd=system("export LC_ALL=C");
@@ -160,6 +170,14 @@ int realizarReduccionLocal(int client_sock){
 		free(rutaResultadoReduccion);
 		free(lineaDeEjecucionReduccion);
 		log_info(logInfo,"fin fork rl");
+		free(nombreScriptReductor);
+		//log_info(logInfo,"25");
+		free(rutaScriptReductor);
+		//log_info(logInfo,"26");
+		free(rutaTemporalesApareados);
+		//log_info(logInfo,"27");
+		free(lineaDeEjecucionApareo);
+		//log_info(logInfo,"28");
 		//close(client_sock);
 		exit(0);
 
@@ -181,13 +199,10 @@ int realizarReduccionLocal(int client_sock){
 	free(infoReduccion);
 	//log_info(logInfo,"24");
 	free(nombreScriptReductor);
-	//log_info(logInfo,"25");
-	free(rutaScriptReductor);
-	//log_info(logInfo,"26");
-	free(rutaTemporalesApareados);
-	//log_info(logInfo,"27");
-	free(lineaDeEjecucionApareo);
-	//log_info(logInfo,"28");
+			//log_info(logInfo,"25");
+			free(rutaScriptReductor);
+
+
 
 	return 0;
 }

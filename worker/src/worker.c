@@ -3,22 +3,22 @@
 Tworker *worker;
 int cantApareosGlobal;
 int cont;
-t_list * listaTemporalesAsociadosAJob;
+t_list * listaApareos;
 char * archivoMapeado;
 int main(int argc, char* argv[]){
 
 
 	Theader * head = malloc(sizeof(Theader));
-	int estado,
-		listenSock,
-		client_sock,
-		clientSize;
-	struct sockaddr_in client;
+	int estado;
+	//	listenSock,
+		//client_sock,
+		//clientSize;
+	//struct sockaddr_in client;
 
 	cantApareosGlobal=0;
-
+	listaApareos=list_create();
 	cont=0;
-	clientSize = sizeof client;
+	//clientSize = sizeof client;
 
 	if(argc!=2){
 		printf("Error en la cantidad de parametros\n");
@@ -57,10 +57,137 @@ int main(int argc, char* argv[]){
 
 	logError = log_create(rutaLogError, "WORKER", false, LOG_LEVEL_ERROR);
 	logInfo = log_create(rutaLogInfo, "WORKER", false, LOG_LEVEL_INFO);
+/////////////////////////////////////////////////////
+	int socketDeEscucha;
+	socketDeEscucha = crearSocketDeEscucha(worker->puerto_entrada);
+	int fileDescriptorMax = -1,
+			cantModificados = 0,
+			nuevoFileDescriptor,
+			fileDescriptor;
+	fd_set readFD, masterFD;
+	FD_ZERO(&masterFD);
+	FD_ZERO(&readFD);
+
+	fileDescriptorMax = MAXIMO(socketDeEscucha, fileDescriptorMax);
+	log_info(logInfo,"antes de entrar al while");
+
+	while (listen(socketDeEscucha, BACKLOG) == -1){
+		log_trace(logError, "Fallo al escuchar el socket servidor de file system.");
+		puts("Reintentamos...");
+	}
 
 
-	listaTemporalesAsociadosAJob=list_create();
-	if((listenSock = crearSocketDeEscucha(worker->puerto_entrada))<0){
+	FD_SET(socketDeEscucha, &masterFD);
+	log_info(logInfo,"El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
+
+	while(1){
+
+		readFD = masterFD;
+
+		if((cantModificados = select(fileDescriptorMax + 1, &readFD, NULL, NULL, NULL)) == -1){
+		//	puts("fallo el select");
+
+			//logErrorAndExit("Fallo el select.");
+
+		}
+
+		for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
+
+			if(FD_ISSET(fileDescriptor, &readFD)){
+				//log_info(logInfo,"Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
+
+				if(fileDescriptor == socketDeEscucha){
+					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
+					log_info(logInfo,"Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
+					log_info(logInfo,"El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
+					break;
+				}
+				//log_info(logInfo,"Recibiendo...");
+
+
+				if ((estado = recv(fileDescriptor, head, HEAD_SIZE, 0)) == -1){
+					perror("Error en recv() de algun socket. error");
+					break;
+
+				} else if (estado == 0){
+					//printf("Se desconecto el socket %d\nLo sacamos del set listen...\n", fileDescriptor);
+					clearAndClose(fileDescriptor, &masterFD);
+					break;
+				}
+
+				if(head->tipo_de_proceso==MASTER){
+
+						log_info(logInfo,"Es master");
+						manejarConexionMaster(head,fileDescriptor);
+					break;
+
+				}
+				else if(head->tipo_de_proceso == WORKER){
+					//printf("es worker. tipo de msj: %d\n",head->tipo_de_mensaje);
+					//log_info(logInfo,"es worker");
+						manejarConexionWorker(head,fileDescriptor);
+						break;
+
+				}
+				else{
+					printf("se quiso conectar el proceso: %d.msj:%d\n",head->tipo_de_proceso,head->tipo_de_mensaje);
+					puts("Hacker detected");
+					log_trace(logError, "Se conecto un proceso que no es conocido/confiable. Expulsandolo...");
+					clearAndClose(fileDescriptor, &masterFD);
+				}
+
+			}
+
+
+
+
+		}
+
+	//log_error(logError, "Fallo el accept de master.");
+
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	////////////////////////////////////////////////////////////////
+
+
+	/*if((listenSock = crearSocketDeEscucha(worker->puerto_entrada))<0){
 		return FALLO_CONEXION;
 	}
 
@@ -98,7 +225,7 @@ int main(int argc, char* argv[]){
 
 	// Si salio del ciclo es porque fallo el accept()
 
-	log_info(logInfo,"Fallo el accept(). error");
+	log_info(logInfo,"Fallo el accept(). error");*/
 
 
 	liberarConfiguracionWorker(worker);
@@ -107,5 +234,16 @@ int main(int argc, char* argv[]){
 	free(head);
 
 	return 0;
+}
+
+int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors){
+		int nuevoFileDescriptor = aceptarCliente(fileDescriptor);
+		FD_SET(nuevoFileDescriptor, bolsaDeFileDescriptors);
+		return nuevoFileDescriptor;
+}
+
+void clearAndClose(int fileDescriptor, fd_set* masterFD){
+	FD_CLR(fileDescriptor, masterFD);
+	close(fileDescriptor);
 }
 

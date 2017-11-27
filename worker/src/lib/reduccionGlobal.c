@@ -14,8 +14,7 @@ extern int cont;
 int realizarReduccionGlobal(client_sock){
 	int stat;
 	char * buffer;
-	char * nombreScriptReductor;
-	char * rutaScriptReductor;
+
 	Theader *head = malloc(sizeof (Theader));
 
 	TreduccionGlobal *infoReduccionGlobal;
@@ -52,8 +51,8 @@ int realizarReduccionGlobal(client_sock){
 		log_info(logInfo," encargado: %d \n",infoNodo->nodoEncargado);
 	}
 
-
-	log_info(logInfo,"Ahora recibo el script reductor");
+	char * nombreScriptReductor;
+	char * rutaScriptReductor;
 
 
 	nombreScriptReductor=string_new();
@@ -75,42 +74,48 @@ int realizarReduccionGlobal(client_sock){
 		enviarHeader(client_sock,head);
 		return -1;
 	}
-	log_info(logInfo,"recibi");
-	//le pido a todos los workers que me pasen sus reducciones locales.
-	puts("Soy el worker encargado. Inicio apareo global...");
-	char * rutaApareoFinal=string_new();
-	//puts("str new");
-	string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
-	cont++;
-	string_append(&rutaApareoFinal,string_itoa(cont));
-	puts(rutaApareoFinal);
-	log_info(logInfo,"realizar apaglobal");
-	stat = realizarApareoGlobal(infoReduccionGlobal->listaNodos,rutaApareoFinal);
-	if(stat<0){
-		puts("error apareo global");
-		head->tipo_de_proceso = WORKER;
-		head->tipo_de_mensaje = FIN_REDUCCIONGLOBALFAIL;
-		enviarHeader(client_sock,head);
-	}
-
-	log_info(logInfo,"hago reduccion global\n");
-
-	printf("Inicio RG %s\n",infoReduccionGlobal->tempRedGlobal);
-
-
 
 
 
 
 
 	//puts("Forkeo");
-	char * lineaDeEjecucionReduccionGlobal;
-	char * rutaResultadoReduccionGlobal;
+
 	pid_t pidRedGl;
 	if ( (pidRedGl=fork()) == 0 )
 	{ /* hijo */
+
+			char * lineaDeEjecucionReduccionGlobal;
+				char * rutaResultadoReduccionGlobal;
+				log_info(logInfo,"Ahora recibo el script reductor");
+
+
+
+					log_info(logInfo,"recibi");
+					//le pido a todos los workers que me pasen sus reducciones locales.
+					puts("Soy el worker encargado. Inicio apareo global...");
+					char * rutaApareoFinal=string_new();
+					//puts("str new");
+					string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
+					cont++;
+					string_append(&rutaApareoFinal,string_itoa(cont));
+					puts(rutaApareoFinal);
+					log_info(logInfo,"realizar apaglobal");
 		//	printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
 		//	printf("%d\n",cont);
+
+		stat = realizarApareoGlobal(infoReduccionGlobal->listaNodos,rutaApareoFinal);
+		if(stat<0){
+			puts("error apareo global");
+			head->tipo_de_proceso = WORKER;
+			head->tipo_de_mensaje = FIN_REDUCCIONGLOBALFAIL;
+			enviarHeader(client_sock,head);
+		}
+
+		log_info(logInfo,"hago reduccion global\n");
+
+		printf("Inicio RG %s\n",infoReduccionGlobal->tempRedGlobal);
+
 
 
 		lineaDeEjecucionReduccionGlobal = string_new();
@@ -154,6 +159,15 @@ int realizarReduccionGlobal(client_sock){
 		free(lineaDeEjecucionReduccionGlobal);
 		free(rutaResultadoReduccionGlobal);
 		//close(client_sock);
+		//log_info(logInfo,"free onmbre script red");
+			free(nombreScriptReductor);
+			//log_info(logInfo,"free pase nsr");
+
+			//log_info(logInfo,"free rsr pase");
+			//log_info(logInfo,"free rar");
+			free(rutaApareoFinal);
+			//log_info(logInfo,"free rar pase");
+
 		log_info(logInfo,"fin fork rg");
 		exit(0);
 
@@ -176,17 +190,10 @@ int realizarReduccionGlobal(client_sock){
 	//log_info(logInfo,"free irg");
 	free(infoReduccionGlobal);
 	//log_info(logInfo,"free irg pase");
-
-
-	//log_info(logInfo,"free onmbre script red");
 	free(nombreScriptReductor);
-	//log_info(logInfo,"free pase nsr");
-	//log_info(logInfo,"free rsr");
 	free(rutaScriptReductor);
-	//log_info(logInfo,"free rsr pase");
-	//log_info(logInfo,"free rar");
-	free(rutaApareoFinal);
-	//log_info(logInfo,"free rar pase");
+
+
 
 	return 0;
 
@@ -234,8 +241,6 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			list_add(listaFds,infoWorker1);
 			free(buffer2);
 		}else{
-
-
 			string_append(&rutaMiTemporal,infoNodo->temporalReduccion);
 			TinfoApareoGlobal *infoWorker2 = malloc(sizeof (TinfoApareoGlobal));
 			infoWorker2->fdWorker=-1;
@@ -281,6 +286,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 		//puts("pase fdw");
 		if(!infoWorker4->encargado){
 			//puts("if 1");
+			head->tipo_de_proceso=WORKER;
 			head->tipo_de_mensaje=GIVE_NEXTLINE;
 			stat = enviarHeader(fdWorker,head);
 			if(stat < 0){
@@ -295,7 +301,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			}
 			//puts("recibo");
 			if(head->tipo_de_mensaje==TAKE_NEXTLINE){
-				if ((buffer = recvGeneric(fdWorker)) == NULL){
+				if ((buffer = recvGenericWFlags(fdWorker,MSG_WAITALL)) == NULL){
 					puts("Fallo recepcion de nextline. worker desconectado. fallo apareo global");
 					return FALLO_RECV;
 				}
@@ -306,7 +312,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 					return FALLO_GRAL;
 				}
 			//	log_info(logInfo,"free buffer");
-					free(buffer);
+				free(buffer);
 				//	log_info(logInfo,"pase free buff");
 				//puts("pase sig linea");
 			//	log_info(logInfo,"Linea Recibida: %s\n",siguienteLinea->bytes);
@@ -378,7 +384,7 @@ int realizarApareoGlobal(t_list * listaInfoNodos,char * rutaApareoGlobal){
 			TinfoApareoGlobal *infoWorker = list_get(listaFds,mayorIndice);
 
 			if(!infoWorker->encargado){
-				head->tipo_de_proceso=YAMA;
+				headEnvio.tipo_de_proceso=WORKER;
 				head->tipo_de_mensaje=GIVE_NEXTLINE;
 
 				enviarHeader(infoWorker->fdWorker,head);
