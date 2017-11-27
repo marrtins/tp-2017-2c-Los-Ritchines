@@ -500,7 +500,9 @@ int copiarBloque(Tbuffer* buffer, Tbuffer* bloque){
 
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo){
 	Theader* head = malloc(sizeof(Theader));
+	puts("voy a buscar el nombre del nodo");
 	Tnodo* nodo = buscarNodoPorNombre(listaDeNodos,nombreNodo);
+	printf("Nombre nodo %s\n", nodo->nombre);
 	Tbuffer* buffer;
 	head->tipo_de_proceso = FILESYSTEM;
 	head->tipo_de_mensaje = ALMACENAR_BLOQUE;

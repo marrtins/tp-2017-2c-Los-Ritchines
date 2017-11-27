@@ -145,8 +145,9 @@ void enviarBloque(int nroBloque, unsigned long long int tamanio, int socketFS){
 
 	head->tipo_de_proceso = DATANODE;
 	head->tipo_de_mensaje = OBTENER_BLOQUE;
+	log_info(logInfo,"Obtengo el bloque: %d",nroBloque);
 	char * bloque = getBloque(nroBloque);
-	puts("voy a empaquetar el bloque");
+
 	buffer = empaquetarBloqueConNBytes(head, tamanio, bloque, nroBloque);
 	if (send(socketFS, buffer->buffer, buffer->tamanio, 0) <= 0){
 		logErrorAndExit("Fallo al enviar a FS el bloque que pidio");

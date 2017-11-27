@@ -84,8 +84,7 @@ int main(int argc, char* argv[]) {
 
 					break;
 				case OBTENER_BLOQUE:
-					log_info(logInfo,"Es fileSystem y quiere un bloque");
-					log_info(logInfo,"Es FileSystem y quiere obtener un bloque");
+					log_info(logInfo,"Es FileSystem y quiere obtener el bloque");
 					int nroBloque_;
 					unsigned long long int tamanioBloque_;
 					if (recv(socketFS, &nroBloque_, sizeof(int), 0) == -1) {

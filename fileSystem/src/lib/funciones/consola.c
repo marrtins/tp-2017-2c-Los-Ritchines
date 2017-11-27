@@ -383,7 +383,7 @@ void consolaMove(char ** palabras, int cantidad) {
 	if (cantidad == 2) {
 		char** carpetas1 = string_split(palabras[1], "/");
 		char** carpetas2 = string_split(palabras[2], "/");
-		if (esRutaYamafs(carpetas1[0])	|| esRutaYamafs(carpetas2[0])) {
+		if (!esRutaYamafs(carpetas1[0])	|| !esRutaYamafs(carpetas2[0])) {
 			puts("Falta la referencia a yamafs:/ en alguna de las rutas.");
 		} else {
 			if(!esRutaDeUnArchivo(palabras[2])){
