@@ -80,15 +80,20 @@ void conexionesDatanode(void * estructura){
 								if((Tnodo*)buscarNodoPorNombre(listaDeNodos, infoNodo->nombreNodo) == NULL){
 									if((Tnodo*)buscarNodoPorNombre(listaDeNodosDesconectados, infoNodo->nombreNodo) == NULL){
 										//nodo nuevo;
-										nuevoNodo = malloc(sizeof(Tnodo));
-										infoNodoNuevo = inicializarInfoNodo(infoNodo);
-										nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
-										list_add(listaInfoNodo,infoNodoNuevo);
-										list_add(listaDeNodos, nuevoNodo);
-										almacenarBitmap(nuevoNodo);
-										agregarNodoATablaDeNodos(nuevoNodo);
-										verificarSiEsEstable(cantNodosPorConectar);
-
+										if(!esEstadoRecuperado){
+											nuevoNodo = malloc(sizeof(Tnodo));
+											infoNodoNuevo = inicializarInfoNodo(infoNodo);
+											nuevoNodo = inicializarNodo(infoNodo, fileDescriptor, nuevoNodo);
+											list_add(listaInfoNodo,infoNodoNuevo);
+											list_add(listaDeNodos, nuevoNodo);
+											almacenarBitmap(nuevoNodo);
+											agregarNodoATablaDeNodos(nuevoNodo);
+											verificarSiEsEstable(cantNodosPorConectar);
+										}
+										else{
+											clearAndClose(fileDescriptor, &masterFD);
+											log_info(logInfo, "El nodo %s no es valido, no se encontraba en el estado anterior. Se expulsa",infoNodo->nombreNodo);
+										}
 									}
 									else {//se reconecta;
 										//pensar si hay que volver a inicializarlo al nodo que
@@ -101,6 +106,7 @@ void conexionesDatanode(void * estructura){
 										//nuevoNodo = inicializarNodo(infoBloque, fileDescriptor, nuevoNodo);
 										borrarNodoPorNombre(listaDeNodosDesconectados,nuevoNodo->nombre);
 										log_info(logInfo, "Nodo que se habia caído, se reconecto.");
+										verificarSiEsEstable(cantNodosPorConectar);
 									}
 								}
 								else {
@@ -266,17 +272,16 @@ void formatearNodos(t_list * lista){
 
 void verificarSiEsEstable(int cantNodosPorConectar) {
 
-	if (list_size(listaDeNodos) == cantNodosPorConectar) {
-		if (esEstadoRecuperado) {
-			//TODO los nodos conectados no se borran de la lista de desconectados!!!
-			//if(todosLosArchivosTienenCopias() && losNodosConectadosSonLosQueEstabanAntes())
-			if(todosLosArchivosTienenCopias()){
-				sem_post(&yama);
-				log_info(logInfo,"FILESYSTEM ESTABLE");
-			}
-		} else {
+	if (esEstadoRecuperado) {
+		if(todosLosArchivosSePuedenLevantar()){
+			sem_post(&yama);
+			log_info(logInfo,"FILESYSTEM ESTABLE");
+		}
+	} else {
+		if(list_size(listaDeNodos)==cantNodosPorConectar){
 			sem_post(&yama);
 			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
 	}
+
 }
