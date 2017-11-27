@@ -35,4 +35,9 @@ typedef struct{
 	FILE * fdTemporal;
 }Tapareo;
 
+typedef struct{
+	unsigned long long tamanioContenido;
+	char * contenidoArchivo;
+}Tscript;
+
 #endif

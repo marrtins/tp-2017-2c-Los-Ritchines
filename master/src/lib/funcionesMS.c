@@ -165,6 +165,68 @@ void removerReduccionDeLista(int id){
 	}
 	return;
 }
+int enviarScript2(char * rutaScript, int sockDestino){
+	FILE * archivoFinal = fopen(rutaScript, "r");
+	unsigned long long tamanioArchivoFinal;
+	int fileDescriptorArchivoFinal;
+	char * contenidoArchivoFinal;
+	char * archivoFinalMapeado;
+	Tbuffer * tbuffer;
+	Theader * header = malloc(sizeof(Theader));
+
+
+	tamanioArchivoFinal = tamanioArchivo(archivoFinal);
+	fileDescriptorArchivoFinal = fileno(archivoFinal);
+	contenidoArchivoFinal = malloc(tamanioArchivoFinal);
+	if ((archivoFinalMapeado = mmap(NULL, tamanioArchivoFinal, PROT_READ, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
+		/*puts("error de almacenamiento. fallo mmap");
+		headEnvio->tipo_de_proceso=MASTER;
+		headEnvio->tipo_de_mensaje=SENDSCRIPT;
+		enviarHeader(sockDestino,headEnvio);*/
+		return -1;
+		//logErrorAndExit("Error al hacer mmap");
+	}
+
+	memcpy(contenidoArchivoFinal, archivoFinalMapeado, tamanioArchivoFinal);
+	//log_info(logInfo,"contenido archv final %s ",contenidoArchivoFinal);
+
+	//yamafs
+	tbuffer = empaquetarScript(header, contenidoArchivoFinal, tamanioArchivoFinal);
+
+	if (send(sockDestino, tbuffer->buffer , tbuffer->tamanio, 0) == -1){
+		puts("fallo al enviar a worker el script");
+		return -1;
+
+		//logErrorAndExit("Fallo al enviar a Nodo el bloque a almacenar");
+
+	}
+
+	munmap(archivoFinalMapeado, strlen(rutaScript)+1);
+
+	close(fileDescriptorArchivoFinal);
+	fclose(archivoFinal);
+	free(tbuffer->buffer);
+	free(tbuffer);
+	free(contenidoArchivoFinal);
+
+	return 0;
+
+}
+Tbuffer * empaquetarScript(Theader * header, char * contenidoArchivo, unsigned long long tamanioArchivoFinal){
+	Tbuffer * buffer = malloc(sizeof(Tbuffer));
+	buffer->tamanio = sizeof(Theader) + sizeof(unsigned long long) + tamanioArchivoFinal;
+	buffer->buffer = malloc(buffer->tamanio);
+
+	char * p = buffer->buffer;
+	memcpy(p, header, sizeof(Theader));
+	p += sizeof(Theader);
+	memcpy(p, &tamanioArchivoFinal, sizeof(tamanioArchivoFinal));
+	p += sizeof(tamanioArchivoFinal);
+	memcpy(p, contenidoArchivo, tamanioArchivoFinal);
+
+	return buffer;
+
+}
 
 int enviarScript(char * rutaScript,int sockDestino){
 

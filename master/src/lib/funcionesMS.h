@@ -17,13 +17,14 @@ void limpiarBloquesTransf(void *info);
 void limpiarTemporales(void * info);
 void limpiarListaNodos(void * info);
 void mostrarMetricasJob();
+Tbuffer * empaquetarScript(Theader * header, char * contenidoArchivo, unsigned long long tamanioArchivoFinal);
 
 double getPromedioTransformaciones();
 double getPromedioRL();
 
 TpackInfoBloque *recibirInfoBloque(int sockYama);
 int enviarScript(char * rutaScript,int sockDestino);
-
+int enviarScript2(char * rutaScript, int sockDestino);
 TreduccionLocal *recibirInfoReduccionLocal(int sockYama);
 
 
