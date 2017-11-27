@@ -107,7 +107,6 @@ void procesarCpblock(char ** palabras){
 				if (enviarBloqueA(bloqueAEnviar, palabras[3]) == -1) {
 					puts("Error no se pudo enviar el bloque.");
 					liberarEstructuraBuffer(bloque);
-					liberarEstructuraBloquesAEnviar(bloqueAEnviar);
 					return;
 				}
 				agregarCopiaAtablaArchivo(rutaLocalArchivo,palabras[3],bloqueDN,nroBloque);
@@ -156,23 +155,34 @@ void consolaCpto(char** palabras, int cantidad) {
 void consolaRename(char** palabras, int cantidad) {
 	if (cantidad == 2) {
 		if (esRutaYamafs(palabras[1])){
-			int esRutaARoot = string_ends_with(palabras[1], "yamafs:/");
-			if (!esRutaARoot) {
-				if (existeDirectorio(palabras[1]) || verificarRutaArchivo(palabras[1])) {
-					renombrarArchivoODirectorio(palabras[1], palabras[2]);
+			if(!esRutaYamafs(palabras[2])){
+				int esRutaARoot = string_ends_with(palabras[1], "yamafs:/");
+				if (!esRutaARoot) {
+					if(esRutaDeUnArchivo(palabras[1])){
+						if(verificarRutaArchivo(palabras[1])){
+							renombrarArchivo(palabras[1],palabras[2]);
+						}
+					}
+					else {
+						if (existeDirectorio(palabras[1])) {
+							renombrarDirectorio(palabras[1], palabras[2]);
+						}
+						else {
+							puts("El directorio no existe");
+						}
+					}
 				}
-				else{
-					puts("No se pudo renombrar por que la ruta no es correcta a un directorio o archivo del yamafs.");
+				else {
+					puts("No se puede renombrar el root.");
 				}
 			}
-			else {
-				puts("No se puede renombrar el root.");
+			else{
+				puts("El segundo parametro tiene que ser un nombre, no una ruta yamafs");
 			}
 		}
 		else {
 			puts("Falta la referencia a yamafs:/.");
 		}
-
 	} else {
 		puts("Error en la cantidad de parametros.");
 	}
@@ -377,28 +387,36 @@ void consolaMove(char ** palabras, int cantidad) {
 			puts("Falta la referencia a yamafs:/ en alguna de las rutas.");
 		} else {
 			if(!esRutaDeUnArchivo(palabras[2])){
-			if (esRutaDeUnArchivo(palabras[1])) {
-				if (verificarRutaArchivo(palabras[1])) {
-					moverArchivo(palabras[1], palabras[2]);
-
-				}else{
-					puts("El archivo no existe");
+				if(existeDirectorio(palabras[2])){
+					if (esRutaDeUnArchivo(palabras[1])) {
+						if (verificarRutaArchivo(palabras[1])) {
+							moverArchivo(palabras[1], palabras[2]);
+						}
+					}
+					else {
+						if(existeDirectorio(palabras[1])){
+							moverDirectorio(palabras[1],palabras[2]);
+						}
+						else{
+							puts("No se puede mover un directorio que no existe.");
+						}
+					}
 				}
-			}else {
-				moverDirectorio(palabras[1],palabras[2]);
+				else {
+					puts("No existe el directorio del segundo parametro");
+				}
+			} else{
+				puts("El segundo parametro tiene que ser una ruta de directorio, no de archivo");
 			}
-		} else{
-			puts("El segundo parametro tiene que ser una ruta de directorio, no de archivo");
 		}
-	}
 
-	liberarPunteroDePunterosAChar(carpetas1);
-	free(carpetas1);
-	liberarPunteroDePunterosAChar(carpetas2);
-	free(carpetas2);
-}
-else {
-	puts("Error en la cantidad de parametros.");
-}
+		liberarPunteroDePunterosAChar(carpetas1);
+		free(carpetas1);
+		liberarPunteroDePunterosAChar(carpetas2);
+		free(carpetas2);
+	}
+	else {
+		puts("Error en la cantidad de parametros.");
+	}
 }
 

@@ -417,16 +417,12 @@ char ** obtenerSubconjuntoDeUnSplit(char ** split, int desde, int hasta){
 	return nuevoSplit;
 }
 
-void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
+void renombrarArchivo(char * rutaYamafs, char * nombre) {
 	char ** split = string_split(rutaYamafs, "/");
 	char * ultimoElemento = obtenerUltimoElementoDeUnSplit(split);
 
-	Tdirectorio * directorio;
-
-	if ((int) string_contains(ultimoElemento, ".") == 1) {
 		if ((int) string_contains(nombre, ".") == 1) {
-			char * extensionOriginal = obtenerExtensionDeUnArchivo(
-					ultimoElemento);
+			char * extensionOriginal = obtenerExtensionDeUnArchivo(ultimoElemento);
 			char * extensionNueva = obtenerExtensionDeUnArchivo(nombre);
 
 			if (string_equals_ignore_case(extensionOriginal, extensionNueva)) {
@@ -439,24 +435,38 @@ void renombrarArchivoODirectorio(char * rutaYamafs, char * nombre) {
 				if (rename(rutaLocal, nuevaRuta) == 0) {
 					puts("Se renombro el archivo exitosamente.");
 				} else {
-					puts("La ruta especificada no concuerda con la ruta del archivo a renombrar.");
+					puts("Ruta o nombre invalido.");
+					puts("No se pudo renombrar el archivo.");
 				}
 				free(rutaLocal);
 				free(nuevaRuta);
 			} else {
 				puts("La extension tiene que ser la misma que la del archivo orginal.");
+				puts("No se pudo renombrar el archivo.");
 			}
 			free(extensionNueva);
 			free(extensionOriginal);
 		} else {
-			puts("Tiene que ingresar el nuevo nombre con la extension del archivo original");
+			puts("Tiene que ingresar el nuevo nombre con la extension del archivo original.");
+			puts("No se pudo renombrar el archivo.");
 		}
-	} else {
-		directorio = buscarPorNombreDeDirectorio(ultimoElemento);
-		strcpy(directorio->nombre, nombre);
-		persistirTablaDeDirectorios();
-		puts("Se renombro el directorio exitosamente.");
-	}
+
+
+	liberarPunteroDePunterosAChar(split);
+	free(split);
+	free(ultimoElemento);
+}
+
+void renombrarDirectorio(char * rutaYamafs, char * nombre){
+	char ** split = string_split(rutaYamafs, "/");
+	char * ultimoElemento = obtenerUltimoElementoDeUnSplit(split);
+
+	Tdirectorio * directorio;
+
+	directorio = buscarPorNombreDeDirectorio(ultimoElemento);
+	strcpy(directorio->nombre, nombre);
+	persistirTablaDeDirectorios();
+	puts("Se renombro el directorio exitosamente.");
 
 	liberarPunteroDePunterosAChar(split);
 	free(split);
