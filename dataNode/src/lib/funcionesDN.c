@@ -99,26 +99,23 @@ Tbloque * recvBloque(int socketFS) {
 	if ((estado = recv(socketFS, &bloque->nroBloque, sizeof(int), 0)) == -1) {
 		logErrorAndExit("Error al recibir el numero de bloque");
 	}
-	printf("Para el nro de bloque recibi %d bytes\n", estado);
-	printf("Recibí el numero de bloque %d\n", bloque->nroBloque);
+
+	log_info(logInfo,"Recibí el numero de bloque %d\n", bloque->nroBloque);
 
 	if ((estado = recv(socketFS, &bloque->tamanioContenido, sizeof(unsigned long long),
 			0)) == -1) {
 		logErrorAndExit("Error al recibir el tamaño de bloque");
 	}
-	printf("Para el tamanio de bloque recibi %d bytes\n", estado);
 
-	printf("Tamanio de bloque = %llu\n", bloque->tamanioContenido);
 	bloque->contenido = malloc(bloque->tamanioContenido);
 	contenidoBloque = malloc(bloque->tamanioContenido);
 
 	if ((estado = recv(socketFS, contenidoBloque, bloque->tamanioContenido, MSG_WAITALL)) == -1) {
 		logErrorAndExit("Error al recibir el contenido del bloque");
 	}
-	printf("Para el contenido de bloque recibi %d bytes\n", estado);
 
 	memcpy(bloque->contenido, contenidoBloque, bloque->tamanioContenido);
-	puts("hice el memcpy");
+
 	free(contenidoBloque);
 	return bloque;
 }

@@ -359,7 +359,7 @@ int todosLosBloquesTienenDosCopias(Tarchivo *  archivo){
 	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
 
 	while(nroBloque < cantBloques){
-		if(archivo->bloques[nroBloque].cantidadCopias>=2){
+		if((archivo->bloques[nroBloque].cantidadCopias)<2){
 			//TODO agregar la copia que falta
 			log_info(logInfo,"El bloque numero %d del archivo %s no tiene copias\n", nroBloque, archivo->nombreArchivoSinExtension);
 			return 0;
