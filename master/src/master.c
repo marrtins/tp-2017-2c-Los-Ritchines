@@ -242,6 +242,11 @@ int main(int argc, char* argv[]) {
 			close(sockYama);
 			return 0;
 			break;
+		case(FS_NO_ESTABLE):
+			puts("yama nos avisa q el job no puede llevarse a cabo. el fs aun no es estable. fin deol proceso");
+			close(sockYama);
+			return 0;
+			break;
 		case FINJOB_ERRORREPLANIFICACION:
 			mostrarMetricasJob();
 			puts("\n\n #####yama nos avisa q termino el job x error de replanificadion######");

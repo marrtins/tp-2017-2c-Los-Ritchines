@@ -82,7 +82,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 			puts("FS paso a un estado NO estable");
 			log_info(logInfo,"FS paso a un estado NO estable");
 			headEnvio->tipo_de_proceso=YAMA;
-			headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO; //TODO lo deje asi para que funcionara
+			headEnvio->tipo_de_mensaje=FS_NO_ESTABLE; //TODO lo deje asi para que funcionara
 			enviarHeader(sockMaster,headEnvio);
 		break;
 		case INFO_ARCHIVO:
