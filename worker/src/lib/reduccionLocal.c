@@ -43,21 +43,21 @@ int realizarReduccionLocal(int client_sock){
 
 	free(bufferReduccion);
 	printf("Nueva RL -> %s\n",infoReduccion->nombreTempReduccion);
-	log_info(logInfo,"\n\n\n esta es la info q  me llego");
-	log_info(logInfo,"Nombre temporal de la reduccion: %s\n",infoReduccion->nombreTempReduccion);
+	log_info(logInfo," esta es la info q  me llego");
+	log_info(logInfo,"Nombre temporal de la reduccion: %s",infoReduccion->nombreTempReduccion);
 
 	int i;
 	char * nombreScriptReductor;
 	char * rutaScriptReductor;
 	nombreScriptReductor=string_new();
-				rutaScriptReductor  = string_new();
-				string_append(&rutaScriptReductor,"/home/utnso/");
-				string_append(&nombreScriptReductor,"reductorLocal");
-				cont++;
-				string_append(&nombreScriptReductor,string_itoa(cont));
-				string_append(&nombreScriptReductor,worker->nombre_nodo);
-				string_append(&nombreScriptReductor,".py");
-				string_append(&rutaScriptReductor,nombreScriptReductor);
+	rutaScriptReductor  = string_new();
+	string_append(&rutaScriptReductor,"/home/utnso/");
+	string_append(&nombreScriptReductor,"reductorLocal");
+	cont++;
+	string_append(&nombreScriptReductor,string_itoa(cont));
+	string_append(&nombreScriptReductor,worker->nombre_nodo);
+	string_append(&nombreScriptReductor,".py");
+	string_append(&rutaScriptReductor,nombreScriptReductor);
 
 
 
@@ -89,7 +89,7 @@ int realizarReduccionLocal(int client_sock){
 
 			for(i=0;i<infoReduccion->listaSize;i++){
 				TreduccionLista *infoAux = list_get(infoReduccion->listaTemporales,i);
-				log_info(logInfo,"Nombre del archivo %d a reducir: %s\n",i,infoAux->nombreTemporal);
+				log_info(logInfo,"Nombre del archivo %d a reducir: %s",i,infoAux->nombreTemporal);
 				string_append(&lineaDeEjecucionApareo," /home/utnso/");
 				string_append(&lineaDeEjecucionApareo,infoAux->nombreTemporal);
 
@@ -104,7 +104,7 @@ int realizarReduccionLocal(int client_sock){
 			string_append(&lineaDeEjecucionApareo," > ");
 			string_append(&lineaDeEjecucionApareo,rutaTemporalesApareados);
 
-			log_info(logInfo,"linea de ejec apareo %s \n",lineaDeEjecucionApareo);
+			log_info(logInfo,"linea de ejec apareo %s ",lineaDeEjecucionApareo);
 			stat = system(lineaDeEjecucionApareo);
 			if(stat != 0){
 				puts("fallo apareo local ");
@@ -208,10 +208,10 @@ int realizarReduccionLocal(int client_sock){
 }
 
 void liberarListaTemporales(void * info){
-	log_info(logInfo,"free lista temp list");
+	//log_info(logInfo,"free lista temp list");
 	TreduccionLista * infoLista = (TreduccionLista*) info;
 	free(infoLista->nombreTemporal);
 	free(infoLista);
-	log_info(logInfo,"pase listsa temp list");
+	//log_info(logInfo,"pase listsa temp list");
 }
 

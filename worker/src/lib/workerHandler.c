@@ -37,7 +37,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 		}
 		free(buffer);
 
-		log_info(logInfo,"Path archivo que vamos a enviarle: %s\n",pathArchivoTemporal->bytes);
+		log_info(logInfo,"Path archivo que vamos a enviarle: %s",pathArchivoTemporal->bytes);
 		FILE * fdTempFilePropio;
 		fdTempFilePropio = fopen((pathArchivoTemporal->bytes),"r");
 
@@ -46,10 +46,10 @@ int manejarConexionWorker(Theader *head, int client_sock){
 		apareo->fdTemporal=fdTempFilePropio;
 		list_add(listaApareos,apareo);
 		free(pathArchivoTemporal->bytes);
-			free(pathArchivoTemporal);
+		free(pathArchivoTemporal);
 
-		puts("comienza el apreo global");
-		printf("fdw %d fdtf %d \n",apareo->fdWorker,apareo->fdWorker);
+		puts("comienza el apareo global");
+		//printf("fdw %d fdtf %d \n",apareo->fdWorker,apareo->fdWorker);
 
 	}else if(head->tipo_de_mensaje==GIVE_NEXTLINE){
 		//puts("me pide nextline");
@@ -68,9 +68,9 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			}
 			//log_info(logInfo,"41");
 			free(buffer);
-			log_info(logInfo,"42");
+			//log_info(logInfo,"42");
 			free(lineaAux);
-			log_info(logInfo,"43");
+			//log_info(logInfo,"43");
 		}else{
 			head->tipo_de_mensaje=EOF_TEMPORAL;
 			head->tipo_de_proceso=WORKER;
@@ -78,9 +78,9 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			enviarHeader(client_sock,head);
 			fclose(getFDTemporal(client_sock));
 			removerFDWorker(client_sock);
-			puts("antes free");
+			//puts("antes free");
 			free(lineaAux);
-			puts("pase free");
+			//puts("pase free");
 		}
 	}
 

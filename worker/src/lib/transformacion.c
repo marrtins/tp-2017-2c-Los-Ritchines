@@ -43,7 +43,7 @@ int realizarTransformacion(int client_sock){
 
 	free(buff);
 
-	log_info(logInfo,"Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
+	log_info(logInfo,"Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s ",datosTransf->nroBloque,
 			datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
 	/*printf("Se nos pide operar sobre el bloque %d, que ocupa %d bytes y guardarlo en el temporal %s \n",datosTransf->nroBloque,
 				datosTransf->bytesOcupadosBloque,datosTransf->nombreTemporal);
@@ -53,27 +53,27 @@ int realizarTransformacion(int client_sock){
 
 
 	char * nombreScriptTransformador;
-			char * rutaScriptTransformador ;
-			nombreScriptTransformador=string_new();
-				rutaScriptTransformador  = string_new();
-				string_append(&rutaScriptTransformador,"/home/utnso/");
-				string_append(&nombreScriptTransformador,"transformador");
-				cont++;
-				//string_append_with_format(&nombreScriptTransformador,"%d",cont);
-				string_append(&nombreScriptTransformador,string_itoa(cont));
-				string_append(&nombreScriptTransformador,worker->nombre_nodo);
-				string_append(&nombreScriptTransformador,".py");
-				string_append(&rutaScriptTransformador,nombreScriptTransformador);
-		log_info(logInfo,"recibimos el script");
-			status = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
-			if(status < 0){
-				puts("fallo recibir y almac script");
-				headEnvio->tipo_de_proceso = WORKER;
-				headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
-				enviarHeader(client_sock,headEnvio);
-				return FALLO_GRAL;
+	char * rutaScriptTransformador ;
+	nombreScriptTransformador=string_new();
+	rutaScriptTransformador  = string_new();
+	string_append(&rutaScriptTransformador,"/home/utnso/");
+	string_append(&nombreScriptTransformador,"transformador");
+	cont++;
+	//string_append_with_format(&nombreScriptTransformador,"%d",cont);
+	string_append(&nombreScriptTransformador,string_itoa(cont));
+	string_append(&nombreScriptTransformador,worker->nombre_nodo);
+	string_append(&nombreScriptTransformador,".py");
+	string_append(&rutaScriptTransformador,nombreScriptTransformador);
+	log_info(logInfo,"recibimos el script");
+	status = recibirYAlmacenarScript(client_sock,rutaScriptTransformador);
+	if(status < 0){
+		puts("fallo recibir y almac script");
+		headEnvio->tipo_de_proceso = WORKER;
+		headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
+		enviarHeader(client_sock,headEnvio);
+		return FALLO_GRAL;
 
-			}
+	}
 
 
 
@@ -82,31 +82,31 @@ int realizarTransformacion(int client_sock){
 	{ /* hijo */
 
 
-			char *input1 = getBloqueWorker(datosTransf->nroBloque);
-			char * input2=malloc(BLOQUE_SIZE);
-			memcpy(input2,input1,datosTransf->bytesOcupadosBloque);
+		char *input1 = getBloqueWorker(datosTransf->nroBloque);
+		char * input2=malloc(BLOQUE_SIZE);
+		memcpy(input2,input1,datosTransf->bytesOcupadosBloque);
 
-			log_info(logInfo,"asd1");
-			free(input1);
-			log_info(logInfo,"2");
+		//log_info(logInfo,"asd1");
+		free(input1);
+		//log_info(logInfo,"2");
 
-			//log_info(logInfo,"linea  %s \n",input2);
+		//log_info(logInfo,"linea  %s \n",input2);
 
-			FILE *bloqueSTD;
-			char * rutaBloque = string_new();
-			string_append(&rutaBloque,"/home/utnso/tmp/tmpbl-");
-			cont++;
-			//string_append_with_format(&rutaBloque,"%d",cont);
-			string_append(&rutaBloque,string_itoa(cont));
-			string_append(&rutaBloque,"-");
-			string_append(&rutaBloque,worker->nombre_nodo);
-			bloqueSTD = fopen(rutaBloque, "w");
+		FILE *bloqueSTD;
+		char * rutaBloque = string_new();
+		string_append(&rutaBloque,"/home/utnso/tmp/tmpbl-");
+		cont++;
+		//string_append_with_format(&rutaBloque,"%d",cont);
+		string_append(&rutaBloque,string_itoa(cont));
+		string_append(&rutaBloque,"-");
+		string_append(&rutaBloque,worker->nombre_nodo);
+		bloqueSTD = fopen(rutaBloque, "w");
 
-			fwrite(input2, sizeof(char), datosTransf->bytesOcupadosBloque, bloqueSTD);
-			log_info(logInfo,"2.1");
-			free(input2);
-			log_info(logInfo,"3");
-			fclose(bloqueSTD);
+		fwrite(input2, sizeof(char), datosTransf->bytesOcupadosBloque, bloqueSTD);
+		//log_info(logInfo,"2.1");
+		free(input2);
+		//log_info(logInfo,"3");
+		fclose(bloqueSTD);
 		char * lineaDeEjecucionTransformacion;
 		char * rutaResultadoTransformacion;
 
@@ -124,13 +124,13 @@ int realizarTransformacion(int client_sock){
 		string_append(&rutaResultadoTransformacion,datosTransf->nombreTemporal);
 		string_append(&lineaDeEjecucionTransformacion,rutaResultadoTransformacion);
 
-		log_info(logInfo,"linea de eecucion %s\n",lineaDeEjecucionTransformacion);
-		log_info(logInfo,"Ruta resutlado Transformador %s\n",rutaResultadoTransformacion);
+		log_info(logInfo,"linea de eecucion %s",lineaDeEjecucionTransformacion);
+		log_info(logInfo,"Ruta resutlado Transformador %s",rutaResultadoTransformacion);
 
 
 
 		status = system(lineaDeEjecucionTransformacion);
-		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",status);
+		log_info(logInfo,"Stat lineaDeEjecucion :%d ",status);
 		if(status!=0){
 			puts("fallo linea de ejecucion transformacion");
 			headEnvio->tipo_de_proceso = WORKER;
@@ -153,8 +153,8 @@ int realizarTransformacion(int client_sock){
 		/*free(nombreScriptTransformador);
 		free(rutaScriptTransformador);*/
 		free(nombreScriptTransformador);
-			//log_info(logInfo,"10");
-			free(rutaScriptTransformador);
+		//log_info(logInfo,"10");
+		free(rutaScriptTransformador);
 		log_info(logInfo,"fin fork t");
 
 		exit(0);
@@ -182,8 +182,8 @@ int realizarTransformacion(int client_sock){
 	//free(rutaResultadoTransformacion);
 	//log_info(logInfo,"9");
 	free(nombreScriptTransformador);
-				//log_info(logInfo,"10");
-				free(rutaScriptTransformador);
+	//log_info(logInfo,"10");
+	free(rutaScriptTransformador);
 	//log_info(logInfo,"11");
 
 	//log_info(logInfo,"12");

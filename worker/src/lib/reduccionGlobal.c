@@ -37,18 +37,18 @@ int realizarReduccionGlobal(client_sock){
 
 
 	printf("Nueva RG %s\n",infoReduccionGlobal->tempRedGlobal);
-	log_info(logInfo," llego info para la redu global job %d\n id %d\n tempred %s\n",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
+	log_info(logInfo," llego info para la redu global job %d\n id %d\n tempred %s",infoReduccionGlobal->job,infoReduccionGlobal->idTarea,infoReduccionGlobal->tempRedGlobal);
 
-	log_info(logInfo,"list size %d\n",infoReduccionGlobal->listaNodosSize);
+	log_info(logInfo,"list size %d",infoReduccionGlobal->listaNodosSize);
 
 	int i;
 	for(i=0;i<list_size(infoReduccionGlobal->listaNodos);i++){
 		TinfoNodoReduccionGlobal *infoNodo = list_get(infoReduccionGlobal->listaNodos,i);
-		log_info(logInfo," nombre nodo: %s \n",infoNodo->nombreNodo);
-		log_info(logInfo," ip nodo: %s \n",infoNodo->ipNodo);
-		log_info(logInfo," peurto: %s \n",infoNodo->puertoNodo);
-		log_info(logInfo," temp red loc: %s \n",infoNodo->temporalReduccion);
-		log_info(logInfo," encargado: %d \n",infoNodo->nodoEncargado);
+		log_info(logInfo," nombre nodo: %s ",infoNodo->nombreNodo);
+		log_info(logInfo," ip nodo: %s ",infoNodo->ipNodo);
+		log_info(logInfo," peurto: %s ",infoNodo->puertoNodo);
+		log_info(logInfo," temp red loc: %s",infoNodo->temporalReduccion);
+		log_info(logInfo," encargado: %d ",infoNodo->nodoEncargado);
 	}
 
 	char * nombreScriptReductor;
@@ -80,7 +80,7 @@ int realizarReduccionGlobal(client_sock){
 
 
 	//puts("Forkeo");
-
+	cont++;
 	pid_t pidRedGl;
 	if ( (pidRedGl=fork()) == 0 )
 	{ /* hijo */
@@ -97,7 +97,7 @@ int realizarReduccionGlobal(client_sock){
 					char * rutaApareoFinal=string_new();
 					//puts("str new");
 					string_append(&rutaApareoFinal,"/home/utnso/tmp/apareoGlobalFinal-");
-					cont++;
+					string_append(&rutaApareoFinal,worker->nombre_nodo);
 					string_append(&rutaApareoFinal,string_itoa(cont));
 					puts(rutaApareoFinal);
 					log_info(logInfo,"realizar apaglobal");
@@ -112,7 +112,7 @@ int realizarReduccionGlobal(client_sock){
 			enviarHeader(client_sock,head);
 		}
 
-		log_info(logInfo,"hago reduccion global\n");
+		log_info(logInfo,"hago reduccion global");
 
 		printf("Inicio RG %s\n",infoReduccionGlobal->tempRedGlobal);
 
@@ -133,13 +133,13 @@ int realizarReduccionGlobal(client_sock){
 		string_append(&rutaResultadoReduccionGlobal,infoReduccionGlobal->tempRedGlobal);
 		string_append(&lineaDeEjecucionReduccionGlobal,rutaResultadoReduccionGlobal);
 
-		log_info(logInfo,"linea de eecucion red global %s\n",lineaDeEjecucionReduccionGlobal);
-		log_info(logInfo,"Ruta resutlado reduccion %s\n",rutaResultadoReduccionGlobal);
+		log_info(logInfo,"linea de eecucion red global %s",lineaDeEjecucionReduccionGlobal);
+		log_info(logInfo,"Ruta resutlado reduccion %s",rutaResultadoReduccionGlobal);
 
 
 
 		stat = system(lineaDeEjecucionReduccionGlobal);
-		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",stat);
+		log_info(logInfo,"Stat lineaDeEjecucion :%d ",stat);
 
 		if(stat != 0){
 			puts("error linea de ejecucion reduccion global");
@@ -178,6 +178,7 @@ int realizarReduccionGlobal(client_sock){
 		//	printf("%d\n",cont);
 		//waitpid(pid,pidStat,0);
 	}
+
 	//log_info(logInfo,"free head");
 	free(head);
 	//log_info(logInfo,"free headpase");

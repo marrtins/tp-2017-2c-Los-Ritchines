@@ -165,7 +165,7 @@ void removerReduccionDeLista(int id){
 	}
 	return;
 }
-int enviarScript2(char * rutaScript, int sockDestino){
+/*int enviarScript2(char * rutaScript, int sockDestino){
 	FILE * archivoFinal = fopen(rutaScript, "r");
 	unsigned long long tamanioArchivoFinal;
 	int fileDescriptorArchivoFinal;
@@ -179,13 +179,15 @@ int enviarScript2(char * rutaScript, int sockDestino){
 	fileDescriptorArchivoFinal = fileno(archivoFinal);
 	contenidoArchivoFinal = malloc(tamanioArchivoFinal);
 	if ((archivoFinalMapeado = mmap(NULL, tamanioArchivoFinal, PROT_READ, MAP_SHARED,	fileDescriptorArchivoFinal, 0)) == MAP_FAILED) {
-		/*puts("error de almacenamiento. fallo mmap");
+		//
+		 *
+		 *//*puts("error de almacenamiento. fallo mmap");
 		headEnvio->tipo_de_proceso=MASTER;
 		headEnvio->tipo_de_mensaje=SENDSCRIPT;
 		enviarHeader(sockDestino,headEnvio);*/
-		return -1;
+		//return -1;
 		//logErrorAndExit("Error al hacer mmap");
-	}
+	/*}
 
 	memcpy(contenidoArchivoFinal, archivoFinalMapeado, tamanioArchivoFinal);
 	//log_info(logInfo,"contenido archv final %s ",contenidoArchivoFinal);
@@ -211,7 +213,7 @@ int enviarScript2(char * rutaScript, int sockDestino){
 
 	return 0;
 
-}
+}*/
 Tbuffer * empaquetarScript(Theader * header, char * contenidoArchivo, unsigned long long tamanioArchivoFinal){
 	Tbuffer * buffer = malloc(sizeof(Tbuffer));
 	buffer->tamanio = sizeof(Theader) + sizeof(unsigned long long) + tamanioArchivoFinal;
