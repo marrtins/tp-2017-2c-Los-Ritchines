@@ -37,12 +37,7 @@ void procesarInput(char* linea) {
 	} else if (!strcmp(*palabras, "cpto")) {
 		consolaCpto(palabras,cantidad);
 	} else if (!strcmp(*palabras, "cpblock")) {
-		if(cantidad == 3){
-			procesarCpblock(palabras);
-		}
-		else{
-			puts("Error en la cantidad de parametros");
-		}
+		consolaCpblock(palabras, cantidad);
 	} else if (!strcmp(*palabras, "md5")) {
 		consolaMd5(palabras,cantidad);
 	} else if (!strcmp(*palabras, "ls")) {
@@ -61,6 +56,15 @@ void procesarInput(char* linea) {
 	liberarPunteroDePunterosAChar(palabras);
 	free(palabras);
 
+}
+
+void consolaCpblock(char ** palabras, int cantidad){
+	if(cantidad == 3){
+		procesarCpblock(palabras);
+	}
+	else{
+		puts("Error en la cantidad de parametros");
+	}
 }
 
 void procesarCpblock(char ** palabras){
@@ -277,6 +281,24 @@ void consolaLs(char**palabras, int cantidad){
 		}
 		else{
 			puts("Falta la referencia a yamafs.");
+		}
+	}
+	else if(cantidad == 2){
+		if(!strcmp(palabras[1], "-d")){
+			if(esRutaYamafs(palabras[2])){
+				if(!esRutaDeUnArchivo(palabras[2])){
+					mostrarArbolDeDirectorios(palabras[2]);
+				}
+				else{
+					puts("La ruta ingresada, no es una ruta a un directorio.");
+				}
+			}
+			else{
+				puts("Falta la referencia a yamafs.");
+			}
+		}
+		else{
+			puts("Error, use el prefijo -d para mostrar el árbol de directorios de una ruta.");
 		}
 	}
 	else{

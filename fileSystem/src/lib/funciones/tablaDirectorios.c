@@ -1055,3 +1055,58 @@ int esDirectorioRaiz (char*ruta){
 void crearDirectorioTemporal(){
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/",0777);
 }
+
+char * generarTabs(int cantidadDeTabs){
+	char * tabs = string_new();
+	if(cantidadDeTabs == 0){
+		return tabs;
+	}
+	while(cantidadDeTabs > 0){
+		string_append(&tabs, "\t");
+		cantidadDeTabs--;
+	}
+	return tabs;
+}
+
+void mostrarPadreEHijosDeUnDirectorio(Tdirectorio * directorio, int nivelDelArbol){
+	char * imprimible = generarTabs(nivelDelArbol);
+	string_append_with_format(&imprimible, "/%s", directorio->nombre);
+	puts(imprimible);
+	t_list * hijos = buscarHijosDeUnDirectorio(directorio);
+	int cantidadDeHijos = list_size(hijos);
+	int i = 0;
+	Tdirectorio * hijo;
+	if(cantidadDeHijos > 0){
+		while(i < cantidadDeHijos){
+			hijo = list_get(hijos, i);
+			mostrarPadreEHijosDeUnDirectorio(hijo, nivelDelArbol+1);
+			i++;
+		}
+	}
+
+	free(imprimible);
+	list_destroy(hijos);
+	//no destruyo los elementos por que sino destruiria la lista global
+	//list_destroy_and_destroy_elements(hijos, free);
+
+	return;
+}
+
+void mostrarArbolDeDirectorios(char * rutaADirectorio){
+	char * nombreDirectorio;
+	Tdirectorio * directorio;
+	char ** split = string_split(rutaADirectorio, "/");
+	if(contarPunteroDePunteros(split) == 1){
+		directorio = buscarPorNombreDeDirectorio("root");
+		mostrarPadreEHijosDeUnDirectorio(directorio, 0);
+		liberarPunteroDePunterosAChar(split);
+		free(split);
+		return;
+	}
+	nombreDirectorio = obtenerUltimoElementoDeUnSplit(split);
+	directorio = buscarPorNombreDeDirectorio(nombreDirectorio);
+	mostrarPadreEHijosDeUnDirectorio(directorio, 0);
+	liberarPunteroDePunterosAChar(split);
+	free(split);
+	free(nombreDirectorio);
+}
