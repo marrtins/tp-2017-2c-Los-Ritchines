@@ -101,41 +101,53 @@ int main(int argc, char* argv[]) {
 
 				//verifico que la ruta que me manda yama sea valida
 				if(verificarRutaArchivoSinPuts(rutaArchivo)){
-					ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
-					levantarTablaArchivo(archivo,ruta);
+					if(sigueEstableParaArchivo(rutaArchivo)){
+						ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
+						levantarTablaArchivo(archivo,ruta);
 
-					TinfoArchivoFSYama *infoSend;
+						TinfoArchivoFSYama *infoSend;
 
-					infoSend = crearListaTablaArchivoParaYama(archivo);
-					head->tipo_de_proceso=FILESYSTEM;
-					head->tipo_de_mensaje=INFO_ARCHIVO;
+						infoSend = crearListaTablaArchivoParaYama(archivo);
+						head->tipo_de_proceso=FILESYSTEM;
+						head->tipo_de_mensaje=INFO_ARCHIVO;
 
-					int packSize;
+						int packSize;
 
-					log_info(logInfo, "Serializando info del archivo");
-					char * buffer2 = serializarInfoArchivoYamaFS(*head,infoSend,&packSize);
-					log_info(logInfo, "Info de archivo serializada.");
+						log_info(logInfo, "Serializando info del archivo");
+						char * buffer2 = serializarInfoArchivoYamaFS(*head,infoSend,&packSize);
+						log_info(logInfo, "Info de archivo serializada.");
 
-					if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
-						logErrorAndExit("Fallo al enviar la informacion de un archivo");
+						if ((estado = send(socketYama, buffer2 , packSize, 0)) == -1){
+							logErrorAndExit("Fallo al enviar la informacion de un archivo");
+						}
+						log_info(logInfo, "Enviando info a yama.");
+
+						//envio la info del nodo
+
+						enviarInfoNodoAYama(socketYama, archivo);
+						log_info(logInfo,"Se envió a yama, la información del archivo: %s que solicito.",archivo->nombreArchivoSinExtension);
+
+						liberarTablaDeArchivo(archivo);
+						free(ruta);
+
+
+						liberarTInfoArchivoFSYama(infoSend);
+						//todo: Free(infoSend)
+
+						free(buffer2);
+
 					}
-					log_info(logInfo, "Enviando info a yama.");
+					else {
+						log_info(logInfo, "FILESYSTEM paso a un estado NO estable");
+						log_info(logInfo, "No se puede levantar el archivo que pidio YAMA. Reconecte los nodos");
 
-					//envio la info del nodo
+						head->tipo_de_proceso = FILESYSTEM;
+						head->tipo_de_mensaje=FS_NO_ESTABLE;
 
-					enviarInfoNodoAYama(socketYama, archivo);
-					log_info(logInfo,"Se envió a yama, la información del archivo: %s que solicito.",archivo->nombreArchivoSinExtension);
-
-					liberarTablaDeArchivo(archivo);
-					free(ruta);
-
-
-					liberarTInfoArchivoFSYama(infoSend);
-					//todo: Free(infoSend)
-
-					free(buffer2);
-
-
+						if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
+							logErrorAndExit("Fallo al enviar header a YAMA");
+						}
+					}
 				}else {
 					//si no es valida se manda esto
 					log_error(logError,"La ruta del archivo que solicito yama NO es valida.");
@@ -144,9 +156,10 @@ int main(int argc, char* argv[]) {
 					head->tipo_de_mensaje=ARCH_NO_VALIDO;
 
 					if ((estado = send(socketYama, head , HEAD_SIZE, 0)) == -1){
-						 logErrorAndExit("Fallo al enviar header a YAMA");
+						logErrorAndExit("Fallo al enviar header a YAMA");
 					}
 				}
+
 				free(rutaArchivo);
 
 			break;

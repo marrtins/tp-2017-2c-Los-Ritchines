@@ -1,7 +1,7 @@
 TAMANIO=170
 NODOS=[Nodo1,Nodo2]
-Nodo1Libre=27
-Nodo2Libre=37
+Nodo1Libre=-7
+Nodo2Libre=3
 Nodo1Total=80
-LIBRE=64
+LIBRE=-4
 Nodo2Total=90

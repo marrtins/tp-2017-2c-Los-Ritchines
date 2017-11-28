@@ -398,3 +398,28 @@ int todosLosArchivosSePuedenLevantar(){
 	return 1;
 }
 
+
+int sePuedeLevantaElArchivo(char * rutaArchivo){
+
+	Tarchivo * archivo= malloc(sizeof(Tarchivo));;
+	int cantBloques;
+	int nroBloque = 0;
+	char * ruta;
+
+	ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
+	levantarTablaArchivo(archivo,ruta);
+	cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
+
+	while(nroBloque < cantBloques){
+		if(nodosDisponiblesParaBloqueDeArchivo(archivo, nroBloque) == 0){
+			log_info(logInfo, "No se encontraron los nodos con las copias del bloque.");
+			free(ruta);
+			liberarTablaDeArchivo(archivo);
+			return 0;
+		}
+		nroBloque++;
+	}
+	liberarTablaDeArchivo(archivo);
+	return 1;
+}
+

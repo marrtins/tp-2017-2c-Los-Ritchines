@@ -19,7 +19,7 @@ int punteroDeStringsContieneString(char ** punteroDeString ,char * string);
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 
-int todosLosArchivosSePuedenLevantar();
+
 
 //Consola
 void procesarCpblock(char ** palabras);
@@ -41,10 +41,15 @@ void consolaInfo(char**palabras, int cantidadParametros);
 //Conexiones
 void conectarNuevoNodo(TpackInfoBloqueDN * infoNodo, int fileDescriptor);
 void verificarSiEsEstable();
+int sigueEstableParaArchivo(char *rutaArchivoYamafs);
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);
 void formatearNodos();
+
+
+int todosLosArchivosSePuedenLevantar();
+int sePuedeLevantaElArchivo(char * rutaArchivoYamafs);
 
 
 //Tablas
