@@ -1105,6 +1105,12 @@ void mostrarArbolDeDirectorios(char * rutaADirectorio){
 	}
 	nombreDirectorio = obtenerUltimoElementoDeUnSplit(split);
 	directorio = buscarPorNombreDeDirectorio(nombreDirectorio);
+	if(directorio == NULL){
+		puts("El directorio especificado, no existe");
+		liberarPunteroDePunterosAChar(split);
+		free(split);
+		free(nombreDirectorio);
+	}
 	mostrarPadreEHijosDeUnDirectorio(directorio, 0);
 	liberarPunteroDePunterosAChar(split);
 	free(split);
