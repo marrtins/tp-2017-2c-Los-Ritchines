@@ -21,6 +21,7 @@ void conexionesDatanode(void * estructura){
 	Tnodo * nuevoNodo;
 	Tnodo * nodoEncontrado;
 	TpackInfoBloqueDN * infoNodo;
+	TinfoNodo * infoNodoNuevo;
 	TfileSystem * fileSystem = (TfileSystem *) estructura;
 	Theader * head = malloc(sizeof(Theader));
 	TarchivoFinal * estructuraArchivoFinal;
@@ -95,6 +96,10 @@ void conexionesDatanode(void * estructura){
 									}
 									else {
 										//se reconecta
+										if((TinfoNodo*)buscarInfoNodoPorNombre(listaInfoNodo, infoNodo->nombreNodo)==NULL){
+											infoNodoNuevo = inicializarInfoNodo(infoNodo);
+											list_add(listaInfoNodo,infoNodoNuevo);
+										}
 										log_info(logInfo,"Un datanode quiere reconectarse.");
 										nuevoNodo = buscarNodoPorNombre(listaDeNodosDesconectados,infoNodo->nombreNodo);
 										log_info(logInfo,"Nombre: %s",nuevoNodo->nombre);
