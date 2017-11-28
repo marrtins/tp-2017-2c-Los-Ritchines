@@ -186,11 +186,11 @@ char *recvGenericWFlags(int sock_in, int flags){
 	char *p_serial;
 
 	if ((stat = recv(sock_in, &pack_size, sizeof(int), flags)) == -1){
-		perror("Fallo de recv. error");
+		log_error(logError,"Fallo de recv. error");
 		return NULL;
 
 	} else if (stat == 0){
-		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
+		log_error(logError,"El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
 		return NULL;
 	}
 
@@ -198,16 +198,16 @@ char *recvGenericWFlags(int sock_in, int flags){
 	//printf("Paquete de size: %d\n", pack_size);
 
 	if ((p_serial = malloc(pack_size)) == NULL){
-		printf("No se pudieron mallocar %d bytes para paquete generico\n", pack_size);
+		log_error(logError,"No se pudieron mallocar %d bytes para paquete generico\n", pack_size);
 		return NULL;
 	}
 
 	if ((stat = recv(sock_in, p_serial, pack_size, flags)) == -1){
-		perror("Fallo de recv. error");
+		log_error(logError,"Fallo de recv. error");
 		return NULL;
 
 	} else if (stat == 0){
-		printf("El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
+		log_error(logError,"El proceso del socket %d se desconecto. No se pudo completar recvGenerico\n", sock_in);
 		return NULL;
 	}
 

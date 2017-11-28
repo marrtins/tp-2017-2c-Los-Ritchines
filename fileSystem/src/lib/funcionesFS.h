@@ -199,6 +199,8 @@ void liberarCopia(void * copia);
 void liberarEstructuraArchivoFinal(TarchivoFinal * archivoFinal);
 void liberarTPackageInfoNodo (void * infoNodo);
 void liberarTpackageUbicacionBloques(void * bloque);
+void liberarBloques(void * bloque);
+void liberarTInfoArchivoFSYama(TinfoArchivoFSYama * infoArchivo);
 
 //YAMA
 char * recvRutaArchivo(int socket);

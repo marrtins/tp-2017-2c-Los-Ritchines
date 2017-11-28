@@ -64,3 +64,17 @@ void liberarTpackageUbicacionBloques(void * bloque){
 	free(bloqueA->nombreNodoC2);
 	free(bloqueA);
 }
+
+void liberarBloques(void * bloque){
+	TpackageUbicacionBloques * bloqueArchivo = (TpackageUbicacionBloques*) bloque;
+	free(bloqueArchivo->nombreNodoC1);
+	free(bloqueArchivo->nombreNodoC2);
+	free(bloqueArchivo);
+}
+
+void liberarTInfoArchivoFSYama(TinfoArchivoFSYama * infoArchivo){
+	list_destroy_and_destroy_elements(infoArchivo->listaBloques,liberarBloques);
+	free(infoArchivo);
+}
+
+

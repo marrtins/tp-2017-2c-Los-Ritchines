@@ -4,23 +4,31 @@ char * recvRutaArchivo(int socket){
 
 
 	char * buffer;
+	char * bytes;
 	TpackBytes *pathArchivo;
 
-	puts("Nos llega el path del archivo");
+	log_info(logInfo,"Nos llega la ruta del archivo");
 
 	if ((buffer = recvGeneric(socket)) == NULL){
-		puts("Fallo recepcion de PATH_FILE_TOREDUCE");
+		log_error(logError,"Fallo recepcion de PATH_FILE_TOREDUCE");
 		return NULL;
 	}
 
 	if ((pathArchivo = (TpackBytes *) deserializeBytes(buffer)) == NULL){
-		puts("Fallo deserializacion de Bytes del path arch a reducir");
+		log_error(logError,"Fallo deserializacion de Bytes del path arch a reducir");
 		return NULL;
 	}
 
-	printf("Path archivo: %s\n",pathArchivo->bytes);
+	log_info(logInfo,"Ruta de archivo: %s",pathArchivo->bytes);
 
-	return pathArchivo->bytes;
+	bytes = strdup(pathArchivo->bytes);
+
+	//TODO el path archivo me dice valgrind que no se libera aunque ya estan los free
+	free(buffer);
+	free(pathArchivo->bytes);
+	free(pathArchivo);
+
+	return bytes;
 
 
 
@@ -56,14 +64,12 @@ TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 		TpackageUbicacionBloques *bloque = malloc(sizeof(TpackageUbicacionBloques));
 		TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia, 0);
 		bloque->bloque = i;
-		bloque->nombreNodoC1 = malloc(strlen(copia1->nombreDeNodo) + 1);
-		bloque->nombreNodoC1 = copia1->nombreDeNodo;
+		bloque->nombreNodoC1 = strdup(copia1->nombreDeNodo);
 		bloque->nombreNodoC1Len = (strlen(copia1->nombreDeNodo) + 1);
 		bloque->bloqueC1 = copia1->numeroBloqueDeNodo;
 
 		TcopiaNodo *copia2 = list_get(archivo->bloques[i].copia, 1);
-		bloque->nombreNodoC2 = malloc(strlen(copia2->nombreDeNodo) + 1);
-		bloque->nombreNodoC2 = copia2->nombreDeNodo;
+		bloque->nombreNodoC2 = strdup(copia2->nombreDeNodo);
 		bloque->nombreNodoC2Len = (strlen(copia2->nombreDeNodo) + 1);
 		bloque->bloqueC2 = copia2->numeroBloqueDeNodo;
 
@@ -72,7 +78,6 @@ TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 	}
 
 	infoSend->listaSize = list_size(listaBloques);
-	infoSend->listaBloques = list_create();
 	infoSend->listaBloques = listaBloques;
 
 	return infoSend;
@@ -95,7 +100,6 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 
 	TinfoNodosFSYama *infoNodos = malloc(sizeof(TinfoNodosFSYama));
 	infoNodos->listaSize=list_size(listaNodos);
-	infoNodos->listaNodos=list_create();
 	infoNodos->listaNodos=listaNodos;
 
 	buffer = serializarInfoNodosYamaFS(head,infoNodos,&packSize);
@@ -103,15 +107,14 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 	if ((send(socketYama, buffer ,packSize, 0)) == -1){
 		logErrorAndExit("Fallo al enviar la informacion de un archivo");
 	}
-	printf("pack size info nodos %d\n",packSize);
-	puts("envie lista de nodos");
 
-	//liberarPunteroDePunterosAChar(nodos);
-	//free(nodos);
-	//list_destroy_and_destroy_elements(listaNodos,liberarTPackageInfoNodo);
+
+	liberarPunteroDePunterosAChar(nodos);
+	free(nodos);
+	list_destroy_and_destroy_elements(listaNodos,liberarTPackageInfoNodo);
 	//list_destroy_and_destroy_elements(infoNodos->listaNodos, liberarTPackageInfoNodo);
-	//free(infoNodos);
-	//free(buffer);
+	free(infoNodos);
+	free(buffer);
 
 }
 
@@ -121,7 +124,7 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 t_list* generarListaInfoNodos(char **nodos){
 
 	t_list * listaNodos = list_create();
-	TinfoNodo * infoNodo = malloc(sizeof(TinfoNodo));
+	TinfoNodo * infoNodo;
 	int i = 0;
 
 	int ipTamanio=10;

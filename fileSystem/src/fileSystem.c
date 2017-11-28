@@ -124,11 +124,13 @@ int main(int argc, char* argv[]) {
 					//envio la info del nodo
 
 					enviarInfoNodoAYama(socketYama, archivo);
-					log_info(logInfo,"Se envió a yama, la información del archivo que solicito.");
+					log_info(logInfo,"Se envió a yama, la información del archivo: %s que solicito.",archivo->nombreArchivoSinExtension);
 
 					liberarTablaDeArchivo(archivo);
 					free(ruta);
 
+
+					liberarTInfoArchivoFSYama(infoSend);
 					//todo: Free(infoSend)
 
 					free(buffer2);
@@ -145,11 +147,7 @@ int main(int argc, char* argv[]) {
 						 logErrorAndExit("Fallo al enviar header a YAMA");
 					}
 				}
-
 				free(rutaArchivo);
-
-
-
 
 			break;
 			default:

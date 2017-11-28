@@ -273,7 +273,7 @@ int almacenarArchivo(char **palabras){
 		free(archivoAAlmacenar->nombreArchivoSinExtension);
 		free(archivoAAlmacenar->extensionArchivo);
 		free(archivoAAlmacenar);
-		return -1;
+		return 0;
 	}
 	guardarTablaDeArchivo(archivoAAlmacenar, palabras[2]);
 	almacenarTodosLosBitmaps(listaDeNodos);
@@ -281,7 +281,6 @@ int almacenarArchivo(char **palabras){
 	free(splitDeRuta);
 	free(nombreArchivoConExtension);
 	liberarTablaDeArchivo(archivoAAlmacenar);
-	puts("Se ha almacenado el archivo en el yamafs con exito.");
 	return 1;
 }
 

@@ -234,7 +234,9 @@ void consolaCpfrom(char** palabras, int cantidad){
 		if(esRutaYamafs(palabras[2])){
 			if(existeDirectorio(palabras[2])){
 				if(archivoRepetidoEnDirectorio(palabras[1],palabras[2])){
-					almacenarArchivo(palabras);
+					if(almacenarArchivo(palabras)){
+						puts("Se ha almacenado el archivo en el yamafs con exito.");
+					}
 				}
 				//que significa este else return? no deberia tirar un mensaje ?? todo
 				else return;

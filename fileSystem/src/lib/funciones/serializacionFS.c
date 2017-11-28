@@ -21,8 +21,7 @@ void desempaquetarArchivoFinal(int fileDescriptor, TarchivoFinal * archivoFinal)
 		logErrorAndExit("Error al recibir la ruta del archivo final.");
 	}
 
-	if (recv(fileDescriptor, &archivoFinal->tamanioContenido, sizeof(archivoFinal->tamanioContenido), 0)
-			== -1) {
+	if (recv(fileDescriptor, &archivoFinal->tamanioContenido, sizeof(archivoFinal->tamanioContenido), 0) == -1) {
 		logErrorAndExit("Error al recibir el tamanio del contenido del archivo final");
 	}
 
