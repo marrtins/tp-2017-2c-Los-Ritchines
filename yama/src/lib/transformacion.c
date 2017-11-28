@@ -70,44 +70,69 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 		TinfoArchivoFSYama *infoArchivo;
 	stat = recv(socketFS, &head, sizeof(Theader), 0);
 	log_info(logInfo,"stat redv foscket fs %d \n",stat);
-	if (head.tipo_de_mensaje == ARCH_NO_VALIDO) {
-		puts("El archivo no es valido");
-		log_info(logInfo,"el ach no es valido");
-		headEnvio->tipo_de_proceso=YAMA;
-		headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO;
-		enviarHeader(sockMaster,headEnvio);
-		return;
-	} else if (head.tipo_de_mensaje == INFO_ARCHIVO) {
-		puts("FS nos quiere mandar la info del archivo que pedi");
-		log_info(logInfo,"Fs nos manda la info del archivo pedid");
-		buffer3 = recvGeneric(socketFS);
-		infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
-		free(buffer3);
-		stat = recv(socketFS, &head, sizeof(Theader), 0);
-		if(head.tipo_de_mensaje==INFO_NODO){
-			puts("ahora recibimos info de los nodos");
-			log_info(logInfo,"ahora info de los nods");
+	switch(head.tipo_de_mensaje){
+		case ARCH_NO_VALIDO:
+			puts("El archivo no es valido");
+			log_info(logInfo,"el ach no es valido");
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO;
+			enviarHeader(sockMaster,headEnvio);
+		break;
+		case FS_NO_ESTABLE:
+			puts("FS paso a un estado NO estable");
+			log_info(logInfo,"FS paso a un estado NO estable");
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO; //TODO lo deje asi para que funcionara
+			enviarHeader(sockMaster,headEnvio);
+		break;
+		case INFO_ARCHIVO:
+			puts("FS nos quiere mandar la info del archivo que pedi");
+			log_info(logInfo,"Fs nos manda la info del archivo pedid");
 			buffer3 = recvGeneric(socketFS);
-			 infoNodos= deserializarInfoNodosFSYama(buffer3);
-			 log_info(logInfo,"ya recibi todo");
-			 free(buffer3);
-		}else{
-			log_info(logInfo,"error al recibir info nodos");
-			puts("error al recibir info de los nodos");
-		}
+			infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
+			free(buffer3);
+			stat = recv(socketFS, &head, sizeof(Theader), 0);
+			if(head.tipo_de_mensaje==INFO_NODO){
+				puts("ahora recibimos info de los nodos");
+				log_info(logInfo,"ahora info de los nods");
+				buffer3 = recvGeneric(socketFS);
+				 infoNodos= deserializarInfoNodosFSYama(buffer3);
+				 log_info(logInfo,"ya recibi todo");
+				 free(buffer3);
+			}else{
+				log_info(logInfo,"error al recibir info nodos");
+				puts("error al recibir info de los nodos");
+			}
 
 
-		int i;
-		for(i=0;i<infoArchivo->listaSize;i++){
-			TpackageUbicacionBloques *bloqueAux = list_get((infoArchivo->listaBloques),i);
-			log_info(logInfo,"bloque %d ; nodoc1 %s ;bloquec1 %d;nodoc2 %s;bloquec2 %d;finbloque %d\n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->bloqueC1,bloqueAux->nombreNodoC2, bloqueAux->bloqueC2,bloqueAux->finBloque);
-		}
-		for(i=0;i<infoNodos->listaSize;i++){
-			TpackageInfoNodo *nodoAux=list_get((infoNodos->listaNodos),i);
-			log_info(logInfo,"nombre nodo %s ipnodo %s puerto nodo %s\n",nodoAux->nombreNodo,nodoAux->ipNodo,nodoAux->puertoWorker);
-		}
+			int i;
+			for(i=0;i<infoArchivo->listaSize;i++){
+				TpackageUbicacionBloques *bloqueAux = list_get((infoArchivo->listaBloques),i);
+				log_info(logInfo,"bloque %d ; nodoc1 %s ;bloquec1 %d;nodoc2 %s;bloquec2 %d;finbloque %d\n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->bloqueC1,bloqueAux->nombreNodoC2, bloqueAux->bloqueC2,bloqueAux->finBloque);
+			}
+			for(i=0;i<infoNodos->listaSize;i++){
+				TpackageInfoNodo *nodoAux=list_get((infoNodos->listaNodos),i);
+				log_info(logInfo,"nombre nodo %s ipnodo %s puerto nodo %s\n",nodoAux->nombreNodo,nodoAux->ipNodo,nodoAux->puertoWorker);
+			}
+
+			log_info(logInfo,"pongo en nevo job");
+			nuevoJob->listaComposicionArchivo=list_create();
+			nuevoJob->listaComposicionArchivo=infoArchivo->listaBloques;
+			nuevoJob->listaNodosArchivo=list_create();
+			nuevoJob->listaNodosArchivo=infoNodos->listaNodos;
+			//list_destroy_and_destroy_elements(infoArchivo->listaBloques,liberarInfoArchivo);
+			//list_destroy_and_destroy_elements(infoNodos->listaNodos,liberarInfoNodos);
+
+			free(infoArchivo);
+			free(infoNodos);
+
+			responderTransformacion(nuevoJob,socketFS);
+		break;
+		default:
+		break;
 
 	}
+
 	log_info(logInfo,"pongo en nevo job");
 	nuevoJob->listaComposicionArchivo=list_create();
 	nuevoJob->listaComposicionArchivo=infoArchivo->listaBloques;
@@ -120,6 +145,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	free(infoNodos);
 
 	responderTransformacion(nuevoJob,socketFS);
+
 }
 
 void liberarInfoArchivo(void * info){

@@ -9,18 +9,25 @@ int main(int argc, char* argv[]) {
 	char *mensaje = malloc(100);
 	Theader *head = malloc(sizeof(Theader));
 	Tbloque * bloque;
+	char * archivoLogInfo = string_new();
+	char * archivoLogError = string_new();
 
 	if(argc!=2){
 			printf("Error en la cantidad de parametros\n");
 			return EXIT_FAILURE;
 		}
 
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log");
-	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log");
-	logError = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error.log", "dataNode", false, LOG_LEVEL_ERROR);
-	logInfo = log_create("/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info.log", "dataNode", true, LOG_LEVEL_INFO);
 	dataNode = obtenerConfiguracionDN(argv[1]);
 	mostrarConfiguracion(dataNode);
+
+	string_append_with_format(&archivoLogInfo, "/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/info-%s.log", dataNode->nombre_nodo);
+	string_append_with_format(&archivoLogError, "/home/utnso/tp-2017-2c-Los-Ritchines/dataNode/error-%s.log", dataNode->nombre_nodo);
+	inicializarArchivoDeLogs(archivoLogInfo);
+	inicializarArchivoDeLogs(archivoLogError);
+	logError = log_create(archivoLogError, "dataNode", false, LOG_LEVEL_ERROR);
+	logInfo = log_create(archivoLogInfo, "dataNode", true, LOG_LEVEL_INFO);
+	free(archivoLogInfo);
+	free(archivoLogError);
 
 	FILE * archivo = fopen(dataNode->ruta_databin, "rb+");
 	log_info(logInfo,"Se abre el databin.");

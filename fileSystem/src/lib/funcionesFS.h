@@ -19,7 +19,7 @@ int punteroDeStringsContieneString(char ** punteroDeString ,char * string);
 TfileSystem *obtenerConfiguracionFS(char* ruta);
 void mostrarConfiguracion(TfileSystem *fileSystem);
 
-int todosLosArchivosSePuedenLevantar();
+
 
 //Consola
 void procesarCpblock(char ** palabras);
@@ -36,15 +36,21 @@ void consolaMd5(char**palabras, int cantidadParametros);
 void consolaLs(char**palabras, int cantidadParametros);
 void consolaMove(char**palabras, int cantidadParametros);
 void consolaInfo(char**palabras, int cantidadParametros);
+void consolaCpblock(char ** palabras, int cantidad);
 
 
 //Conexiones
 void conectarNuevoNodo(TpackInfoBloqueDN * infoNodo, int fileDescriptor);
 void verificarSiEsEstable();
+int sigueEstableParaArchivo(char *rutaArchivoYamafs);
 int conectarNuevoCliente( int fileDescriptor, fd_set * masterFD);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 void conexionesDatanode(void * estructura);
 void formatearNodos();
+
+
+int todosLosArchivosSePuedenLevantar();
+int sePuedeLevantaElArchivo(char * rutaArchivoYamafs);
 
 
 //Tablas
@@ -88,6 +94,9 @@ int eliminarKeyDeArchivo(char * rutaArchivo, char * key);
 char * obtenerExtensionDeArchivoDeUnaRuta(char * rutaLocal);
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio);
 char ** obtenerNodosDeUnArchivo(Tarchivo * archivo);
+void mostrarPadreEHijosDeUnDirectorio(Tdirectorio * directorio, int nivelDelArbol);
+char * generarTabs(int cantidadDeTabs);
+void mostrarArbolDeDirectorios(char * rutaADirectorio);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);

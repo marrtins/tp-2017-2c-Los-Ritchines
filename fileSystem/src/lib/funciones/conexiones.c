@@ -292,6 +292,16 @@ void verificarSiEsEstable() {
 
 }
 
+int sigueEstableParaArchivo(char *rutaArchivo){
+	if(list_size(listaDeNodos)>=2){
+		if(sePuedeLevantaElArchivo(rutaArchivo)){
+			return 1;
+		}
+	}
+	return 0;
+
+}
+
 void conectarNuevoNodo(TpackInfoBloqueDN * infoNodo, int fileDescriptor){
 	Tnodo * nuevoNodo = malloc(sizeof(Tnodo));
 	TinfoNodo * infoNodoNuevo = inicializarInfoNodo(infoNodo);
