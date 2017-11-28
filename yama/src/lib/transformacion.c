@@ -6,7 +6,7 @@
  */
 
 #include "funcionesYM.h"
-extern t_list * listaJobFinalizados,*listaJobsMaster,*listaEstadoFinalizadoOK;
+extern t_list * listaJobFinalizados,*listaJobsMaster,*listaEstadoFinalizadoOK,*listaEstadoEnProceso,*listaEstadoError;
 extern float retardoPlanificacionSegs;
 extern int idTareaGlobal,idJobGlobal,idMasterGlobal;
 
@@ -119,7 +119,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	free(infoArchivo);
 	free(infoNodos);
 
-	responderTransformacion(nuevoJob);
+	responderTransformacion(nuevoJob,socketFS);
 }
 
 void liberarInfoArchivo(void * info){
@@ -153,7 +153,7 @@ void liberarInfoNodos(void * info){
 
 
 
-int responderTransformacion(TjobMaster *job){
+int responderTransformacion(TjobMaster *job,int socketFS){
 
 	int sockMaster = job->fdMaster;
 	int stat;
@@ -161,7 +161,7 @@ int responderTransformacion(TjobMaster *job){
 	job->nroJob=idJobGlobal++;
 	sleep(retardoPlanificacionSegs);
 
-	t_list *listaBloquesPlanificados=planificar(job);
+	t_list *listaBloquesPlanificados=planificar(job,socketFS);
 
 
 	log_info(logInfo,"lista blqoes planificados job%d",job->nroJob);
@@ -239,6 +239,14 @@ void liberarBloquesPlanificados(void * info){
 	log_info(logInfo,"pase free info bl pl");
 }
 
+void limpiarNodosOff(void * info){
+	log_info(logInfo,"free info bl pl");
+	char * nombre = (char*) info;
+	free(nombre);
+}
+
+
+
 void manejarFinTransformacionOK(int sockMaster){
 
 	int idTareaFinalizada;
@@ -282,6 +290,8 @@ void manejarFinTransformacionFailDesconexion(int sockMaster){
 
 	if(sePuedeReplanificar(idTareaFinalizada,jobFinalizado->listaComposicionArchivo)){
 			log_info(logInfo,"se peude replanificar");
+			log_info(logInfo,"libero en 1 la carga de %s",tareaFinalizada->nodo);
+			liberarCargaEn(tareaFinalizada->nodo,1);
 			stat = replanificar(idTareaFinalizada,sockMaster,jobFinalizado->listaComposicionArchivo);
 
 			if(stat<0){
@@ -352,6 +362,179 @@ void manejarFinTransformacionFailDesconexion(int sockMaster){
 		}
 	}
 
+}
+
+void manejarFinTransformacionFailDesconexionBIS(int sockMaster){
+	int idTareaFinalizada,stat;
+	Theader *headEnvio=malloc(sizeof(Theader));
+
+	idTareaFinalizada = recibirValor(sockMaster);
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+
+
+	TjobMaster *jobFinalizado = getJobPorNroJob(tareaFinalizada->job);
+
+	if(yaFinalizoAlgunaInstancia(idTareaFinalizada)){
+
+
+		sleep(retardoPlanificacionSegs);
+		printf("FINTRANSFORMACIONLOCAL FAIL x desconexion del %s de la tarea%d\n",tareaFinalizada->nodo,idTareaFinalizada);
+		log_info(logInfo,"fin TL fail x desco del %s . tarea %d",tareaFinalizada->nodo,idTareaFinalizada);
+		puts("actuializo tbala de estados y reasigno todos los temporales ok a otros nodos");
+		log_info(logInfo,"actuializo tbala de estados y reasigno todos los temporales ok a otros nodos");
+
+		//moverAListaError(idTareaFinalizada);
+
+
+		if(sePuedeReplanificar(idTareaFinalizada,jobFinalizado->listaComposicionArchivo)){
+			log_info(logInfo,"se peude replanificar");
+			log_info(logInfo,"libero en 1 la carga de %s",tareaFinalizada->nodo);
+			liberarCargaEn(tareaFinalizada->nodo,1);
+			stat = replanificar(idTareaFinalizada,sockMaster,jobFinalizado->listaComposicionArchivo);
+
+			if(stat<0){
+				//esto no deberia pasar nunca.. lo dejo aca para que no rompa tod
+				printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+				puts("Se da x terminado el job");
+				log_info(logInfo,"al final no se podia");
+				headEnvio->tipo_de_proceso=YAMA;
+				headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+				enviarHeader(sockMaster,headEnvio);
+
+				if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+					TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+					TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+					job->nroJob = tareaFinalizada->job;
+					job->finCorrecto=false;
+					list_add(listaJobFinalizados,job);
+				}
+
+			}
+		}else{
+
+			printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+			puts("Se da x terminado el job");
+			log_info(logInfo,"%d no se puede repla. se da x temrinado eljobn",idTareaFinalizada);
+			headEnvio->tipo_de_proceso=YAMA;
+			headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+			enviarHeader(sockMaster,headEnvio);
+			liberarCargaNodos(idTareaFinalizada);
+
+			if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+				TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+				TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+				job->nroJob = tareaFinalizada->job;
+				job->finCorrecto=false;
+				list_add(listaJobFinalizados,job);
+			}
+
+		}
+
+
+
+		int i;
+		for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+			TpackTablaEstados *aux = list_get(listaEstadoFinalizadoOK,i);
+			if(string_equals_ignore_case(aux->nodo,tareaFinalizada->nodo) && tareaFinalizada->etapa==TRANSFORMACION && tareaFinalizada->job == aux->job){
+				moverFinalizadaAListaError(aux->idTarea);
+				//list_remove(listaEstadoFinalizadoOK,i);
+				if(sePuedeReplanificar(aux->idTarea,jobFinalizado->listaComposicionArchivo)){
+					replanificar(aux->idTarea,sockMaster,jobFinalizado->listaComposicionArchivo);
+				}else{
+					printf("La tarea %d no se puede replanificar ",aux->idTarea);
+					puts("Se da x terminado el job");
+					log_info(logInfo,"la tarea %d no se puede repla. se da x termiando el job",aux->idTarea);
+					headEnvio->tipo_de_proceso=YAMA;
+					headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+					enviarHeader(sockMaster,headEnvio);
+					liberarCargaNodos(aux->idTarea);
+
+					if(!yaFueAgregadoAlistaJobFinalizados(aux->idTarea)){
+						TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+						TpackTablaEstados *tareaFinalizada=getTareaPorId(aux->idTarea);
+						job->nroJob = tareaFinalizada->job;
+						job->finCorrecto=false;
+						list_add(listaJobFinalizados,job);
+					}
+				}
+			}
+		}
+	}else{
+
+		if(sePuedeReplanificar(idTareaFinalizada,jobFinalizado->listaComposicionArchivo)){
+				//log_info(logInfo,"se peude replanificar");
+				stat = replanificar(idTareaFinalizada,sockMaster,jobFinalizado->listaComposicionArchivo);
+
+				if(stat<0){
+					//esto no deberia pasar nunca.. lo dejo aca para que no rompa tod
+					printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+					puts("Se da x terminado el job");
+					log_info(logInfo,"al final no se podia");
+					headEnvio->tipo_de_proceso=YAMA;
+					headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+					enviarHeader(sockMaster,headEnvio);
+
+					if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+						TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+						TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+						job->nroJob = tareaFinalizada->job;
+						job->finCorrecto=false;
+						list_add(listaJobFinalizados,job);
+					}
+
+				}
+			}else{
+
+				printf("La tarea %d no se puede replanificar ",idTareaFinalizada);
+				puts("Se da x terminado el job");
+				log_info(logInfo,"%d no se puede repla. se da x temrinado eljobn",idTareaFinalizada);
+				headEnvio->tipo_de_proceso=YAMA;
+				headEnvio->tipo_de_mensaje=FINJOB_ERRORREPLANIFICACION;
+				enviarHeader(sockMaster,headEnvio);
+				liberarCargaNodos(idTareaFinalizada);
+
+				if(!yaFueAgregadoAlistaJobFinalizados(idTareaFinalizada)){
+					TjobFinalizado *job = malloc(sizeof (TjobFinalizado));
+					TpackTablaEstados *tareaFinalizada=getTareaPorId(idTareaFinalizada);
+					job->nroJob = tareaFinalizada->job;
+					job->finCorrecto=false;
+					list_add(listaJobFinalizados,job);
+				}
+
+			}
+		liberarCargaEn(tareaFinalizada->nodo,1);
+		removerListaEstadoEnProceso(idTareaFinalizada);
+	}
+
+}
+void removerListaEstadoEnProceso(int idTarea){
+	//TpackTablaEstados *tareaFinalizada=getTareaPorId(idTarea);
+	int i;
+	for(i=0;i<list_size(listaEstadoEnProceso);i++){
+		TpackTablaEstados *aux=list_get(listaEstadoEnProceso,i);
+		if(aux->idTarea ==idTarea){
+			list_remove(listaEstadoEnProceso,i);
+			return;
+		}
+
+	}
+}
+bool yaFinalizoAlgunaInstancia(int idTarea){
+	int i;
+	TpackTablaEstados *tareaFinalizada=getTareaPorId(idTarea);
+	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
+		TpackTablaEstados *aux=list_get(listaEstadoFinalizadoOK,i);
+		if(aux->job==tareaFinalizada->job){
+			return true;
+		}
+	}
+	for(i=0;i<list_size(listaEstadoError);i++){
+			TpackTablaEstados *aux=list_get(listaEstadoError,i);
+			if(aux->job==tareaFinalizada->job){
+				return true;
+			}
+		}
+	return false;
 }
 
 void manejarFinTransformacionFail(int sockMaster){

@@ -18,7 +18,7 @@ void limpiarTemporales(void * info);
 void limpiarListaNodos(void * info);
 void mostrarMetricasJob();
 Tbuffer * empaquetarScript(Theader * header, char * contenidoArchivo, unsigned long long tamanioArchivoFinal);
-
+int conectarAServidor2(char *ipDestino, char *puertoDestino);
 double getPromedioTransformaciones();
 double getPromedioRL();
 

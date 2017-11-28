@@ -159,6 +159,10 @@ void conexionesDatanode(void * estructura){
 									liberarEstructuraArchivoFinal(estructuraArchivoFinal);
 									free(rutaATemporal);
 									log_info(logInfo, "No hay suficiente espacio en los nodos, para almacenar el archivo final.");
+									head->tipo_de_proceso=FILESYSTEM;
+									head->tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;
+									enviarHeader(fileDescriptor,head);
+
 									break;
 								}
 

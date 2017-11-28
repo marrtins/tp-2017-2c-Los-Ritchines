@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 	listaDeNodosDesconectados = list_create();
 	listaTablaDirectorios = list_create();
 	listaInfoNodo = list_create();
-
+	bool mande=false;
 	if(argc == 2){
 		char * flag = malloc(10);
 		strcpy(flag,"--clean");
@@ -150,6 +150,55 @@ int main(int argc, char* argv[]) {
 				free(rutaArchivo);
 
 			break;
+			case NODOSDESCONECTADOS:
+				mande=false;
+				if(list_size(listaDeNodosDesconectados)==0){
+					Theader *headEnvio=malloc(sizeof(Theader));
+					headEnvio->tipo_de_proceso=FILESYSTEM;
+					headEnvio->tipo_de_mensaje=NOHAYDESCONECTADOS;
+					enviarHeader(socketYama,headEnvio);
+					mande=true;
+					free(headEnvio);
+				}else{
+
+					char * buffer;
+					int packSize;
+					int stat;
+
+					Theader headSerializado;
+					int i;
+					headSerializado.tipo_de_proceso=FILESYSTEM;
+					for(i=0;i<list_size(listaDeNodosDesconectados);i++){
+						Tnodo * nodoEncontrado;
+						nodoEncontrado=list_get(listaDeNodosDesconectados,i);
+						if(nodoEncontrado!=NULL){
+							if((i+1)==list_size(listaDeNodosDesconectados)){
+								headSerializado.tipo_de_mensaje=NODOSDESCONECTADOS_RTALAST;
+							}else{
+								headSerializado.tipo_de_mensaje=NODOSDESCONECTADOS_RTA;
+							}
+							packSize = 0;
+							buffer=serializeBytes(headSerializado,nodoEncontrado->nombre,(strlen(nodoEncontrado->nombre)+1),&packSize);
+							if ((stat = send(socketYama, buffer, packSize, 0)) == -1){
+								puts("no se pudo enviar nodo desconectado a yama. ");
+								return  FALLO_SEND;
+							}
+							free(buffer);
+							mande=true;
+						}
+
+					}
+				}
+				if(!mande){
+					Theader *headEnvio=malloc(sizeof(Theader));
+					headEnvio->tipo_de_proceso=FILESYSTEM;
+					headEnvio->tipo_de_mensaje=NOHAYDESCONECTADOS;
+					enviarHeader(socketYama,headEnvio);
+					mande=true;
+					free(headEnvio);
+				}
+
+				break;
 			default:
 			break;
 				}

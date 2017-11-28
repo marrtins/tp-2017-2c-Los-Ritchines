@@ -118,7 +118,7 @@ void hiloWorkerAlmacenamientoFinal(void *info){
 
 
 	}else if(!finDesconexion){
-		puts("Fin AF Fail");
+		puts("Fin AF Fail. No hay mas lugar en el FS");
 		log_info(logInfo,"almac finalfallo. Le avisamos a yama");
 		head.tipo_de_proceso=MASTER;
 		head.tipo_de_mensaje=FIN_ALMACENAMIENTOFINALFAIL;

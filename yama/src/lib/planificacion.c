@@ -13,7 +13,7 @@ extern int idTareaGlobal;
 extern int idTempName;
 
 
-t_list * planificar(TjobMaster *job){
+t_list * planificar(TjobMaster *job,int socketFS){
 
 
 
@@ -68,6 +68,56 @@ t_list * planificar(TjobMaster *job){
 		list_add(listaPlanificada,bloque);
 	}
 
+	Theader *headEnvio=malloc(sizeof(Theader));
+	headEnvio->tipo_de_proceso=YAMA;
+	headEnvio->tipo_de_mensaje=NODOSDESCONECTADOS;
+	enviarHeader(socketFS,headEnvio);
+	Theader head;
+	t_list * nodosOFF=list_create();
+	char * buffer;
+	TpackBytes *bytes;
+	bool finRecv=false;
+	stat = recv(socketFS, &head, sizeof(Theader), 0);
+	if(head.tipo_de_proceso==FILESYSTEM && stat > 0){
+		if(head.tipo_de_mensaje==NOHAYDESCONECTADOS){
+			//break;
+		}else{
+			while(!finRecv){
+				if(head.tipo_de_mensaje==NODOSDESCONECTADOS_RTA){
+					buffer=recvGeneric(socketFS);
+					bytes =(TpackBytes *) deserializeBytes(buffer);
+					list_add(nodosOFF,bytes->bytes);
+					free(buffer);
+				}else{
+					if(head.tipo_de_mensaje==NODOSDESCONECTADOS_RTALAST){
+						buffer=recvGeneric(socketFS);
+						bytes =(TpackBytes *) deserializeBytes(buffer);
+						list_add(nodosOFF,bytes->bytes);
+						free(buffer);
+						finRecv=true;
+					}
+				}
+			}
+			int i;
+			for(i=0;i<list_size(listaPlanificada);i++){
+				TpackInfoBloque *bloqueAux = list_get(listaPlanificada,i);
+				if(estaDesconectado(bloqueAux->nombreNodo,nodosOFF)){
+					liberarCargaEn(bloqueAux->nombreNodo,1);
+					disminuirHistoricoEn(bloqueAux->nombreNodo,1);
+					replanificarBloque(bloqueAux,job->listaComposicionArchivo,job);
+					actualizarCargaWorkerEn(bloqueAux->nombreNodo,1);
+
+				}
+			}
+
+
+		}
+	}else{
+		puts("fallo recibir nodos desconectados");
+	}
+
+
+
 	int q;
 	for(q=0;q<list_size(listaPlanificada);q++){
 		TpackInfoBloque *aux = list_get(listaPlanificada,q);
@@ -77,9 +127,68 @@ t_list * planificar(TjobMaster *job){
 	//list_destroy_and_destroy_elements(listaPlanificada,liberarBloquesPlanificados);
 
 	//list_destroy_and_destroy_elements(listaWorkersPlanificacion,liberarWorkersPlanificacion);
-
+	list_destroy_and_destroy_elements(nodosOFF,limpiarNodosOff);
 	return listaPlanificada;
 }
+
+
+
+bool estaDesconectado(char * nodo,t_list * nodosOFF){
+	int i;
+	for(i=0;i<list_size(nodosOFF);i++){
+		char * nodoAux = list_get(nodosOFF,i);
+		if(string_equals_ignore_case(nodoAux,nodo)){
+			return true;
+		}
+	}
+
+
+	return false;
+}
+
+
+void replanificarBloque(TpackInfoBloque *bloque,t_list * listaComposicionArchivo,TjobMaster * job){
+
+	int i;
+
+	for(i=0;i<list_size(listaComposicionArchivo);i++){
+		TpackageUbicacionBloques *bloqueAux=list_get(listaComposicionArchivo,i);
+		if(bloqueAux->bloque==bloque->bloqueDelArchivo){
+			if(string_equals_ignore_case(bloque->nombreNodo,bloqueAux->nombreNodoC1)){
+
+				bloque->bloqueDelDatabin=bloqueAux->bloqueC2;
+				//free(bloque->ipWorker);
+				bloque->ipWorker=malloc(strlen(getIpNodo(bloqueAux->nombreNodoC2,job)));
+				bloque->ipWorker=getIpNodo(bloqueAux->nombreNodoC2,job);
+				//free(bloque->nombreNodo);
+				bloque->nombreNodo=malloc(bloqueAux->nombreNodoC2Len);
+				bloque->nombreNodo=bloqueAux->nombreNodoC2;
+
+				//free(bloque->puertoWorker);
+				bloque->puertoWorker=malloc(strlen(getPuertoNodo(bloqueAux->nombreNodoC2,job)+1));
+				bloque->puertoWorker=getPuertoNodo(bloqueAux->nombreNodoC2,job);
+				return;
+			}else{
+				bloque->bloqueDelDatabin=bloqueAux->bloqueC1;
+				//free(bloque->ipWorker);
+				bloque->ipWorker=malloc(strlen(getIpNodo(bloqueAux->nombreNodoC1,job)+1));
+				bloque->ipWorker=getIpNodo(bloqueAux->nombreNodoC1,job);
+				//free(bloque->nombreNodo);
+				bloque->nombreNodo=malloc(bloqueAux->nombreNodoC1Len);
+				bloque->nombreNodo=bloqueAux->nombreNodoC1;
+
+				//free(bloque->puertoWorker);
+				bloque->puertoWorker=malloc(strlen(getPuertoNodo(bloqueAux->nombreNodoC1,job)+1));
+				bloque->puertoWorker=getPuertoNodo(bloqueAux->nombreNodoC1,job);
+				return;
+			}
+		}
+	}
+
+
+}
+
+
 
 void actualizarCargaWorkerEn(char * nombreNodo, int cantidadAAumentar){
 
@@ -699,6 +808,16 @@ void liberarCargaEn(char * nombreNodo,int cantidad){
 
 	}
 }
+void disminuirHistoricoEn(char * nombreNodo,int cantidad){
+	int i;
+	for(i=0;i<list_size(listaHistoricaTareas);i++){
+		ThistorialTareas *historico = list_get(listaHistoricaTareas,i);
+		if(string_equals_ignore_case(nombreNodo,historico->nombreNodo)){
+			historico->tareasRealizadas-=cantidad;
+			break;
+		}
+	}
+}
 
 void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion,char * bloquesReducidos,TjobMaster *job){
 
@@ -1189,6 +1308,101 @@ int replanificar(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
 	return FALLO_GRAL;
 
 }
+
+
+int replanificarCaido(int idTarea, int sockMaster,t_list * listaComposicionArchivo){
+	log_info(logInfo,"en replanificar");
+	sleep(retardoPlanificacionSegs);
+	TpackTablaEstados *tareaAReplanificar=getTareaPorId(idTarea);
+	TjobMaster *job = getJobPorNroJob(tareaAReplanificar->job);
+	int i,packSize,stat;
+	char * buffer;
+
+	if(tareaAReplanificar==NULL){
+		puts("error tarea a replanificar ==NULL");
+		log_info(logInfo,"La tarea no existe en la tabla de estados");
+			return FALLO_GRAL;
+	}
+
+	for(i=0;i<list_size(listaComposicionArchivo);i++){
+		TpackageUbicacionBloques * bloqueAux =list_get(listaComposicionArchivo,i);
+		if(tareaAReplanificar->bloqueDelArchivo == bloqueAux->bloque){
+			TpackInfoBloque *bloqueRet=malloc(sizeof(TpackInfoBloque));
+			if(string_equals_ignore_case(tareaAReplanificar->nodo, bloqueAux->nombreNodoC1)){
+				//le paso la info para q labure en el otronodo
+
+				bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
+
+				bloqueRet->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
+				bloqueRet->nombreNodo=bloqueAux->nombreNodoC2;
+				bloqueRet->tamanioNombre=strlen(bloqueRet->nombreNodo)+1;
+
+				bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
+				bloqueRet->puertoWorker=getPuertoNodo(bloqueRet->nombreNodo,job);
+				bloqueRet->tamanioPuerto=strlen(bloqueRet->puertoWorker)+1;
+				bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
+				bloqueRet->ipWorker=getIpNodo(bloqueRet->nombreNodo,job);
+				bloqueRet->tamanioIp=strlen(bloqueRet->ipWorker)+1;
+
+			}else{
+				//le paso la info para q trabaje en el otronodo
+				bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
+
+				bloqueRet->nombreNodo=malloc(TAMANIO_NOMBRE_NODO);
+				bloqueRet->nombreNodo=bloqueAux->nombreNodoC1;
+				bloqueRet->tamanioNombre=strlen(bloqueRet->nombreNodo)+1;
+
+				bloqueRet->puertoWorker=malloc(MAXIMA_LONGITUD_PUERTO);
+				bloqueRet->puertoWorker=getPuertoNodo(bloqueRet->nombreNodo,job);
+				bloqueRet->tamanioPuerto=strlen(bloqueRet->puertoWorker)+1;
+
+				bloqueRet->ipWorker=malloc(MAXIMA_LONGITUD_IP);
+				bloqueRet->ipWorker=getIpNodo(bloqueRet->nombreNodo,job);
+				bloqueRet->tamanioIp=strlen(bloqueRet->ipWorker)+1;
+
+			}
+
+			bloqueRet->bloqueDelArchivo=tareaAReplanificar->bloqueDelArchivo;
+			bloqueRet->bytesOcupados=bloqueAux->finBloque;
+
+			bloqueRet->idTarea=idTareaGlobal++;
+
+			bloqueRet->nombreTemporal=malloc(TAMANIO_NOMBRE_TEMPORAL);
+			bloqueRet->nombreTemporal=generarNombreTemporal(job->masterId);
+			bloqueRet->nombreTemporalLen=strlen(bloqueRet->nombreTemporal)+1;
+
+			tareaAReplanificar->fueReplanificada=true;
+
+			log_info(logInfo,"replanifique la tarea %d. ahora es la %d. job %d, nuevo nodo: %s, nuevo arch temp %s",idTarea,bloqueRet->idTarea,job->nroJob,bloqueRet->nombreNodo,bloqueRet->nombreTemporal);
+
+			Theader head;
+			head.tipo_de_proceso=YAMA;
+			head.tipo_de_mensaje=INFOBLOQUEREPLANIFICADO;
+			packSize=0;
+			buffer=serializeInfoBloque(head,bloqueRet,&packSize);
+
+			log_info(logInfo,"Info del bloque %d serializado, enviamos\n",bloqueRet->bloqueDelArchivo);
+
+			if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
+				puts("no se pudo enviar info del bloque. ");
+				return  FALLO_SEND;
+			}
+			log_info(logInfo,"se enviaron %d bytes de la info del bloque\n",stat);
+			bool mostrarTabla=true;
+			agregarTransformacionAListaEnProceso(job,bloqueRet,mostrarTabla);
+			actualizarCargaWorkerEn(tareaAReplanificar->nodo,1);
+			aumentarHistoricoEn(bloqueRet->nombreNodo,1);
+			free(buffer);
+			return 0;
+		}
+	}
+
+	log_info(logInfo,"fallo gral en planificar");
+	puts("fallo gral en planificar");
+	return FALLO_GRAL;
+
+}
+
 
 
 char *  generarNombreTemporal(int idMaster){

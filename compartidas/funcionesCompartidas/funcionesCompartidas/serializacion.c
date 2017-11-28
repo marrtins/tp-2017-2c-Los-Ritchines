@@ -1355,6 +1355,7 @@ TinfoArchivoFSYama *deserializarInfoArchivoYamaFS(char * buffer){
 	return infoArchivo;
 }
 
+
 char * serializarInfoNodosYamaFS(Theader head,TinfoNodosFSYama *infoNodos,int *pack_size){
 
 	char *bytes_serial;

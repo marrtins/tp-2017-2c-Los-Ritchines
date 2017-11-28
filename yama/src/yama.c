@@ -151,6 +151,9 @@ puts("ASDDDDDDDDDDDDDDDDDDDDDDDDDD");
 					case FINTRANSFORMACIONFAILDESCONEXION:
 						manejarFinTransformacionFailDesconexion(fileDescriptor);
 						break;
+					case FINTRANSFORMACIONFAILDESCONEXIONBIS:
+						manejarFinTransformacionFailDesconexionBIS(fileDescriptor);
+						break;
 
 					case FIN_REDUCCIONLOCALOK:
 						manejarFinReduccionLocalOK(fileDescriptor);

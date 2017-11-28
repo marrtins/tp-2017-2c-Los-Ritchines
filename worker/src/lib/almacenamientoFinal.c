@@ -81,7 +81,7 @@ int realizarAlmacenamientoFinal(client_sock){
 	}
 
 	memcpy(contenidoArchivoFinal, archivoFinalMapeado, tamanioArchivoFinal);
-	//log_info(logInfo,"contenido archv final %s ",contenidoArchivoFinal);
+
 
 	//yamafs
 	tbuffer = empaquetarArchivoFinal(header, infoAlmacenado->nombreResultante, contenidoArchivoFinal, tamanioArchivoFinal);
@@ -98,7 +98,7 @@ int realizarAlmacenamientoFinal(client_sock){
 	}
 
 	munmap(archivoFinalMapeado, infoAlmacenado->nombreTempReduccionLen);
-
+	log_info(logInfo,"mande a fs ");
 	close(fileDescriptorArchivoFinal);
 	fclose(archivoFinal);
 	free(tbuffer->buffer);

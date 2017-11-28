@@ -39,13 +39,13 @@ int getHistorico(Tplanificacion *infoWorker);
 Tplanificacion * getSiguienteNodoDisponible(t_list * listaWorkersPlanificacion,char * nombreNodo1,char* nombreNodo2);
 Tplanificacion * getSiguienteConDisponibilidadPositivaPosible(t_list * listaWorkersPlanificacion, int indice,char * nombre1,char * nombre2);
 void actualizarCargaWorkerEn(char * nombreNodo, int cantidadAAumentar);
-t_list * planificar(TjobMaster *job);
+t_list * planificar(TjobMaster *job,int socketFS);
 void aumentarHistoricoEn(char * nombreNodo,int cantidadAAumentar);
 void sumarDisponibilidadBaseATodos(t_list * listaWorkersPlanificacion);
 int getCargaWorker(char * nombreWorker);
 int getMayorCargaAllWorkers();
 void asignarNodoElegido(t_list * listaReduccionGlobal);
-
+bool estaDesconectado(char * nodo,t_list * nodosOFF);
 int moverAListaFinalizadosOK(int idTareaFinalizada);
 int moverFinalizadaAListaError(int idTarea);
 int moverAListaError(int idTareaFinalizada);
@@ -68,7 +68,7 @@ void agregarReduccionLocalAListaEnProceso(TreduccionLocal * infoReduccion,char *
 void agregarTransformacionAListaEnProceso(TjobMaster *job, TpackInfoBloque *bloque,bool mostrarTabla);
 void agregarReduccionGlobalAListaEnProceso(TreduccionGlobal *infoReduccion,char * bloquesReducidos,TjobMaster *job);
 void agregarAlmacenadoFinalAListaEnProceso(TinfoAlmacenadoFinal *infoAlmacenado,char * nombreNodo,char * bloquesReducidos,TjobMaster *job);
-
+void disminuirHistoricoEn(char * nombreNodo,int cantidad);
 bool sePuedeComenzarReduccionGlobal(int idTareaFinalizada);
 int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster);
 bool esNodoEncargado(char * nombreNodo);
@@ -87,15 +87,17 @@ void mostrarTablaHistorica();
 void mostrarTablaCargas();
 
 char * recibirPathArchivo(int sockMaster);
-int responderTransformacion(TjobMaster *job);
+int responderTransformacion(TjobMaster *job,int socketFS);
 void iniciarNuevoJob(int sockMaster,int socketFS);
 void manejarFinTransformacionOK(int sockMaster);
 void manejarFinTransformacionFailDesconexion(int sockMaster);
-
-
+void replanificarBloque(TpackInfoBloque *bloque,t_list * listaComposicionArchivo,TjobMaster * job);
+void limpiarNodosOff(void * info);
 void liberarWorkersPlanificacion(void * info);
 void liberarBloquesPlanificados(void * info);
-
+bool yaFinalizoAlgunaInstancia(int idTarea);
+void removerListaEstadoEnProceso(int idTarea);
+void manejarFinTransformacionFailDesconexionBIS(int sockMaster);
 void manejarFinTransformacionFail(int sockMaster);
 void manejarFinReduccionLocalOK(int sockMaster);
 void manejarFinReduccionLocalFail(int sockMaster);

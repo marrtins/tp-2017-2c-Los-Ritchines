@@ -14,7 +14,7 @@ int manejarConexionMaster(Theader *head, int client_sock){
 
 	int stat;
 
-	printf("En manejar conexion master. fd %d\n",client_sock);
+	//printf("En manejar conexion master. fd %d\n",client_sock);
 
 	if(head->tipo_de_mensaje==NUEVATRANSFORMACION){
 		if((stat = realizarTransformacion(client_sock))<0){

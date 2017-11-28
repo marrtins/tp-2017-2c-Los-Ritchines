@@ -36,7 +36,6 @@ void hiloWorkerTransformacion(void *info){
 
 	bloqueDelArchivo=atributos->infoBloque.bloqueDelArchivo;
 	idTarea=atributos->infoBloque.idTarea;
-	inicioEjecucionTransformacion(idTarea);
 
 	printf("Inicio Transf bloque %d\n",bloqueDelArchivo);
 	log_info(logInfo,"Hilo del bloque del archivo %d. id Tarea%d\n",bloqueDelArchivo,idTarea);
@@ -44,17 +43,21 @@ void hiloWorkerTransformacion(void *info){
 	log_info(logInfo,"Nombre nodo %s\n ip nodo %s\n puerto nodo %s\n Nombre tempo %s\n",atributos->infoBloque.nombreNodo,atributos->infoBloque.ipWorker,atributos->infoBloque.puertoWorker,atributos->infoBloque.nombreTemporal);
 
 	if((sockWorker = conectarAServidor(atributos->infoBloque.ipWorker, atributos->infoBloque.puertoWorker))<0){
-		puts("No pudo conectarse a worker. le avisamos a yama");
-		log_info(logInfo,"No pudo conectarse a worker. le avisamos a yama");
+		//puts("No pudo conectarse a worker. le avisamos a yama");
+		//log_info(logInfo,"No pudo conectarse a worker. le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
 		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONFAILDESCONEXION;
+		puts("nevio fin tr d b");
 		enviarHeaderYValor(headASerializar,idTarea,sockYama);
-		removerTransformacionFallida(idTarea);
+		/*removerTransformacionFallida(idTarea);
 		MUX_LOCK(&mux_cantFallos);
 		cantFallos++;
-		MUX_UNLOCK(&mux_cantFallos);
+		MUX_UNLOCK(&mux_cantFallos);*/
 		return;
 	}
+
+	inicioEjecucionTransformacion(idTarea);
+
 
 	log_info(logInfo,"Nos conectamos a worker");
 
@@ -250,8 +253,34 @@ int conectarseAWorkersTransformacion(t_list * bloquesTransformacion,int sockYama
 	return 0;
 }
 
+int conectarAServidor2(char *ipDestino, char *puertoDestino){
 
+	int estado;
+	int socketDestino;
+	struct addrinfo hints, *infoServer;
 
+	setupHints(&hints, AF_INET, SOCK_STREAM, 0);
+
+	if ((estado = getaddrinfo(ipDestino, puertoDestino, &hints, &infoServer)) != 0){
+		//fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(estado));
+		return FALLO_GRAL;
+	}
+
+	if ((socketDestino = socket(infoServer->ai_family, infoServer->ai_socktype, infoServer->ai_protocol)) == -1){
+		//perror("No se pudo crear socket. error.");
+		return FALLO_GRAL;
+	}
+
+	if ((estado = connect(socketDestino, infoServer->ai_addr, infoServer->ai_addrlen)) == -1){
+		//perror("No se pudo establecer conexion, fallo connect(). error");
+		//printf("Fallo conexion con destino IP: %s PORT: %s\n", ipDestino, puertoDestino);
+		return FALLO_CONEXION;
+	}
+
+	freeaddrinfo(infoServer);
+
+	return socketDestino;
+}
 
 
 
