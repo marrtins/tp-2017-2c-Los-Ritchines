@@ -77,13 +77,15 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 			headEnvio->tipo_de_proceso=YAMA;
 			headEnvio->tipo_de_mensaje=ARCH_NO_VALIDO;
 			enviarHeader(sockMaster,headEnvio);
+			return;
 		break;
 		case FS_NO_ESTABLE:
 			puts("FS paso a un estado NO estable");
 			log_info(logInfo,"FS paso a un estado NO estable");
 			headEnvio->tipo_de_proceso=YAMA;
-			headEnvio->tipo_de_mensaje=FS_NO_ESTABLE; //TODO lo deje asi para que funcionara
+			headEnvio->tipo_de_mensaje=FS_NO_ESTABLE;
 			enviarHeader(sockMaster,headEnvio);
+			return;
 		break;
 		case INFO_ARCHIVO:
 			puts("FS nos quiere mandar la info del archivo que pedi");
@@ -114,20 +116,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 				TpackageInfoNodo *nodoAux=list_get((infoNodos->listaNodos),i);
 				log_info(logInfo,"nombre nodo %s ipnodo %s puerto nodo %s\n",nodoAux->nombreNodo,nodoAux->ipNodo,nodoAux->puertoWorker);
 			}
-
-			log_info(logInfo,"pongo en nevo job");
-			nuevoJob->listaComposicionArchivo=list_create();
-			nuevoJob->listaComposicionArchivo=infoArchivo->listaBloques;
-			nuevoJob->listaNodosArchivo=list_create();
-			nuevoJob->listaNodosArchivo=infoNodos->listaNodos;
-			//list_destroy_and_destroy_elements(infoArchivo->listaBloques,liberarInfoArchivo);
-			//list_destroy_and_destroy_elements(infoNodos->listaNodos,liberarInfoNodos);
-
-			free(infoArchivo);
-			free(infoNodos);
-
-			responderTransformacion(nuevoJob,socketFS);
-		break;
+			break;
 		default:
 		break;
 
