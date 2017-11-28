@@ -7,7 +7,8 @@ t_list * listaApareos;
 char * archivoMapeado;
 int main(int argc, char* argv[]){
 
-
+	int k=0;
+	int p=0;
 	Theader * head = malloc(sizeof(Theader));
 	int estado;
 	//	listenSock,
@@ -126,6 +127,12 @@ int main(int argc, char* argv[]){
 				else if(head->tipo_de_proceso == WORKER){
 					//printf("es worker. tipo de msj: %d\n",head->tipo_de_mensaje);
 					//log_info(logInfo,"es worker");
+					if(head->tipo_de_mensaje==GIVE_NEXTLINE)k++;
+					if((k==4000) && (head->tipo_de_mensaje==GIVE_NEXTLINE)){
+							printf("Realizando apareo(%d)\n",p);
+							p++;
+							k=0;
+						}
 						manejarConexionWorker(head,fileDescriptor);
 						break;
 

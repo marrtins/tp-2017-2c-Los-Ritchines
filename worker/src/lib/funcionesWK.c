@@ -65,7 +65,56 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	return 0;
 
 }
+int recibirYAlmacenarScript2(int client_sock,char *rutaAAlmacenar){
 
+	Tscript * script = malloc(sizeof(Tscript));
+	desempaquetarScript(client_sock, script);
+	int stat;
+	FILE *scriptFile;
+	scriptFile = fopen(rutaAAlmacenar, "w");
+	if (scriptFile == NULL){
+			fprintf(stderr, "Fallo open script file --> %s\n", strerror(errno));
+			exit(EXIT_FAILURE);
+	}
+	fwrite(script->contenidoArchivo, sizeof(char), script->tamanioContenido, scriptFile);
+	char * lineaPermisoEjecucion;
+
+
+	lineaPermisoEjecucion=string_new();
+	string_append(&lineaPermisoEjecucion,"chmod 777 ");
+	string_append(&lineaPermisoEjecucion,rutaAAlmacenar);
+	log_info(logInfo,"%s \n",lineaPermisoEjecucion);
+	stat=system(lineaPermisoEjecucion);
+	//log_info(logInfo,"54");
+	free(lineaPermisoEjecucion);
+	//log_info(logInfo,"55");
+	if(stat != 0){
+		puts("error al dar chmod 777");
+		return -1;
+	}
+	log_info(logInfo,"Stat lineaPermisoEjecucion :%d \n",stat);
+	log_info(logInfo,"Permisos de ejecucion otorgados al script recibido");
+
+	//free(lineaPermisoEjecucion);
+
+
+	return 0;
+}
+
+void desempaquetarScript(int fileDescriptor, Tscript * script){
+
+	if (recv(fileDescriptor, &script->tamanioContenido, sizeof(script->tamanioContenido), 0)
+			== -1) {
+		logErrorAndExit("Error al recibir el tamanio del contenido del archivo final");
+	}
+
+	script->contenidoArchivo = malloc(script->tamanioContenido);
+
+	if (recv(fileDescriptor, script->contenidoArchivo, script->tamanioContenido, MSG_WAITALL) == -1) {
+		puts("error al recibir el contenido del archivo final");
+		logErrorAndExit("Error al recibir el contenido del archivo final");
+	}
+}
 
 int recibirYAlmacenarArchivo(int client_sock,char * rutaAAlmacenar){
 

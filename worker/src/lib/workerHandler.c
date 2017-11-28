@@ -59,8 +59,8 @@ int manejarConexionWorker(Theader *head, int client_sock){
 		headEnvio.tipo_de_proceso=WORKER;
 		headEnvio.tipo_de_mensaje=TAKE_NEXTLINE;
 		if(fgets(lineaAux, 1024*1024,getFDTemporal(client_sock)) !=NULL){
-			log_info(logInfo,"Envio: %s\n",lineaAux);
-			printf("Envio: %s\n",lineaAux);
+			//log_info(logInfo,"Envio: %s\n",lineaAux);
+			//printf("Envio: %s\n",lineaAux);
 			buffer=serializeBytes(headEnvio,lineaAux,strlen(lineaAux)+1,&packSize);
 			if ((stat = send(client_sock, buffer, packSize, 0)) == -1){
 				puts("no se pudo enviar path del archivo temporal que necesitamos. ");
@@ -78,6 +78,9 @@ int manejarConexionWorker(Theader *head, int client_sock){
 			enviarHeader(client_sock,head);
 			fclose(getFDTemporal(client_sock));
 			removerFDWorker(client_sock);
+			puts("antes free");
+			free(lineaAux);
+			puts("pase free");
 		}
 	}
 
