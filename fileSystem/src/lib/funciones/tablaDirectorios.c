@@ -1213,7 +1213,7 @@ void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo 
 			nodo = (TelementoDeTablaArchivoGlobal*)siNoExisteElNodoAgregar(copia->nombreDeNodo, tablaDeArchivosGlobal);
 			archivoDeTablaDeArchivosGlobal = (TarchivoDeTablaArchivoGlobal*)siNoExisteElArchivoAgregar(nombreDeArchivo, nodo->archivos);
 			//list_add(nodo->archivos, archivoDeTablaDeArchivosGlobal);
-			list_add(archivoDeTablaDeArchivosGlobal->bloques, i);
+			list_add(archivoDeTablaDeArchivosGlobal->bloques, (void*)i);
 			j++;
 		}
 		i++;

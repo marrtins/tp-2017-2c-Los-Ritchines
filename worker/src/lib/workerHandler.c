@@ -74,7 +74,7 @@ int manejarConexionWorker(Theader *head, int client_sock){
 		}else{
 			head->tipo_de_mensaje=EOF_TEMPORAL;
 			head->tipo_de_proceso=WORKER;
-			puts("le mando eof");
+			puts("Fin Conexion con encargado");
 			enviarHeader(client_sock,head);
 			fclose(getFDTemporal(client_sock));
 			removerFDWorker(client_sock);

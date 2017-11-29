@@ -143,7 +143,7 @@ int realizarReduccionGlobal(client_sock){
 
 		stat = system(lineaDeEjecucionReduccionGlobal);
 		log_info(logInfo,"Stat lineaDeEjecucion  RG :%d ",stat);
-		stat=0;
+		//stat=0;
 		if(stat != 0){
 			puts("error linea de ejecucion reduccion global");
 			head->tipo_de_proceso = WORKER;
@@ -177,11 +177,14 @@ int realizarReduccionGlobal(client_sock){
 	}
 	else
 	{ /* padre */
+
 		//	printf("Soy el padre (%d, hijo de %d)\n", getpid(),	getppid());
 		//	printf("%d\n",cont);
 		//waitpid(pid,pidStat,0);
 	}
 
+	//int pidStat;
+	//waitpid(pidRedGl,&pidStat,WNOHANG);
 	//log_info(logInfo,"free head");
 	free(head);
 	//log_info(logInfo,"free headpase");

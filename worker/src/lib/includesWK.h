@@ -9,6 +9,6 @@
 #include <fcntl.h>
 #include <sys/stat.h>   // open
 #include <sys/mman.h>
-
+#include <sys/wait.h>
 
 #endif

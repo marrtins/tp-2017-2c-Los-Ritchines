@@ -12,6 +12,7 @@ extern Tworker *worker;
 
 extern int cont;
 
+int  keepRunning;
 
 
 
@@ -22,7 +23,7 @@ int realizarTransformacion(int client_sock){
 	Theader *headEnvio  = malloc(sizeof (Theader));
 	int status;
 	pid_t pid;
-
+	keepRunning=1;
 	//puts("llego solicitud para nueva transformacion. recibimos bloque cant bytes y nombre temporal..");
 	log_info(logInfo,"llego sol para neuva transf. recibimos daots");
 	if ((buff = recvGenericWFlags(client_sock,0)) == NULL){
@@ -81,6 +82,8 @@ int realizarTransformacion(int client_sock){
 	if ( (pid=fork()) == 0 )
 	{ /* hijo */
 
+		//signal(SIGINT, intHandler);
+
 
 		char *input1 = getBloqueWorker(datosTransf->nroBloque);
 		char * input2=malloc(BLOQUE_SIZE);
@@ -131,7 +134,7 @@ int realizarTransformacion(int client_sock){
 
 		status = system(lineaDeEjecucionTransformacion);
 		log_info(logInfo,"Stat lineaDeEjecucion transf :%d ",status);
-		status=0;
+		//status=0;
 		if(status!=0){
 			puts("fallo linea de ejecucion transformacion");
 			headEnvio->tipo_de_proceso = WORKER;
@@ -147,6 +150,22 @@ int realizarTransformacion(int client_sock){
 			log_info(logInfo,"Envio header. fin transfo oky");
 
 		}
+		//log_info(logInfo,"por mandar el header. kr:%d",keepRunning);
+		/*if(keepRunning==1){
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_LOCALTRANSF;
+
+			printf("Fin Transformacion %d OK\n",datosTransf->nroBloque);
+			enviarHeader(client_sock,headEnvio);
+			log_info(logInfo,"Envio header. fin transfo oky");
+		}else{
+			puts("fallo linea de ejecucion transformacion");
+			headEnvio->tipo_de_proceso = WORKER;
+			headEnvio->tipo_de_mensaje = FIN_LOCALTRANSFFAIL;
+			enviarHeader(client_sock,headEnvio);
+			log_info(logInfo,"Envio header. fin transfo fail");
+
+		}*/
 		remove(rutaBloque);
 		remove(rutaScriptTransformador);
 		free(lineaDeEjecucionTransformacion);
@@ -162,15 +181,18 @@ int realizarTransformacion(int client_sock){
 
 	}
 	else
-	{ /* padre */
+	{
+
+		//log_info(logInfo,"pid stat %d",pidStat);
+		/* padre */
 		//	printf("Soy el padre (%d, hijo de %d)\n", getpid(),	getppid());
 		//	printf("%d\n",cont);
 		//waitpid(pid,pidStat,0);
 	}
 	//printf("Cierro fd %d\n",client_sock);
 	//close(client_sock);
-
-
+	//int pidStat;
+	//waitpid(pid,&pidStat,WNOHANG);
 	//log_info(logInfo,"4");
 	free(headEnvio);
 	//log_info(logInfo,"5");
@@ -191,4 +213,13 @@ int realizarTransformacion(int client_sock){
 	return 0;
 }
 
+void intHandler(int dummy){
+	signal(SIGINT, intHandler);
+
+	puts("SIGNAL!");
+    log_info(logInfo,"signal");
+	keepRunning = 0;
+	log_info(logInfo,"kr=%d",keepRunning);
+	//exit(1);
+}
 

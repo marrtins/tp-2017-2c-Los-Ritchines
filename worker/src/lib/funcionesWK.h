@@ -9,7 +9,7 @@ void mostrarConfiguracion(Tworker *worker);
 char * getBloqueWorker(int nroBloque);
 int manejarConexionMaster(Theader *header,int client_sock);
 int manejarConexionWorker(Theader *head, int client_sock);
-
+void intHandler(int dummy);
 void clearAndClose(int fileDescriptor, fd_set* masterFD);
 int conectarNuevoCliente( int fileDescriptor, fd_set * bolsaDeFileDescriptors);
 void desempaquetarScript(int fileDescriptor, Tscript * script);
