@@ -1116,3 +1116,125 @@ void mostrarArbolDeDirectorios(char * rutaADirectorio){
 	free(split);
 	free(nombreDirectorio);
 }
+
+void mostrarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal){
+	int cantidadNodos = list_size(tablaDeArchivosGlobal);
+	int cantidadArchivos;
+	int cantidadBloques;
+	int bloque;
+	TelementoDeTablaArchivoGlobal * nodo;
+	TarchivoDeTablaArchivoGlobal * archivo;
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	ordenarTablaDeArchivosGlobalPorNombre(tablaDeArchivosGlobal);
+	while(i < cantidadNodos){
+		nodo = list_get(tablaDeArchivosGlobal, i);
+		puts(nodo->nombreNodo);
+		cantidadArchivos = list_size(nodo->archivos);
+		j = 0;
+		ordenarArchivosDeTablaDeArchivosGlobalPorNombre(nodo->archivos);
+		while(j < cantidadArchivos){
+			archivo = list_get(nodo->archivos, j);
+			printf("\t%s:\n", archivo->nombreArchivo);
+			cantidadBloques = list_size(archivo->bloques);
+			k = 0;
+			printf("\t[");
+			while(k < cantidadBloques){
+				bloque = (int)list_get(archivo->bloques, k);
+				if(k == cantidadBloques-1){
+					printf("%d", bloque);
+				}
+				else{
+					printf("%d,", bloque);
+				}
+				k++;
+			}
+			printf("]\n");
+			j++;
+		}
+		puts("");
+		i++;
+	}
+}
+
+void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo){
+	int i = 0;
+	int j = 0;
+	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(estructuraArchivo->tamanioTotal);
+	int cantidadDeCopias;
+	TcopiaNodo * copia;
+	t_list * listaDeCopias;
+	TelementoDeTablaArchivoGlobal * nodo;
+	TarchivoDeTablaArchivoGlobal * archivoDeTablaDeArchivosGlobal;
+	char * nombreDeArchivo = string_new();
+	string_append_with_format(&nombreDeArchivo, "%s.%s", estructuraArchivo->nombreArchivoSinExtension, estructuraArchivo->extensionArchivo);
+	while(i < cantidadDeBloques){
+		cantidadDeCopias = estructuraArchivo->bloques[i].cantidadCopias;
+		listaDeCopias = estructuraArchivo->bloques[i].copia;
+		j = 0;
+		while(j < cantidadDeCopias){
+			copia = list_get(listaDeCopias, j);
+			nodo = (TelementoDeTablaArchivoGlobal*)siNoExisteElNodoAgregar(copia->nombreDeNodo, tablaDeArchivosGlobal);
+			archivoDeTablaDeArchivosGlobal = (TarchivoDeTablaArchivoGlobal*)siNoExisteElArchivoAgregar(nombreDeArchivo, nodo->archivos);
+			//list_add(nodo->archivos, archivoDeTablaDeArchivosGlobal);
+			list_add(archivoDeTablaDeArchivosGlobal->bloques, i);
+			j++;
+		}
+		i++;
+	}
+	free(nombreDeArchivo);
+}
+
+void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * tablaDeArchivosGlobal){
+	char * rutaDirectorio = string_new();
+	DIR * directorioMaestro;
+	struct dirent * archivo;
+	char * rutaArchivo;
+	Tarchivo * estructuraArchivo = malloc(sizeof(Tarchivo));
+	string_append(&rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	string_append(&rutaDirectorio, directorio->d_name);
+	string_append(&rutaDirectorio, "/");
+	directorioMaestro = opendir(rutaDirectorio);
+	if (directorioMaestro != NULL){
+		archivo = readdir(directorioMaestro);
+		while (archivo){
+			if(strcmp(archivo->d_name, ".") && strcmp(archivo->d_name, "..")){
+				rutaArchivo = string_new();
+				string_append(&rutaArchivo, rutaDirectorio);
+				string_append(&rutaArchivo, archivo->d_name);
+				levantarTablaArchivo(estructuraArchivo, rutaArchivo);
+				actualizarEnTablaDeArchivosGlobal(tablaDeArchivosGlobal, estructuraArchivo);
+				liberarTablaDeArchivo(estructuraArchivo);
+				free(rutaArchivo);
+			}
+			archivo = readdir(directorioMaestro);
+		}
+		closedir(directorioMaestro);
+		free(rutaDirectorio);
+		return;
+	}
+	closedir(directorioMaestro);
+	free(rutaDirectorio);
+	free(rutaArchivo);
+
+}
+
+void mostrarDistribucionDeBloquesEnNodos(){
+	DIR * directorioMaestro;
+	struct dirent * directorio;
+	t_list * tablaDeArchivosGlobal = list_create();
+	directorioMaestro = opendir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	if (directorioMaestro != NULL){
+		directorio = readdir(directorioMaestro);
+		while (directorio){
+			if(strcmp(directorio->d_name, ".") && strcmp(directorio->d_name, "..")){
+				generarDistribucionDeBloquesEnNodos(directorio, tablaDeArchivosGlobal);
+			}
+			directorio = readdir(directorioMaestro);
+		}
+	}
+	mostrarTablaDeArchivosGlobal(tablaDeArchivosGlobal);
+	liberarTablaDeArchivosGlobal(tablaDeArchivosGlobal);
+	closedir(directorioMaestro);
+}

@@ -316,7 +316,14 @@ void consolaInfo(char**palabras, int cantidad) {
 			liberarTablaDeArchivo(tablaArchivo);
 			free(rutaLocal);
 		}
-	} else {
+		else if(!strcmp(palabras[1], "-all")){
+			mostrarDistribucionDeBloquesEnNodos();
+		}
+		else{
+			puts("Error en los parametros. Utilice una ruta para mostrar los contenido de ese archivo o -all para mostrar todo.");
+		}
+	}
+	else {
 		puts("Error en la cantidad de parametros.");
 	}
 }

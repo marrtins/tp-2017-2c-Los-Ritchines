@@ -57,8 +57,8 @@ int main(int argc, char* argv[]) {
 
 	FD_ZERO(&masterFD);
 	FD_ZERO(&readFD);
-	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	crearHilo(&datanodesThread, (void*)conexionesDatanode, (void*)fileSystem);
+	crearHilo(&consolaThread, (void *)consolaFS, NULL);
 	socketDeEscuchaYama = crearSocketDeEscucha(fileSystem->puerto_yama);
 	while (listen(socketDeEscuchaYama, 1) == -1) {
 		log_error(logError,"Fallo al escuchar el socket servidor de file system.");

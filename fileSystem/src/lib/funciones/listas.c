@@ -210,3 +210,53 @@ t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre){
 	return list_filter(listaTablaDirectorios, esHijo);
 
 }
+
+TelementoDeTablaArchivoGlobal * siNoExisteElNodoAgregar(char * nombreNodo, t_list * tablaDeArchivosGlobal){
+	bool buscarPorNombre(void * nodo){
+		TelementoDeTablaArchivoGlobal * nodoEncontrado = (TelementoDeTablaArchivoGlobal*) nodo;
+		return !strcmp(nombreNodo, nodoEncontrado->nombreNodo);
+	}
+	TelementoDeTablaArchivoGlobal * nodoEncontrado = (TelementoDeTablaArchivoGlobal*)list_find(tablaDeArchivosGlobal, buscarPorNombre);
+	if(nodoEncontrado == NULL){
+		nodoEncontrado = malloc(sizeof(TelementoDeTablaArchivoGlobal));
+		nodoEncontrado->nombreNodo = strdup(nombreNodo);
+		nodoEncontrado->archivos = list_create();
+		list_add(tablaDeArchivosGlobal, nodoEncontrado);
+	}
+
+	return nodoEncontrado;
+}
+
+TarchivoDeTablaArchivoGlobal * siNoExisteElArchivoAgregar(char * nombreArchivo, t_list * listaDeArchivos){
+	bool buscarPorNombre(void * archivo) {
+		TarchivoDeTablaArchivoGlobal * archivoEncontrado = (TarchivoDeTablaArchivoGlobal*) archivo;
+		return !strcmp(nombreArchivo, archivoEncontrado->nombreArchivo);
+	}
+	TarchivoDeTablaArchivoGlobal * archivoEncontrado = (TarchivoDeTablaArchivoGlobal *) list_find(listaDeArchivos, buscarPorNombre);
+	if (archivoEncontrado == NULL) {
+		archivoEncontrado = malloc(sizeof(TarchivoDeTablaArchivoGlobal));
+		archivoEncontrado->nombreArchivo = strdup(nombreArchivo);
+		archivoEncontrado->bloques = list_create();
+		list_add(listaDeArchivos, archivoEncontrado);
+	}
+
+	return archivoEncontrado;
+}
+
+void ordenarTablaDeArchivosGlobalPorNombre(t_list * tablaDeArchivosGlobal){
+	bool ordenarPorNombre(void * nodo1, void * nodo2){
+		TelementoDeTablaArchivoGlobal * nodoEncontrado1 = (TelementoDeTablaArchivoGlobal*) nodo1;
+		TelementoDeTablaArchivoGlobal * nodoEncontrado2 = (TelementoDeTablaArchivoGlobal*) nodo2;
+		return !strcmp(nodoEncontrado1->nombreNodo, nodoEncontrado2->nombreNodo);
+	}
+	list_sort(tablaDeArchivosGlobal, ordenarPorNombre);
+}
+
+void ordenarArchivosDeTablaDeArchivosGlobalPorNombre(t_list * archivos){
+	bool ordenarPorNombre(void * archivo1, void * archivo2){
+		TarchivoDeTablaArchivoGlobal * archivoEncontrado1 = (TarchivoDeTablaArchivoGlobal*) archivo1;
+		TarchivoDeTablaArchivoGlobal * archivoEncontrado2 = (TarchivoDeTablaArchivoGlobal*) archivo2;
+		return !strcmp(archivoEncontrado1->nombreArchivo, archivoEncontrado2->nombreArchivo);
+	}
+	list_sort(archivos, ordenarPorNombre);
+}
