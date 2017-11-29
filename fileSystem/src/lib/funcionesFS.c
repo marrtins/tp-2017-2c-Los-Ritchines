@@ -247,7 +247,12 @@ int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs)
 			free(nombreArchivo);
 			return 0;
 		}
-		removerArchivo(rutaArchivoYamafs);
+		if(removerArchivo(rutaArchivoYamafs)){
+			//puts("El archivo se elimino correctamente.");
+		}
+		else{
+			puts("No se pudo remover el archivo, el nodo con la copia no esta en ningun lado.");
+		}
 	}
 	free(rutaArchivoYamafs);
 	free(nombreArchivo);

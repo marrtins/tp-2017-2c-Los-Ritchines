@@ -324,7 +324,12 @@ void consolaInfo(char**palabras, int cantidad) {
 void consolaRemove (char** palabras, int cantidad){
 	if (cantidad == 1){
 		if(verificarRutaArchivo(palabras[1])){
-			removerArchivo(palabras[1]);
+			if(removerArchivo(palabras[1])){
+				puts("El archivo se elimino correctamente.");
+			}
+			else{
+				puts("No se pudo completar la operacion, el nodo con la copia no esta en ningun lado.");
+			}
 		}
 	}
 	else if (cantidad ==2){

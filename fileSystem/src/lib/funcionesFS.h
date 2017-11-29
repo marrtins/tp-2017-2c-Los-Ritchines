@@ -142,7 +142,7 @@ int existeArchivo(int indiceDirectorio , char * rutaYamafs);
 char * obtenerRutaSinArchivo(char * ruta);
 char * obtenerRutaLocalDeArchivo(char * rutaYamafs);
 int esRutaDeUnArchivo(char * ruta);
-void removerArchivo(char* ruta);
+int removerArchivo(char* ruta);
 void removerDirectorio(char*ruta);
 void removerDirectorioDeTabla(char* directorio);
 int archivoRepetidoEnDirectorio(char* rutaLocalArchivo, char* rutaDestinoYamafs);

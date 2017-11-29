@@ -802,7 +802,7 @@ int verificarRutaArchivoSinPuts(char * rutaYamafs){
 
 }
 
-void removerArchivo(char* ruta){
+int removerArchivo(char* ruta){
 	char* rutaArchivo = obtenerRutaLocalDeArchivo(ruta);
 	t_config * archivo = config_create(rutaArchivo);
 	Tnodo * nodo;
@@ -824,12 +824,11 @@ void removerArchivo(char* ruta){
 			if(nodo == NULL){
 				nodo = buscarNodoPorNombre(listaDeNodosDesconectados, nombreYPosicion[0]);
 				if(nodo == NULL){
-					puts("No se pudo completar la operacion, el nodo con la copia no esta en ningun lado.");
 					liberarPunteroDePunterosAChar(nombreYPosicion);
 					free(nombreYPosicion);
 					free(keyBloqueCopias);
 					free(keyBloqueNCopiaM);
-					return;
+					return 0;
 				}
 			}
 			desocuparBloque(nodo, atoi(nombreYPosicion[1]));
@@ -845,7 +844,8 @@ void removerArchivo(char* ruta){
 	remove(rutaArchivo);
 	free(rutaArchivo);
 	config_destroy(archivo);
-	puts("El archivo se elimino correctamente.");
+	return 1;
+
 	}
 
 void pasarInfoDeUnArchivoAOtro(char * archivoAMoverMapeado, char * archivoMapeado, unsigned long long tamanio){

@@ -186,6 +186,13 @@ void conexionesDatanode(void * estructura){
 									}
 								}
 								//todo hay que probar esto de arriba
+								int indice = obtenerIndexDeUnaRuta(directorioACrear);
+
+								if(existeArchivo(indice,estructuraArchivoFinal->rutaArchivo)){
+									log_info(logInfo, "El archivo que se quiere almacenar ya existe");
+									removerArchivo(estructuraArchivoFinal->rutaArchivo);
+									log_info(logInfo, "Se sobreescribe");
+								}
 
 
 								rutaLocalArchivoFinal = obtenerRutaLocalDeArchivo(estructuraArchivoFinal->rutaArchivo);
