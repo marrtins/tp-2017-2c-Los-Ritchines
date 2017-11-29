@@ -55,7 +55,7 @@ int recibirYAlmacenarScript(int client_sock,char * rutaAAlmacenar){
 	//log_info(logInfo,"54");
 	free(lineaPermisoEjecucion);
 	log_info(logInfo,"stat chmod %d",stat);
-	stat=0;
+	//stat=0;
 	if(stat != 0){
 		puts("error al dar chmod 777");
 		return -1;

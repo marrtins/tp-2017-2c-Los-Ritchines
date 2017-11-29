@@ -90,14 +90,14 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 		case INFO_ARCHIVO:
 			puts("FS nos quiere mandar la info del archivo que pedi");
 			log_info(logInfo,"Fs nos manda la info del archivo pedid");
-			buffer3 = recvGeneric(socketFS);
+			buffer3 = recvGenericWFlags(socketFS,MSG_WAITALL);
 			infoArchivo = deserializarInfoArchivoYamaFS(buffer3);
 			free(buffer3);
 			stat = recv(socketFS, &head, sizeof(Theader), 0);
 			if(head.tipo_de_mensaje==INFO_NODO){
 				puts("ahora recibimos info de los nodos");
 				log_info(logInfo,"ahora info de los nods");
-				buffer3 = recvGeneric(socketFS);
+				buffer3 = recvGenericWFlags(socketFS,MSG_WAITALL);
 				 infoNodos= deserializarInfoNodosFSYama(buffer3);
 				 log_info(logInfo,"ya recibi todo");
 				 free(buffer3);

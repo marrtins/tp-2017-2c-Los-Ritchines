@@ -7,8 +7,8 @@ t_list * listaApareos;
 char * archivoMapeado;
 int main(int argc, char* argv[]){
 	//
-	signal(SIGCHLD, SIG_IGN);
-
+	//signal(SIGCHLD, SIG_IGN);
+	//signal(SA_NOCLDWAIT, SIG_IGN);
 	int k=0;
 	int p=0;
 	Theader * head = malloc(sizeof(Theader));
@@ -123,6 +123,7 @@ int main(int argc, char* argv[]){
 
 						log_info(logInfo,"Es master");
 						manejarConexionMaster(head,fileDescriptor);
+
 					break;
 
 				}

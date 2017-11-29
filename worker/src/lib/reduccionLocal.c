@@ -108,7 +108,7 @@ int realizarReduccionLocal(int client_sock){
 			log_info(logInfo,"linea de ejec apareo %s ",lineaDeEjecucionApareo);
 			stat = system(lineaDeEjecucionApareo);
 			log_info(logInfo,"Stat lineaDeEjecucion ApareoLocal :%d ",stat);
-			stat=0;
+			//stat=0;
 			if(stat != 0){
 				puts("fallo apareo local ");
 				headEnvio->tipo_de_proceso = WORKER;
@@ -147,7 +147,7 @@ int realizarReduccionLocal(int client_sock){
 		stat = system(lineaDeEjecucionReduccion);
 		log_info(logInfo,"Stat lineaDeEjecucion RL :%d ",stat);
 
-		stat=0;
+		//stat=0;
 		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",stat);
 		if(stat !=0){
 			puts("fallo linea de ejecucion de la reduccion");
@@ -182,7 +182,8 @@ int realizarReduccionLocal(int client_sock){
 	{ /* padre */
 
 	}
-
+	//int pidStat;
+	//		waitpid(pidRed,&pidStat,WNOHANG);
 	//log_info(logInfo,"20");
 	free(headEnvio);
 	//log_info(logInfo,"21");
