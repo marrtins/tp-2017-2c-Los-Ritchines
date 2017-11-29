@@ -135,7 +135,7 @@ t_list* generarListaInfoNodos(char **nodos){
 		TpackageInfoNodo *nodo = malloc(sizeof(TpackageInfoNodo));
 		infoNodo = buscarInfoNodoPorNombre(listaInfoNodo, nodos[i]);
 
-		//todo check..
+		/*//todo check..
 		if(infoNodo==NULL){
 			infoNodo=buscarInfoNodoPorNombre(listaDeNodosDesconectados,nodos[i]);
 			//hardcode pero funcionaria igual..
@@ -143,7 +143,7 @@ t_list* generarListaInfoNodos(char **nodos){
 			infoNodo->ip="111.111.11.111";
 			infoNodo->puerto=malloc(puertoTamanio);
 			infoNodo->puerto="9999";
-		}
+		}*/
 
 		if(infoNodo==NULL){
 			puts("error buscar info nodo x nombre");
