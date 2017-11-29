@@ -135,34 +135,40 @@ t_list* generarListaInfoNodos(char **nodos){
 		TpackageInfoNodo *nodo = malloc(sizeof(TpackageInfoNodo));
 		infoNodo = buscarInfoNodoPorNombre(listaInfoNodo, nodos[i]);
 
-		/*//todo check..
+		//todo check..
 		if(infoNodo==NULL){
 			infoNodo=buscarInfoNodoPorNombre(listaDeNodosDesconectados,nodos[i]);
 			//hardcode pero funcionaria igual..
-			infoNodo->ip=malloc(ipTamanio);
-			infoNodo->ip="111.111.11.111";
-			infoNodo->puerto=malloc(puertoTamanio);
-			infoNodo->puerto="9999";
-		}*/
 
-		if(infoNodo==NULL){
-			puts("error buscar info nodo x nombre");
-			log_error(logError,"error buscar info nodo x nombre");
+			nodo->nombreNodo = malloc(TAMANIO_NOMBRE_NODO);
+			strcpy(nodo->nombreNodo,infoNodo->nombre);
+			nodo->tamanioNombre = strlen(nodo->nombreNodo)+1;
+
+			nodo->ipNodo = malloc(ipTamanio);
+			strcpy(nodo->ipNodo,"111.111.111.11");
+			nodo->tamanioIp = strlen(nodo->ipNodo)+1;
+
+			nodo->puertoWorker =malloc(puertoTamanio);
+			strcpy(nodo->puertoWorker,"9999");
+			nodo->tamanioPuerto=strlen(nodo->puertoWorker)+1;
+
+		}else{
+
+
+
+
+			nodo->nombreNodo = malloc(TAMANIO_NOMBRE_NODO);
+			strcpy(nodo->nombreNodo,infoNodo->nombre);
+			nodo->tamanioNombre = strlen(nodo->nombreNodo)+1;
+
+			nodo->ipNodo = malloc(ipTamanio);
+			strcpy(nodo->ipNodo,infoNodo->ip);
+			nodo->tamanioIp = strlen(nodo->ipNodo)+1;
+
+			nodo->puertoWorker =malloc(puertoTamanio);
+			strcpy(nodo->puertoWorker,infoNodo->puerto);
+			nodo->tamanioPuerto=strlen(nodo->puertoWorker)+1;
 		}
-
-
-		nodo->nombreNodo = malloc(TAMANIO_NOMBRE_NODO);
-		strcpy(nodo->nombreNodo,infoNodo->nombre);
-		nodo->tamanioNombre = strlen(nodo->nombreNodo)+1;
-
-		nodo->ipNodo = malloc(ipTamanio);
-		strcpy(nodo->ipNodo,infoNodo->ip);
-		nodo->tamanioIp = strlen(nodo->ipNodo)+1;
-
-		nodo->puertoWorker =malloc(puertoTamanio);
-		strcpy(nodo->puertoWorker,infoNodo->puerto);
-		nodo->tamanioPuerto=strlen(nodo->puertoWorker)+1;
-
 		list_add(listaNodos,nodo);
 		i++;
 
