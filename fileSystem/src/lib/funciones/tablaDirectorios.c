@@ -1110,6 +1110,7 @@ void mostrarArbolDeDirectorios(char * rutaADirectorio){
 		liberarPunteroDePunterosAChar(split);
 		free(split);
 		free(nombreDirectorio);
+		return;
 	}
 	mostrarPadreEHijosDeUnDirectorio(directorio, 0);
 	liberarPunteroDePunterosAChar(split);
