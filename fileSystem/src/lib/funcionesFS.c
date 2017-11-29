@@ -55,6 +55,10 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 			nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
 		}
 	}
+	else{
+		nodo1->estadoParaEnviarBloque = 1;
+		nodo2->estadoParaEnviarBloque = 2;
+	}
 	//Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	//Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	buffer1 = empaquetarBloque(head,bloque,nodo1);
@@ -95,7 +99,6 @@ void procesarArchivoBinario(Tarchivo * archivoAAlmacenar, char * archivoMapeado,
 	unsigned long long bytesFaltantesPorEnviar = archivoAAlmacenar->tamanioTotal;
 	char * punteroAuxiliar = archivoMapeado;
 	infoBloque->tamanio = BLOQUE_SIZE;
-
 	while(cantidadDeBloquesDelArchivo != 1){
 		memcpy(infoBloque->contenido, punteroAuxiliar, BLOQUE_SIZE);
 		enviarBloque(infoBloque, archivoAAlmacenar);
@@ -213,7 +216,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
-
+	setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
 		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
