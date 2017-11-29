@@ -77,4 +77,36 @@ void liberarTInfoArchivoFSYama(TinfoArchivoFSYama * infoArchivo){
 	free(infoArchivo);
 }
 
+void liberarArchivosDeTablaDeArchivosGlobal(TarchivoDeTablaArchivoGlobal * archivo){
+	free(archivo->nombreArchivo);
+	list_destroy(archivo->bloques);
+}
+
+void liberarNodoDeTablaDeArchivosGlobal(TelementoDeTablaArchivoGlobal * nodo){
+	free(nodo->nombreNodo);
+	list_destroy_and_destroy_elements(nodo->archivos, free);
+}
+
+void liberarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal){
+	int i = 0;
+	int j = 0;
+	int cantidadNodos = list_size(tablaDeArchivosGlobal);
+	int cantidadArchivos;
+	TelementoDeTablaArchivoGlobal * nodo;
+	TarchivoDeTablaArchivoGlobal * archivo;
+	while(i < cantidadNodos){
+		nodo = list_get(tablaDeArchivosGlobal, i);
+		cantidadArchivos = list_size(nodo->archivos);
+		j = 0;
+		while(j < cantidadArchivos){
+			archivo = list_get(nodo->archivos, j);
+			liberarArchivosDeTablaDeArchivosGlobal(archivo);
+			j++;
+		}
+		liberarNodoDeTablaDeArchivosGlobal(nodo);
+		i++;
+	}
+	list_destroy_and_destroy_elements(tablaDeArchivosGlobal, free);
+}
+
 

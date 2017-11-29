@@ -97,6 +97,9 @@ char ** obtenerNodosDeUnArchivo(Tarchivo * archivo);
 void mostrarPadreEHijosDeUnDirectorio(Tdirectorio * directorio, int nivelDelArbol);
 char * generarTabs(int cantidadDeTabs);
 void mostrarArbolDeDirectorios(char * rutaADirectorio);
+void mostrarDistribucionDeBloquesEnNodos();
+void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * tablaDeArchivosGlobal);
+void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -115,6 +118,8 @@ void borrarNodoPorNombre(t_list * lista, char * nombre);
 Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos);
 Tdirectorio * buscarDirectorioPorIndice(int indice);
 t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre);
+TelementoDeTablaArchivoGlobal * siNoExisteElNodoAgregar(char * nombreNodo, t_list * tablaDeArchivosGlobal);
+TarchivoDeTablaArchivoGlobal * siNoExisteElArchivoAgregar(char * nombreArchivo, t_list * listaDeArchivos);
 
 //Directorios
 void crearRoot();
@@ -210,6 +215,9 @@ void liberarTPackageInfoNodo (void * infoNodo);
 void liberarTpackageUbicacionBloques(void * bloque);
 void liberarBloques(void * bloque);
 void liberarTInfoArchivoFSYama(TinfoArchivoFSYama * infoArchivo);
+void liberarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal);
+void liberarNodoDeTablaDeArchivosGlobal(TelementoDeTablaArchivoGlobal * nodo);
+void liberarArchivosDeTablaDeArchivosGlobal(TarchivoDeTablaArchivoGlobal * archivo);
 
 //YAMA
 char * recvRutaArchivo(int socket);

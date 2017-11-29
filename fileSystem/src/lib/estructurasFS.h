@@ -59,6 +59,16 @@ typedef struct{
 	char * contenidoArchivo;
 }TarchivoFinal;
 
+typedef struct{
+	char * nombreArchivo;
+	t_list * bloques;
+}TarchivoDeTablaArchivoGlobal;
+
+typedef struct{
+	char * nombreNodo;
+	t_list * archivos;
+}TelementoDeTablaArchivoGlobal;
+
 t_list * listaDeNodos;
 t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;
