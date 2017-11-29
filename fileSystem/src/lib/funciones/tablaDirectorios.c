@@ -1203,7 +1203,9 @@ void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo 
 	int index = atoi(nombreDirectorioPadre);
 	generarSplitApartirDeUnIndice(index, palabras, cantidadPalabras);
 	char * nombreDeArchivo = generarRutaAPartirDeUnSplit(palabras);
+	puts("ruta::");
 	string_append_with_format(&nombreDeArchivo, "%s.%s", estructuraArchivo->nombreArchivoSinExtension, estructuraArchivo->extensionArchivo);
+	puts(nombreDeArchivo);
 	while(i < cantidadDeBloques){
 		cantidadDeCopias = estructuraArchivo->bloques[i].cantidadCopias;
 		listaDeCopias = estructuraArchivo->bloques[i].copia;
@@ -1211,6 +1213,7 @@ void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo 
 		while(j < cantidadDeCopias){
 			copia = list_get(listaDeCopias, j);
 			nodo = (TelementoDeTablaArchivoGlobal*)siNoExisteElNodoAgregar(copia->nombreDeNodo, tablaDeArchivosGlobal);
+			puts("encontre el nodo y la copia");
 			archivoDeTablaDeArchivosGlobal = (TarchivoDeTablaArchivoGlobal*)siNoExisteElArchivoAgregar(nombreDeArchivo, nodo->archivos);
 			//list_add(nodo->archivos, archivoDeTablaDeArchivosGlobal);
 			list_add(archivoDeTablaDeArchivosGlobal->bloques, i);
@@ -1236,12 +1239,16 @@ void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * ta
 	if (directorioMaestro != NULL){
 		archivo = readdir(directorioMaestro);
 		while (archivo){
+			puts("Ya soy un archiivo");
 			if(strcmp(archivo->d_name, ".") && strcmp(archivo->d_name, "..")){
 				rutaArchivo = string_new();
 				string_append(&rutaArchivo, rutaDirectorio);
 				string_append(&rutaArchivo, archivo->d_name);
+				puts("levantando tabla de archivos");
 				levantarTablaArchivo(estructuraArchivo, rutaArchivo);
+				puts("por actualizar");
 				actualizarEnTablaDeArchivosGlobal(tablaDeArchivosGlobal, estructuraArchivo, directorio->d_name);
+				puts("liberando tabla de archivos");
 				liberarTablaDeArchivo(estructuraArchivo);
 				free(rutaArchivo);
 			}
@@ -1262,16 +1269,20 @@ void mostrarDistribucionDeBloquesEnNodos(){
 	struct dirent * directorio;
 	t_list * tablaDeArchivosGlobal = list_create();
 	directorioMaestro = opendir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	puts("archivo maestro");
 	if (directorioMaestro != NULL){
 		directorio = readdir(directorioMaestro);
 		while (directorio){
 			if(strcmp(directorio->d_name, ".") && strcmp(directorio->d_name, "..")){
+				puts("Entrando a los directorios individualmente");
 				generarDistribucionDeBloquesEnNodos(directorio, tablaDeArchivosGlobal);
 			}
 			directorio = readdir(directorioMaestro);
 		}
 	}
+	puts("mostrar la tabla global");
 	mostrarTablaDeArchivosGlobal(tablaDeArchivosGlobal);
+	puts("liberar tabla global");
 	liberarTablaDeArchivosGlobal(tablaDeArchivosGlobal);
 	closedir(directorioMaestro);
 }
