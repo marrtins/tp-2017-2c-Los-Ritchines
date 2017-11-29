@@ -144,11 +144,21 @@ void consolaFormat(char**palabras, int cantidad){
 void consolaCpto(char** palabras, int cantidad) {
 	if (cantidad == 2) {
 		if (verificarRutaArchivo(palabras[1])) {
-			if (copiarArchivo(palabras) != -1) {
-				puts("Se copio el archivo correctamente.");
-			} else {
-				puts("No se pudo copiar el archivo.");
+			DIR* dir = opendir(palabras[2]);
+			if(dir){
+				if (copiarArchivo(palabras) != -1) {
+					puts("Se copio el archivo correctamente.");
+				} else {
+					puts("No se pudo copiar el archivo.");
+				}
+				closedir(dir);
 			}
+			else{
+				puts("El directorio especificado, no existe. Por favor, creelo e intente otra vez.");
+			}
+		}
+		else{
+			puts("La ruta especificado es incorrecta.");
 		}
 	} else {
 		puts("Error en la cantidad de parametros");
