@@ -1,3 +1,13 @@
-TAMANIO=0
-NODOS=[]
-LIBRE=0
+Nodo5Libre=5
+Nodo4Total=150
+Nodo5Total=150
+Nodo3Libre=29
+TAMANIO=620
+NODOS=[Nodo1,Nodo2,Nodo3,Nodo4,Nodo5]
+Nodo3Total=150
+Nodo4Libre=5
+Nodo1Libre=0
+Nodo2Libre=1
+Nodo1Total=80
+LIBRE=40
+Nodo2Total=90

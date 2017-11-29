@@ -157,7 +157,7 @@ void hiloWorkerTransformacion(void *info){
 		//puts("termino la conexion con worker que nosaviso q la Transformacion fallo. Le avisamos a yama");
 		log_info(logInfo,"termino la conexion con worker que nosaviso q la Transformacion fallo. Le avisamos a yama");
 		headASerializar.tipo_de_proceso=MASTER;
-		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONFAIL;
+		headASerializar.tipo_de_mensaje=FINTRANSFORMACIONFAILDESCONEXION;
 		enviarHeaderYValor(headASerializar,idTarea,sockYama);
 		MUX_LOCK(&mux_cantFallos);
 		cantFallos++;

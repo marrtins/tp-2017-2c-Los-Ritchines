@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
 
 
 						liberarTInfoArchivoFSYama(infoSend);
-						//todo: Free(infoSend)
+
 
 						free(buffer2);
 
@@ -187,6 +187,7 @@ int main(int argc, char* argv[]) {
 						if(nodoEncontrado!=NULL){
 							if((i+1)==list_size(listaDeNodosDesconectados)){
 								headSerializado.tipo_de_mensaje=NODOSDESCONECTADOS_RTALAST;
+								mande=true;
 							}else{
 								headSerializado.tipo_de_mensaje=NODOSDESCONECTADOS_RTA;
 							}
@@ -197,7 +198,7 @@ int main(int argc, char* argv[]) {
 								return  FALLO_SEND;
 							}
 							free(buffer);
-							mande=true;
+
 						}
 
 					}
@@ -205,7 +206,7 @@ int main(int argc, char* argv[]) {
 				if(!mande){
 					Theader *headEnvio=malloc(sizeof(Theader));
 					headEnvio->tipo_de_proceso=FILESYSTEM;
-					headEnvio->tipo_de_mensaje=NOHAYDESCONECTADOS;
+					headEnvio->tipo_de_mensaje=FIN_NODOS;
 					enviarHeader(socketYama,headEnvio);
 					mande=true;
 					free(headEnvio);

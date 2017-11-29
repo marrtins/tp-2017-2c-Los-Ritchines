@@ -59,12 +59,14 @@ void conexionesDatanode(void * estructura){
 						log_error(logError, "Error al recibir información de un datanode.");
 						break;
 					}
-					else if( estado == 0){
-						nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
-						list_add(listaDeNodosDesconectados, nodoEncontrado);
-						borrarNodoPorFD(fileDescriptor);
-						sprintf(mensaje, "Se desconecto un datanode de fd: %d.", fileDescriptor);
-						log_error(logError, mensaje);
+					else if(estado == 0){
+							nodoEncontrado = buscarNodoPorFD(listaDeNodos, fileDescriptor);
+							if(nodoEncontrado!=NULL){
+							list_add(listaDeNodosDesconectados, nodoEncontrado);
+							borrarNodoPorFD(fileDescriptor);
+							sprintf(mensaje, "Se desconecto un datanode de fd: %d.", fileDescriptor);
+							log_error(logError, mensaje);
+						}
 						clearAndClose(fileDescriptor, &masterFD);
 						break;
 					}
@@ -91,11 +93,13 @@ void conexionesDatanode(void * estructura){
 											}
 										}
 										else{
+											log_info(logInfo,"conectar nevo nodo");
 											conectarNuevoNodo(infoNodo,fileDescriptor);
 										}
 									}
 									else {
 										//se reconecta
+										log_info(logInfo,"se reconecta");
 										if((TinfoNodo*)buscarInfoNodoPorNombre(listaInfoNodo, infoNodo->nombreNodo)==NULL){
 											infoNodoNuevo = inicializarInfoNodo(infoNodo);
 											list_add(listaInfoNodo,infoNodoNuevo);

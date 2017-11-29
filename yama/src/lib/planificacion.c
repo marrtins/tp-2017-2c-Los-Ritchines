@@ -83,7 +83,10 @@ t_list * planificar(TjobMaster *job,int socketFS){
 			//break;
 		}else{
 			while(!finRecv){
-				if(head.tipo_de_mensaje==NODOSDESCONECTADOS_RTA){
+				if(head.tipo_de_mensaje==FIN_NODOS){
+					finRecv=true;
+				}
+				else if(head.tipo_de_mensaje==NODOSDESCONECTADOS_RTA){
 					buffer=recvGeneric(socketFS);
 					bytes =(TpackBytes *) deserializeBytes(buffer);
 					list_add(nodosOFF,bytes->bytes);
@@ -95,27 +98,23 @@ t_list * planificar(TjobMaster *job,int socketFS){
 						list_add(nodosOFF,bytes->bytes);
 						free(buffer);
 						finRecv=true;
+						int i;
+						for(i=0;i<list_size(listaPlanificada);i++){
+							TpackInfoBloque *bloqueAux = list_get(listaPlanificada,i);
+							if(estaDesconectado(bloqueAux->nombreNodo,nodosOFF)){
+								liberarCargaEn(bloqueAux->nombreNodo,1);
+								disminuirHistoricoEn(bloqueAux->nombreNodo,1);
+								replanificarBloque(bloqueAux,job->listaComposicionArchivo,job);
+								actualizarCargaWorkerEn(bloqueAux->nombreNodo,1);
+							}
+						}
 					}
 				}
 			}
-			int i;
-			for(i=0;i<list_size(listaPlanificada);i++){
-				TpackInfoBloque *bloqueAux = list_get(listaPlanificada,i);
-				if(estaDesconectado(bloqueAux->nombreNodo,nodosOFF)){
-					liberarCargaEn(bloqueAux->nombreNodo,1);
-					disminuirHistoricoEn(bloqueAux->nombreNodo,1);
-					replanificarBloque(bloqueAux,job->listaComposicionArchivo,job);
-					actualizarCargaWorkerEn(bloqueAux->nombreNodo,1);
-
-				}
-			}
-
-
 		}
 	}else{
 		puts("fallo recibir nodos desconectados");
 	}
-
 
 
 	int q;
