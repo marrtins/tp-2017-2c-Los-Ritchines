@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
 
 				//verifico que la ruta que me manda yama sea valida
 				if(verificarRutaArchivoSinPuts(rutaArchivo)){
-					if(sigueEstableParaArchivo(rutaArchivo)){
+					if(sePuedeLevantaElArchivo(rutaArchivo)){
 						ruta = obtenerRutaLocalDeArchivo(rutaArchivo);
 						levantarTablaArchivo(archivo,ruta);
 
