@@ -318,16 +318,16 @@ void consolaLs(char**palabras, int cantidad){
 
 void consolaInfo(char**palabras, int cantidad) {
 	if (cantidad == 1) {
-		if (verificarRutaArchivo(palabras[1])) {
+		if(!strcmp(palabras[1], "--all")){
+			mostrarDistribucionDeBloquesEnNodos();
+		}
+		else if (verificarRutaArchivo(palabras[1])) {
 			Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
 			char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[1]);
 			levantarTablaArchivo(tablaArchivo, rutaLocal);
 			mostrarTablaArchivo(tablaArchivo);
 			liberarTablaDeArchivo(tablaArchivo);
 			free(rutaLocal);
-		}
-		else if(!strcmp(palabras[1], "--all")){
-			mostrarDistribucionDeBloquesEnNodos();
 		}
 		else{
 			puts("Error en los parametros. Utilice una ruta para mostrar los contenido de ese archivo o --all para mostrar todo.");
