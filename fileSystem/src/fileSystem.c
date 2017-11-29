@@ -39,8 +39,11 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 		free(flag);
-	}else {
+	}else if(argc == 1) {
 		levantarEstadoAnteriorDeLaTablaDeNodos(listaDeNodosDesconectados);
+	}
+	else{
+		puts("Error en la cantidad de parametros.");
 	}
 
 	inicializarArchivoDeLogs("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/error.log");

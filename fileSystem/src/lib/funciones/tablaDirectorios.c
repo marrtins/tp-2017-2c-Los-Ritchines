@@ -1152,22 +1152,57 @@ void mostrarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal){
 			}
 			printf("]\n");
 			j++;
+			puts("");
 		}
+		puts("");
 		puts("");
 		i++;
 	}
 }
 
-void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo){
+char * generarRutaAPartirDeUnSplit(char ** palabras){
+	int cantidadDeElementosDelSplit = contarPunteroDePunteros(palabras);
+	char * ruta = string_new();
+	while(cantidadDeElementosDelSplit > 0){
+		if(!strcmp(palabras[cantidadDeElementosDelSplit-1], "root")){
+			string_append(&ruta, "/");
+		}
+		string_append_with_format(&ruta, "%s/", palabras[cantidadDeElementosDelSplit-1]);
+		cantidadDeElementosDelSplit--;
+	}
+	return ruta;
+}
+
+void generarSplitApartirDeUnIndice(int index, char ** palabras, int cantidadPalabras){
+	Tdirectorio * directorio = buscarDirectorioPorIndice(index);
+	Tdirectorio * padre = buscarDirectorioPorIndice(directorio->padre);
+	palabras = realloc(palabras, sizeof(char*) * (cantidadPalabras + 1));
+	palabras[cantidadPalabras-1] = strdup(directorio->nombre);
+	palabras[cantidadPalabras] = NULL;
+	cantidadPalabras++;
+	if(padre != NULL){
+		generarSplitApartirDeUnIndice(padre->index, palabras, cantidadPalabras);
+	}
+	else{
+		return;
+	}
+}
+
+void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo, char * nombreDirectorioPadre){
 	int i = 0;
 	int j = 0;
 	int cantidadDeBloques = cantidadDeBloquesDeUnArchivo(estructuraArchivo->tamanioTotal);
 	int cantidadDeCopias;
+	int cantidadPalabras = 1;
+	char ** palabras = malloc(sizeof(char *) * cantidadPalabras);
+	palabras[0] = NULL;
 	TcopiaNodo * copia;
 	t_list * listaDeCopias;
 	TelementoDeTablaArchivoGlobal * nodo;
 	TarchivoDeTablaArchivoGlobal * archivoDeTablaDeArchivosGlobal;
-	char * nombreDeArchivo = string_new();
+	int index = atoi(nombreDirectorioPadre);
+	generarSplitApartirDeUnIndice(index, palabras, cantidadPalabras);
+	char * nombreDeArchivo = generarRutaAPartirDeUnSplit(palabras);
 	string_append_with_format(&nombreDeArchivo, "%s.%s", estructuraArchivo->nombreArchivoSinExtension, estructuraArchivo->extensionArchivo);
 	while(i < cantidadDeBloques){
 		cantidadDeCopias = estructuraArchivo->bloques[i].cantidadCopias;
@@ -1183,7 +1218,9 @@ void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo 
 		}
 		i++;
 	}
+	liberarPunteroDePunterosAChar(palabras);
 	free(nombreDeArchivo);
+	free(palabras);
 }
 
 void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * tablaDeArchivosGlobal){
@@ -1204,7 +1241,7 @@ void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * ta
 				string_append(&rutaArchivo, rutaDirectorio);
 				string_append(&rutaArchivo, archivo->d_name);
 				levantarTablaArchivo(estructuraArchivo, rutaArchivo);
-				actualizarEnTablaDeArchivosGlobal(tablaDeArchivosGlobal, estructuraArchivo);
+				actualizarEnTablaDeArchivosGlobal(tablaDeArchivosGlobal, estructuraArchivo, directorio->d_name);
 				liberarTablaDeArchivo(estructuraArchivo);
 				free(rutaArchivo);
 			}

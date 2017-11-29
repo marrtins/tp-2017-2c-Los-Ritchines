@@ -99,7 +99,7 @@ char * generarTabs(int cantidadDeTabs);
 void mostrarArbolDeDirectorios(char * rutaADirectorio);
 void mostrarDistribucionDeBloquesEnNodos();
 void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * tablaDeArchivosGlobal);
-void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo);
+void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo, char * nombreDirectorioPadre);
 
 //Listas
 bool ordenarListaPorMayor(void * directorio1, void * directorio2);
@@ -120,6 +120,8 @@ Tdirectorio * buscarDirectorioPorIndice(int indice);
 t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre);
 TelementoDeTablaArchivoGlobal * siNoExisteElNodoAgregar(char * nombreNodo, t_list * tablaDeArchivosGlobal);
 TarchivoDeTablaArchivoGlobal * siNoExisteElArchivoAgregar(char * nombreArchivo, t_list * listaDeArchivos);
+void ordenarTablaDeArchivosGlobalPorNombre(t_list * tablaDeArchivosGlobal);
+void ordenarArchivosDeTablaDeArchivosGlobalPorNombre(t_list * archivos);
 
 //Directorios
 void crearRoot();

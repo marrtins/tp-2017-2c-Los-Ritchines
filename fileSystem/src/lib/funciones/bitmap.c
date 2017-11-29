@@ -28,7 +28,7 @@ void levantarBitmapDeUnNodo(Tnodo * nodo){
 	int bit;
 	while(!feof(archivo)){
 		fread(&bitChar, 1, sizeof(char), archivo);
-		putchar(bitChar);
+		//putchar(bitChar);
 		bit = bitChar - '0';
 		if(bit == 1){
 			bitarray_set_bit(nodo->bitmap, i);
