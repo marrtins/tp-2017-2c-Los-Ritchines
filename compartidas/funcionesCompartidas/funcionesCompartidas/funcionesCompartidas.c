@@ -111,9 +111,12 @@ int crearSocketDeEscucha(char * puertoDeEscucha){
 }
 
 void crearHilo(pthread_t * nombreHilo, void * nombreFuncion, void * parametros){
-	if(pthread_create(nombreHilo, NULL, nombreFuncion, parametros) < 0){
-				logErrorAndExit("No se pudo crear el hilo.");
-		}
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	if(pthread_create(nombreHilo, &attr, nombreFuncion, parametros) < 0){
+			logErrorAndExit("No se pudo crear el hilo.");
+	}
 }
 
 int aceptarCliente(int fileDescriptor){
