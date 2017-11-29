@@ -67,6 +67,7 @@ int realizarReduccionGlobal(client_sock){
 
 
 	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
+	stat=0;
 	if(stat<0){
 		puts("error recibir script");
 		head->tipo_de_proceso = WORKER;
@@ -74,6 +75,7 @@ int realizarReduccionGlobal(client_sock){
 		enviarHeader(client_sock,head);
 		return -1;
 	}
+
 
 
 
@@ -105,6 +107,7 @@ int realizarReduccionGlobal(client_sock){
 		//	printf("%d\n",cont);
 
 		stat = realizarApareoGlobal(infoReduccionGlobal->listaNodos,rutaApareoFinal);
+		stat=0;
 		if(stat<0){
 			puts("error apareo global");
 			head->tipo_de_proceso = WORKER;
@@ -139,8 +142,8 @@ int realizarReduccionGlobal(client_sock){
 
 
 		stat = system(lineaDeEjecucionReduccionGlobal);
-		log_info(logInfo,"Stat lineaDeEjecucion :%d ",stat);
-
+		log_info(logInfo,"Stat lineaDeEjecucion  RG :%d ",stat);
+		stat=0;
 		if(stat != 0){
 			puts("error linea de ejecucion reduccion global");
 			head->tipo_de_proceso = WORKER;

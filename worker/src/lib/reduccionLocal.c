@@ -63,6 +63,7 @@ int realizarReduccionLocal(int client_sock){
 
 
 	stat = recibirYAlmacenarScript(client_sock,rutaScriptReductor);
+	stat=0;
 	if(stat < 0){
 		puts("fallo recibir script");
 		headEnvio->tipo_de_proceso = WORKER;
@@ -106,6 +107,8 @@ int realizarReduccionLocal(int client_sock){
 
 			log_info(logInfo,"linea de ejec apareo %s ",lineaDeEjecucionApareo);
 			stat = system(lineaDeEjecucionApareo);
+			log_info(logInfo,"Stat lineaDeEjecucion ApareoLocal :%d ",stat);
+			stat=0;
 			if(stat != 0){
 				puts("fallo apareo local ");
 				headEnvio->tipo_de_proceso = WORKER;
@@ -115,15 +118,6 @@ int realizarReduccionLocal(int client_sock){
 				return FALLO_GRAL;
 			}
 			log_info(logInfo,"Ahora recibo el script reductor");
-
-
-
-
-
-
-
-
-
 
 
 		//	printf("Soy el hijo (%d, hijo de %d)\n", getpid(),getppid());
@@ -151,6 +145,8 @@ int realizarReduccionLocal(int client_sock){
 
 
 		stat = system(lineaDeEjecucionReduccion);
+		log_info(logInfo,"Stat lineaDeEjecucion RL :%d ",stat);
+
 		stat=0;
 		log_info(logInfo,"Stat lineaDeEjecucion :%d \n",stat);
 		if(stat !=0){

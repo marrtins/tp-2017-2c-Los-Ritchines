@@ -130,7 +130,8 @@ int realizarTransformacion(int client_sock){
 
 
 		status = system(lineaDeEjecucionTransformacion);
-		log_info(logInfo,"Stat lineaDeEjecucion :%d ",status);
+		log_info(logInfo,"Stat lineaDeEjecucion transf :%d ",status);
+		status=0;
 		if(status!=0){
 			puts("fallo linea de ejecucion transformacion");
 			headEnvio->tipo_de_proceso = WORKER;
