@@ -193,7 +193,7 @@ TinfoNodo * inicializarInfoNodo(TpackInfoBloqueDN * infoBloqueRecibido);
 Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescriptor, Tnodo * nuevoNodo);
 void borrarNodoPorFD(int fd);
 void* buscarNodoPorFD(t_list * lista, int fd);
-int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanio);
+int verificarDisponibilidadDeEspacioEnNodos(int bloquesDeArchivo);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor);
