@@ -267,6 +267,7 @@ Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos, int *indice){
 				(*indice)++;
 				return nodo;
 			}
+			(*indice)++;
 		}
 		return NULL;
 	}
