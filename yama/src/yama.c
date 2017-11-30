@@ -120,7 +120,8 @@ int main(int argc, char* argv[]){
 
 
 				if ((estado = recv(fileDescriptor, head, HEAD_SIZE, 0)) == -1){
-					perror("Error en recv() de algun socket. error");
+					//perror("Error en recv() de algun socket. error");
+					log_info(logInfo,"Error en recv() de algun socket. error");
 					break;
 
 				} else if (estado == 0){
