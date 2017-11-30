@@ -1,5 +1,69 @@
 #include "../funcionesFS.h"
 
+void liberarListaCircular(TlistaCircular * listaCircular){
+	int i = 0;
+	TlistaCircular * punteroAuxiliar = listaCircular;
+	while(punteroAuxiliar->siguiente != listaCircular){
+		free(punteroAuxiliar);
+		punteroAuxiliar = listaCircular;
+		listaCircular = listaCircular->siguiente;
+		i++;
+	}
+
+	return;
+}
+
+int cantidadElementosDeListaCircular(TlistaCircular * listaCircular){
+	int i = 0;
+	if(listaCircular == NULL){
+		return 0;
+	}
+	TlistaCircular * punteroAuxiliar = listaCircular;
+	while(listaCircular != punteroAuxiliar || i == 0){
+		i++;
+		punteroAuxiliar = punteroAuxiliar->siguiente;
+	}
+	return i;
+}
+
+TlistaCircular * ultimoElementoDeListaCircular(TlistaCircular * listaCircular){
+	TlistaCircular * ultimoElemento = listaCircular;
+	while(ultimoElemento->siguiente != listaCircular){
+		ultimoElemento = ultimoElemento->siguiente;
+	}
+
+	return ultimoElemento;
+}
+
+TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int elemento){
+	TlistaCircular * nuevoElemento = malloc(sizeof(TlistaCircular));
+	nuevoElemento->valor = elemento;
+	if(listaOriginal == NULL){
+		nuevoElemento->siguiente = nuevoElemento;
+		listaOriginal = nuevoElemento;
+		return listaOriginal;
+	}
+
+	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(listaOriginal);
+
+	ultimoElemento->siguiente = nuevoElemento;
+	nuevoElemento->siguiente = listaOriginal;
+
+	return listaOriginal;
+
+}
+
+void mostrarListaCircular(TlistaCircular * listaCircular){
+	int i = 0;
+	TlistaCircular * punteroAuxiliar = listaCircular;
+	while(punteroAuxiliar->siguiente != listaCircular){
+		printf("Elemento: %d\n", i);
+		printf("Valor: %d\n", punteroAuxiliar->valor);
+		punteroAuxiliar = punteroAuxiliar->siguiente;
+		i++;
+	}
+}
+
 int bloquesOcupadosDeNodo(Tnodo * nodo){
 	return nodo->cantidadBloquesTotal - nodo->cantidadBloquesLibres;
 }

@@ -69,6 +69,11 @@ typedef struct{
 	t_list * archivos;
 }TelementoDeTablaArchivoGlobal;
 
+typedef struct lista{
+	int valor;
+	struct lista * siguiente;
+}TlistaCircular;
+
 t_list * listaDeNodos;
 t_list * listaDeNodosDesconectados;
 t_list * listaTablaDirectorios;

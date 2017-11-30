@@ -109,4 +109,19 @@ void liberarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal){
 	list_destroy_and_destroy_elements(tablaDeArchivosGlobal, free);
 }
 
+void liberarListaCircular(TlistaCircular * listaCircular){
+	int i = 0;
+	TlistaCircular * punteroAuxiliar = listaCircular;
+	listaCircular = listaCircular->siguiente;
+	int cantidadElementos = cantidadElementosDeListaCircular(listaCircular);
+	while(i < cantidadElementos){
+		free(punteroAuxiliar);
+		punteroAuxiliar = listaCircular;
+		listaCircular = listaCircular->siguiente;
+		i++;
+	}
+
+	return;
+}
+
 

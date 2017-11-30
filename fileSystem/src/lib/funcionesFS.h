@@ -122,6 +122,11 @@ TelementoDeTablaArchivoGlobal * siNoExisteElNodoAgregar(char * nombreNodo, t_lis
 TarchivoDeTablaArchivoGlobal * siNoExisteElArchivoAgregar(char * nombreArchivo, t_list * listaDeArchivos);
 void ordenarTablaDeArchivosGlobalPorNombre(t_list * tablaDeArchivosGlobal);
 void ordenarArchivosDeTablaDeArchivosGlobalPorNombre(t_list * archivos);
+void liberarListaCircular(TlistaCircular * listaCircular);
+int cantidadElementosDeListaCircular(TlistaCircular * listaCircular);
+TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int elemento);
+void mostrarListaCircular(TlistaCircular * listaCircular);
+TlistaCircular * ultimoElementoDeListaCircular(TlistaCircular * listaCircular);
 
 //Directorios
 void crearRoot();
