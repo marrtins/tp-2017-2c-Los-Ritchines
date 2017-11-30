@@ -1217,7 +1217,7 @@ void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo 
 			puts("encontre el nodo y la copia");
 			archivoDeTablaDeArchivosGlobal = (TarchivoDeTablaArchivoGlobal*)siNoExisteElArchivoAgregar(nombreDeArchivo, nodo->archivos);
 			//list_add(nodo->archivos, archivoDeTablaDeArchivosGlobal);
-			list_add(archivoDeTablaDeArchivosGlobal->bloques, i);
+			list_add(archivoDeTablaDeArchivosGlobal->bloques, (void*)i);
 			j++;
 		}
 		i++;
@@ -1232,7 +1232,7 @@ void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * ta
 	DIR * directorioMaestro;
 	struct dirent * archivo;
 	char * rutaArchivo;
-	Tarchivo * estructuraArchivo = malloc(sizeof(Tarchivo));
+	Tarchivo * estructuraArchivo;
 	string_append(&rutaDirectorio, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
 	string_append(&rutaDirectorio, directorio->d_name);
 	string_append(&rutaDirectorio, "/");
@@ -1242,6 +1242,7 @@ void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * ta
 		while (archivo){
 			puts("Ya soy un archiivo");
 			if(strcmp(archivo->d_name, ".") && strcmp(archivo->d_name, "..")){
+				estructuraArchivo =  malloc(sizeof(Tarchivo));
 				rutaArchivo = string_new();
 				string_append(&rutaArchivo, rutaDirectorio);
 				string_append(&rutaArchivo, archivo->d_name);
