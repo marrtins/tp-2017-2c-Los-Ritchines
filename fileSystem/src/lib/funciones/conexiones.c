@@ -159,8 +159,8 @@ void conexionesDatanode(void * estructura){
 								log_info(logInfo, "Por desempaquetar");
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
 								log_info(logInfo, "Desempaquetado");
-
-								if(verificarDisponibilidadDeEspacioEnNodos(estructuraArchivoFinal->tamanioContenido ) == 0 ){
+								int cantBloques=cantidadDeBloquesDeUnArchivo(estructuraArchivoFinal->tamanioContenido);
+								if(verificarDisponibilidadDeEspacioEnNodos(cantBloques ) == 0 ){
 									log_info(logInfo, "Por liberar rutasParaCpfrom");
 									free(rutasParaCpfrom);
 									log_info(logInfo, "Se libero rutasParaCpfrom");
