@@ -150,15 +150,39 @@ int capacidadDeAlmacenamientoDeFileSystem(Tnodo * nodoMaximo, int sumaSinMaximo)
 
 }
 
-int verificarDisponibilidadDeEspacioEnNodos(unsigned long long tamanioDelArchivoAGuardar){
-	int tamanioEnMBArchivo = cantidadDeBloquesDeUnArchivo(tamanioDelArchivoAGuardar);
-	Tnodo * nodoMaximo = obtenerNodoPorTamanioMaximo();
-	int sumaSinMaximo = sumarBloquesLibresDeNodoSinElMaximo(nodoMaximo);
-	int capacidadEnMB = capacidadDeAlmacenamientoDeFileSystem(nodoMaximo, sumaSinMaximo);
-	if(tamanioEnMBArchivo > capacidadEnMB){
-		return 0;
+TlistaCircular* restarEnLaListaCircular(TlistaCircular* lista, TlistaCircular* posicion){
+	TlistaCircular* siguiente = posicion.siguiente;
+	posicion->valor--;
+	if(posicion->valor == 0){
+		lista = quitarElementoDeUnaLista(lista,posicion);
 	}
-	return 1;
+	return siguiente;
+}
+
+int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
+	TlistaCircular* listaCircular = NULL;
+	TlistaCircular* punteroQueRecorreLaListaConLosElementosQueSeVanRestando = NULL;
+	int i = 0;
+	while(i < list_size(listaDeNodos)){
+		Tnodo* nodo = list_get(listaDeNodos, i);
+		if(nodo->cantidadBloquesLibres > 0) {
+			listaCircular = insertarEnListaCircular(listaCircular,nodo->cantidadBloquesLibres);
+		}
+		i++;
+	}
+	punteroQueRecorreLaListaConLosElementosQueSeVanRestando = listaCircular;
+	while(cantidadBloquesArchivo > 0 || cantidadElementosDeListaCircular(listaCircular) > 1){
+		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
+				restarEnLaListaCircular(listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
+		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
+				restarEnLaListaCircular(listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
+		cantidadBloquesArchivo--;
+	}
+
+	if(cantidadBloquesArchivo == 0){
+		return 1;
+	}
+	return 0;
 }
 
 int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArchivo){
@@ -194,7 +218,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		return -1;
 	}
 
-	if(verificarDisponibilidadDeEspacioEnNodos(tamanio) == 0){
+	if(verificarDisponibilidadDeEspacioEnNodos(cantidadDeBloquesDeUnArchivo(tamanio)) == 0){
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_error(logError, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		liberarEstructuraBloquesAEnviar(infoBloque);
