@@ -172,7 +172,7 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 		i++;
 	}
 	punteroQueRecorreLaListaConLosElementosQueSeVanRestando = listaCircular;
-	while(cantidadBloquesArchivo > 0 || cantidadElementosDeListaCircular(listaCircular) > 1){
+	while(cantidadBloquesArchivo > 0 && cantidadElementosDeListaCircular(listaCircular) > 1){
 		mostrarListaCircular(listaCircular);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
 				restarEnLaListaCircular(listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
