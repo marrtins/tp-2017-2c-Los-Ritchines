@@ -1,25 +1,12 @@
 #include "../funcionesFS.h"
 
-void liberarListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
-	TlistaCircular * punteroAuxiliar = listaCircular;
-	while(punteroAuxiliar->siguiente != listaCircular){
-		free(punteroAuxiliar);
-		punteroAuxiliar = listaCircular;
-		listaCircular = listaCircular->siguiente;
-		i++;
-	}
-
-	return;
-}
-
 int cantidadElementosDeListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
+	int i = 1;
 	if(listaCircular == NULL){
 		return 0;
 	}
 	TlistaCircular * punteroAuxiliar = listaCircular;
-	while(listaCircular != punteroAuxiliar || i == 0){
+	while(punteroAuxiliar->siguiente != listaCircular){
 		i++;
 		punteroAuxiliar = punteroAuxiliar->siguiente;
 	}
@@ -54,14 +41,16 @@ TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int ele
 }
 
 void mostrarListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
 	TlistaCircular * punteroAuxiliar = listaCircular;
+	int i = 0;
 	while(punteroAuxiliar->siguiente != listaCircular){
 		printf("Elemento: %d\n", i);
 		printf("Valor: %d\n", punteroAuxiliar->valor);
 		punteroAuxiliar = punteroAuxiliar->siguiente;
 		i++;
 	}
+	printf("Elemento: %d\n", i);
+	printf("Valor: %d\n", punteroAuxiliar->valor);
 }
 
 int bloquesOcupadosDeNodo(Tnodo * nodo){
