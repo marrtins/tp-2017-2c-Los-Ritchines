@@ -156,11 +156,16 @@ void conexionesDatanode(void * estructura){
 								rutaATemporal = malloc(250);
 								rutasParaCpfrom = malloc(sizeof(char *) * 4);
 								estructuraArchivoFinal = malloc(sizeof(TarchivoFinal));
+								log_info(logInfo, "Por desempaquetar");
 								desempaquetarArchivoFinal(fileDescriptor, estructuraArchivoFinal);
+								log_info(logInfo, "Desempaquetado");
 
 								if(verificarDisponibilidadDeEspacioEnNodos(estructuraArchivoFinal->tamanioContenido ) == 0 ){
+									log_info(logInfo, "Por liberar rutasParaCpfrom");
 									free(rutasParaCpfrom);
+									log_info(logInfo, "Se libero rutasParaCpfrom");
 									liberarEstructuraArchivoFinal(estructuraArchivoFinal);
+									log_info(logInfo, "Se libero estructuraArchivoFInal");
 									free(rutaATemporal);
 									log_info(logInfo, "No hay suficiente espacio en los nodos, para almacenar el archivo final.");
 									head->tipo_de_proceso=FILESYSTEM;
