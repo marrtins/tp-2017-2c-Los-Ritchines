@@ -123,7 +123,7 @@ TarchivoDeTablaArchivoGlobal * siNoExisteElArchivoAgregar(char * nombreArchivo, 
 void ordenarTablaDeArchivosGlobalPorNombre(t_list * tablaDeArchivosGlobal);
 void ordenarArchivosDeTablaDeArchivosGlobalPorNombre(t_list * archivos);
 int cantidadElementosDeListaCircular(TlistaCircular * listaCircular);
-TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int elemento);
+void insertarEnListaCircular(TlistaCircular ** listaOriginal ,int elemento);
 void mostrarListaCircular(TlistaCircular * listaCircular);
 TlistaCircular * ultimoElementoDeListaCircular(TlistaCircular * listaCircular);
 TlistaCircular * quitarElementoDeUnaLista(TlistaCircular * principio, TlistaCircular * elemento);

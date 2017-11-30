@@ -43,21 +43,21 @@ TlistaCircular * ultimoElementoDeListaCircular(TlistaCircular * listaCircular){
 	return ultimoElemento;
 }
 
-TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int elemento){
+void insertarEnListaCircular(TlistaCircular ** listaOriginal ,int elemento){
 	TlistaCircular * nuevoElemento = malloc(sizeof(TlistaCircular));
 	nuevoElemento->valor = elemento;
-	if(listaOriginal == NULL){
+	if(*listaOriginal == NULL){
 		nuevoElemento->siguiente = nuevoElemento;
-		listaOriginal = nuevoElemento;
-		return listaOriginal;
+		*listaOriginal = nuevoElemento;
+		return;
 	}
 
-	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(listaOriginal);
+	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(*listaOriginal);
 
 	ultimoElemento->siguiente = nuevoElemento;
-	nuevoElemento->siguiente = listaOriginal;
+	nuevoElemento->siguiente = *listaOriginal;
 
-	return listaOriginal;
+	return;
 
 }
 
