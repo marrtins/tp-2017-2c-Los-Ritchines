@@ -7,6 +7,7 @@ void quitarElementoDeUnaLista(TlistaCircular ** principio, TlistaCircular * elem
 	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(elemento);
 	if(ultimoElemento == *principio){
 		free(*principio);
+		*principio = NULL;
 		return;
 	}
 	if(*principio == elemento){
