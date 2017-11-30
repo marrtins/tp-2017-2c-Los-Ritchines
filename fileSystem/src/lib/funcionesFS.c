@@ -150,12 +150,12 @@ int capacidadDeAlmacenamientoDeFileSystem(Tnodo * nodoMaximo, int sumaSinMaximo)
 
 }
 
-TlistaCircular* restarEnLaListaCircular(TlistaCircular* lista, TlistaCircular* posicion){
+TlistaCircular* restarEnLaListaCircular(TlistaCircular** lista, TlistaCircular* posicion){
 	TlistaCircular* siguiente;
 	siguiente = posicion->siguiente;
 	posicion->valor--;
 	if(posicion->valor == 0){
-		lista = quitarElementoDeUnaLista(lista,posicion);
+		quitarElementoDeUnaLista(lista,posicion);
 	}
 	return siguiente;
 }
@@ -167,7 +167,7 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 	while(i < list_size(listaDeNodos)){
 		Tnodo* nodo = list_get(listaDeNodos, i);
 		if(nodo->cantidadBloquesLibres > 0) {
-			listaCircular = insertarEnListaCircular(listaCircular,nodo->cantidadBloquesLibres);
+			insertarEnListaCircular(&listaCircular,nodo->cantidadBloquesLibres);
 		}
 		i++;
 	}
@@ -175,9 +175,9 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 	while(cantidadBloquesArchivo > 0 && cantidadElementosDeListaCircular(listaCircular) > 1){
 		mostrarListaCircular(listaCircular);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
-				restarEnLaListaCircular(listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
+				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
-				restarEnLaListaCircular(listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
+				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		cantidadBloquesArchivo--;
 	}
 	mostrarListaCircular(listaCircular);
