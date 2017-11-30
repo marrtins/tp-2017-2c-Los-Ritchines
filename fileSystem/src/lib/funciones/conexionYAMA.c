@@ -61,20 +61,38 @@ TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 	int i;
 	int cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
 	for (i = 0; i < cantBloques; i++) {
-		TpackageUbicacionBloques *bloque = malloc(sizeof(TpackageUbicacionBloques));
-		TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia, 0);
-		bloque->bloque = i;
-		bloque->nombreNodoC1 = strdup(copia1->nombreDeNodo);
-		bloque->nombreNodoC1Len = (strlen(copia1->nombreDeNodo) + 1);
-		bloque->bloqueC1 = copia1->numeroBloqueDeNodo;
+		if(archivo->bloques->cantidadCopias >= 2){
+			TpackageUbicacionBloques *bloque = malloc(sizeof(TpackageUbicacionBloques));
+			TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia, 0);
+			bloque->bloque = i;
+			bloque->nombreNodoC1 = strdup(copia1->nombreDeNodo);
+			bloque->nombreNodoC1Len = (strlen(copia1->nombreDeNodo) + 1);
+			bloque->bloqueC1 = copia1->numeroBloqueDeNodo;
 
-		TcopiaNodo *copia2 = list_get(archivo->bloques[i].copia, 1);
-		bloque->nombreNodoC2 = strdup(copia2->nombreDeNodo);
-		bloque->nombreNodoC2Len = (strlen(copia2->nombreDeNodo) + 1);
-		bloque->bloqueC2 = copia2->numeroBloqueDeNodo;
+			TcopiaNodo *copia2 = list_get(archivo->bloques[i].copia, 1);
+			bloque->nombreNodoC2 = strdup(copia2->nombreDeNodo);
+			bloque->nombreNodoC2Len = (strlen(copia2->nombreDeNodo) + 1);
+			bloque->bloqueC2 = copia2->numeroBloqueDeNodo;
 
-		bloque->finBloque = archivo->bloques[i].bytes;
-		list_add(listaBloques, bloque);
+			bloque->finBloque = archivo->bloques[i].bytes;
+			list_add(listaBloques, bloque);
+		}
+		else{
+			TpackageUbicacionBloques *bloque = malloc(sizeof(TpackageUbicacionBloques));
+			TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia, 0);
+			bloque->bloque = i;
+			bloque->nombreNodoC1 = strdup(copia1->nombreDeNodo);
+			bloque->nombreNodoC1Len = (strlen(copia1->nombreDeNodo) + 1);
+			bloque->bloqueC1 = copia1->numeroBloqueDeNodo;
+
+			bloque->nombreNodoC2 = sstrdup(copia1->nombreDeNodo);
+			bloque->nombreNodoC2Len = (strlen(copia1->nombreDeNodo) + 1);
+			bloque->bloqueC2 = copia1->numeroBloqueDeNodo;
+
+			bloque->finBloque = archivo->bloques[i].bytes;
+			list_add(listaBloques, bloque);
+
+		}
 	}
 
 	infoSend->listaSize = list_size(listaBloques);
