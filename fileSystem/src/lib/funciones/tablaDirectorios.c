@@ -682,7 +682,7 @@ char * obtenerRutaLocalDeArchivo(char * rutaYamafs){
 	int indice;
 	char * rutaSinArchivo;
 	char * archivo;
-	char * ruta = malloc(100);
+	char * ruta = malloc(280);
 	char ** carpetas = string_split(rutaYamafs,"/");
 
 	rutaSinArchivo =  obtenerRutaSinArchivo(rutaYamafs);

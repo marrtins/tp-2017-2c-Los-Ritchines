@@ -83,24 +83,28 @@ void procesarCpblock(char ** palabras){
 				if (nroBloque>=cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal)) {
 					puts("Numero de bloque incorrecto, intentelo de nuevo.");
 					liberarTablaDeArchivo(tablaArchivo);
+					free(rutaLocalArchivo);
 					return;
 				}
 
 				if(existeBloqueEnNodo(nroBloque, nodo, tablaArchivo)){
 					puts("Ya existe una copia del bloque en el nodo");
 					liberarTablaDeArchivo(tablaArchivo);
+					free(rutaLocalArchivo);
 					return;
 				}
 
 				if (nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0) {
 					puts("No se encontraron los nodos con las copias del bloque.");
 					liberarTablaDeArchivo(tablaArchivo);
+					free(rutaLocalArchivo);
 					return;
 				}
 				pthread_mutex_init(&bloqueMutex, NULL);
 				if (pedirBloque(tablaArchivo, nroBloque) == -1) {
 					puts("Error al solicitar bloque.");
 					liberarTablaDeArchivo(tablaArchivo);
+					free(rutaLocalArchivo);
 					return;
 				}
 				liberarTablaDeArchivo(tablaArchivo);
@@ -117,6 +121,7 @@ void procesarCpblock(char ** palabras){
 				bloqueAEnviar->numeroDeBloque = bloqueDN;
 				if (enviarBloqueA(bloqueAEnviar, palabras[3]) == -1) {
 					puts("Error no se pudo enviar el bloque.");
+					free(rutaLocalArchivo);
 					liberarEstructuraBuffer(bloque);
 					return;
 				}
@@ -383,14 +388,31 @@ void consolaRemove (char** palabras, int cantidad){
 	else if(cantidad == 4){
 		if (!strcmp(palabras[1], "-b")){
 			if(verificarRutaArchivo(palabras[2])){
-				if(isdigit(*palabras[3]) && isdigit(*palabras[4])){
-					char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[2]);
-					eliminarBloqueDeUnArchivo(rutaLocal, atoi(palabras[3]), atoi(palabras[4]));
-					free(rutaLocal);
+				char* rutaLocalArchivo = obtenerRutaLocalDeArchivo(palabras[2]);
+				Tarchivo* tablaArchivo = malloc(sizeof(Tarchivo));
+				levantarTablaArchivo(tablaArchivo, rutaLocalArchivo);
+				free(rutaLocalArchivo);
+				int nroBloque = atoi(palabras[3]);
+				if(esBloqueValido(tablaArchivo, nroBloque)){
+					int nroCopia = atoi(palabras[4]);
+					if (esCopiaValida(tablaArchivo->bloques[nroBloque], nroCopia)) {
+						char * rutaLocal = obtenerRutaLocalDeArchivo(palabras[2]);
+						eliminarBloqueDeUnArchivo(rutaLocal, nroBloque, nroCopia);
+						free(rutaLocal);
+						liberarTablaDeArchivo(tablaArchivo);
+					}
+					else{
+						puts("Numero de Copia incorrecta.");
+						liberarTablaDeArchivo(tablaArchivo);
+					}
 				}
 				else{
-					puts("Ingrese numero de copias y bloques validos.");
+					puts("Numero de bloque incorrecto.");
+					liberarTablaDeArchivo(tablaArchivo);
 				}
+			}
+			else{
+				puts("Ruta de archivo incorrecta.");
 			}
 		}
 		else{
