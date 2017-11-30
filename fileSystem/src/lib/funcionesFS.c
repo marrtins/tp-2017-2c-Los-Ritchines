@@ -565,3 +565,16 @@ int existeBloqueEnNodo(int nroBloque, Tnodo* nodo, Tarchivo* tablaArchivo){
 	}
 	return 0;
 }
+
+int esBloqueValido(Tarchivo* tablaArchivo, int nroBloque){
+	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
+	if(nroBloque < cantBloques)
+		return 1;
+	return 0;
+}
+
+int esCopiaValida(Tbloques bloque, int nroCopia){
+	if(nroCopia < bloque.cantidadCopias)
+		return 1;
+	return 0;
+}
