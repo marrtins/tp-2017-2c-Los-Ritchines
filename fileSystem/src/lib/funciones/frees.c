@@ -114,12 +114,12 @@ void liberarListaCircular(TlistaCircular * listaCircular){
 	if(listaCircular == NULL){
 		return;
 	}
-	TlistaCircular * siguiente = listaCircular->siguiente;
 	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(listaCircular);
+	TlistaCircular * auxiliar = listaCircular;
 	while(listaCircular != ultimoElemento){
-		free(listaCircular);
-		listaCircular = siguiente;
-		siguiente = siguiente->siguiente;
+		listaCircular = listaCircular->siguiente;
+		free(auxiliar);
+		auxiliar = listaCircular;
 	}
 	free(listaCircular);
 

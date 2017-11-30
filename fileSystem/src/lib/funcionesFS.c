@@ -216,6 +216,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		puts("No hay nodos conectados, imposible realizar la operacion.");
 		log_error(logError, "Los nodos no están conectados, error en realizar la operación de almacenar en yamafs.");
 		liberarEstructuraBloquesAEnviar(infoBloque);
+		free(archivoAAlmacenar->bloques);
 		return -1;
 	}
 
@@ -223,6 +224,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		puts("No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		log_error(logError, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		liberarEstructuraBloquesAEnviar(infoBloque);
+		free(archivoAAlmacenar->bloques);
 		return -1;
 	}
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
