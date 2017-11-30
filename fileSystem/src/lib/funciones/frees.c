@@ -109,7 +109,11 @@ void liberarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal){
 	list_destroy_and_destroy_elements(tablaDeArchivosGlobal, free);
 }
 
+
 void liberarListaCircular(TlistaCircular * listaCircular){
+	if(listaCircular == NULL){
+		return;
+	}
 	TlistaCircular * siguiente = listaCircular->siguiente;
 	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(listaCircular);
 	while(listaCircular != ultimoElemento){

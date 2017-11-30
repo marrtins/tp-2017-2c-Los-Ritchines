@@ -1,5 +1,26 @@
 #include "../funcionesFS.h"
 
+TlistaCircular * quitarElementoDeUnaLista(TlistaCircular * principio, TlistaCircular * elemento){
+	if(principio == NULL || elemento == NULL){
+		return principio;
+	}
+	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(elemento);
+	if(ultimoElemento == principio){
+		free(principio);
+		return NULL;
+	}
+	if(principio == elemento){
+		ultimoElemento->siguiente = principio->siguiente;
+		principio = principio->siguiente;
+		free(elemento);
+		return principio;
+	}
+	ultimoElemento->siguiente = elemento->siguiente;
+	free(elemento);
+	return principio;
+
+}
+
 int cantidadElementosDeListaCircular(TlistaCircular * listaCircular){
 	int i = 1;
 	if(listaCircular == NULL){
@@ -41,6 +62,10 @@ TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int ele
 }
 
 void mostrarListaCircular(TlistaCircular * listaCircular){
+	if(listaCircular == NULL){
+		puts("No hay elementos en la lista");
+		return;
+	}
 	TlistaCircular * punteroAuxiliar = listaCircular;
 	int i = 0;
 	while(punteroAuxiliar->siguiente != listaCircular){
