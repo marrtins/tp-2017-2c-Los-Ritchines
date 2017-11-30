@@ -196,7 +196,6 @@ void* buscarNodoPorFD(t_list * lista, int fd);
 int verificarDisponibilidadDeEspacioEnNodos(int bloquesDeArchivo);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
-void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor);
 int losNodosConectadosSonLosQueEstabanAntes();
 
 

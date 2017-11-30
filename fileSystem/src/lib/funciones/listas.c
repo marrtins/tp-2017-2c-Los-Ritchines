@@ -267,6 +267,7 @@ Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos, int *indice){
 				(*indice)++;
 				return nodo;
 			}
+			(*indice)++;
 		}
 		return NULL;
 	}
@@ -294,16 +295,6 @@ Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos, int *indice){
 		nodo->estadoParaEnviarBloque = 1;
 	}
 	return nodo;*/
-}
-
-void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor){
-	int i = 0;
-	Tnodo * nodo;
-	while(i < list_size(listaDeNodos)){
-		nodo = list_get(listaDeNodos, i);
-		nodo->estadoParaEnviarBloque = valor;
-		i++;
-	}
 }
 
 t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre){

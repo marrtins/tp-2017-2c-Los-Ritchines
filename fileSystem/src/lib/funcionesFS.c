@@ -225,7 +225,6 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
-	setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
 		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
@@ -317,7 +316,6 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
-	nuevoNodo->estadoParaEnviarBloque = 0;
 	return nuevoNodo;
 }
 
