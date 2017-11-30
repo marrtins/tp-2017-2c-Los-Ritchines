@@ -85,7 +85,7 @@ TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 			bloque->nombreNodoC1Len = (strlen(copia1->nombreDeNodo) + 1);
 			bloque->bloqueC1 = copia1->numeroBloqueDeNodo;
 
-			bloque->nombreNodoC2 = sstrdup(copia1->nombreDeNodo);
+			bloque->nombreNodoC2 = strdup(copia1->nombreDeNodo);
 			bloque->nombreNodoC2Len = (strlen(copia1->nombreDeNodo) + 1);
 			bloque->bloqueC2 = copia1->numeroBloqueDeNodo;
 
