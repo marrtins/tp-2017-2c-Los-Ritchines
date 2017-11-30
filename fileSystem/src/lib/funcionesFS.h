@@ -122,7 +122,6 @@ TelementoDeTablaArchivoGlobal * siNoExisteElNodoAgregar(char * nombreNodo, t_lis
 TarchivoDeTablaArchivoGlobal * siNoExisteElArchivoAgregar(char * nombreArchivo, t_list * listaDeArchivos);
 void ordenarTablaDeArchivosGlobalPorNombre(t_list * tablaDeArchivosGlobal);
 void ordenarArchivosDeTablaDeArchivosGlobalPorNombre(t_list * archivos);
-void liberarListaCircular(TlistaCircular * listaCircular);
 int cantidadElementosDeListaCircular(TlistaCircular * listaCircular);
 TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int elemento);
 void mostrarListaCircular(TlistaCircular * listaCircular);
@@ -226,6 +225,7 @@ void liberarTInfoArchivoFSYama(TinfoArchivoFSYama * infoArchivo);
 void liberarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal);
 void liberarNodoDeTablaDeArchivosGlobal(TelementoDeTablaArchivoGlobal * nodo);
 void liberarArchivosDeTablaDeArchivosGlobal(TarchivoDeTablaArchivoGlobal * archivo);
+void liberarListaCircular(TlistaCircular * listaCircular);
 
 //YAMA
 char * recvRutaArchivo(int socket);

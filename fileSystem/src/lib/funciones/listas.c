@@ -69,13 +69,11 @@ void mostrarListaCircular(TlistaCircular * listaCircular){
 	TlistaCircular * punteroAuxiliar = listaCircular;
 	int i = 0;
 	while(punteroAuxiliar->siguiente != listaCircular){
-		printf("Elemento: %d\n", i);
-		printf("Valor: %d\n", punteroAuxiliar->valor);
+		printf("%d ", punteroAuxiliar->valor);
 		punteroAuxiliar = punteroAuxiliar->siguiente;
 		i++;
 	}
-	printf("Elemento: %d\n", i);
-	printf("Valor: %d\n", punteroAuxiliar->valor);
+	printf("%d\n", punteroAuxiliar->valor);
 }
 
 int bloquesOcupadosDeNodo(Tnodo * nodo){
