@@ -173,12 +173,14 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 	}
 	punteroQueRecorreLaListaConLosElementosQueSeVanRestando = listaCircular;
 	while(cantidadBloquesArchivo > 0 && cantidadElementosDeListaCircular(listaCircular) > 1){
+		mostrarListaCircular(listaCircular);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
 				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
 				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		cantidadBloquesArchivo--;
 	}
+	mostrarListaCircular(listaCircular);
 	liberarListaCircular(listaCircular);
 	if(cantidadBloquesArchivo == 0){
 		return 1;
