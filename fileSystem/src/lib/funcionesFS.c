@@ -225,7 +225,6 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		return -1;
 	}
-	setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
 		procesarArchivoCsv(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
@@ -547,5 +546,17 @@ int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque){
 		i++;
 	}
 
+	return 0;
+}
+
+int existeBloqueEnNodo(int nroBloque, Tnodo* nodo, Tarchivo* tablaArchivo){
+	Tbloques bloque = tablaArchivo->bloques[nroBloque];
+	int i;
+	for(i = 0; i < bloque.cantidadCopias; i++){
+		Tnodo* nodoDoLista = list_get(bloque.copia,i);
+		if(!strcmp(nodoDoLista->nombre, nodo->nombre)){
+			return 1;
+		}
+	}
 	return 0;
 }

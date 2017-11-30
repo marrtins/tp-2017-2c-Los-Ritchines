@@ -85,6 +85,13 @@ void procesarCpblock(char ** palabras){
 					liberarTablaDeArchivo(tablaArchivo);
 					return;
 				}
+
+				if(existeBloqueEnNodo(nroBloque, nodo, tablaArchivo)){
+					puts("Ya existe una copia del bloque en el nodo");
+					liberarTablaDeArchivo(tablaArchivo);
+					return;
+				}
+
 				if (nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0) {
 					puts("No se encontraron los nodos con las copias del bloque.");
 					liberarTablaDeArchivo(tablaArchivo);

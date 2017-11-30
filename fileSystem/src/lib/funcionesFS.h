@@ -198,6 +198,7 @@ int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor);
 int losNodosConectadosSonLosQueEstabanAntes();
+int existeBloqueEnNodo(int nroBloque, Tnodo* nodo, Tarchivo* tablaArchivo);
 
 
 //Archivos
