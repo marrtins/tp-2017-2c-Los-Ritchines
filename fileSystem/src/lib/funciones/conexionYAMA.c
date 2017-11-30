@@ -61,7 +61,7 @@ TinfoArchivoFSYama * crearListaTablaArchivoParaYama(Tarchivo * archivo){
 	int i;
 	int cantBloques = cantidadDeBloquesDeUnArchivo(archivo->tamanioTotal);
 	for (i = 0; i < cantBloques; i++) {
-		if(archivo->bloques->cantidadCopias >= 2){
+		if(archivo->bloques[i].cantidadCopias >= 2){
 			TpackageUbicacionBloques *bloque = malloc(sizeof(TpackageUbicacionBloques));
 			TcopiaNodo *copia1 = list_get(archivo->bloques[i].copia, 0);
 			bloque->bloque = i;
