@@ -54,7 +54,7 @@ t_list * planificar(TjobMaster *job,int socketFS){
 		log_info(logInfo,"Nodo:%s, ava:%d, clock:%d",nodo->infoNodo.nombreNodo,nodo->availability,nodo->clock);
 		list_add(listaWorkersPlanificacion,nodo);
 	}
-
+	log_info(logInfo,"posiciono clock.");
 	if((stat = posicionarClock(listaWorkersPlanificacion))<0){
 		puts("error");
 		log_info(logInfo,"error posicionar clock");
@@ -62,15 +62,16 @@ t_list * planificar(TjobMaster *job,int socketFS){
 	int k;
 	for(k=0;k<list_size(job->listaComposicionArchivo);k++){
 		TpackageUbicacionBloques *bloqueAux=list_get(job->listaComposicionArchivo,k);
-		log_info(logInfo,"asigno al bloque del archivo %d\n",bloqueAux->bloque);
+		log_info(logInfo,"asigno al bloque del archivo %dn",bloqueAux->bloque);
 		TpackInfoBloque *bloque = asignarBloque(bloqueAux,listaWorkersPlanificacion,job);
-		log_info(logInfo,"asigne al bloque %d, el nodo %s. bloque databin %d \n",bloque->bloqueDelArchivo,bloque->nombreNodo,bloque->bloqueDelDatabin);
+		log_info(logInfo,"asigne al bloque %d, el nodo %s. bloque databin %d ",bloque->bloqueDelArchivo,bloque->nombreNodo,bloque->bloqueDelDatabin);
 		list_add(listaPlanificada,bloque);
 	}
 
 	Theader *headEnvio=malloc(sizeof(Theader));
 	headEnvio->tipo_de_proceso=YAMA;
 	headEnvio->tipo_de_mensaje=NODOSDESCONECTADOS;
+	log_info(logInfo,"mando solic nd yama");
 	enviarHeader(socketFS,headEnvio);
 	Theader head;
 	t_list * nodosOFF=list_create();
@@ -78,6 +79,7 @@ t_list * planificar(TjobMaster *job,int socketFS){
 	TpackBytes *bytes;
 	bool finRecv=false;
 	stat = recv(socketFS, &head, sizeof(Theader), 0);
+	log_info(logInfo,"stat rta yama: %d",stat);
 	if(head.tipo_de_proceso==FILESYSTEM && stat > 0){
 		if(head.tipo_de_mensaje==NOHAYDESCONECTADOS){
 			//break;
@@ -106,6 +108,7 @@ t_list * planificar(TjobMaster *job,int socketFS){
 								disminuirHistoricoEn(bloqueAux->nombreNodo,1);
 								replanificarBloque(bloqueAux,job->listaComposicionArchivo,job);
 								actualizarCargaWorkerEn(bloqueAux->nombreNodo,1);
+								aumentarHistoricoEn(aux->nombreNodo,1);
 							}
 						}
 					}
@@ -115,13 +118,17 @@ t_list * planificar(TjobMaster *job,int socketFS){
 	}else{
 		puts("fallo recibir nodos desconectados");
 	}
-
+	log_info(logInfo,"fin rtas yama");
 
 	int q;
 	for(q=0;q<list_size(listaPlanificada);q++){
 		TpackInfoBloque *aux = list_get(listaPlanificada,q);
 		log_info(logInfo,"b arch %d  bdata %d %d %s",aux->bloqueDelArchivo,aux->bloqueDelDatabin,aux->bytesOcupados,aux->nombreNodo);
 	}
+
+	log_info(logInfo,"muestro tablas. tras finalizar la planificaiocn");
+	mostrarTablaCargas();
+	mostrarTablaHistorica();
 
 	//list_destroy_and_destroy_elements(listaPlanificada,liberarBloquesPlanificados);
 
@@ -241,7 +248,7 @@ void mostrarTablaHistorica(){
 	int i;
 	for(i=0;i<list_size(listaHistoricaTareas);i++){
 			ThistorialTareas *historial = list_get(listaHistoricaTareas,i);
-			log_info(logInfo,"%s ; historico: %d\n",historial->nombreNodo,historial->tareasRealizadas);
+			log_info(logInfo,"%s ; historico: %d",historial->nombreNodo,historial->tareasRealizadas);
 	}
 }
 
@@ -250,7 +257,7 @@ void mostrarTablaCargas(){
 	log_info(logInfo,"muestro tabla cargas");
 	for(i=0;i<list_size(listaCargaGlobal);i++){
 			TcargaGlobal *historial = list_get(listaCargaGlobal,i);
-			log_info(logInfo,"%s ; carga: %d\n",historial->nombreNodo,historial->cargaGlobal);
+			log_info(logInfo,"%s ; carga: %d",historial->nombreNodo,historial->cargaGlobal);
 	}
 }
 
@@ -260,48 +267,48 @@ TpackInfoBloque * asignarBloque(TpackageUbicacionBloques *bloqueAux,t_list *list
 	Tplanificacion *nodoApuntado = getNodoApuntado(listaWorkersPlanificacion);
 	TpackInfoBloque *bloqueRet=malloc(sizeof(TpackInfoBloque));
 
-	log_info(logInfo,"en asignar bloque");
-	log_info(logInfo,"copias del bloque %d: %s y %s \n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->nombreNodoC2);
-	log_info(logInfo,"nodo apuntado %s. availability %d\n",nodoApuntado->infoNodo.nombreNodo,nodoApuntado->availability);
+	//log_info(logInfo,"en asignar bloque");
+	log_info(logInfo,"copias del bloque %d: %s y %s ",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->nombreNodoC2);
+	log_info(logInfo,"nodo apuntado %s. availability %d",nodoApuntado->infoNodo.nombreNodo,nodoApuntado->availability);
 	if((nodoApuntado->availability > 0 && string_equals_ignore_case(bloqueAux->nombreNodoC1,nodoApuntado->infoNodo.nombreNodo)) ||
 			(nodoApuntado->availability > 0 && string_equals_ignore_case(bloqueAux->nombreNodoC2,nodoApuntado->infoNodo.nombreNodo))){
 		if(string_equals_ignore_case(bloqueAux->nombreNodoC1,nodoApuntado->infoNodo.nombreNodo) ){
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
-			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,nodoApuntado->infoNodo.nombreNodo);
+			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,nodoApuntado->infoNodo.nombreNodo);
 		}
 		if(string_equals_ignore_case(bloqueAux->nombreNodoC2,nodoApuntado->infoNodo.nombreNodo) ){
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
-			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,nodoApuntado->infoNodo.nombreNodo);
+			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,nodoApuntado->infoNodo.nombreNodo);
 		}
 
 		mergeBloque(bloqueRet,nodoApuntado,bloqueAux,job->masterId);
 		nodoApuntado->availability-=1;
-		log_info(logInfo,"cumplio. le asigno el bloque %d al nodo apuntado %s. bloque databn %d\n",bloqueRet->bloqueDelArchivo,bloqueRet->nombreNodo,bloqueRet->bloqueDelDatabin);
+		//log_info(logInfo,"cumplio. le asigno el bloque %d al nodo apuntado %s. bloque databn %d",bloqueRet->bloqueDelArchivo,bloqueRet->nombreNodo,bloqueRet->bloqueDelDatabin);
 		avanzarClock(listaWorkersPlanificacion);
 
 	}else{
 		log_info(logInfo,"no cumplio. busco el siguiente nodo");
 		Tplanificacion *siguienteNodo = getSiguienteNodoDisponible(listaWorkersPlanificacion,bloqueAux->nombreNodoC1,bloqueAux->nombreNodoC2);
-		log_info(logInfo,"consegui el siguiente dispo. el nodo %s\n",siguienteNodo->infoNodo.nombreNodo);
+		log_info(logInfo,"consegui el siguiente dispo. el nodo %s",siguienteNodo->infoNodo.nombreNodo);
 		if(string_equals_ignore_case(siguienteNodo->infoNodo.nombreNodo,bloqueAux->nombreNodoC1)){
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC1;
-			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,siguienteNodo->infoNodo.nombreNodo);
+			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,siguienteNodo->infoNodo.nombreNodo);
 		}else{
 			bloqueRet->bloqueDelDatabin=bloqueAux->bloqueC2;
-			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s\n",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,siguienteNodo->infoNodo.nombreNodo);
+			log_info(logInfo,"asigno al bloque del archivo %d, el bloque adtabin: %d del %s",bloqueAux->bloque,bloqueRet->bloqueDelDatabin,siguienteNodo->infoNodo.nombreNodo);
 		}
 
 		mergeBloque(bloqueRet,siguienteNodo,bloqueAux,job->masterId);
 		siguienteNodo->availability-=1;
-		log_info(logInfo,"le asigno el bloque %d al nodo q recien consegui %s, bloque databind :%d \n",bloqueRet->bloqueDelArchivo,siguienteNodo->infoNodo.nombreNodo,bloqueRet->bloqueDelDatabin);
+		//log_info(logInfo,"le asigno el bloque %d al nodo q recien consegui %s, bloque databind :%d ",bloqueRet->bloqueDelArchivo,siguienteNodo->infoNodo.nombreNodo,bloqueRet->bloqueDelDatabin);
 	}
 	aumentarHistoricoEn(bloqueRet->nombreNodo,1);
 	actualizarCargaWorkerEn(bloqueRet->nombreNodo,1);
-	log_info(logInfo,"aumento carga e historico y asi queda mi tabla de nodos\n");
+	log_info(logInfo,"aumente carga e historico y asi queda mi tabla de nodos");
 	int i;
 	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
 		Tplanificacion *aux=list_get(listaWorkersPlanificacion,i);
-		log_info(logInfo,"nombrenodo %s. ava %d clock %d \n",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
+		log_info(logInfo,"nombrenodo %s. ava %d clock %d ",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
 	}
 
 	return bloqueRet;
@@ -373,7 +380,7 @@ Tplanificacion * getSiguienteNodoDisponible(t_list * listaWorkersPlanificacion,c
 	for(i=0;i<list_size(listaWorkersPlanificacion);i++){
 		Tplanificacion *aux= list_get(listaWorkersPlanificacion,i);
 		if(aux->clock){
-			log_info(logInfo,"busco el siguiente al apuntado actualmente que es %s\n",aux->infoNodo.nombreNodo);
+			//log_info(logInfo,"busco el siguiente al apuntado actualmente que es %s\n",aux->infoNodo.nombreNodo);
 			Tplanificacion *siguienteDisponible = getSiguienteConDisponibilidadPositivaPosible(listaWorkersPlanificacion,i,nombreNodo1,nombreNodo2);
 			return siguienteDisponible;
 
@@ -401,38 +408,38 @@ Tplanificacion *getSiguiente(t_list * listaWorkers,int indice){
 Tplanificacion * getSiguienteConDisponibilidadPositivaPosible(t_list * listaWorkersPlanificacion, int indice,char * nombre1,char * nombre2){
 
 
-	log_info(logInfo,"en get sig c dispo positiva posibla");
+	//log_info(logInfo,"en get sig c dispo positiva posibla");
 	int punt = indice +1;
-	log_info(logInfo,"punt: %d\n",punt);
-	log_info(logInfo,"indice: %d\n",indice);
-	log_info(logInfo,"list size %d\n",list_size(listaWorkersPlanificacion));
-	log_info(logInfo,"copia 1 %s copia 2 %s\n",nombre1,nombre2);
+	//log_info(logInfo,"punt: %d\n",punt);
+	//log_info(logInfo,"indice: %d\n",indice);
+	//log_info(logInfo,"list size %d\n",list_size(listaWorkersPlanificacion));
+	//log_info(logInfo,"copia 1 %s copia 2 %s\n",nombre1,nombre2);
 	int k=0;
 	while(1){
-		log_info(logInfo,"entro al while");
-		log_info(logInfo,"punt: %d\n",punt);
+		//log_info(logInfo,"entro al while");
+		//log_info(logInfo,"punt: %d\n",punt);
 
 
 		if(punt >=list_size(listaWorkersPlanificacion)){
-			log_info(logInfo,"punt = lista size. punt=0");
+			//log_info(logInfo,"punt = lista size. punt=0");
 			punt=0;
 		}
 		if(punt==indice){
-			log_info(logInfo,"puts=indice");
-			log_info(logInfo,"sumo dispo a todos");
+			//log_info(logInfo,"puts=indice");
+			//log_info(logInfo,"sumo dispo a todos");
 			sumarDisponibilidadBaseATodos(listaWorkersPlanificacion);
 		}
 		Tplanificacion *aux = list_get(listaWorkersPlanificacion,punt);
-		log_info(logInfo,"AUX: nodo:%s . availa: %d\n",aux->infoNodo.nombreNodo,aux->availability);
+		//log_info(logInfo,"AUX: nodo:%s . availa: %d\n",aux->infoNodo.nombreNodo,aux->availability);
 		if(aux->availability>0){
 			if(string_equals_ignore_case(aux->infoNodo.nombreNodo,nombre1)||string_equals_ignore_case(aux->infoNodo.nombreNodo,nombre2) ){
-				log_info(logInfo,"nombre nodo = n1 o n2");
+				//log_info(logInfo,"nombre nodo = n1 o n2");
 				return aux;
 			}
-			log_info(logInfo,"nombre nodo distinto a n1 o n2");
+			//log_info(logInfo,"nombre nodo distinto a n1 o n2");
 
 		}
-		log_info(logInfo,"doy la vuelta");
+		//log_info(logInfo,"doy la vuelta");
 		punt++;
 		k++;
 
@@ -561,25 +568,26 @@ int posicionarClock(t_list *listaWorkers){
 	bool empate=false;
 	for(i=0;i<list_size(listaWorkers);i++){
 		Tplanificacion *aux = list_get(listaWorkers,i);
-		log_info(logInfo,"dispo mas alta %d \n",disponibilidadMasAlta);
-		log_info(logInfo,"Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
+		//log_info(logInfo,"dispo mas alta %d \n",disponibilidadMasAlta);
+		//log_info(logInfo,"Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
 		if(aux->availability > disponibilidadMasAlta){
 			disponibilidadMasAlta=aux->availability;
-			log_info(logInfo,"nueva dispo mas alta %d \n",disponibilidadMasAlta);
-			log_info(logInfo,"no hay empate");
+			//log_info(logInfo,"nueva dispo mas alta %d \n",disponibilidadMasAlta);
+			//log_info(logInfo,"no hay empate");
 			empate=false;
 			indiceAModificar = i;
 		}else if(aux->availability==disponibilidadMasAlta){
-			log_info(logInfo,"hay empate");
+			//log_info(logInfo,"hay empate");
 			empate=true;
 		}
 	}
 	if(empate){
-		log_info(logInfo,"hubo empate. desempato");
+		//log_info(logInfo,"hubo empate. desempato");
 		desempatarClock(disponibilidadMasAlta,listaWorkers);
 	}else{
 		Tplanificacion *aux = list_get(listaWorkers,indiceAModificar);
 		aux->clock=true;
+		log_info(logInfo,"no hubo empate. le pongo el clock a %s",aux->infoNodo.nombreNodo);
 	}
 
 
@@ -597,20 +605,20 @@ int desempatarClock(int disponibilidadMasAlta,t_list * listaWorkers){
 	int indiceAModificar=0;
 	for(i=0;i<list_size(listaWorkers);i++){
 		aux = list_get(listaWorkers,i);
-		log_info(logInfo,"Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
+		//log_info(logInfo,"Nodo:%s, ava:%d, clock:%d\n,",aux->infoNodo.nombreNodo,aux->availability,aux->clock);
 		if(aux->availability == disponibilidadMasAlta){
 			historico1=getHistorico(aux);
-			log_info(logInfo,"historico %s:%d\n,",aux->infoNodo.nombreNodo,historico1);
+			//log_info(logInfo,"historico %s:%d\n,",aux->infoNodo.nombreNodo,historico1);
 		}
 		if(historico1<historico2){ //todo cambio (?????????????)
-			log_info(logInfo,"historico de %s:(%d) es el mayor. x ahora lo modifico\n,",aux->infoNodo.nombreNodo,historico1);
+			//log_info(logInfo,"historico de %s:(%d) es el mayor. x ahora lo modifico\n,",aux->infoNodo.nombreNodo,historico1);
 			historico2=historico1;
 			indiceAModificar=i;
 		}
 
 	}
 	aux=list_get(listaWorkers,indiceAModificar);
-	log_info(logInfo,"le pongo el clock a %s, historico %d\n",aux->infoNodo.nombreNodo,historico2);
+	log_info(logInfo,"hubo empate. le pongo el clock a %s, historico %d",aux->infoNodo.nombreNodo,historico2);
 	aux->clock=true;
 
 	return 0;
@@ -687,6 +695,7 @@ void asignarNodoElegido(t_list * listaReduccionGlobal){
 int getCargaReduccionGlobal(int job){
 	int carga=0;
 	int i;
+
 	TpackTablaEstados * estado;
 	for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 		estado = list_get(listaEstadoFinalizadoOK,i);
@@ -695,7 +704,7 @@ int getCargaReduccionGlobal(int job){
 		}
 	}
 
-	log_info(logInfo,"Libero carga en %d\n",divideYRedondea(carga,2));
+	//log_info(logInfo,"Libero carga en %d\n",divideYRedondea(carga,2));
 	return divideYRedondea(carga,2);
 }
 
@@ -736,16 +745,16 @@ void liberarCargaNodos(int idTareaFinalizada){
 		for(i=0;i<list_size(listaEstadoEnProceso);i++){
 			TpackTablaEstados *aux  = list_get(listaEstadoEnProceso,i);
 			if(aux->job==jobALiberar){
-				log_info(logInfo,"libero del job %d, idtarea: %d en %s",aux->job,aux->idTarea,aux->nodo);
+
 				if(aux->etapa==TRANSFORMACION){
-					log_info(logInfo,"libero 1");
+					log_info(logInfo,"POR TRlibero del job %d, idtarea: %d en %s. libero 1",aux->job,aux->idTarea,aux->nodo);
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONLOCAL){
-					log_info(logInfo,"libero 1");
+					log_info(logInfo,"POR RL libero del job %d, idtarea: %d en %s. libero 1",aux->job,aux->idTarea,aux->nodo);
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
 					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
-					log_info(logInfo,"libero %d",cargaAReducir);
+					log_info(logInfo,"POR RG libero del job %d, idtarea: %d en %s. libero %d",aux->job,aux->idTarea,aux->nodo,cargaAReducir);
 					liberarCargaEn(aux->nodo,cargaAReducir);
 				}
 			}
@@ -753,17 +762,16 @@ void liberarCargaNodos(int idTareaFinalizada){
 		for(i=0;i<list_size(listaEstadoFinalizadoOK);i++){
 			TpackTablaEstados *aux  = list_get(listaEstadoFinalizadoOK,i);
 			if(aux->job==jobALiberar){
-				log_info(logInfo,"libero del job %d, idtarea: %d en %s",aux->job,aux->idTarea,aux->nodo);
+
 				if(aux->etapa==TRANSFORMACION){
 					liberarCargaEn(aux->nodo,1);
+					log_info(logInfo,"POR TR libero del job %d, idtarea: %d en %s. libero 1",aux->job,aux->idTarea,aux->nodo);
 				}else if(aux->etapa==REDUCCIONLOCAL){
-					log_info(logInfo,"libero 1");
-
+					log_info(logInfo,"POR RLlibero del job %d, idtarea: %d en %s. libero 1",aux->job,aux->idTarea,aux->nodo);
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
 					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
-					log_info(logInfo,"libero %d",cargaAReducir);
-
+					log_info(logInfo,"POR RG libero del job %d, idtarea: %d en %s. libero %d",aux->job,aux->idTarea,aux->nodo,cargaAReducir);
 					liberarCargaEn(aux->nodo,cargaAReducir);
 
 				}
@@ -772,17 +780,15 @@ void liberarCargaNodos(int idTareaFinalizada){
 		for(i=0;i<list_size(listaEstadoError);i++){
 			TpackTablaEstados *aux  = list_get(listaEstadoError,i);
 			if(aux->job==jobALiberar){
-				log_info(logInfo,"libero del job %d, idtarea: %d en %s",aux->job,aux->idTarea,aux->nodo);
 				if(aux->etapa==TRANSFORMACION){
+					log_info(logInfo,"POR TRlibero del job %d, idtarea: %d en %s. libero 1",aux->job,aux->idTarea,aux->nodo);
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONLOCAL){
-					log_info(logInfo,"libero 1");
-
+					log_info(logInfo,"POR RL libero del job %d, idtarea: %d en %s. libero 1",aux->job,aux->idTarea,aux->nodo);
 					liberarCargaEn(aux->nodo,1);
 				}else if(aux->etapa==REDUCCIONGLOBAL){
 					int cargaAReducir = getCargaReduccionGlobal(jobALiberar);
-					log_info(logInfo,"libero %d",cargaAReducir);
-					liberarCargaEn(aux->nodo,cargaAReducir);
+					log_info(logInfo,"POR RG libero del job %d, idtarea: %d en %s. libero %d",aux->job,aux->idTarea,aux->nodo,cargaAReducir);					liberarCargaEn(aux->nodo,cargaAReducir);
 				}
 			}
 		}
@@ -857,8 +863,6 @@ bool yaFueFinalizadoPorErrorDeReplanificacion(int job){
 	for(i=0;i<list_size(listaJobFinalizados);i++){
 		TjobFinalizado *jobAux = list_get(listaJobFinalizados,i);
 		if(jobAux->nroJob == job){
-
-
 			return true;
 		}
 	}
@@ -1406,7 +1410,7 @@ int replanificarCaido(int idTarea, int sockMaster,t_list * listaComposicionArchi
 
 char *  generarNombreTemporal(int idMaster){
 
-	log_info(logInfo,"en gnrar nombre temp");
+	//log_info(logInfo,"en gnrar nombre temp");
 	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");
@@ -1421,7 +1425,7 @@ char *  generarNombreTemporal(int idMaster){
 }
 
 char *  generarNombreReductorTemporal(char * nombreNodo,int idMaster){
-	log_info(logInfo,"en generar nombre red temp");
+	//log_info(logInfo,"en generar nombre red temp");
 	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");
@@ -1436,7 +1440,7 @@ char *  generarNombreReductorTemporal(char * nombreNodo,int idMaster){
 
 
 char *  generarNombreReduccionGlobalTemporal(int idMaster){
-	log_info(logInfo,"en generar nombre rg temp");
+	//log_info(logInfo,"en generar nombre rg temp");
 	char *temp = string_new();
 
 	string_append(&temp,"tmp/Master");

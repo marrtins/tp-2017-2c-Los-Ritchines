@@ -135,7 +135,7 @@ int comenzarReduccionLocal(int idTareaFinalizada,int sockMaster){
 	string_append(&bloquesReducidos,"]");
 
 	log_info(logInfo,"bloques a reducir rl %s",bloquesReducidos);
-
+	log_info(logInfo,"tablas dps de enviar la rl");
 	agregarReduccionLocalAListaEnProceso(infoReduccion,bloquesReducidos,job);
 	//free(bloquesReducidos);
 	actualizarCargaWorkerEn(infoReduccion->nombreNodo,1);

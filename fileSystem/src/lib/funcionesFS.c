@@ -38,6 +38,7 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	int estado;
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
+
 	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
 	Tnodo * nodo1 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
 	Tnodo * nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
