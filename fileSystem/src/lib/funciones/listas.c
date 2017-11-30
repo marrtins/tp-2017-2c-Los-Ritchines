@@ -1,23 +1,23 @@
 #include "../funcionesFS.h"
 
-TlistaCircular * quitarElementoDeUnaLista(TlistaCircular * principio, TlistaCircular * elemento){
-	if(principio == NULL || elemento == NULL){
-		return principio;
+void quitarElementoDeUnaLista(TlistaCircular ** principio, TlistaCircular * elemento){
+	if(*principio == NULL || elemento == NULL){
+		return;
 	}
 	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(elemento);
-	if(ultimoElemento == principio){
-		free(principio);
-		return NULL;
+	if(ultimoElemento == *principio){
+		free(*principio);
+		return;
 	}
-	if(principio == elemento){
-		ultimoElemento->siguiente = principio->siguiente;
-		principio = principio->siguiente;
+	if(*principio == elemento){
+		ultimoElemento->siguiente = (*principio)->siguiente;
+		*principio = (*principio)->siguiente;
 		free(elemento);
-		return principio;
+		return;
 	}
 	ultimoElemento->siguiente = elemento->siguiente;
 	free(elemento);
-	return principio;
+	return;
 
 }
 

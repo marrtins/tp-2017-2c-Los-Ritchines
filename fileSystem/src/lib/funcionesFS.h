@@ -126,7 +126,7 @@ int cantidadElementosDeListaCircular(TlistaCircular * listaCircular);
 void insertarEnListaCircular(TlistaCircular ** listaOriginal ,int elemento);
 void mostrarListaCircular(TlistaCircular * listaCircular);
 TlistaCircular * ultimoElementoDeListaCircular(TlistaCircular * listaCircular);
-TlistaCircular * quitarElementoDeUnaLista(TlistaCircular * principio, TlistaCircular * elemento);
+void quitarElementoDeUnaLista(TlistaCircular ** principio, TlistaCircular * elemento);
 
 //Directorios
 void crearRoot();
