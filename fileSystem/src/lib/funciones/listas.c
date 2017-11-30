@@ -1,12 +1,12 @@
 #include "../funcionesFS.h"
 
 int cantidadElementosDeListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
+	int i = 1;
 	if(listaCircular == NULL){
 		return 0;
 	}
 	TlistaCircular * punteroAuxiliar = listaCircular;
-	while(listaCircular != punteroAuxiliar || i == 0){
+	while(punteroAuxiliar->siguiente != listaCircular){
 		i++;
 		punteroAuxiliar = punteroAuxiliar->siguiente;
 	}
