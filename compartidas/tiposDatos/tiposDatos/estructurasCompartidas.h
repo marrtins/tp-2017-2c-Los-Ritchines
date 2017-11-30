@@ -211,7 +211,6 @@ typedef struct{
 	unsigned int cantidadBloquesTotal;
 	unsigned int cantidadBloquesLibres;
 	t_bitarray * bitmap;
-	int estadoParaEnviarBloque;
 }Tnodo;
 
 typedef struct {

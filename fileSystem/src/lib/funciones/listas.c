@@ -297,16 +297,6 @@ Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos, int *indice){
 	return nodo;*/
 }
 
-void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor){
-	int i = 0;
-	Tnodo * nodo;
-	while(i < list_size(listaDeNodos)){
-		nodo = list_get(listaDeNodos, i);
-		nodo->estadoParaEnviarBloque = valor;
-		i++;
-	}
-}
-
 t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre){
 	bool esHijo(void * posibleHijoVoid){
 		Tdirectorio * posibleHijo = (Tdirectorio *) posibleHijoVoid;

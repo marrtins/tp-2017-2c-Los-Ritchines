@@ -316,7 +316,6 @@ Tnodo * inicializarNodo(TpackInfoBloqueDN * infoBloqueRecibido, int fileDescript
 	nuevoNodo->cantidadBloquesLibres = infoBloqueRecibido->databinEnMB;
 	nuevoNodo->nombre = strdup(infoBloqueRecibido->nombreNodo);
 	nuevoNodo->bitmap = crearBitmap(infoBloqueRecibido->databinEnMB);
-	nuevoNodo->estadoParaEnviarBloque = 0;
 	return nuevoNodo;
 }
 
