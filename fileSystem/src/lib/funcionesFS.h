@@ -197,6 +197,7 @@ int verificarDisponibilidadDeEspacioEnNodos(int bloquesDeArchivo);
 int bloquesOcupadosDeNodo(Tnodo * nodo);
 int nodosDisponiblesParaBloqueDeArchivo(Tarchivo* tablaArchivo,int nroBloque);
 int losNodosConectadosSonLosQueEstabanAntes();
+int existeBloqueEnNodo(int nroBloque, Tnodo* nodo, Tarchivo* tablaArchivo);
 
 
 //Archivos
