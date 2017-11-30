@@ -419,6 +419,7 @@ int sePuedeLevantaElArchivo(char * rutaArchivo){
 		}
 		nroBloque++;
 	}
+	free(ruta);
 	liberarTablaDeArchivo(archivo);
 	return 1;
 }
