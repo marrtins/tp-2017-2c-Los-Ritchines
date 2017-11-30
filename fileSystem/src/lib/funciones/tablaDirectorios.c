@@ -1271,7 +1271,7 @@ void mostrarDistribucionDeBloquesEnNodos(){
 		directorio = readdir(directorioMaestro);
 		while (directorio){
 			if(strcmp(directorio->d_name, ".") && strcmp(directorio->d_name, "..")){
-				log_info("Carpeta yamafs leída (%s).", directorio->d_name);
+				log_info(logInfo, "Carpeta yamafs leída (%s).", directorio->d_name);
 				generarDistribucionDeBloquesEnNodos(directorio, tablaDeArchivosGlobal);
 			}
 			directorio = readdir(directorioMaestro);
