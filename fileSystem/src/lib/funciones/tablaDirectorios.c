@@ -1174,7 +1174,7 @@ char * generarRutaAPartirDeUnSplit(char ** palabras){
 	return ruta;
 }
 
-void generarSplitApartirDeUnIndice(int index, char ** palabras, int cantidadPalabras){
+char** generarSplitApartirDeUnIndice(int index, char ** palabras, int cantidadPalabras){
 	Tdirectorio * directorio = buscarDirectorioPorIndice(index);
 	Tdirectorio * padre = buscarDirectorioPorIndice(directorio->padre);
 	palabras = realloc(palabras, sizeof(char*) * (cantidadPalabras + 1));
@@ -1182,11 +1182,10 @@ void generarSplitApartirDeUnIndice(int index, char ** palabras, int cantidadPala
 	palabras[cantidadPalabras] = NULL;
 	cantidadPalabras++;
 	if(padre != NULL){
-		generarSplitApartirDeUnIndice(padre->index, palabras, cantidadPalabras);
+		palabras = generarSplitApartirDeUnIndice(padre->index, palabras, cantidadPalabras);
 	}
-	else{
-		return;
-	}
+
+	return palabras;
 }
 
 void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo * estructuraArchivo, char * nombreDirectorioPadre){
@@ -1202,7 +1201,7 @@ void actualizarEnTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal, Tarchivo 
 	TelementoDeTablaArchivoGlobal * nodo;
 	TarchivoDeTablaArchivoGlobal * archivoDeTablaDeArchivosGlobal;
 	int index = atoi(nombreDirectorioPadre);
-	generarSplitApartirDeUnIndice(index, palabras, cantidadPalabras);
+	palabras = generarSplitApartirDeUnIndice(index, palabras, cantidadPalabras);
 	char * nombreDeArchivo = generarRutaAPartirDeUnSplit(palabras);
 	string_append_with_format(&nombreDeArchivo, "%s.%s", estructuraArchivo->nombreArchivoSinExtension, estructuraArchivo->extensionArchivo);
 	puts(nombreDeArchivo);
