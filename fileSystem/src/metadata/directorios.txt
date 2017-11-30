@@ -1,1 +1,4 @@
+2 zeus 0
+1 ala 2
 0 root -1
+3 papa 2
