@@ -54,14 +54,16 @@ TlistaCircular * insertarEnListaCircular(TlistaCircular * listaOriginal ,int ele
 }
 
 void mostrarListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
 	TlistaCircular * punteroAuxiliar = listaCircular;
+	int i = 0;
 	while(punteroAuxiliar->siguiente != listaCircular){
 		printf("Elemento: %d\n", i);
 		printf("Valor: %d\n", punteroAuxiliar->valor);
 		punteroAuxiliar = punteroAuxiliar->siguiente;
 		i++;
 	}
+	printf("Elemento: %d\n", i);
+	printf("Valor: %d\n", punteroAuxiliar->valor);
 }
 
 int bloquesOcupadosDeNodo(Tnodo * nodo){
