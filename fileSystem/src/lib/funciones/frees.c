@@ -110,16 +110,14 @@ void liberarTablaDeArchivosGlobal(t_list * tablaDeArchivosGlobal){
 }
 
 void liberarListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
-	TlistaCircular * punteroAuxiliar = listaCircular;
-	listaCircular = listaCircular->siguiente;
-	int cantidadElementos = cantidadElementosDeListaCircular(listaCircular);
-	while(i < cantidadElementos){
-		free(punteroAuxiliar);
-		punteroAuxiliar = listaCircular;
-		listaCircular = listaCircular->siguiente;
-		i++;
+	TlistaCircular * siguiente = listaCircular->siguiente;
+	TlistaCircular * ultimoElemento = ultimoElementoDeListaCircular(listaCircular);
+	while(listaCircular != ultimoElemento){
+		free(listaCircular);
+		listaCircular = siguiente;
+		siguiente = siguiente->siguiente;
 	}
+	free(listaCircular);
 
 	return;
 }

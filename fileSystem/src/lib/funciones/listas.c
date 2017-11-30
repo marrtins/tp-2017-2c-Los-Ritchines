@@ -1,18 +1,5 @@
 #include "../funcionesFS.h"
 
-void liberarListaCircular(TlistaCircular * listaCircular){
-	int i = 0;
-	TlistaCircular * punteroAuxiliar = listaCircular;
-	while(punteroAuxiliar->siguiente != listaCircular){
-		free(punteroAuxiliar);
-		punteroAuxiliar = listaCircular;
-		listaCircular = listaCircular->siguiente;
-		i++;
-	}
-
-	return;
-}
-
 int cantidadElementosDeListaCircular(TlistaCircular * listaCircular){
 	int i = 0;
 	if(listaCircular == NULL){
