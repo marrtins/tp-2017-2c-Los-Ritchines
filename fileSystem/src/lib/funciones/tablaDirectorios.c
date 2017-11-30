@@ -1235,6 +1235,7 @@ void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * ta
 	string_append(&rutaDirectorio, directorio->d_name);
 	string_append(&rutaDirectorio, "/");
 	directorioMaestro = opendir(rutaDirectorio);
+	log_info(logInfo, "Abrí la carpeta %s.", rutaDirectorio);
 	if (directorioMaestro != NULL){
 		archivo = readdir(directorioMaestro);
 		while (archivo){
@@ -1243,6 +1244,7 @@ void generarDistribucionDeBloquesEnNodos(struct dirent * directorio, t_list * ta
 				rutaArchivo = string_new();
 				string_append(&rutaArchivo, rutaDirectorio);
 				string_append(&rutaArchivo, archivo->d_name);
+				log_info(logInfo, "Archivo %s leído.", rutaArchivo);
 				levantarTablaArchivo(estructuraArchivo, rutaArchivo);
 				actualizarEnTablaDeArchivosGlobal(tablaDeArchivosGlobal, estructuraArchivo, directorio->d_name);
 				liberarTablaDeArchivo(estructuraArchivo);
@@ -1265,10 +1267,12 @@ void mostrarDistribucionDeBloquesEnNodos(){
 	struct dirent * directorio;
 	t_list * tablaDeArchivosGlobal = list_create();
 	directorioMaestro = opendir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/archivos/");
+	log_info(logInfo, "Archivo Maestro abierto.");
 	if (directorioMaestro != NULL){
 		directorio = readdir(directorioMaestro);
 		while (directorio){
 			if(strcmp(directorio->d_name, ".") && strcmp(directorio->d_name, "..")){
+				log_info("Carpeta yamafs leída (%s).", directorio->d_name);
 				generarDistribucionDeBloquesEnNodos(directorio, tablaDeArchivosGlobal);
 			}
 			directorio = readdir(directorioMaestro);
