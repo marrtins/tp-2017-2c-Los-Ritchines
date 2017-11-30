@@ -38,28 +38,11 @@ void enviarBloque(TbloqueAEnviar* bloque, Tarchivo * estructuraArchivoAAlmacenar
 	int estado;
 	head->tipo_de_proceso=FILESYSTEM;
 	head->tipo_de_mensaje=ALMACENAR_BLOQUE;
+	static int indice = 0;
+	Tnodo * nodo1 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos, &indice);
+	Tnodo * nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos, &indice);
 
-	list_sort(listaDeNodos, ordenarSegunBloquesDisponibles);
-	Tnodo * nodo1 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
-	Tnodo * nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
-	if(nodo1 == NULL || nodo2 == NULL){
-		if(nodo1 == NULL){
-			//significa que, todos los nodos estan en 1
-			setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
-			nodo1 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
-			nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
-		}
-		else{
-			//hay uno solo en cero
-			setearDisponibilidadDeEnvioDeNodos(listaDeNodos, 0);
-			nodo1->estadoParaEnviarBloque = 1;
-			nodo2 = (Tnodo*)buscarNodoDiponibleParaEnviar(listaDeNodos);
-		}
-	}
-	else{
-		nodo1->estadoParaEnviarBloque = 1;
-		nodo2->estadoParaEnviarBloque = 2;
-	}
+
 	//Tnodo* nodo1 = (Tnodo*)list_get(listaDeNodos, 0);
 	//Tnodo* nodo2 = (Tnodo*)list_get(listaDeNodos, 1);
 	buffer1 = empaquetarBloque(head,bloque,nodo1);

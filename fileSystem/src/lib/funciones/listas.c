@@ -180,8 +180,36 @@ void vaciarLista(){
 	}
 }
 
-Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos){
-	bool esNodoDisponibleParaEnviar(void * nodo){
+Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos, int *indice){
+	Tnodo* nodo;
+	int indiceAnterior = *indice;
+	if(*indice >= list_size(listaDeNodos)){
+		*indice = 0;
+		while(*indice < list_size(listaDeNodos)){
+			nodo = list_get(listaDeNodos,*indice);
+			if(nodo->cantidadBloquesLibres > 0){
+				(*indice)++;
+				return nodo;
+			}
+		}
+		return NULL;
+	}
+	while(*indice <= list_size(listaDeNodos)){
+		if(*indice >= list_size(listaDeNodos)){
+			*indice = 0;
+		}
+		nodo = list_get(listaDeNodos,*indice);
+		if(nodo->cantidadBloquesLibres > 0){
+			(*indice)++;
+			return nodo;
+		}
+		(*indice)++;
+		if(*indice == indiceAnterior){
+			break;
+		}
+	}
+	return NULL;
+	/*	bool esNodoDisponibleParaEnviar(void * nodo){
 		Tnodo * nodoAEnviar = (Tnodo*) nodo;
 		return nodoAEnviar->estadoParaEnviarBloque == 0 && nodoAEnviar->cantidadBloquesLibres > 0;
 	}
@@ -189,7 +217,7 @@ Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos){
 	if(nodo != NULL){
 		nodo->estadoParaEnviarBloque = 1;
 	}
-	return nodo;
+	return nodo;*/
 }
 
 void setearDisponibilidadDeEnvioDeNodos(t_list * listaDeNodos, int valor){

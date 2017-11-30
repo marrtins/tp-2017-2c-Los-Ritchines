@@ -115,7 +115,7 @@ TinfoNodo * buscarInfoNodoPorNombre(t_list * lista, char * nombre);
 void liberarNodosDeLista(void * nodo);
 void vaciarLista();
 void borrarNodoPorNombre(t_list * lista, char * nombre);
-Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos);
+Tnodo * buscarNodoDiponibleParaEnviar(t_list * listaDeNodos, int* indice);
 Tdirectorio * buscarDirectorioPorIndice(int indice);
 t_list * buscarHijosDeUnDirectorio(Tdirectorio * padre);
 TelementoDeTablaArchivoGlobal * siNoExisteElNodoAgregar(char * nombreNodo, t_list * tablaDeArchivosGlobal);
