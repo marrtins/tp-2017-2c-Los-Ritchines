@@ -164,6 +164,7 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 	TlistaCircular* listaCircular = NULL;
 	TlistaCircular* punteroQueRecorreLaListaConLosElementosQueSeVanRestando = NULL;
 	int i = 0;
+	log_info(logInfo, "Creando lista circular");
 	while(i < list_size(listaDeNodos)){
 		Tnodo* nodo = list_get(listaDeNodos, i);
 		if(nodo->cantidadBloquesLibres > 0) {
@@ -171,15 +172,20 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 		}
 		i++;
 	}
+	log_info(logInfo, "realizando calculo");
 	punteroQueRecorreLaListaConLosElementosQueSeVanRestando = listaCircular;
 	while(cantidadBloquesArchivo > 0 && cantidadElementosDeListaCircular(listaCircular) > 1){
+		mostrarListaCircular(listaCircular);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
 				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
 				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		cantidadBloquesArchivo--;
 	}
+	mostrarListaCircular(listaCircular);
+	log_info(logInfo, "liberando lista circular");
 	liberarListaCircular(listaCircular);
+	log_info(logInfo, "liberada la lista circular");
 	if(cantidadBloquesArchivo == 0){
 		return 1;
 	}
@@ -559,5 +565,18 @@ int existeBloqueEnNodo(int nroBloque, Tnodo* nodo, Tarchivo* tablaArchivo){
 			return 1;
 		}
 	}
+	return 0;
+}
+
+int esBloqueValido(Tarchivo* tablaArchivo, int nroBloque){
+	int cantBloques = cantidadDeBloquesDeUnArchivo(tablaArchivo->tamanioTotal);
+	if(nroBloque < cantBloques)
+		return 1;
+	return 0;
+}
+
+int esCopiaValida(Tbloques bloque, int nroCopia){
+	if(nroCopia < bloque.cantidadCopias)
+		return 1;
 	return 0;
 }

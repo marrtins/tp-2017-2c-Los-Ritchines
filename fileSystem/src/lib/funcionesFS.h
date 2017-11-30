@@ -208,6 +208,8 @@ int pedirBloque(Tarchivo* tablaArchivo,int nroBloque);
 int copiarBloque(Tbuffer* buffer, Tbuffer * destino);
 int enviarBloqueA(TbloqueAEnviar* bloque, char* nombreNodo);
 int getMD5(char* ruta);
+int esBloqueValido(Tarchivo* tablaArchivo, int nroBloque);
+int esCopiaValida(Tbloques bloque, int nroCopia);
 
 
 

@@ -1,7 +1,18 @@
-TAMANIO=50
+<<<<<<< HEAD
+Nodo3Libre=127
+TAMANIO=320
+NODOS=[Nodo1,Nodo2,Nodo3]
+Nodo3Total=150
+Nodo1Libre=57
+Nodo2Libre=68
+Nodo1Total=80
+LIBRE=252
+=======
+TAMANIO=170
 NODOS=[Nodo1,Nodo2]
-LIBRE=15
-Nodo1Total=20
-Nodo1Libre=5
-Nodo2Total=30
-Nodo2Libre=10
+Nodo1Libre=12
+Nodo2Libre=22
+Nodo1Total=80
+LIBRE=34
+>>>>>>> 49ff2fb3b76414a87637fca9d64f88a0934b275d
+Nodo2Total=90
