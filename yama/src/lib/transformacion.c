@@ -23,7 +23,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	nuevoJob->nroJob=idJobGlobal;
 	nuevoJob->masterId=idMasterGlobal;
 	printf("Id del nuevo job: %d, master id:%d, fdMaster :%d \n",idJobGlobal,idMasterGlobal,sockMaster);
-	log_info(logInfo,"Id del nuevo job: %d, master id:%d, fdMaster :%d \n",idJobGlobal,idMasterGlobal,sockMaster);
+	log_info(logInfo,"Id del nuevo job: %d, master id:%d, fdMaster :%d ",idJobGlobal,idMasterGlobal,sockMaster);
 	char * pathResultado = recibirPathArchivo(sockMaster);
 	nuevoJob->pathResultado=pathResultado;
 
@@ -35,7 +35,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 	char * pathArchivoAReducir;
 	if(stat>0 && head.tipo_de_mensaje==PATH_FILE_TOREDUCE){
 
-		log_info(logInfo,"llega path file to reduce del job :%d. ID master: %d\n",nuevoJob->nroJob,nuevoJob->masterId);
+		log_info(logInfo,"llega path file to reduce del job :%d. ID master: %d",nuevoJob->nroJob,nuevoJob->masterId);
 		pathArchivoAReducir  = recibirPathArchivo(sockMaster);
 		log_info(logInfo,"patha rch a red %s",pathArchivoAReducir);
 	}
@@ -69,7 +69,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 		TinfoNodosFSYama *infoNodos;
 		TinfoArchivoFSYama *infoArchivo;
 	stat = recv(socketFS, &head, sizeof(Theader), 0);
-	log_info(logInfo,"stat redv foscket fs %d \n",stat);
+	log_info(logInfo,"stat redv foscket fs %d ",stat);
 	switch(head.tipo_de_mensaje){
 		case ARCH_NO_VALIDO:
 			puts("El archivo no es valido");
@@ -110,7 +110,7 @@ void iniciarNuevoJob(int sockMaster,int socketFS){
 			int i;
 			for(i=0;i<infoArchivo->listaSize;i++){
 				TpackageUbicacionBloques *bloqueAux = list_get((infoArchivo->listaBloques),i);
-				log_info(logInfo,"bloque %d ; nodoc1 %s ;bloquec1 %d;nodoc2 %s;bloquec2 %d;finbloque %d\n",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->bloqueC1,bloqueAux->nombreNodoC2, bloqueAux->bloqueC2,bloqueAux->finBloque);
+				log_info(logInfo,"bloque %d ; nodoc1 %s ;bloquec1 %d;nodoc2 %s;bloquec2 %d;finbloque %d",bloqueAux->bloque,bloqueAux->nombreNodoC1,bloqueAux->bloqueC1,bloqueAux->nombreNodoC2, bloqueAux->bloqueC2,bloqueAux->finBloque);
 			}
 			for(i=0;i<infoNodos->listaSize;i++){
 				TpackageInfoNodo *nodoAux=list_get((infoNodos->listaNodos),i);
@@ -199,7 +199,7 @@ int responderTransformacion(TjobMaster *job,int socketFS){
 	char * buffer;
 	bool mostrarTabla = false;
 
-	log_info(logInfo,"Cantidad de paquetes con info de bloques a enviar: %d\n",list_size(listaBloquesPlanificados));
+	log_info(logInfo,"Cantidad de paquetes con info de bloques a enviar: %d",list_size(listaBloquesPlanificados));
 	for (i=0;i<list_size(listaBloquesPlanificados);i++){
 		if(i+1<list_size(listaBloquesPlanificados)){
 			head.tipo_de_mensaje=INFOBLOQUE;
@@ -215,13 +215,13 @@ int responderTransformacion(TjobMaster *job,int socketFS){
 
 		buffer=serializeInfoBloque(head,bloqueAEnviar,&packSize);
 
-		log_info(logInfo,"Info del bloque %d serializado, enviamos\n",bloqueAEnviar->bloqueDelArchivo);
+		log_info(logInfo,"Info del bloque %d serializado, enviamos",bloqueAEnviar->bloqueDelArchivo);
 
 		if ((stat = send(sockMaster, buffer, packSize, 0)) == -1){
 			puts("no se pudo enviar info del bloque. ");
 			return  FALLO_SEND;
 		}
-		log_info(logInfo,"se enviaron %d bytes de la info del bloque\n",stat);
+		log_info(logInfo,"se enviaron %d bytes de la info del bloque",stat);
 		free(buffer);
 		agregarTransformacionAListaEnProceso(job,bloqueAEnviar,mostrarTabla);
 

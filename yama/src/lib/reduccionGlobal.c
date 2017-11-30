@@ -164,8 +164,9 @@ int comenzarReduccionGlobal(int idTareaFinalizada,int sockMaster){
 
 	agregarReduccionGlobalAListaEnProceso(nuevaReduccion,bloquesReducidos,job);
 
-	int cargaWorker = divideYRedondea(list_size(job->listaNodosArchivo),2);
-	log_info(logInfo,"sumo carga de la rg: %d",cargaWorker);
+	//int cargaWorker = divideYRedondea(list_size(job->listaNodosArchivo),2);
+	int cargaWorker = getCargaReduccionGlobal(job->nroJob);
+	log_info(logInfo,"\n\nsumo carga de la rg: %d a %s\n\n",cargaWorker,getNodoElegido(listaInformacionNodos));
 	actualizarCargaWorkerEn(getNodoElegido(listaInformacionNodos),cargaWorker);
 	aumentarHistoricoEn(getNodoElegido(listaInformacionNodos),cargaWorker);
 	mostrarTablaCargas();

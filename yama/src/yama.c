@@ -107,11 +107,11 @@ int main(int argc, char* argv[]){
 		for(fileDescriptor = 3; fileDescriptor <= fileDescriptorMax; fileDescriptor++){
 
 			if(FD_ISSET(fileDescriptor, &readFD)){
-				log_info(logInfo,"Hay un file descriptor listo. El id es: %d\n", fileDescriptor);
+				log_info(logInfo,"Hay un file descriptor listo. El id es: %d", fileDescriptor);
 
 				if(fileDescriptor == socketDeEscuchaMaster){
 					nuevoFileDescriptor = conectarNuevoCliente(fileDescriptor, &masterFD);
-					log_info(logInfo,"Nuevo nodo conectado: %d\n", nuevoFileDescriptor);
+					log_info(logInfo,"Nuevo cliente conectado: %d", nuevoFileDescriptor);
 					fileDescriptorMax = MAXIMO(nuevoFileDescriptor, fileDescriptorMax);
 					log_info(logInfo,"El FILEDESCRIPTORMAX es %d", fileDescriptorMax);
 					break;
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]){
 					switch(head->tipo_de_mensaje){
 					//no tendria q entrar aca x ahora..
 					default:
-						log_trace(logError, "Tipo de mensaje no encontrado en el protocolo.");
+						//log_trace(logError, "Tipo de mensaje no encontrado en el protocolo.");
 						log_info(logInfo,"Tipo de mensaje no encontrado en el protocolo.");
 						break;
 					}

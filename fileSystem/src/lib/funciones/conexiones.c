@@ -293,10 +293,12 @@ void verificarSiEsEstable() {
 		if (esEstadoRecuperado) {
 			if(todosLosArchivosSePuedenLevantar()){
 				sem_post(&yama);
+				puts("FileSystem estable");
 				log_info(logInfo,"FILESYSTEM ESTABLE");
 			}
 		} else {
 			sem_post(&yama);
+			puts("FileSystem estable");
 			log_info(logInfo,"FILESYSTEM ESTABLE");
 		}
 	}
