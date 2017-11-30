@@ -111,11 +111,13 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 	head.tipo_de_proceso=FILESYSTEM;
 	head.tipo_de_mensaje=INFO_NODO;
 	t_list * listaNodos;
+	log_info(logInfo,"en enviar info n a y");
+
 
 	nodos = obtenerNodosDeUnArchivo(archivo);
-
+	log_info(logInfo,"pase obtener nodos de un archivo");
 	listaNodos = generarListaInfoNodos(nodos);
-
+	log_info(logInfo,"pase generar lista info nodos");
 	TinfoNodosFSYama *infoNodos = malloc(sizeof(TinfoNodosFSYama));
 	infoNodos->listaSize=list_size(listaNodos);
 	infoNodos->listaNodos=listaNodos;
@@ -126,13 +128,14 @@ void enviarInfoNodoAYama(int socketYama, Tarchivo * archivo){
 		logErrorAndExit("Fallo al enviar la informacion de un archivo");
 	}
 
-
+	log_info(logInfo,"puts ennvie info nodos");
 	liberarPunteroDePunterosAChar(nodos);
 	free(nodos);
 	list_destroy_and_destroy_elements(listaNodos,liberarTPackageInfoNodo);
 	//list_destroy_and_destroy_elements(infoNodos->listaNodos, liberarTPackageInfoNodo);
 	free(infoNodos);
 	free(buffer);
+	log_info(logInfo,"pase frees enviar info nodo");
 
 }
 
