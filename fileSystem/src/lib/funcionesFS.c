@@ -164,6 +164,7 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 	TlistaCircular* listaCircular = NULL;
 	TlistaCircular* punteroQueRecorreLaListaConLosElementosQueSeVanRestando = NULL;
 	int i = 0;
+	log_info(logInfo, "Creando lista circular");
 	while(i < list_size(listaDeNodos)){
 		Tnodo* nodo = list_get(listaDeNodos, i);
 		if(nodo->cantidadBloquesLibres > 0) {
@@ -171,6 +172,7 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 		}
 		i++;
 	}
+	log_info(logInfo, "realizando calculo");
 	punteroQueRecorreLaListaConLosElementosQueSeVanRestando = listaCircular;
 	while(cantidadBloquesArchivo > 0 && cantidadElementosDeListaCircular(listaCircular) > 1){
 		punteroQueRecorreLaListaConLosElementosQueSeVanRestando =
@@ -179,7 +181,9 @@ int verificarDisponibilidadDeEspacioEnNodos(int cantidadBloquesArchivo){
 				restarEnLaListaCircular(&listaCircular, punteroQueRecorreLaListaConLosElementosQueSeVanRestando);
 		cantidadBloquesArchivo--;
 	}
+	log_info(logInfo, "liberando lista circular");
 	liberarListaCircular(listaCircular);
+	log_info(logInfo, "liberada la lista circular");
 	if(cantidadBloquesArchivo == 0){
 		return 1;
 	}
