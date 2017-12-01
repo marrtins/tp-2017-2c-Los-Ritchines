@@ -298,20 +298,21 @@ void leerArchivoComoTextoPlano(char * rutaLocal){
 	char * extension = obtenerExtensionDeUnArchivo(nombreArchivoConExtension);
 	char * rutaTmp = string_new();
 	Tarchivo * archivo = malloc(sizeof(Tarchivo));
-
+	int stat;
 	levantarTablaArchivo(archivo,rutaLocal);
 	mkdir("/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/", 0777);
 	string_append(&rutaTmp, "/home/utnso/tp-2017-2c-Los-Ritchines/fileSystem/src/metadata/tmp/");
 	string_append(&rutaTmp, nombreArchivoConExtension);
-	levantarArchivo(archivo,rutaTmp);
-	if(strcmp(extension, "csv") == 0){
-		mostrarCsv(rutaTmp);
-	}else{
-		mostrarBinario(rutaTmp);
+	stat = levantarArchivo(archivo,rutaTmp);
+	if(stat !=-1){
+		if(strcmp(extension, "csv") == 0){
+			mostrarCsv(rutaTmp);
+		}else{
+			mostrarBinario(rutaTmp);
+		}
+		liberarTablaDeArchivo(archivo);
 	}
-
 	remove(rutaTmp);
-	liberarTablaDeArchivo(archivo);
 	free(nombreArchivoConExtension);
 	free(extension);
 	free(rutaTmp);
