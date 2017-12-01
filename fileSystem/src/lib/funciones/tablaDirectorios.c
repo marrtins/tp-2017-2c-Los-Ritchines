@@ -288,6 +288,8 @@ void mostrarBinario(char * rutaLocal){
 		}
 	}
 	puts("Finalizado, archivo leido.");
+	munmap(archivoMapeado,tamanio);
+
 	close(fd);
 }
 
