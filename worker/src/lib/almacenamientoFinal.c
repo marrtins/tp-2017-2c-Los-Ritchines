@@ -97,7 +97,7 @@ int realizarAlmacenamientoFinal(client_sock){
 
 	}
 
-	munmap(archivoFinalMapeado, infoAlmacenado->nombreTempReduccionLen);
+	munmap(archivoFinalMapeado, tamanioArchivoFinal);
 	log_info(logInfo,"mande a fs ");
 	close(fileDescriptorArchivoFinal);
 	fclose(archivoFinal);

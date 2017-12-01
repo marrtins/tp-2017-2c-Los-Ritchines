@@ -199,8 +199,19 @@ int conectarseAWorkerParaReplanificarTransformacion(TpackInfoBloque *infoBloque,
 	atributos->infoBloque.tamanioPuerto = infoBloque->tamanioPuerto;
 	atributos->sockYama=sockYama;
 
-	crearHilo(&workerThread, (void*)hiloWorkerTransformacion, (void*)atributos);
+	//crearHilo(&workerThread, (void*)hiloWorkerTransformacion, (void*)atributos);
 
+
+	pthread_attr_t attr_ondemand;
+	pthread_attr_init(&attr_ondemand);
+	pthread_attr_setdetachstate(&attr_ondemand, PTHREAD_CREATE_DETACHED);
+
+	//pthread_t workerThread;
+	if( pthread_create(&workerThread, &attr_ondemand, (void*) hiloWorkerTransformacion, (void*) atributos) < 0){
+		//log_error(logTrace,"no pudo creasr hilo");
+		perror("no pudo crear hilo. error");
+		return FALLO_GRAL;
+	}
 	return 0;
 }
 

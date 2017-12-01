@@ -206,6 +206,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	}
 
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+		munmap(archivoMapeado, tamanio);
 		logErrorAndExit("Error al hacer mmap del archivo a copiar.");
 	}
 
@@ -219,6 +220,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		log_error(logError, "Los nodos no están conectados, error en realizar la operación de almacenar en yamafs.");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		//free(archivoAAlmacenar->bloques);
+		munmap(archivoMapeado, tamanio);
 		return -1;
 	}
 
@@ -227,6 +229,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 		log_error(logError, "No hay suficiente espacio en los datanodes, intente con un archivo más chico");
 		liberarEstructuraBloquesAEnviar(infoBloque);
 		//free(archivoAAlmacenar->bloques);
+		munmap(archivoMapeado, tamanio);
 		return -1;
 	}
 	if(strcmp(archivoAAlmacenar->extensionArchivo, "csv") == 0){
@@ -235,7 +238,7 @@ int procesarArchivoSegunExtension(Tarchivo * archivoAAlmacenar, char * nombreArc
 	else{
 		procesarArchivoBinario(archivoAAlmacenar, archivoMapeado, infoBloque);
 	}
-
+	munmap(archivoMapeado, tamanio);
 	liberarEstructuraBloquesAEnviar(infoBloque);
 	return 1;
 }

@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 			if(stat <0 ){
 				puts("error conectarse workers transformacion");
 			}
-			//list_destroy_and_destroy_elements(bloquesTransformacion,limpiarBloquesTransf);
+
 
 
 			break;
@@ -260,6 +260,7 @@ int main(int argc, char* argv[]) {
 		}
 
 	}
+	list_destroy_and_destroy_elements(bloquesTransformacion,limpiarBloquesTransf);
 	puts("fin conexion con yama");
 	log_info(logInfo,"fin conexcion c yama");
 	free(head);
