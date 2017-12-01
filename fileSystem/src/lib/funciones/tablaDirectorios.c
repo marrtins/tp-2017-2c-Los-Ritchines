@@ -238,6 +238,7 @@ void mostrarCsv(char * rutaLocal){
 	if ((archivoMapeado = mmap(NULL, tamanio, PROT_READ, MAP_SHARED,	fd, 0)) == MAP_FAILED) {
 		log_error(logError, "No se pudo abrir el archivo csv.");
 		puts("No se pudo abrir el archivo especificado csv.");
+		munmap(archivoMapeado,tamanio);
 		return;
 	}
 	fclose(archivo);
@@ -256,6 +257,7 @@ void mostrarCsv(char * rutaLocal){
 	}
 	puts("Finalizado, archivo leído.");
 	close(fd);
+	munmap(archivoMapeado,tamanio);
 }
 
 void mostrarBinario(char * rutaLocal){
