@@ -407,6 +407,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		if(nodosDisponiblesParaBloqueDeArchivo(tablaArchivo, nroBloque) == 0){
 			puts("No se encuentran los nodos con las copias del bloque");
 			log_error(logError, "No se encontraron los nodos con las copias del bloque.");
+			munmap(archivoMapeado,tablaArchivo->tamanioTotal);
 			return -1;
 		}
 
@@ -419,6 +420,7 @@ int levantarArchivo(Tarchivo * tablaArchivo, char * ruta){
 		free(mensajePeticionBloque);
 		if(pedirBloque(tablaArchivo, nroBloque) == -1){
 			log_error(logError,"Error al levantar archivo.");
+			munmap(archivoMapeado,tablaArchivo->tamanioTotal);
 			return -1;
 		}
 
